@@ -86,7 +86,7 @@ src/
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22+
 - Yarn or npm
 
 ### Installation

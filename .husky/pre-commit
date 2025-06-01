@@ -1,7 +1,8 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
 
+npx tsc --noEmit
+echo "🧪 Ejecutando tests..."
+npm test -- --bail --findRelatedTests
+echo "🧪 Ejecutando linter..."
 npx lint-staged
-
-echo "🧪 Ejecutando tests y comprobando cobertura..."
-npm run test:coverage

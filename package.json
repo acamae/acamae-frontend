@@ -24,6 +24,8 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@eslint/js": "^8.56.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -96,6 +98,7 @@
     "test:e2e:open": "cypress open",
     "test:e2e:prod": "NODE_ENV=production cypress run",
     "test:e2e:prod:open": "NODE_ENV=production cypress open",
+    "type-check": "tsc --noEmit",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --max-warnings 0",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css,scss}\"",
