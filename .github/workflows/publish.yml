@@ -32,8 +32,7 @@ jobs:
         run: npm test
         working-directory: ./
 
-      # TODO: Add publish with Lerna
-      # - name: Lerna publish
-      #   run: npx lerna publish from-package --yes
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Lerna publish
+        run: npx lerna publish from-package --yes
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

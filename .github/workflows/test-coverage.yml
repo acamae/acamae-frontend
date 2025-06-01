@@ -23,22 +23,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install frontend dependencies
-        working-directory: ./
-        run: npm ci
-
-      - name: Listar contenido de Forms (debug)
-        run: ls -l src/ui/components/Forms
-        working-directory: ./
-
-      - name: Listar contenido de components (debug)
-        run: ls -l src/ui/components
-        working-directory: ./
-
-      - name: Mostrar rootDir de Jest (debug)
-        run: echo "rootDir en jest.config.js:" && grep rootDir jest.config.js || echo "No se encontró rootDir explícito"
-        working-directory: ./
-
       - name: Run tests with coverage and check threshold (continue-on-error)
         working-directory: ./
         run: npm run test:coverage
