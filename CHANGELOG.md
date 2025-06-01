@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.1](https://github.com/alfonsomartinde/emanager.com-frontend/compare/v0.3.0...v0.3.1) (2025-06-01)
+
+### Bug Fixes
+
+- **husky:** Lighthouse job has been simplified ([58a7937](https://github.com/alfonsomartinde/emanager.com-frontend/commit/58a7937e18341243a89be9becbc2ad00ac20a66c))
+
+## [0.3.1](https://github.com/alfonsomartinde/emanager.com-frontend/compare/v0.3.0...v0.3.1) (2025-06-01)
+
+### Bug Fixes
+
+- **husky:** Lighthouse job has been simplified ([58a7937](https://github.com/alfonsomartinde/emanager.com-frontend/commit/58a7937e18341243a89be9becbc2ad00ac20a66c))
+
 # 0.3.0 (2025-06-01)
 
 ### Bug Fixes
