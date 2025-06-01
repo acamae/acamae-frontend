@@ -156,6 +156,29 @@ npm run update:snapshots
 - Snapshots: Update only after review (`npm run update:snapshots`)
 - Profiling: Use Jest and Node.js profiling for performance bottlenecks
 
+### Quality Automation: GitHub Actions, Husky, and Pre-commit
+
+#### GitHub Actions
+
+- **CI general (`ci.yml`)**: Se ejecuta en todas las ramas y PRs. Valida el código con linter (auto-fix y estricto), build, tests unitarios y cobertura. Sube los reportes de cobertura como artefacto.
+- **Release & Lighthouse (`publish-and-lighthouse.yml`)**: Solo en `main`. Versiona y publica automáticamente con Lerna usando Conventional Commits, sube el paquete a GitHub Packages y audita el build con Lighthouse CI. Los resultados de Lighthouse se suben como artefacto y no bloquean el flujo de publicación.
+
+#### Husky + lint-staged
+
+- **Pre-commit**:
+  - Salta automáticamente en commits de versionado de Lerna (detectando `[skip ci]` en el mensaje).
+  - Chequeo de tipos con TypeScript (`tsc --noEmit`).
+  - Ejecuta tests unitarios solo en los archivos staged relevantes.
+  - Linter y formateo automático en los archivos staged mediante lint-staged (ESLint y Prettier).
+  - Si queda algún error tras el auto-fix, el commit es bloqueado.
+- **Commit-msg**: Valida que todos los mensajes de commit sigan el estándar Conventional Commits usando commitlint.
+
+#### Other best practices
+
+- `.gitattributes` and `.prettierrc` enforce LF line endings to avoid cross-platform issues.
+- Workflows are separated for clarity and efficiency.
+- Main branch protection: only publishes and audits on `main` after all quality checks pass.
+
 ---
 
 ## Docker & Deployment
