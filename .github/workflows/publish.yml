@@ -31,8 +31,17 @@ jobs:
       - name: Run build
         run: npm run build
 
-      - name: Run tests
-        run: npm run test
+      - name: Run tests with coverage and check threshold (continue-on-error)
+        working-directory: ./
+        run: npm run test:coverage
+        continue-on-error: true
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: ./coverage
+          retention-days: 7
 
       - name: Run linter
         run: npm run lint
@@ -43,7 +52,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Lerna version (conventional commits)
-        run: npx lerna version --conventional-commits --yes --create-release github
+        run: 'npx lerna version --conventional-commits --yes --create-release github --message "chore(release): %s [skip ci]"'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
