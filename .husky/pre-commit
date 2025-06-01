@@ -1,8 +1,19 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
+# Skip tests for Lerna version commits
+if git log -1 --pretty=%B | grep -q '\[skip ci\]'; then
+  echo "⏩ Pre-commit hook skipped for Lerna version commit."
+  exit 0
+fi
+
 npx tsc --noEmit
-echo "🧪 Ejecutando tests..."
-npm test -- --bail --findRelatedTests
+
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|jsx|ts|tsx)$' | tr '\n' ' ')
+if [ -n "$STAGED_FILES" ]; then
+  echo "🧪 Ejecutando tests..."
+  npx jest --bail --findRelatedTests $STAGED_FILES
+fi
+
 echo "🧪 Ejecutando linter..."
 npx lint-staged
