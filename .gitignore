@@ -1,0 +1,45 @@
+# Dependencies (node_modules)
+node_modules/
+
+# Webpack generated files (dist)
+dist/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Docker temporary files
+*.dockerignore
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Docker volumes and persistent data folders
+docker/volumes/
+
+# Jest coverage files
+coverage/
+
+# Environment variables
+**/.env.local
+**/.env.*.local
+
+# IDEs (IntelliJ IDEA, Visual Studio Code, etc.)
+.idea/
+.vscode/
+.cursor/
+*.iml
+
+# Other temporary files
+*.swp
+*.zip
+*.rar
+*.txt
+*~
+
+# Exclude local SSL configuration files
+docker/ssl/*.crt
+docker/ssl/*.key
+docker/ssl/*.pem

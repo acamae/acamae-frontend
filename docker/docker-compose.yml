@@ -1,0 +1,27 @@
+services:
+  frontend:
+    build:
+      context: ../
+    stdin_open: true
+    tty: true
+    env_file:
+      - ../.env.development
+    command: npm start
+    expose:
+      - '3000'
+    volumes:
+      - ../:/app
+      # - ../node_modules:/app/node_modules
+
+  nginx:
+    build:
+      context: ./nginx
+    container_name: emanager.com-nginx
+    ports:
+      - '443:443'
+      - '80:80'
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend

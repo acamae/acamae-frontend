@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PublicHeader snapshot: renderizado de PublicHeader 1`] = `
+<DocumentFragment>
+  <nav
+    class="navbar navbar-expand-lg navbar-dark bg-dark px-3"
+  >
+    <a
+      class="navbar-brand"
+      data-discover="true"
+      data-testid="link-home"
+      href="/"
+    >
+      Gestión eSports
+    </a>
+    <div
+      class="ms-auto d-flex align-items-center gap-3"
+    >
+      <div
+        data-testid="mock-language-selector"
+      />
+      <a
+        class="btn btn-outline-light btn-sm"
+        data-discover="true"
+        data-testid="link-login-nav"
+        href="/login"
+      >
+        Iniciar sesión
+      </a>
+      <a
+        class="btn btn-primary btn-sm"
+        data-discover="true"
+        data-testid="link-register"
+        href="/register"
+      >
+        Registrarse
+      </a>
+    </div>
+  </nav>
+</DocumentFragment>
+`;

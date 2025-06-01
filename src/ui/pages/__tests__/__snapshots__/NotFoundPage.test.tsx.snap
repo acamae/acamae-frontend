@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NotFoundPage snapshot render 1`] = `
+<DocumentFragment>
+  <div
+    class="text-center mt-5 container"
+    data-testid="not-found-page"
+  >
+    <h1
+      class="display-4"
+      data-testid="not-found-title"
+    >
+      Página no encontrada
+    </h1>
+    <p
+      class="lead"
+      data-testid="not-found-message"
+    >
+      La ruta que intentas acceder no existe.
+    </p>
+    <a
+      class="btn btn-primary mt-3"
+      data-discover="true"
+      data-testid="link-back-home"
+      href="/"
+    >
+      Volver al inicio
+    </a>
+  </div>
+</DocumentFragment>
+`;

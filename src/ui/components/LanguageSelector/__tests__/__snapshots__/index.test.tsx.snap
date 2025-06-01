@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LanguageSelector snapshot: render of the selector 1`] = `
+<DocumentFragment>
+  <div
+    class="d-flex align-items-center language-picker"
+  >
+    <form
+      class="language-picker__form"
+      data-testid="language-selector"
+    >
+      <div
+        class="language-picker__group"
+      >
+        <label
+          class="visually-hidden language-picker__label form-label"
+          data-testid="lang-select-label"
+          for="language-picker-select"
+        >
+          language.selector_label
+        </label>
+        <select
+          aria-label="language.selector_label"
+          class="language-picker__select form-select"
+          data-testid="language-picker-select"
+          id="language-picker-select"
+          name="language-picker-select"
+        >
+          <option
+            data-testid="language-picker__option_es-ES"
+            value="es-ES"
+          >
+            language.es-ES
+          </option>
+          <option
+            data-testid="language-picker__option_en-GB"
+            value="en-GB"
+          >
+            language.en-GB
+          </option>
+        </select>
+        <span
+          class="visually-hidden"
+          id="language-selector-desc"
+        >
+          language.selector_hint
+        </span>
+        <div
+          aria-atomic="true"
+          aria-live="polite"
+          class="visually-hidden"
+        >
+          language.changed
+        </div>
+        <button
+          aria-controls="language-picker-dropdown"
+          aria-expanded="false"
+          aria-label="English, Select your language"
+          class="visually-hidden language-picker__button btn btn-primary"
+          type="submit"
+        >
+          <span
+            aria-hidden="true"
+            class="language-picker__flag language-picker__flag--english"
+          />
+        </button>
+      </div>
+    </form>
+  </div>
+</DocumentFragment>
+`;

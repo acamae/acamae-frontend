@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ResendVerificationForm snapshot render 1`] = `
+<DocumentFragment>
+  <form
+    class=""
+  >
+    <div
+      class="mb-3"
+    >
+      <label
+        class="form-label"
+        for="identifier"
+      >
+        Correo electrónico o nombre de usuario
+      </label>
+      <input
+        class="form-control"
+        data-testid="input-email-username"
+        id="identifier"
+        required=""
+        type="text"
+        value=""
+      />
+    </div>
+    <div
+      class="d-grid"
+    >
+      <button
+        class="btn btn-primary"
+        data-testid="btn-resend-verification"
+        type="submit"
+      >
+        Reenviar verificación
+      </button>
+    </div>
+  </form>
+</DocumentFragment>
+`;

@@ -1,0 +1,159 @@
+{
+  "home": {
+    "title": "Welcome to eSports Management",
+    "description": "Manage your eSports teams with security and ease",
+    "welcome_message": "Welcome to eSports Management"
+  },
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "button": "Login",
+    "accessing": "Accessing...",
+    "forgot": "Forgot your password?",
+    "remember": "Keep me logged in",
+    "email_help": "Enter your registered email address.",
+    "password_help": "Minimum 8 characters, at least one uppercase letter, one lowercase letter and one number.",
+    "toggle_password": "Show/hide password",
+    "failed": "Login failed",
+    "success": "Login successful",
+    "welcome": "Welcome back!"
+  },
+  "forgot": {
+    "title": "Recover Password",
+    "email": "Email",
+    "email_help": "Enter the email address associated with your account.",
+    "submit": "Send Recovery Link",
+    "sending": "Sending...",
+    "success": "If your email exists in our system, you will receive a password reset link."
+  },
+  "register": {
+    "title": "Create account",
+    "username": "Username",
+    "username_help": "3-32 characters, no accents or special symbols.",
+    "email": "Email",
+    "email_help": "Required to confirm your account and recover password.",
+    "password": "Password",
+    "password_help": "Minimum 8 characters, at least one uppercase letter, one lowercase letter and one number.",
+    "confirm_password": "Confirm password",
+    "confirm_password_help": "Type the same password to verify.",
+    "button": "Register",
+    "processing": "Registering...",
+    "message": "Don't have an account yet?",
+    "toggle_password": "Show/hide password",
+    "strength": {
+      "weak": "Weak",
+      "fair": "Fair",
+      "good": "Good",
+      "strong": "Strong",
+      "very_strong": "Very strong"
+    }
+  },
+  "sessionTimeout": {
+    "title": "Session about to expire",
+    "body": "Your session will expire in <1>{{seconds}}</1> seconds.",
+    "question": "Do you want to stay connected?",
+    "logout": "Log out",
+    "stayConnected": "Stay connected"
+  },
+  "errors": {
+    "username": {
+      "invalid": "Username must be between 3 and 32 characters.",
+      "taken": "Username is already taken.",
+      "required": "Please enter a valid username."
+    },
+    "email": {
+      "invalid": "Please enter a valid email.",
+      "exists": "That email is already registered.",
+      "required": "Please enter a valid email.",
+      "not_found": "That email is not registered."
+    },
+    "password": {
+      "invalid": "Password must have at least 8 characters, one uppercase letter, one lowercase letter and one number.",
+      "mismatch": "Passwords do not match.",
+      "required": "Please enter a password.",
+      "confirm_required": "Please confirm your password.",
+      "reset": "Error resetting password.",
+      "reset_request": "Could not process request. Please try again later."
+    },
+    "recaptcha": "Error verifying reCAPTCHA.",
+    "session": {
+      "start": "Could not start session.",
+      "expired": "Your session has expired. Please log in again.",
+      "checking": "Checking session...",
+      "required": "You must be logged in to continue."
+    },
+    "unknown": "An unexpected error occurred."
+  },
+  "session": {
+    "checking": "Checking session..."
+  },
+  "email": {
+    "verification_sent": "We've sent you an email to verify your account.",
+    "verification_success": "Your email has been verified successfully.",
+    "verification_expired": "The link has expired. Request a new one.",
+    "verification_repeat": "This email was already verified.",
+    "resend": "Resend verification link",
+    "resend_success": "New link sent. Check your inbox."
+  },
+  "verification": {
+    "success": {
+      "title": "Your account has been verified!",
+      "message": "You can now log in to the platform.",
+      "login": "Go to login"
+    },
+    "expired": {
+      "title": "Verification link expired",
+      "message": "The verification link has expired. Please request a new one.",
+      "resend": "Resend verification"
+    },
+    "already": {
+      "title": "Already verified",
+      "message": "This email was already verified."
+    },
+    "sent": {
+      "title": "Verification email sent",
+      "message": "We've sent you an email with a link to verify your account."
+    },
+    "resend": {
+      "title": "Resend verification email",
+      "label": "Email or username",
+      "button": "Resend verification",
+      "loading": "Sending...",
+      "success": "Verification email sent. Please check your inbox."
+    }
+  },
+  "reset": {
+    "title": "Reset password",
+    "email_sent": "If your email exists, you will receive a password reset email.",
+    "success": "Password updated. Redirecting...",
+    "password": "New password",
+    "confirm_password": "Confirm new password",
+    "submit": "Update password",
+    "saving": "Updating...",
+    "invalid_token": "The reset link is invalid or has expired."
+  },
+  "not_found": {
+    "title": "Page not found",
+    "message": "The page you are looking for does not exist."
+  },
+  "dashboard": {
+    "title": "User dashboard"
+  },
+  "language": {
+    "label": "Language selector",
+    "es-ES": "Spanish",
+    "en-GB": "English"
+  },
+  "nav": {
+    "login": "Login",
+    "register": "Register",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "teams": "Teams",
+    "logout": "Logout"
+  },
+  "app": {
+    "name": "eSports Management"
+  }
+}

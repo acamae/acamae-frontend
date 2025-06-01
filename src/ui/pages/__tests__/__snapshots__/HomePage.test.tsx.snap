@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HomePage snapshot render 1`] = `
+<DocumentFragment>
+  <div
+    class="py-5 container"
+    data-testid="home-page"
+  >
+    <div
+      class="justify-content-center row"
+    >
+      <div
+        class="col-xl-5 col-lg-6 col-md-8 col-12"
+      >
+        <div
+          class="card"
+        >
+          <div
+            class="text-center card-header"
+          >
+            <h2
+              class="mb-4 text-center"
+              data-testid="home-title"
+            >
+              Bienvenido a Gestión eSports
+            </h2>
+            <p
+              class="text-center mb-4"
+              data-testid="home-description"
+            >
+              Gestiona tus equipos de eSports con seguridad y facilidad
+            </p>
+          </div>
+          <div
+            class="card-body"
+          >
+            <div
+              data-testid="mock-login-form"
+            >
+              Mocked Login Form
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

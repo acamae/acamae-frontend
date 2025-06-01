@@ -1,0 +1,161 @@
+{
+  "home": {
+    "title": "Bienvenido a Gestión eSports",
+    "description": "Gestiona tus equipos de eSports con seguridad y facilidad",
+    "welcome_message": "Bienvenido a Gestión eSports"
+  },
+  "login": {
+    "title": "Iniciar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "button": "Acceder",
+    "accessing": "Accediendo...",
+    "forgot": "¿Olvidaste tu contraseña?",
+    "remember": "Mantener sesión iniciada",
+    "email_help": "Introduce tu correo electrónico registrado.",
+    "password_help": "Mínimo 8 caracteres, al menos una letra mayúscula, una minúscula y un número.",
+    "toggle_password": "Mostrar/ocultar contraseña",
+    "failed": "Error al iniciar sesión",
+    "success": "Sesión iniciada correctamente",
+    "welcome": "¡Bienvenido de nuevo!"
+  },
+  "forgot": {
+    "title": "Recuperar contraseña",
+    "email": "Correo electrónico",
+    "email_help": "Introduce el correo electrónico asociado a tu cuenta.",
+    "submit": "Enviar enlace de recuperación",
+    "sending": "Enviando...",
+    "success": "Si tu correo existe en nuestro sistema, recibirás un enlace para restablecer tu contraseña."
+  },
+  "register": {
+    "title": "Crear cuenta",
+    "username": "Nombre de usuario",
+    "username_help": "3-32 caracteres, sin acentos ni símbolos especiales.",
+    "email": "Correo electrónico",
+    "email_help": "Necesario para confirmar tu cuenta y recuperar la contraseña.",
+    "password": "Contraseña",
+    "password_help": "Mínimo 8 caracteres, al menos una letra mayúscula, una minúscula y un número.",
+    "confirm_password": "Confirmar contraseña",
+    "confirm_password_help": "Escribe la misma contraseña para verificar.",
+    "button": "Registrarse",
+    "processing": "Registrando...",
+    "message": "¿Aún no tienes cuenta?",
+    "toggle_password": "Mostrar/ocultar contraseña",
+    "strength": {
+      "weak": "Débil",
+      "fair": "Regular",
+      "good": "Buena",
+      "strong": "Fuerte",
+      "very_strong": "Muy fuerte"
+    }
+  },
+  "sessionTimeout": {
+    "title": "Sesión a punto de expirar",
+    "body": "Tu sesión caducará en <1>{{seconds}}</1> segundos.",
+    "question": "¿Quieres seguir conectado?",
+    "logout": "Cerrar sesión",
+    "stayConnected": "Seguir conectado"
+  },
+  "errors": {
+    "username": {
+      "invalid": "El nombre de usuario debe tener entre 3 y 32 caracteres.",
+      "taken": "El nombre de usuario ya está en uso.",
+      "required": "Por favor, introduce un nombre de usuario válido."
+    },
+    "email": {
+      "invalid": "Por favor, introduce un email válido.",
+      "exists": "Ese email ya está registrado.",
+      "required": "Por favor, introduce un email válido.",
+      "not_found": "Ese email no está registrado."
+    },
+    "password": {
+      "invalid": "La contraseña debe tener mínimo 8 caracteres, al menos una letra mayúscula, una minúscula y un número.",
+      "mismatch": "Las contraseñas no coinciden.",
+      "required": "Por favor, introduce una contraseña.",
+      "confirm_required": "Por favor, confirma tu contraseña.",
+      "reset": "Error al restablecer la contraseña.",
+      "reset_request": "No se pudo procesar la solicitud. Intenta más tarde."
+    },
+    "recaptcha": "Error al verificar reCAPTCHA.",
+    "session": {
+      "start": "No se pudo iniciar sesión.",
+      "expired": "Tu sesión ha expirado. Inicia sesión de nuevo.",
+      "checking": "Verificando sesión...",
+      "required": "Debes iniciar sesión para continuar."
+    },
+    "unknown": "Ha ocurrido un error inesperado."
+  },
+  "session": {
+    "checking": "Verificando sesión..."
+  },
+  "email": {
+    "verification_sent": "Te hemos enviado un correo para verificar tu cuenta.",
+    "verification_success": "Tu correo ha sido verificado correctamente.",
+    "verification_expired": "El enlace ha expirado. Solicita uno nuevo.",
+    "verification_repeat": "Este correo ya estaba verificado.",
+    "resend": "Reenviar enlace de verificación",
+    "resend_success": "Nuevo enlace enviado. Revisa tu bandeja de entrada."
+  },
+  "verification": {
+    "success": {
+      "title": "¡Tu cuenta ha sido verificada!",
+      "message": "Ya puedes iniciar sesión en la plataforma.",
+      "login": "Ir al login"
+    },
+    "expired": {
+      "title": "Enlace de verificación expirado",
+      "message": "El enlace de verificación ha expirado. Por favor, solicita uno nuevo.",
+      "resend": "Reenviar verificación"
+    },
+    "already": {
+      "title": "Ya verificado",
+      "message": "Este correo ya estaba verificado."
+    },
+    "sent": {
+      "title": "Correo de verificación enviado",
+      "message": "Te hemos enviado un correo con un enlace para verificar tu cuenta."
+    },
+    "resend": {
+      "title": "Reenviar correo de verificación",
+      "label": "Correo electrónico o nombre de usuario",
+      "button": "Reenviar verificación",
+      "loading": "Enviando...",
+      "success": "Correo de verificación enviado. Por favor, revisa tu bandeja de entrada."
+    }
+  },
+  "reset": {
+    "title": "Restablecer contraseña",
+    "email_sent": "Si tu correo existe, recibirás un email para restablecer la contraseña.",
+    "success": "Contraseña actualizada. Redirigiendo...",
+    "password": "Nueva contraseña",
+    "confirm_password": "Confirmar nueva contraseña",
+    "submit": "Actualizar contraseña",
+    "saving": "Actualizando...",
+    "invalid_token": "El enlace de restablecimiento no es válido o ha expirado."
+  },
+  "not_found": {
+    "title": "Página no encontrada",
+    "message": "La ruta que intentas acceder no existe.",
+    "backHome": "Volver al inicio"
+  },
+  "dashboard": {
+    "title": "Panel de usuario",
+    "welcome_message": "Bienvenido. Esta es tu área privada."
+  },
+  "language": {
+    "label": "Selector de idioma",
+    "es-ES": "Español",
+    "en-GB": "Inglés"
+  },
+  "nav": {
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "dashboard": "Panel de control",
+    "profile": "Perfil",
+    "teams": "Equipos",
+    "logout": "Cerrar sesión"
+  },
+  "app": {
+    "name": "Gestión eSports"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "categories": {
+    "performance": 90,
+    "accessibility": 90,
+    "best-practices": 90,
+    "seo": 90
+  },
+  "metrics": {
+    "largest-contentful-paint": [2500, 4000],
+    "first-input-delay": [100, 300],
+    "cumulative-layout-shift": [0.1, 0.25],
+    "first-contentful-paint": [1800, 3000],
+    "interactive": [3800, 7300],
+    "total-blocking-time": [200, 600],
+    "speed-index": [3400, 5800]
+  },
+  "timing": {
+    "server-response-time": 600
+  }
+}
