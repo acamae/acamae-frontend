@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.26](https://github.com/acamae/acamae-frontend/compare/v0.3.25...v0.3.26) (2025-06-02)
+
+### Bug Fixes
+
+- **changelog:** fix CHANGELOG ([68c5616](https://github.com/acamae/acamae-frontend/commit/68c56164954511e38abe9ca4f571907b511995bf))
+
+## [0.3.26](https://github.com/acamae/acamae-frontend/compare/v0.3.25...v0.3.26) (2025-06-02)
+
+### Bug Fixes
+
+- **changelog:** fix CHANGELOG ([68c5616](https://github.com/acamae/acamae-frontend/commit/68c56164954511e38abe9ca4f571907b511995bf))
+
 ## [0.3.25](https://github.com/acamae/acamae-frontend/compare/v0.3.4...v0.3.25) (2025-06-02)
 
 **Note:** Version bump only for package @acamae/frontend
