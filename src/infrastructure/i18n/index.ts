@@ -1,4 +1,3 @@
-/* eslint-disable import/no-named-as-default-member, import/no-named-as-default */
 import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';

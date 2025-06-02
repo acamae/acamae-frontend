@@ -30,15 +30,6 @@
       "@shared/*": ["src/shared/*"]
     }
   },
-  "include": [
-    "cypress/**/*.ts",
-    "src/**/*",
-    "commitlint.config.js",
-    "jest.setup.ts",
-    "jest.config.js",
-    "cypress.config.js",
-    "webpack.config.js",
-    "scripts/**/*.js"
-  ],
+  "include": ["cypress/**/*.ts", "src/**/*", "*.config.js", "*.setup.ts", "scripts/**/*.js"],
   "exclude": ["node_modules"]
 }

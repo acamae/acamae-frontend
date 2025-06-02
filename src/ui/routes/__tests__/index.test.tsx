@@ -104,7 +104,7 @@ jest.mock('@/ui/hooks/useAuth', () => ({
 
 jest.mock('@ui/components/PrivateRoute', () => {
   // Import useAuth from the already-mocked module
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+
   const { useAuth } = require('@/ui/hooks/useAuth');
   function MockPrivateRoute({ children }: { children?: React.ReactNode }) {
     const { isAuthenticated, loading } = useAuth();

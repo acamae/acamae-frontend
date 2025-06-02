@@ -289,14 +289,14 @@ describe('useForm Hook', () => {
         })
       );
 
-      // Silenciar console.error para este test específico
+      // Silence console.error for this specific test
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
       await act(async () => {
         try {
           await result.current.handleSubmit(mockFormEvent);
         } catch (e) {
-          // Error esperado, ya que el hook no lo relanza, solo lo loguea
+          void e;
         }
       });
 

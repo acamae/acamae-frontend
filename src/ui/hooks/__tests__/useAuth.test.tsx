@@ -16,7 +16,6 @@ function createTestStore(preloadedAuthState = initialAuthState) {
 
 function getWrapper(store: ReturnType<typeof createTestStore>) {
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    // eslint-disable-next-line
     <Provider store={store}>{children}</Provider>
   );
   Wrapper.displayName = 'ReduxTestWrapper';
