@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1](https://github.com/acamae/acamae-frontend/compare/v0.4.0...v0.4.1) (2025-06-02)
+
+### Bug Fixes
+
+- **docker:** ensure sass-embedded binary is installed for Alpine ([757a968](https://github.com/acamae/acamae-frontend/commit/757a968ff1b0ab5351a11d676a74c0ba596a911e))
+
+## [0.4.1](https://github.com/acamae/acamae-frontend/compare/v0.4.0...v0.4.1) (2025-06-02)
+
+### Bug Fixes
+
+- **docker:** ensure sass-embedded binary is installed for Alpine ([757a968](https://github.com/acamae/acamae-frontend/commit/757a968ff1b0ab5351a11d676a74c0ba596a911e))
+
 # [0.4.0](https://github.com/acamae/acamae-frontend/compare/v0.3.29...v0.4.0) (2025-06-02)
 
 ### Features
