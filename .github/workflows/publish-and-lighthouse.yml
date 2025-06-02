@@ -27,7 +27,7 @@ jobs:
       - name: Create temporary .npmrc for publish
         run: |
           echo "@acamae:registry=https://npm.pkg.github.com" > $HOME/.npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> $HOME/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NODE_AUTH_TOKEN }}" >> $HOME/.npmrc
           cat $HOME/.npmrc
 
       - name: Install dependencies
