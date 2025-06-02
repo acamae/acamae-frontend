@@ -29,6 +29,16 @@
       "@shared/*": ["shared/*"]
     }
   },
-  "include": ["cypress/**/*.ts", "src/**/*", "commitlint.config.js", "setupTests.ts", "jest.config.js", "cypress.config.js", "checkCoverage.mjs", "webpack.config.js"],
+  "include": [
+    "cypress/**/*.ts",
+    "src/**/*",
+    "commitlint.config.js",
+    "setupTests.ts",
+    "jest.config.js",
+    "cypress.config.js",
+    "checkCoverage.mjs",
+    "webpack.config.js",
+    "scripts/**/*.js"
+  ],
   "exclude": ["node_modules"]
 }

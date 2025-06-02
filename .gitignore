@@ -44,3 +44,4 @@ docker/ssl/*.crt
 docker/ssl/*.key
 docker/ssl/*.pem
 .npmrc
+/dependency-graph*.*

@@ -48,6 +48,7 @@
     "css-loader": "^6.10.0",
     "cypress": "^14.3.0",
     "cz-conventional-changelog": "^3.3.0",
+    "dependency-cruiser": "^16.10.2",
     "dotenv": "^16.5.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
@@ -114,7 +115,10 @@
     "docker:up": "docker compose -f docker/docker-compose.yml up",
     "docker:up:build": "docker compose -f docker/docker-compose.yml up --build",
     "docker:down": "docker compose -f docker/docker-compose.yml down -v --remove-orphans",
-    "docker:reset": "docker compose -f docker/docker-compose.yml down -v --rmi all --remove-orphans"
+    "docker:reset": "docker compose -f docker/docker-compose.yml down -v --rmi all --remove-orphans",
+    "depcruise:dot": "node scripts/generate-dot.js",
+    "depcruise:svg": "dot -Tsvg dependency-graph.dot -o dependency-graph.svg",
+    "depcruise:kpi": "node scripts/depcruise-kpi.js"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
