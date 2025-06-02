@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.2](https://github.com/acamae/acamae-frontend/compare/v0.4.1...v0.4.2) (2025-06-02)
+
+### Bug Fixes
+
+- **test:** prevent unused variable lint error in useForm.test.ts ([9a38702](https://github.com/acamae/acamae-frontend/commit/9a387023bf15a8eda72673ea3a6adba5b475cc8d))
+
+## [0.4.2](https://github.com/acamae/acamae-frontend/compare/v0.4.1...v0.4.2) (2025-06-02)
+
+### Bug Fixes
+
+- **test:** prevent unused variable lint error in useForm.test.ts ([9a38702](https://github.com/acamae/acamae-frontend/commit/9a387023bf15a8eda72673ea3a6adba5b475cc8d))
+
 ## [0.4.1](https://github.com/acamae/acamae-frontend/compare/v0.4.0...v0.4.1) (2025-06-02)
 
 ### Bug Fixes
