@@ -7,15 +7,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @acamae/frontend
 
-## [0.3.25](https://github.com/acamae/acamae-frontend/compare/v0.3.4...v0.3.25) (2025-06-02)
-
-**Note:** Version bump only for package @acamae/frontend
-
-## [0.3.22](https://github.com/acamae/acamae.com-frontend/compare/v0.3.22...v0.3.24) (2025-06-02)
-
-**Note:** bump version to 0.3.24
-
-## [0.3.22](https://github.com/acamae/acamae.com-frontend/compare/v0.3.1...v0.3.22) (2025-06-02)
+## [0.3.4](https://github.com/acamae/acamae.com-frontend/compare/v0.3.1...v0.3.4) (2025-06-02)
 
 **Note:** Version bump only for package @acamae/frontend
 
