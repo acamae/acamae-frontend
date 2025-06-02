@@ -6,6 +6,7 @@ vendor/
 frontend/dist/
 frontend/build/
 *.log
+.npmrc
 
 # Archivos del sistema
 .DS_Store
