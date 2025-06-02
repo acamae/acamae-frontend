@@ -18,7 +18,7 @@ export default {
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',
   },
   modulePaths: ['<rootDir>/src'],
-  setupFilesAfterEnv: ['<rootDir>/setupTests.ts'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   transform: {
     '^.+\\.(ts|tsx|js|jsx)$': [
       'ts-jest',

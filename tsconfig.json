@@ -6,7 +6,7 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -20,23 +20,23 @@
     "typeRoots": ["./node_modules/@types", "./src/domain/types"],
     "types": ["node", "jest", "cypress"],
     "paths": {
-      "@/*": ["*"],
-      "@ui/*": ["ui/*"],
-      "@domain/*": ["domain/*"],
-      "@application/*": ["application/*"],
-      "@infrastructure/*": ["infrastructure/*"],
-      "@i18n/*": ["infrastructure/i18n/*"],
-      "@shared/*": ["shared/*"]
+      "@/*": ["src/*"],
+      "@ui/*": ["src/ui/*"],
+      "@domain/*": ["src/domain/*"],
+      "@application/*": ["src/application/*"],
+      "@infrastructure/*": ["src/infrastructure/*"],
+      "@i18n/*": ["src/infrastructure/i18n/*"],
+      "@styles/*": ["src/ui/styles/*"],
+      "@shared/*": ["src/shared/*"]
     }
   },
   "include": [
     "cypress/**/*.ts",
     "src/**/*",
     "commitlint.config.js",
-    "setupTests.ts",
+    "jest.setup.ts",
     "jest.config.js",
     "cypress.config.js",
-    "checkCoverage.mjs",
     "webpack.config.js",
     "scripts/**/*.js"
   ],
