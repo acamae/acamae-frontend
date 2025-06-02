@@ -14,7 +14,7 @@ npx tsc --noEmit
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|jsx|ts|tsx)$' | tr '\n' ' ')
 if [ -n "$STAGED_FILES" ]; then
   echo "🧪 Ejecutando tests..."
-  npx jest --bail --findRelatedTests $STAGED_FILES
+  npx jest --bail --findRelatedTests --passWithNoTests $STAGED_FILES
 fi
 
 echo "🧪 Ejecutando linter..."
