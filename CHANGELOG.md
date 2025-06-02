@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/acamae/acamae-frontend/compare/v0.3.29...v0.4.0) (2025-06-02)
+
+### Features
+
+- **architecture:** add automated dependency KPIs and architecture rule reporting ([6da3359](https://github.com/acamae/acamae-frontend/commit/6da33592e745539fe8bad818dbc8ec8680cc7868))
+
+# [0.4.0](https://github.com/acamae/acamae-frontend/compare/v0.3.29...v0.4.0) (2025-06-02)
+
+### Features
+
+- **architecture:** add automated dependency KPIs and architecture rule reporting ([6da3359](https://github.com/acamae/acamae-frontend/commit/6da33592e745539fe8bad818dbc8ec8680cc7868))
+
 ## [0.3.29](https://github.com/acamae/acamae-frontend/compare/v0.3.28...v0.3.29) (2025-06-02)
 
 **Note:** Version bump only for package @acamae/frontend
