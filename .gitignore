@@ -44,4 +44,3 @@ docker/ssl/*.crt
 docker/ssl/*.key
 docker/ssl/*.pem
 .npmrc
-.npmrc2
