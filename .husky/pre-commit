@@ -1,9 +1,10 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# Skip tests for Lerna version commits
-echo "Commit message: $(git log -1 --pretty=%B)"
-if git log -1 --pretty=%B | grep -q '\[skip ci\]'; then
+COMMIT_MSG=$(git log -1 --pretty=%B)
+echo "Commit message: $COMMIT_MSG"
+
+if echo "$COMMIT_MSG" | grep -q '\[skip ci\]'; then
   echo "⏩ Pre-commit hook skipped for Lerna version commit."
   exit 0
 fi

@@ -1,6 +1,6 @@
 {
-  "name": "@emanager.com/frontend",
-  "version": "0.3.4",
+  "name": "@acamae/frontend",
+  "version": "0.3.22",
   "type": "module",
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.1",
@@ -105,7 +105,7 @@
     "commit": "cz",
     "update:snapshots": "jest -u",
     "lerna:bootstrap": "lerna bootstrap",
-    "lerna:start": "lerna run --scope=@emanager.com/frontend start",
+    "lerna:start": "lerna run --scope=@acamae/frontend start",
     "lerna:build": "lerna run build",
     "lerna:test": "lerna run test",
     "lerna:lint": "lerna run lint",
@@ -131,6 +131,6 @@
     }
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://npm.pkg.github.com/"
   }
 }

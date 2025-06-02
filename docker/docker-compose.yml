@@ -16,7 +16,7 @@ services:
   nginx:
     build:
       context: ./nginx
-    container_name: emanager.com-nginx
+    container_name: acamae-nginx
     ports:
       - '443:443'
       - '80:80'
@@ -25,3 +25,4 @@ services:
       - ./ssl:/etc/nginx/ssl:ro
     depends_on:
       - frontend
+

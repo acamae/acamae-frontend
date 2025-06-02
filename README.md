@@ -1,4 +1,4 @@
-# @emanager.com/frontend
+# @acamae/frontend
 
 Modern React application for professional esports management.
 Designed for accessibility, internationalization, and maintainability.

@@ -8,10 +8,9 @@ on:
 jobs:
   lerna-publish:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
-      pull-requests: write
+    permissions: write-all
+    environment:
+      name: development
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -23,7 +22,13 @@ jobs:
         with:
           node-version: 22
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@emanager.com'
+          scope: '@acamae'
+
+      - name: Create .npmrc file
+        run: |
+          echo "@acamae:registry=https://npm.pkg.github.com" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+          cat .npmrc
 
       - name: Install dependencies
         run: npm ci
@@ -40,8 +45,6 @@ jobs:
 
       - name: Publish to GitHub Packages
         run: npx lerna publish from-git --yes
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   lighthouse:
     runs-on: ubuntu-latest
@@ -80,3 +83,4 @@ jobs:
         with:
           name: lighthouse-results
           path: .lighthouseci
+
