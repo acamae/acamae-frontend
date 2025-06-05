@@ -29,7 +29,6 @@ coverage/
 # IDEs (IntelliJ IDEA, Visual Studio Code, etc.)
 .idea/
 .vscode/
-.cursor/
 *.iml
 
 # Other temporary files

@@ -1,0 +1,56 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Design and implement the request described above using a systematic, validation-driven approach:
+
+1. **Map System Context**:
+
+   - Explore the codebase structure with `tree -L 4 --gitignore | cat` to locate where the feature belongs.
+Design and implement the request described above using a systematic, validation-driven approach:
+
+1. **Analyze Context**:
+   - Identify relevant patterns, conventions, or domain models using `codebase_search` to ensure seamless integration.
+   - Pinpoint integration points—e.g., UI components, data layers, or APIs—affected by the request.
+   - Verify alignment with Hexagonal Architecture principles (domain, application, infrastructure, ui, shared layers).
+
+2. **Specify Requirements**:
+   - Break the request into clear, testable criteria—e.g., "Button triggers save, shows success state."
+   - Define use cases (normal and edge) and constraints (e.g., performance, UI consistency).
+   - Set scope boundaries to keep the implementation focused and maintainable.
+   - Ensure WCAG2 compliance and i18n support for all UI components.
+
+3. **Leverage Reusability**:
+   - Search for existing components or utilities with `codebase_search` that can be adapted—e.g., a "button" component or "save" function.
+   - Use `grep_search` to confirm similar implementations, ensuring consistency with project standards.
+   - Evaluate if the feature could be abstracted for future reuse, noting potential opportunities.
+   - Check `shared/` directory for common utilities and patterns.
+
+4. **Plan Targeted Changes**:
+   - List all files requiring edits (relative to workspace root), dependencies to update, and new files if needed.
+   - Assess impacts on cross-cutting concerns—e.g., error handling, logging, or state management.
+   - Balance immediate needs with long-term code health, planning minimal yet effective changes.
+   - Ensure API routes are defined in `shared/constants/apiRoutes.ts`.
+
+5. **Implement with Precision**:
+   - Provide a step-by-step plan with specific code changes—include file paths, line numbers, and snippets.
+   - Adhere to project conventions:
+     * Components: PascalCase
+     * Hooks: `use` + camelCase
+     * Utilities: camelCase
+     * Constants: UPPER_SNAKE_CASE
+   - Follow Prettier (2-space indent, single quotes, max 100 chars/line) and ESLint rules.
+   - Highlight enhancements to organization or clarity—e.g., "Extract logic to a helper function."
+
+6. **Validate and Stabilize**:
+   - Define test scenarios—e.g., "Save with valid data," "Save with no input"—to confirm functionality.
+   - Ensure 90%+ test coverage for new code.
+   - Use Jest & Testing Library for unit tests, Cypress for E2E tests.
+   - Follow test patterns:
+     * Use `I18nextProvider` and `MemoryRouter` for integration
+     * Mock only what is necessary
+     * For route tests, mock layouts with `<Outlet />`
+   - Recommend a stability check—e.g., "Monitor save API calls"—with rollback steps if issues arise.
+
+This process delivers a well-integrated, reliable solution that enhances the codebase while meeting the request's goals.
