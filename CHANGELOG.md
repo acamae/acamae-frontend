@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.4](https://github.com/acamae/acamae-frontend/compare/v0.4.3...v0.4.4) (2025-06-06)
+
+### Bug Fixes
+
+- **lint:** fix import order and types ([8b8b3ad](https://github.com/acamae/acamae-frontend/commit/8b8b3ad6008b0e873312a241511a637cd69abbcc))
+- **lint:** fix lint issues ([0f084d5](https://github.com/acamae/acamae-frontend/commit/0f084d5fc16a488fef806084ec41ea4d3854e210))
+- resolve linting errors across test files ([b5d72d3](https://github.com/acamae/acamae-frontend/commit/b5d72d3f468d23edb4da1927b30afc6f26187e26))
+
+## [0.4.4](https://github.com/acamae/acamae-frontend/compare/v0.4.3...v0.4.4) (2025-06-06)
+
+### Bug Fixes
+
+- **lint:** fix import order and types ([8b8b3ad](https://github.com/acamae/acamae-frontend/commit/8b8b3ad6008b0e873312a241511a637cd69abbcc))
+- **lint:** fix lint issues ([0f084d5](https://github.com/acamae/acamae-frontend/commit/0f084d5fc16a488fef806084ec41ea4d3854e210))
+- resolve linting errors across test files ([b5d72d3](https://github.com/acamae/acamae-frontend/commit/b5d72d3f468d23edb4da1927b30afc6f26187e26))
+
 ## [0.4.3](https://github.com/acamae/acamae-frontend/compare/v0.4.2...v0.4.3) (2025-06-05)
 
 **Note:** Version bump only for package @acamae/frontend
