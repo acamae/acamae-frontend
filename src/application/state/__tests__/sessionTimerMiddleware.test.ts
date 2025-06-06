@@ -19,7 +19,11 @@ jest.mock('@infrastructure/storage/sessionExpiryService', () => ({
 jest.mock('@application/state/actions/auth.actions', () => {
   const logoutAction = () => ({ type: 'auth/logout/fulfilled' });
   logoutAction.fulfilled = {
-    match: (action: unknown) => action.type === 'auth/logout/fulfilled',
+    match: (action: unknown) =>
+      typeof action === 'object' &&
+      action !== null &&
+      'type' in action &&
+      action.type === 'auth/logout/fulfilled',
   } as unknown;
   return { logoutAction };
 });

@@ -5,13 +5,12 @@ import { authPersistConfig } from '@application/state/persistConfig';
 import sessionTimerMiddleware from '@application/state/sessionTimerMiddleware';
 import authReducer from '@application/state/slices/authSlice';
 import sessionTimerReducer from '@application/state/slices/sessionTimerSlice';
+import { ForgotPasswordUseCase } from '@application/use-cases/auth/ForgotPasswordUseCase';
 import { LoginUseCase } from '@application/use-cases/auth/LoginUseCase';
 import { LogoutUseCase } from '@application/use-cases/auth/LogoutUseCase';
 import { RegisterUseCase } from '@application/use-cases/auth/RegisterUseCase';
-import { AuthApiRepository } from '@infrastructure/api/AuthApiRepository';
-
-import { ForgotPasswordUseCase } from '@application/use-cases/auth/ForgotPasswordUseCase';
 import { ResetPasswordUseCase } from '@application/use-cases/auth/ResetPasswordUseCase';
+import { AuthApiRepository } from '@infrastructure/api/AuthApiRepository';
 
 // Auth repository
 const authRepository = new AuthApiRepository();

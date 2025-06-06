@@ -33,4 +33,13 @@ describe('auth.actions thunks', () => {
     expect(execute).toHaveBeenCalled();
     expect(result.type).toContain('rejected');
   });
+
+  it.each([
+    ['login', loginAction],
+    ['register', registerAction],
+  ])('%s action creator', (_name, thunkCreator: unknown) => {
+    expect(thunkCreator.pending.type).toBeDefined();
+    expect(thunkCreator.fulfilled.type).toBeDefined();
+    expect(thunkCreator.rejected.type).toBeDefined();
+  });
 });

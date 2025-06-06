@@ -3,14 +3,25 @@ import React from 'react';
 
 import { ToastProvider, useToastContext } from '../ToastProvider';
 
+interface MockToastProps {
+  children: React.ReactNode;
+  bg?: string;
+  onClose?: () => void;
+}
+
+interface MockToastComponent extends React.FC<MockToastProps> {
+  Header: React.FC<{ children: React.ReactNode }>;
+  Body: React.FC<{ children: React.ReactNode }>;
+}
+
 jest.mock('react-bootstrap', () => {
-  const MockToast: unknown = ({ children, bg, onClose }: unknown) => (
+  const MockToast: MockToastComponent = ({ children, bg, onClose }) => (
     <div data-testid={`toast-${bg || 'primary'}`} onClick={onClose}>
       {children}
     </div>
   );
-  MockToast.Header = ({ children }: unknown) => <div>{children}</div>;
-  MockToast.Body = ({ children }: unknown) => <div>{children}</div>;
+  MockToast.Header = ({ children }) => <div>{children}</div>;
+  MockToast.Body = ({ children }) => <div>{children}</div>;
 
   return {
     ToastContainer: ({ children }: { children: React.ReactNode }) => (

@@ -8,6 +8,12 @@ import {
 import reducer, { initialAuthState } from '@application/state/slices/authSlice';
 import { USER_ROLES } from '@domain/constants/user';
 
+interface ActionCreator {
+  pending: { type: string };
+  fulfilled: { type: string };
+  rejected: { type: string };
+}
+
 describe('authSlice reducer', () => {
   const user = {
     id: '1',
@@ -21,7 +27,7 @@ describe('authSlice reducer', () => {
   it.each([
     ['login', loginAction],
     ['register', registerAction],
-  ])('%s pending => loading true', (_name, actionCreator: unknown) => {
+  ])('%s pending => loading true', (_name, actionCreator: ActionCreator) => {
     const state = reducer(initialAuthState, { type: actionCreator.pending.type });
     expect(state.loading).toBe(true);
     expect(state.error).toBeNull();
@@ -30,7 +36,7 @@ describe('authSlice reducer', () => {
   it.each([
     ['login', loginAction],
     ['register', registerAction],
-  ])('%s fulfilled => isAuthenticated true y user set', (_n, actionCreator: unknown) => {
+  ])('%s fulfilled => isAuthenticated true y user set', (_n, actionCreator: ActionCreator) => {
     const state = reducer(initialAuthState, {
       type: actionCreator.fulfilled.type,
       payload: { data: user },
