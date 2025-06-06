@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
+
+import sessionTimerMiddleware from '@application/state/sessionTimerMiddleware';
 import sessionTimerReducer, {
   resetTimer,
   setExpiresAt,
   removeExpiresAt,
-  hideModal,
   showModal,
 } from '@application/state/slices/sessionTimerSlice';
+import { sessionExpiryService } from '@infrastructure/storage/sessionExpiryService';
 
 jest.mock('@infrastructure/storage/sessionExpiryService', () => ({
   sessionExpiryService: {
@@ -16,13 +18,11 @@ jest.mock('@infrastructure/storage/sessionExpiryService', () => ({
 
 jest.mock('@application/state/actions/auth.actions', () => {
   const logoutAction = () => ({ type: 'auth/logout/fulfilled' });
-  logoutAction.fulfilled = { match: (action: any) => action.type === 'auth/logout/fulfilled' } as any;
+  logoutAction.fulfilled = {
+    match: (action: unknown) => action.type === 'auth/logout/fulfilled',
+  } as unknown;
   return { logoutAction };
 });
-
-import { sessionExpiryService } from '@infrastructure/storage/sessionExpiryService';
-import { logoutAction } from '@application/state/actions/auth.actions';
-import sessionTimerMiddleware from '@application/state/sessionTimerMiddleware';
 
 const createTestStore = () =>
   configureStore({
@@ -95,4 +95,4 @@ describe('sessionTimerMiddleware', () => {
     // El modal debe seguir visible pero no debe haber cambiado su estado
     expect(store.getState().sessionTimer.showModal).toBe(true);
   });
-}); 
+});

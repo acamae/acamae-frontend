@@ -28,4 +28,4 @@ describe('apiRoutes helpers', () => {
     expect(API_ROUTES.AUTH.LOGIN).toBe('/auth/login');
     expect(API_ROUTES.USERS.GET_ALL).toBe('/users');
   });
-}); 
+});

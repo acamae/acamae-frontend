@@ -1,4 +1,3 @@
-import reducer, { initialAuthState } from '@application/state/slices/authSlice';
 import {
   loginAction,
   logoutAction,
@@ -6,6 +5,7 @@ import {
   forgotPasswordAction,
   resetPasswordAction,
 } from '@application/state/actions/auth.actions';
+import reducer, { initialAuthState } from '@application/state/slices/authSlice';
 import { USER_ROLES } from '@domain/constants/user';
 
 describe('authSlice reducer', () => {
@@ -21,7 +21,7 @@ describe('authSlice reducer', () => {
   it.each([
     ['login', loginAction],
     ['register', registerAction],
-  ])('%s pending => loading true', (_name, actionCreator: any) => {
+  ])('%s pending => loading true', (_name, actionCreator: unknown) => {
     const state = reducer(initialAuthState, { type: actionCreator.pending.type });
     expect(state.loading).toBe(true);
     expect(state.error).toBeNull();
@@ -30,7 +30,7 @@ describe('authSlice reducer', () => {
   it.each([
     ['login', loginAction],
     ['register', registerAction],
-  ])('%s fulfilled => isAuthenticated true y user set', (_n, actionCreator: any) => {
+  ])('%s fulfilled => isAuthenticated true y user set', (_n, actionCreator: unknown) => {
     const state = reducer(initialAuthState, {
       type: actionCreator.fulfilled.type,
       payload: { data: user },
@@ -87,9 +87,12 @@ describe('authSlice reducer', () => {
   });
 
   it('forgotPassword fulfilled => loading false', () => {
-    const state = reducer({ ...initialAuthState, loading: true }, {
-      type: forgotPasswordAction.fulfilled.type,
-    });
+    const state = reducer(
+      { ...initialAuthState, loading: true },
+      {
+        type: forgotPasswordAction.fulfilled.type,
+      }
+    );
     expect(state.loading).toBe(false);
   });
 
@@ -123,9 +126,12 @@ describe('authSlice reducer', () => {
   });
 
   it('resetPassword fulfilled marca loading false', () => {
-    const state = reducer({ ...initialAuthState, loading: true }, {
-      type: resetPasswordAction.fulfilled.type,
-    });
+    const state = reducer(
+      { ...initialAuthState, loading: true },
+      {
+        type: resetPasswordAction.fulfilled.type,
+      }
+    );
     expect(state.loading).toBe(false);
   });
-}); 
+});

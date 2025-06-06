@@ -26,4 +26,4 @@ describe('validationService', () => {
     expect(validateToken(token)).toBe(true);
     expect(validateToken('short')).toBe(false);
   });
-}); 
+});

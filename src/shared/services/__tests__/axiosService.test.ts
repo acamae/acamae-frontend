@@ -1,9 +1,9 @@
 import { jest } from '@jest/globals';
 
-const reqOk: any[] = [];
-const reqErr: any[] = [];
-const resOk: any[] = [];
-const resErr: any[] = [];
+const reqOk: unknown[] = [];
+const reqErr: unknown[] = [];
+const resOk: unknown[] = [];
+const resErr: unknown[] = [];
 
 jest.mock('axios', () => {
   const create = jest.fn(() => ({
@@ -96,12 +96,12 @@ describe('axiosService unit tests', () => {
 
   it('request interceptor añade Authorization header cuando hay token', () => {
     jest.isolateModules(() => {
-      storeMock.getState.mockReturnValueOnce({ auth: { token: 'abc123' } } as any);
+      storeMock.getState.mockReturnValueOnce({ auth: { token: 'abc123' } } as unknown);
 
       require('@shared/services/axiosService');
       expect(reqOk).toHaveLength(1);
 
-      const cfg = { headers: {} } as any;
+      const cfg = { headers: {} } as unknown;
       const result = reqOk[0](cfg);
       expect(result.headers.Authorization).toBe('Bearer abc123');
     });
@@ -111,7 +111,7 @@ describe('axiosService unit tests', () => {
     jest.isolateModules(() => {
       storeMock.getState.mockReturnValueOnce({ auth: { token: null } });
       require('@shared/services/axiosService');
-      const cfg = { headers: {} } as any;
+      const cfg = { headers: {} } as unknown;
       const result = reqOk[0](cfg);
       expect(result.headers.Authorization).toBeUndefined();
     });
@@ -119,14 +119,14 @@ describe('axiosService unit tests', () => {
 
   it('response interceptor renueva sesión para endpoints definidos', () => {
     jest.isolateModules(() => {
-      const jsonSpy = jest.spyOn(JSON, 'parse').mockReturnValue(false as any);
+      const jsonSpy = jest.spyOn(JSON, 'parse').mockReturnValue(false as unknown);
 
       require('@shared/services/axiosService');
       expect(resOk).toHaveLength(1);
 
       const resetTimer = require('@application/state/slices/sessionTimerSlice').resetTimer;
 
-      const response = { config: { url: '/auth/login' } } as any;
+      const response = { config: { url: '/auth/login' } } as unknown;
       resOk[0](response);
       expect(storeMock.dispatch).toHaveBeenCalledWith(resetTimer());
 
@@ -134,7 +134,6 @@ describe('axiosService unit tests', () => {
     });
   });
 
-  
   it('response interceptor maneja 401 limpiando tokens', () => {
     jest.isolateModules(() => {
       const { localStorageService } = require('@/infrastructure/storage/localStorageService');
@@ -143,7 +142,7 @@ describe('axiosService unit tests', () => {
       const error401 = {
         response: { status: 401 },
         config: { url: '/otro' },
-      } as any;
+      } as unknown;
 
       // el interceptor devuelve una promesa rechazada; ignoramos el catch
       resErr[0](error401).catch(() => {});

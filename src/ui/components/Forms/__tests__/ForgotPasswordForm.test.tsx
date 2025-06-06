@@ -1,10 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
+import api from '@shared/services/axiosService';
+import ForgotPasswordForm from '@ui/components/Forms/ForgotPasswordForm';
 import { useForm } from '@ui/hooks/useForm';
 import { useToast } from '@ui/hooks/useToast';
-import api from '@shared/services/axiosService';
-
-import ForgotPasswordForm from '@ui/components/Forms/ForgotPasswordForm';
 
 // Mock de las dependencias
 jest.mock('@ui/hooks/useForm');
@@ -18,7 +17,8 @@ jest.mock('react-i18next', () => ({
       const translations: Record<string, string> = {
         'forgot.email': 'Correo electrónico',
         'forgot.email_help': 'Introduce el correo electrónico asociado a tu cuenta.',
-        'forgot.success': 'Si tu correo existe en nuestro sistema, recibirás un enlace para restablecer tu contraseña.',
+        'forgot.success':
+          'Si tu correo existe en nuestro sistema, recibirás un enlace para restablecer tu contraseña.',
         'forgot.check_email': 'Revisa tu correo electrónico',
         'errors.email.not_found': 'Ese email no está registrado.',
         'forgot.failed': 'No se pudo enviar el correo',
@@ -57,9 +57,11 @@ describe('ForgotPasswordForm', () => {
     });
 
     render(<ForgotPasswordForm />);
-    
+
     expect(screen.getByLabelText(/correo electrónico/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /enviar enlace de recuperación/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /enviar enlace de recuperación/i })
+    ).toBeInTheDocument();
   });
 
   it('maneja el envío exitoso del formulario', async () => {
@@ -77,9 +79,9 @@ describe('ForgotPasswordForm', () => {
     }));
 
     apiPostMock.mockResolvedValueOnce({});
-    
+
     render(<ForgotPasswordForm />);
-    
+
     const submitButton = screen.getByRole('button', { name: /enviar enlace de recuperación/i });
     fireEvent.click(submitButton);
 
@@ -107,11 +109,11 @@ describe('ForgotPasswordForm', () => {
     }));
 
     apiPostMock.mockRejectedValueOnce({
-      response: { data: { code: 'USER_NOT_FOUND' } }
+      response: { data: { code: 'USER_NOT_FOUND' } },
     });
-    
+
     render(<ForgotPasswordForm />);
-    
+
     const submitButton = screen.getByRole('button', { name: /enviar enlace de recuperación/i });
     fireEvent.click(submitButton);
 
@@ -139,9 +141,9 @@ describe('ForgotPasswordForm', () => {
     }));
 
     apiPostMock.mockRejectedValueOnce({});
-    
+
     render(<ForgotPasswordForm />);
-    
+
     const submitButton = screen.getByRole('button', { name: /enviar enlace de recuperación/i });
     fireEvent.click(submitButton);
 
@@ -164,9 +166,9 @@ describe('ForgotPasswordForm', () => {
         handleChange: jest.fn(),
         handleSubmit: jest.fn(),
       });
-      
+
       render(<ForgotPasswordForm />);
-      
+
       expect(screen.getByText('errors.email.required')).toBeInTheDocument();
       expect(apiPostMock).not.toHaveBeenCalled();
     });
@@ -181,9 +183,9 @@ describe('ForgotPasswordForm', () => {
       handleChange: jest.fn(),
       handleSubmit: jest.fn(),
     });
-    
+
     render(<ForgotPasswordForm />);
-    
+
     expect(screen.queryByText('errors.email.required')).not.toBeInTheDocument();
     expect(screen.queryByText('errors.email.invalid')).not.toBeInTheDocument();
     expect(apiPostMock).not.toHaveBeenCalled();
@@ -198,11 +200,11 @@ describe('ForgotPasswordForm', () => {
       handleChange: jest.fn(),
       handleSubmit: jest.fn(),
     });
-    
+
     render(<ForgotPasswordForm />);
-    
+
     const submitButton = screen.getByRole('button', { name: /enviar enlace de recuperación/i });
     expect(submitButton).toBeDisabled();
     expect(submitButton).toHaveAttribute('aria-busy', 'true');
   });
-}); 
+});

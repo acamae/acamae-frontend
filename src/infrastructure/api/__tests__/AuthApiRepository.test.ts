@@ -1,9 +1,10 @@
-let mockAxios: any;
+let mockAxios: unknown;
 
 import { AxiosError } from 'axios';
+
+import { USER_ROLES } from '@domain/constants/user';
 import { AuthApiRepository } from '@infrastructure/api/AuthApiRepository';
 import { API_ROUTES } from '@shared/constants/apiRoutes';
-import { USER_ROLES } from '@domain/constants/user';
 
 jest.mock('@shared/services/axiosService', () => {
   const instance = {
@@ -39,14 +40,17 @@ describe('AuthApiRepository', () => {
 
     const result = await repo.login({ email: 'a@b.com', password: '123456' });
 
-    expect(getMock().post).toHaveBeenCalledWith(API_ROUTES.AUTH.LOGIN, { email: 'a@b.com', password: '123456' });
+    expect(getMock().post).toHaveBeenCalledWith(API_ROUTES.AUTH.LOGIN, {
+      email: 'a@b.com',
+      password: '123456',
+    });
     expect(result.success).toBe(true);
     expect(result.data?.email).toBe('a@b.com');
   });
 
   it('login – error http 400 devuelve success=false', async () => {
     const error = new AxiosError('Bad request');
-    (error as any).response = { status: 400, data: { message: 'Bad' } };
+    (error as unknown).response = { status: 400, data: { message: 'Bad' } };
     getMock().post.mockRejectedValue(error);
 
     const result = await repo.login({ email: 'a@b.com', password: '123456' });
@@ -57,12 +61,14 @@ describe('AuthApiRepository', () => {
 
   it('forgotPassword – network error devuelve success=false status 500', async () => {
     const netErr = new AxiosError('Network');
-    (netErr as any).request = {};
+    (netErr as unknown).request = {};
     getMock().post.mockRejectedValue(netErr);
 
     const result = await repo.forgotPassword({ email: 'a@b.com' });
 
-    expect(getMock().post).toHaveBeenCalledWith(API_ROUTES.AUTH.FORGOT_PASSWORD, { email: 'a@b.com' });
+    expect(getMock().post).toHaveBeenCalledWith(API_ROUTES.AUTH.FORGOT_PASSWORD, {
+      email: 'a@b.com',
+    });
     expect(result.success).toBe(false);
     expect(result.status).toBe(500);
   });
@@ -98,15 +104,17 @@ describe('AuthApiRepository', () => {
     const result = await repo.getCurrentUser();
     expect(result.success).toBe(true);
     expect(result.status).toBe(200);
-    expect(result.data).toEqual(expect.objectContaining({
-      email: userResponse.email,
-      username: userResponse.username,
-    }));
+    expect(result.data).toEqual(
+      expect.objectContaining({
+        email: userResponse.email,
+        username: userResponse.username,
+      })
+    );
   });
 
   it('handleApiError - maneja error de respuesta', async () => {
     const error = new AxiosError('Server Error');
-    (error as any).response = { status: 500, data: { message: 'Internal Server Error' } };
+    (error as unknown).response = { status: 500, data: { message: 'Internal Server Error' } };
     getMock().get.mockRejectedValue(error);
     const result = await repo.getCurrentUser();
     expect(result.success).toBe(false);
@@ -115,7 +123,7 @@ describe('AuthApiRepository', () => {
 
   it('handleApiError - maneja error de red', async () => {
     const error = new AxiosError('Network Error');
-    (error as any).request = {};
+    (error as unknown).request = {};
     getMock().get.mockRejectedValue(error);
     const result = await repo.getCurrentUser();
     expect(result.success).toBe(false);
@@ -136,15 +144,17 @@ describe('AuthApiRepository', () => {
     const result = await repo.findById('1');
     expect(getMock().get).toHaveBeenCalledWith(expect.stringContaining('/users/1'));
     expect(result.success).toBe(true);
-    expect(result.data).toEqual(expect.objectContaining({
-      id: '1',
-      email: userResponse.email,
-    }));
+    expect(result.data).toEqual(
+      expect.objectContaining({
+        id: '1',
+        email: userResponse.email,
+      })
+    );
   });
 
   it('findById - error', async () => {
     const error = new AxiosError('Not Found');
-    (error as any).response = { status: 404, data: { message: 'User not found' } };
+    (error as unknown).response = { status: 404, data: { message: 'User not found' } };
     getMock().get.mockRejectedValue(error);
     const result = await repo.findById('1');
     expect(result.success).toBe(false);
@@ -176,7 +186,7 @@ describe('AuthApiRepository', () => {
 
   it('save - error', async () => {
     const error = new AxiosError('Bad Request');
-    (error as any).response = { status: 400, data: { message: 'Invalid data' } };
+    (error as unknown).response = { status: 400, data: { message: 'Invalid data' } };
     getMock().put.mockRejectedValue(error);
     const result = await repo.save({
       id: '1',
@@ -200,7 +210,7 @@ describe('AuthApiRepository', () => {
 
   it('delete - error', async () => {
     const error = new AxiosError('Not Found');
-    (error as any).response = { status: 404, data: { message: 'User not found' } };
+    (error as unknown).response = { status: 404, data: { message: 'User not found' } };
     getMock().delete.mockRejectedValue(error);
     const result = await repo.delete('1');
     expect(result.success).toBe(false);
@@ -219,16 +229,19 @@ describe('AuthApiRepository', () => {
 
   it('resetPassword - error', async () => {
     const error = new AxiosError('Invalid token');
-    (error as any).response = { status: 400, data: { message: 'Invalid or expired token' } };
+    (error as unknown).response = { status: 400, data: { message: 'Invalid or expired token' } };
     getMock().post.mockRejectedValue(error);
-    const result = await repo.resetPassword({ token: 'invalid-token', newPassword: 'new-password' });
+    const result = await repo.resetPassword({
+      token: 'invalid-token',
+      newPassword: 'new-password',
+    });
     expect(result.success).toBe(false);
     expect(result.status).toBe(400);
   });
 
   it('logout - error', async () => {
     const error = new AxiosError('Server Error');
-    (error as any).response = { status: 500, data: { message: 'Internal Server Error' } };
+    (error as unknown).response = { status: 500, data: { message: 'Internal Server Error' } };
     getMock().post.mockRejectedValue(error);
     const result = await repo.logout();
     expect(result.success).toBe(false);
@@ -237,7 +250,7 @@ describe('AuthApiRepository', () => {
 
   it('getCurrentUser - error', async () => {
     const error = new AxiosError('Unauthorized');
-    (error as any).response = { status: 401, data: { message: 'Not authenticated' } };
+    (error as unknown).response = { status: 401, data: { message: 'Not authenticated' } };
     getMock().get.mockRejectedValue(error);
     const result = await repo.getCurrentUser();
     expect(result.success).toBe(false);
@@ -246,11 +259,11 @@ describe('AuthApiRepository', () => {
 
   it('findById - error with network issue', async () => {
     const error = new AxiosError('Network Error');
-    (error as any).request = {};
+    (error as unknown).request = {};
     getMock().get.mockRejectedValue(error);
     const result = await repo.findById('1');
     expect(result.success).toBe(false);
     expect(result.status).toBe(500);
     expect(result.code).toBe('REQUEST_ERROR');
   });
-}); 
+});

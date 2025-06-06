@@ -16,11 +16,14 @@ describe('auth.actions thunks', () => {
       'registerUseCase',
       { email: 'c@d.com', password: 'pwd', username: 'u' },
     ],
-  ])('%sAction ejecuta UseCase correspondiente', async (_n, thunkCreator: any, key: string, payload) => {
-    const execute = jest.fn().mockResolvedValue({ data: null, success: true });
-    await thunkCreator(payload)(dispatch, getState, { [key]: { execute } });
-    expect(execute).toHaveBeenCalledWith(payload);
-  });
+  ])(
+    '%sAction ejecuta UseCase correspondiente',
+    async (_n, thunkCreator: unknown, key: string, payload) => {
+      const execute = jest.fn().mockResolvedValue({ data: null, success: true });
+      await thunkCreator(payload)(dispatch, getState, { [key]: { execute } });
+      expect(execute).toHaveBeenCalledWith(payload);
+    }
+  );
 
   it('forgotPasswordAction maneja error', async () => {
     const execute = jest.fn().mockRejectedValue(new Error('fail'));
@@ -30,4 +33,4 @@ describe('auth.actions thunks', () => {
     expect(execute).toHaveBeenCalled();
     expect(result.type).toContain('rejected');
   });
-}); 
+});

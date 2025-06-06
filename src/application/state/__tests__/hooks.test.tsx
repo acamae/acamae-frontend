@@ -1,8 +1,9 @@
-import { renderHook } from '@testing-library/react';
-import { useAppDispatch, useAppSelector } from '../hooks';
 import { configureStore } from '@reduxjs/toolkit';
-import rootReducer from '../rootReducer';
+import { renderHook } from '@testing-library/react';
 import { Provider } from 'react-redux';
+
+import { useAppDispatch, useAppSelector } from '../hooks';
+import rootReducer from '../rootReducer';
 
 describe('Redux Hooks', () => {
   const store = configureStore({
@@ -31,4 +32,4 @@ describe('Redux Hooks', () => {
       expect(result.current).toBeDefined();
     });
   });
-}); 
+});

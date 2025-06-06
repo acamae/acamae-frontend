@@ -1,4 +1,3 @@
-import { AuthState } from '@domain/types/auth';
 import { encryptToken, decryptToken } from '@application/state/tokenTransform';
 
 describe('tokenTransform', () => {

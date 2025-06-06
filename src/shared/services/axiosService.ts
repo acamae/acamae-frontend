@@ -88,7 +88,6 @@ api.interceptors.response.use(
       if (SESSION_RENEWAL_ENDPOINTS.some(endpoint => url.includes(endpoint))) {
         store.dispatch(resetTimer());
       }
-
     } else if (error.request) {
       // The request was made but no response was received
       console.error('No response received. Request:', error.request);

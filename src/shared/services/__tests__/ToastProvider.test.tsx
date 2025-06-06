@@ -1,16 +1,16 @@
-import React from 'react';
 import { render, fireEvent, screen, act, waitFor } from '@testing-library/react';
-import { ToastProvider, useToastContext } from '@shared/services/ToastProvider';
-import { ToastType } from '@domain/types/toast';
+import React from 'react';
+
+import { ToastProvider, useToastContext } from '../ToastProvider';
 
 jest.mock('react-bootstrap', () => {
-  const MockToast: any = ({ children, bg, onClose }: any) => (
+  const MockToast: unknown = ({ children, bg, onClose }: unknown) => (
     <div data-testid={`toast-${bg || 'primary'}`} onClick={onClose}>
       {children}
     </div>
   );
-  MockToast.Header = ({ children }: any) => <div>{children}</div>;
-  MockToast.Body = ({ children }: any) => <div>{children}</div>;
+  MockToast.Header = ({ children }: unknown) => <div>{children}</div>;
+  MockToast.Body = ({ children }: unknown) => <div>{children}</div>;
 
   return {
     ToastContainer: ({ children }: { children: React.ReactNode }) => (
@@ -38,18 +38,15 @@ const Demo: React.FC = () => {
 const ToastWithTitle: React.FC = () => {
   const toast = useToastContext();
   return (
-    <button onClick={() => toast.show({ message: 'Test message', title: 'Test title', type: 'Primary' })}>
+    <button
+      onClick={() => toast.show({ message: 'Test message', title: 'Test title', type: 'Primary' })}>
       Show Toast with Title
     </button>
   );
 };
 
 const renderWithProvider = (children: React.ReactNode) =>
-  render(
-    <ToastProvider>
-      {children}
-    </ToastProvider>
-  );
+  render(<ToastProvider>{children}</ToastProvider>);
 
 describe('ToastProvider', () => {
   it('muestra un toast genérico', async () => {
@@ -64,7 +61,7 @@ describe('ToastProvider', () => {
 
   it('limita a máximo 3 toasts simultáneos', async () => {
     renderWithProvider(<Demo />);
-    
+
     // Mostrar 4 toasts genéricos
     await act(async () => {
       for (let i = 0; i < 4; i++) {
@@ -113,7 +110,7 @@ describe('ToastProvider', () => {
 
   it('muestra toasts con todos los tipos disponibles respetando el límite', async () => {
     renderWithProvider(<Demo />);
-    
+
     // Mostrar los primeros 3 toasts
     await act(async () => {
       fireEvent.click(screen.getByText('success'));
@@ -137,12 +134,12 @@ describe('ToastProvider', () => {
     await waitFor(() => {
       // Primero verificamos que el toast más antiguo se eliminó
       expect(screen.queryByTestId('toast-success')).not.toBeInTheDocument();
-      
+
       // Luego verificamos que los otros 3 toasts están presentes
       expect(screen.getByTestId('toast-danger')).toBeInTheDocument();
       expect(screen.getByTestId('toast-warning')).toBeInTheDocument();
       expect(screen.getByTestId('toast-info')).toBeInTheDocument();
-      
+
       // Finalmente verificamos el número total de toasts
       const container = screen.getByTestId('toast-container');
       const toasts = container.querySelectorAll('[data-testid^="toast-"]');
@@ -161,4 +158,4 @@ describe('ToastProvider', () => {
       expect(screen.getByText('Test title')).toBeInTheDocument();
     });
   });
-}); 
+});

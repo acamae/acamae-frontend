@@ -2,7 +2,13 @@ import { configureStore } from '@reduxjs/toolkit';
 import { renderHook, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 
-import { loginAction, logoutAction, registerAction, forgotPasswordAction, resetPasswordAction } from '@application/state/actions/auth.actions';
+import {
+  loginAction,
+  logoutAction,
+  registerAction,
+  forgotPasswordAction,
+  resetPasswordAction,
+} from '@application/state/actions/auth.actions';
 import authReducer, { initialAuthState } from '@application/state/slices/authSlice';
 import { UserRole } from '@domain/constants/user';
 import { useAuth } from '@ui/hooks/useAuth';
@@ -20,7 +26,7 @@ function createTestStore(preloadedAuthState = initialAuthState) {
   return configureStore({
     reducer: { auth: authReducer },
     preloadedState: { auth: preloadedAuthState },
-    middleware: (getDefaultMiddleware) =>
+    middleware: getDefaultMiddleware =>
       getDefaultMiddleware({
         thunk: {
           extraArgument: {

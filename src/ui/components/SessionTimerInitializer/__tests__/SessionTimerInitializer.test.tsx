@@ -46,7 +46,7 @@ describe('SessionTimerInitializer', () => {
   it('no hace nada cuando el usuario no está autenticado', () => {
     (useAppSelector as unknown as jest.Mock).mockReturnValue(false);
     renderHook(() => SessionTimerInitializer());
-    
+
     expect(mockGetExpiresAt).not.toHaveBeenCalled();
     expect(mockDispatch).not.toHaveBeenCalled();
   });
@@ -56,24 +56,24 @@ describe('SessionTimerInitializer', () => {
     mockGetExpiresAt.mockReturnValue(Date.now() - 1000); // Sesión expirada
 
     renderHook(() => SessionTimerInitializer());
-    
+
     expect(mockGetExpiresAt).toHaveBeenCalled();
     expect(mockDispatch).toHaveBeenCalledWith(mockLogoutAction());
   });
 
   it('muestra el modal cuando la sesión está cerca de expirar', () => {
     const warningSeconds = 30;
-    const expiresAt = Date.now() + (warningSeconds * 1000);
-    
+    const expiresAt = Date.now() + warningSeconds * 1000;
+
     (useAppSelector as unknown as jest.Mock).mockReturnValue(true);
     mockGetExpiresAt.mockReturnValue(expiresAt);
-    
+
     // Mock de la variable de entorno
     const originalEnv = process.env.REACT_APP_SESSION_TIMEOUT_WARNING_SECONDS;
     process.env.REACT_APP_SESSION_TIMEOUT_WARNING_SECONDS = warningSeconds.toString();
 
     renderHook(() => SessionTimerInitializer());
-    
+
     expect(mockGetExpiresAt).toHaveBeenCalled();
     expect(mockDispatch).toHaveBeenCalledWith(mockSetExpiresAt(expiresAt));
     expect(mockDispatch).toHaveBeenCalledWith(mockShowModal());
@@ -84,17 +84,17 @@ describe('SessionTimerInitializer', () => {
 
   it('solo actualiza expiresAt cuando la sesión está lejos de expirar', () => {
     const warningSeconds = 30;
-    const expiresAt = Date.now() + ((warningSeconds + 10) * 1000);
-    
+    const expiresAt = Date.now() + (warningSeconds + 10) * 1000;
+
     (useAppSelector as unknown as jest.Mock).mockReturnValue(true);
     mockGetExpiresAt.mockReturnValue(expiresAt);
-    
+
     // Mock de la variable de entorno
     const originalEnv = process.env.REACT_APP_SESSION_TIMEOUT_WARNING_SECONDS;
     process.env.REACT_APP_SESSION_TIMEOUT_WARNING_SECONDS = warningSeconds.toString();
 
     renderHook(() => SessionTimerInitializer());
-    
+
     expect(mockGetExpiresAt).toHaveBeenCalled();
     expect(mockDispatch).toHaveBeenCalledWith(mockSetExpiresAt(expiresAt));
     expect(mockDispatch).not.toHaveBeenCalledWith(mockShowModal());
@@ -102,4 +102,4 @@ describe('SessionTimerInitializer', () => {
     // Restaurar variable de entorno
     process.env.REACT_APP_SESSION_TIMEOUT_WARNING_SECONDS = originalEnv;
   });
-}); 
+});

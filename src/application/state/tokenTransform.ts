@@ -29,7 +29,7 @@ export function decryptToken(token?: string | null): string | null {
       return null;
     }
     return decrypted;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
