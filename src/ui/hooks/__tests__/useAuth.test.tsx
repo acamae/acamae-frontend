@@ -2,15 +2,33 @@ import { configureStore } from '@reduxjs/toolkit';
 import { renderHook, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 
-import { loginAction, logoutAction, registerAction } from '@application/state/actions/auth.actions';
+import { loginAction, logoutAction, registerAction, forgotPasswordAction, resetPasswordAction } from '@application/state/actions/auth.actions';
 import authReducer, { initialAuthState } from '@application/state/slices/authSlice';
 import { UserRole } from '@domain/constants/user';
 import { useAuth } from '@ui/hooks/useAuth';
+
+// Mock de los casos de uso
+const mockForgotPasswordUseCase = {
+  execute: jest.fn().mockResolvedValue({ success: true }),
+};
+
+const mockResetPasswordUseCase = {
+  execute: jest.fn().mockResolvedValue({ success: true }),
+};
 
 function createTestStore(preloadedAuthState = initialAuthState) {
   return configureStore({
     reducer: { auth: authReducer },
     preloadedState: { auth: preloadedAuthState },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        thunk: {
+          extraArgument: {
+            forgotPasswordUseCase: mockForgotPasswordUseCase,
+            resetPasswordUseCase: mockResetPasswordUseCase,
+          },
+        },
+      }),
   });
 }
 
@@ -130,5 +148,105 @@ describe('useAuth Hook (Redux integration)', () => {
 
     expect(result.current.error).toBe('Credenciales inválidas');
     expect(result.current.isAuthenticated).toBe(false);
+  });
+
+  it('debe despachar forgotPassword y actualizar el estado', async () => {
+    const store = createTestStore();
+    const { result } = renderHook(() => useAuth(), { wrapper: getWrapper(store) });
+
+    await act(async () => {
+      await store.dispatch(
+        forgotPasswordAction.fulfilled({ success: true }, '', { email: 'test@example.com' })
+      );
+    });
+
+    expect(result.current.loading).toBe(false);
+    expect(result.current.error).toBeNull();
+  });
+
+  it('debe despachar resetPassword y actualizar el estado', async () => {
+    const store = createTestStore();
+    const { result } = renderHook(() => useAuth(), { wrapper: getWrapper(store) });
+
+    await act(async () => {
+      await store.dispatch(
+        resetPasswordAction.fulfilled({ success: true }, '', {
+          token: 'reset-token',
+          newPassword: 'new-password',
+        })
+      );
+    });
+
+    expect(result.current.loading).toBe(false);
+    expect(result.current.error).toBeNull();
+  });
+
+  it('debe manejar error en forgotPassword', async () => {
+    const store = createTestStore();
+    const { result } = renderHook(() => useAuth(), { wrapper: getWrapper(store) });
+
+    await act(async () => {
+      await store.dispatch(
+        forgotPasswordAction.rejected(
+          new Error('Error al enviar correo'),
+          '',
+          { email: 'test@example.com' },
+          { message: 'Error al enviar correo' }
+        )
+      );
+    });
+
+    expect(result.current.loading).toBe(false);
+    expect(result.current.error).toBe('Error al enviar correo');
+  });
+
+  it('debe manejar error en resetPassword', async () => {
+    const store = createTestStore();
+    const { result } = renderHook(() => useAuth(), { wrapper: getWrapper(store) });
+
+    await act(async () => {
+      await store.dispatch(
+        resetPasswordAction.rejected(
+          new Error('Error al restablecer contraseña'),
+          '',
+          { token: 'reset-token', newPassword: 'new-password' },
+          { message: 'Error al restablecer contraseña' }
+        )
+      );
+    });
+
+    expect(result.current.loading).toBe(false);
+    expect(result.current.error).toBe('Error al restablecer contraseña');
+  });
+
+  it('debe llamar a forgotPassword con los parámetros correctos', async () => {
+    const store = createTestStore();
+    const { result } = renderHook(() => useAuth(), { wrapper: getWrapper(store) });
+
+    const email = 'test@example.com';
+    await act(async () => {
+      await result.current.forgotPassword({ email });
+    });
+
+    expect(mockForgotPasswordUseCase.execute).toHaveBeenCalledWith({ email });
+    expect(store.getState().auth.loading).toBe(false);
+    expect(store.getState().auth.error).toBeNull();
+  });
+
+  it('debe llamar a resetPassword con los parámetros correctos', async () => {
+    const store = createTestStore();
+    const { result } = renderHook(() => useAuth(), { wrapper: getWrapper(store) });
+
+    const payload = {
+      token: 'reset-token',
+      newPassword: 'new-password',
+    };
+    await act(async () => {
+      await result.current.resetPassword(payload);
+    });
+
+    expect(mockResetPasswordUseCase.execute).toHaveBeenCalledWith(payload);
+    expect(store.getState().auth.loading).toBe(false);
+    expect(store.getState().auth.error).toBeNull();
   });
 });

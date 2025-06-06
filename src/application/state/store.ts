@@ -10,8 +10,8 @@ import { LogoutUseCase } from '@application/use-cases/auth/LogoutUseCase';
 import { RegisterUseCase } from '@application/use-cases/auth/RegisterUseCase';
 import { AuthApiRepository } from '@infrastructure/api/AuthApiRepository';
 
-import { ForgotPasswordUseCase } from '../use-cases/auth/ForgotPasswordUseCase';
-import { ResetPasswordUseCase } from '../use-cases/auth/ResetPasswordUseCase';
+import { ForgotPasswordUseCase } from '@application/use-cases/auth/ForgotPasswordUseCase';
+import { ResetPasswordUseCase } from '@application/use-cases/auth/ResetPasswordUseCase';
 
 // Auth repository
 const authRepository = new AuthApiRepository();

@@ -33,4 +33,22 @@ describe('ResetPasswordPage', () => {
     const { asFragment } = renderResetPasswordPage();
     expect(asFragment()).toMatchSnapshot();
   });
+
+  it('should not render when route does not match', () => {
+    const renderWithProviders = createTestProviderFactory();
+    const { container } = renderWithProviders(
+      <Routes>
+        <Route path="/restablecer-clave" element={<ResetPasswordPage />} />
+      </Routes>,
+      {
+        route: '/otra-ruta',
+      }
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('should render with empty token', () => {
+    renderResetPasswordPage({ token: '' });
+    expect(screen.getByTestId('reset-password-title')).toBeInTheDocument();
+  });
 });

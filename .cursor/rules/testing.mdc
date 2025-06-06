@@ -1,0 +1,36 @@
+---
+description: 
+globs: *.test.ts,*.test.tsx
+alwaysApply: false
+---
+**Testing Guidelines**
+
+* **Test Structure**:
+  - Use `act` for state updates and `waitFor` for verifications
+  - Group related assertions in a single `waitFor`
+  - Order assertions from most specific to most general
+  - Add clear comments explaining the purpose of each verification step
+
+* **DOM Queries**:
+  - Be specific with selectors to avoid false positives
+  - Scope queries to specific containers when possible
+  - Prefer `getByTestId` over generic selectors
+  - Check the actual HTML rendered in test errors
+
+* **Environment Safety**:
+  - Never modify `process.env` directly in tests
+  - Use `jest.spyOn(process.env, 'VARIABLE_NAME', 'get')` to mock environment variables
+  - Restore all spies and mocks in `afterEach` blocks
+  - Design tests to work correctly when run in parallel
+
+* **Type Consistency**:
+  - Check how types are transformed in the component
+  - Match test expectations with actual rendered values
+  - Document type transformations in component tests
+  - Maintain consistency in type handling across tests
+
+* **Test Coverage**:
+  - Maintain 90%+ test coverage for all new code
+  - Focus on testing behavior, not implementation details
+  - Test edge cases and error scenarios
+  - Verify component behavior before writing tests

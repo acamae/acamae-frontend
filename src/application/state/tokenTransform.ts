@@ -25,8 +25,11 @@ export function decryptToken(token?: string | null): string | null {
   try {
     const bytes = CryptoJS.AES.decrypt(token, SECRET_KEY);
     const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-    return decrypted ? decrypted : null;
-  } catch {
+    if (!decrypted || decrypted.length === 0) {
+      return null;
+    }
+    return decrypted;
+  } catch (error) {
     return null;
   }
 }

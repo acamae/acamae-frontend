@@ -3,54 +3,99 @@ description:
 globs: 
 alwaysApply: false
 ---
-Design and implement the request described above using a systematic, validation-driven approach:
+---
+description: To be used when implementing new features or code improvements
+---
 
-1. **Map System Context**:
-
-   - Explore the codebase structure with `tree -L 4 --gitignore | cat` to locate where the feature belongs.
 Design and implement the request described above using a systematic, validation-driven approach:
 
 1. **Analyze Context**:
-   - Identify relevant patterns, conventions, or domain models using `codebase_search` to ensure seamless integration.
-   - Pinpoint integration points—e.g., UI components, data layers, or APIs—affected by the request.
-   - Verify alignment with Hexagonal Architecture principles (domain, application, infrastructure, ui, shared layers).
+   - Identify relevant patterns, conventions, or domain models using `codebase_search`.
+   - Pinpoint integration points—e.g., UI components, data layers, or APIs.
+   - Verify alignment with Hexagonal Architecture principles.
+   - Check existing test patterns and coverage requirements.
 
 2. **Specify Requirements**:
-   - Break the request into clear, testable criteria—e.g., "Button triggers save, shows success state."
-   - Define use cases (normal and edge) and constraints (e.g., performance, UI consistency).
-   - Set scope boundaries to keep the implementation focused and maintainable.
-   - Ensure WCAG2 compliance and i18n support for all UI components.
+   - Break the request into clear, testable criteria.
+   - Define use cases (normal and edge) and constraints.
+   - Set scope boundaries to keep the implementation focused.
+   - Ensure WCAG2 compliance and i18n support.
 
 3. **Leverage Reusability**:
-   - Search for existing components or utilities with `codebase_search` that can be adapted—e.g., a "button" component or "save" function.
-   - Use `grep_search` to confirm similar implementations, ensuring consistency with project standards.
-   - Evaluate if the feature could be abstracted for future reuse, noting potential opportunities.
+   - Search for existing components or utilities with `codebase_search`.
+   - Use `grep_search` to confirm similar implementations.
+   - Evaluate if the feature could be abstracted for future reuse.
    - Check `shared/` directory for common utilities and patterns.
 
 4. **Plan Targeted Changes**:
-   - List all files requiring edits (relative to workspace root), dependencies to update, and new files if needed.
-   - Assess impacts on cross-cutting concerns—e.g., error handling, logging, or state management.
-   - Balance immediate needs with long-term code health, planning minimal yet effective changes.
+   - List all files requiring edits, dependencies to update, and new files.
+   - Assess impacts on cross-cutting concerns.
+   - Balance immediate needs with long-term code health.
    - Ensure API routes are defined in `shared/constants/apiRoutes.ts`.
 
 5. **Implement with Precision**:
-   - Provide a step-by-step plan with specific code changes—include file paths, line numbers, and snippets.
+   - Provide a step-by-step plan with specific code changes.
    - Adhere to project conventions:
      * Components: PascalCase
      * Hooks: `use` + camelCase
      * Utilities: camelCase
      * Constants: UPPER_SNAKE_CASE
-   - Follow Prettier (2-space indent, single quotes, max 100 chars/line) and ESLint rules.
-   - Highlight enhancements to organization or clarity—e.g., "Extract logic to a helper function."
+   - Follow Prettier and ESLint rules.
+   - Highlight enhancements to organization or clarity.
 
 6. **Validate and Stabilize**:
-   - Define test scenarios—e.g., "Save with valid data," "Save with no input"—to confirm functionality.
+   - Define test scenarios for normal, edge, and failure cases.
    - Ensure 90%+ test coverage for new code.
    - Use Jest & Testing Library for unit tests, Cypress for E2E tests.
    - Follow test patterns:
      * Use `I18nextProvider` and `MemoryRouter` for integration
      * Mock only what is necessary
      * For route tests, mock layouts with `<Outlet />`
-   - Recommend a stability check—e.g., "Monitor save API calls"—with rollback steps if issues arise.
+
+7. **Test Environment Safety**:
+   - Never modify `process.env` directly in tests
+   - Use `jest.spyOn` for environment variable mocking:
+     ```typescript
+     let envSpy: jest.SpyInstance;
+     
+     beforeEach(() => {
+       envSpy = jest.spyOn(process.env, 'VARIABLE_NAME', 'get')
+         .mockReturnValue('test-value');
+     });
+     
+     afterEach(() => {
+       envSpy.mockRestore();
+     });
+     ```
+   - Ensure test isolation by restoring all spies and mocks
+   - Design tests to work correctly in parallel execution
+   - Clean up environment modifications to prevent test pollution
+
+8. **Test Configuration**:
+   - Configure ALL mocks BEFORE importing the module to test
+   - Use `jest.isolateModules()` to prevent test pollution
+   - Clean mocks and state in `beforeEach`
+   - Restore mocks and spies in `afterEach/afterAll`
+   - Document test purpose with clear comments
+   - Verify environment variables are correctly mocked
+   - Use `expect.any()` for dynamic values instead of hardcoding
+
+9. **State Management**:
+   - Clean state between tests
+   - Restore original environment variables
+   - Verify mocks don't affect other tests
+   - Use `beforeEach` for setup and `afterEach` for cleanup
+   - Document test dependencies
+   - Avoid shared state between tests
+   - Verify state is properly restored
+
+10. **Documentation**:
+    - Explain each test's purpose
+    - Document non-obvious test cases
+    - Explain mock configuration
+    - Document state management
+    - Explain expectations
+    - Document debugging process
+    - Keep documentation updated
 
 This process delivers a well-integrated, reliable solution that enhances the codebase while meeting the request's goals.
