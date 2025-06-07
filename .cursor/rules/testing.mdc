@@ -23,14 +23,38 @@ alwaysApply: false
   - Restore all spies and mocks in `afterEach` blocks
   - Design tests to work correctly when run in parallel
 
-* **Type Consistency**:
-  - Check how types are transformed in the component
-  - Match test expectations with actual rendered values
-  - Document type transformations in component tests
-  - Maintain consistency in type handling across tests
+* **Type Safety in Tests**:
+  - Prefer specific types over `any` when possible
+  - Use `unknown` instead of `any` for better type safety
+  - Implement type guards for runtime type checking
+  - Define clear interfaces for test data structures
+  - Document type expectations in test comments
+  - Handle type errors with descriptive messages
+
+* **Test Code Formatting**:
+  - Follow Prettier rules for test files
+  - Keep test descriptions clear and concise
+  - Use consistent indentation for test blocks
+  - Format long conditions across multiple lines when required
+  - Maintain consistent spacing around operators
 
 * **Test Coverage**:
   - Maintain 90%+ test coverage for all new code
   - Focus on testing behavior, not implementation details
   - Test edge cases and error scenarios
   - Verify component behavior before writing tests
+
+* **Redux Testing Best Practices**:
+  - Use type-safe action creators in tests
+  - Mock Redux store with proper typing
+  - Test both success and failure scenarios
+  - Verify action types and payloads
+  - Test middleware behavior with proper type checking
+  - Use type guards for thunk testing
+
+* **Error Handling in Tests**:
+  - Test error scenarios explicitly
+  - Verify error messages and types
+  - Handle async errors properly
+  - Test error boundaries when applicable
+  - Document expected error behavior

@@ -50,7 +50,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ redirectTo = '/dashboard' }) => {
           typeof err === 'string'
             ? err
             : (err as { message?: string })?.message || t('login.failed');
-        console.error('errorMessage', errorMessage);
+        toast.error(errorMessage, t('login.failed'));
       }
     },
   });

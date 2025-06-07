@@ -172,6 +172,51 @@ describe('ForgotPasswordForm', () => {
       expect(screen.getByText('errors.email.required')).toBeInTheDocument();
       expect(apiPostMock).not.toHaveBeenCalled();
     });
+
+    it('valida que el correo electrónico tenga un formato válido', async () => {
+      (useForm as jest.Mock).mockReturnValue({
+        values: { email: 'invalid-email' },
+        errors: { email: 'errors.email.invalid' },
+        touched: { email: true },
+        isSubmitting: false,
+        handleChange: jest.fn(),
+        handleSubmit: jest.fn(),
+      });
+
+      render(<ForgotPasswordForm />);
+
+      expect(screen.getByText('errors.email.invalid')).toBeInTheDocument();
+      expect(apiPostMock).not.toHaveBeenCalled();
+    });
+
+    it('ejecuta la función de validación correctamente', () => {
+      let validateFn: (values: { email: string }) => Partial<{ email: string }> = () => ({});
+
+      (useForm as jest.Mock).mockImplementation(config => {
+        validateFn = config.validate;
+        return {
+          values: { email: '' },
+          errors: {},
+          touched: {},
+          isSubmitting: false,
+          handleChange: jest.fn(),
+          handleSubmit: jest.fn(),
+        };
+      });
+
+      render(<ForgotPasswordForm />);
+
+      // Test email vacío
+      expect(validateFn({ email: '' })).toEqual({ email: 'El correo electrónico es requerido' });
+
+      // Test email inválido
+      expect(validateFn({ email: 'invalid-email' })).toEqual({
+        email: 'Correo electrónico inválido',
+      });
+
+      // Test email válido
+      expect(validateFn({ email: 'test@example.com' })).toEqual({});
+    });
   });
 
   it('no muestra errores cuando el correo es válido', async () => {

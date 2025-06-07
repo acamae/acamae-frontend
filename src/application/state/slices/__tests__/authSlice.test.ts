@@ -140,4 +140,88 @@ describe('authSlice reducer', () => {
     );
     expect(state.loading).toBe(false);
   });
+
+  it('register rejected => error set', () => {
+    const state = reducer(initialAuthState, {
+      type: registerAction.rejected.type,
+      error: { message: 'Error de registro' },
+    });
+    expect(state.loading).toBe(false);
+    expect(state.error).toBe('Error de registro');
+  });
+
+  it('register rejected with undefined error message => error set to null', () => {
+    const state = reducer(initialAuthState, {
+      type: registerAction.rejected.type,
+      error: { message: undefined },
+    });
+    expect(state.loading).toBe(false);
+    expect(state.error).toBeNull();
+  });
+
+  it('login rejected with undefined error message => error set to null', () => {
+    const state = reducer(initialAuthState, {
+      type: loginAction.rejected.type,
+      error: { message: undefined },
+    });
+    expect(state.loading).toBe(false);
+    expect(state.error).toBeNull();
+  });
+
+  it('logout rejected with undefined error message => error set to null', () => {
+    const state = reducer(initialAuthState, {
+      type: logoutAction.rejected.type,
+      error: { message: undefined },
+    });
+    expect(state.loading).toBe(false);
+    expect(state.error).toBeNull();
+  });
+
+  it('forgotPassword rejected => error set', () => {
+    const state = reducer(initialAuthState, {
+      type: forgotPasswordAction.rejected.type,
+      error: { message: 'Error en recuperación' },
+    });
+    expect(state.loading).toBe(false);
+    expect(state.error).toBe('Error en recuperación');
+  });
+
+  it('forgotPassword rejected with undefined error message => error set to null', () => {
+    const state = reducer(initialAuthState, {
+      type: forgotPasswordAction.rejected.type,
+      error: { message: undefined },
+    });
+    expect(state.loading).toBe(false);
+    expect(state.error).toBeNull();
+  });
+
+  it('login fulfilled with undefined payload => sets user to null', () => {
+    const state = reducer(initialAuthState, {
+      type: loginAction.fulfilled.type,
+      payload: undefined,
+    });
+    expect(state.loading).toBe(false);
+    expect(state.isAuthenticated).toBe(true);
+    expect(state.user).toBeNull();
+  });
+
+  it('register fulfilled with undefined payload => sets user to null', () => {
+    const state = reducer(initialAuthState, {
+      type: registerAction.fulfilled.type,
+      payload: undefined,
+    });
+    expect(state.loading).toBe(false);
+    expect(state.isAuthenticated).toBe(true);
+    expect(state.user).toBeNull();
+  });
+
+  it('register fulfilled with undefined data => sets user to null', () => {
+    const state = reducer(initialAuthState, {
+      type: registerAction.fulfilled.type,
+      payload: { data: undefined },
+    });
+    expect(state.loading).toBe(false);
+    expect(state.isAuthenticated).toBe(true);
+    expect(state.user).toBeNull();
+  });
 });
