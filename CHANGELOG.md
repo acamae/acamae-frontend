@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/acamae/acamae-frontend/compare/v0.4.6...v0.5.0) (2025-06-07)
+
+### Features
+
+- **api:** add swagger doc ([f9e8cbe](https://github.com/acamae/acamae-frontend/commit/f9e8cbe7da9e52362cf082cfdd7a303d0fc9dda8))
+
+# [0.5.0](https://github.com/acamae/acamae-frontend/compare/v0.4.6...v0.5.0) (2025-06-07)
+
+### Features
+
+- **api:** add swagger doc ([f9e8cbe](https://github.com/acamae/acamae-frontend/commit/f9e8cbe7da9e52362cf082cfdd7a303d0fc9dda8))
+
 ## [0.4.6](https://github.com/acamae/acamae-frontend/compare/v0.4.5...v0.4.6) (2025-06-07)
 
 **Note:** Version bump only for package @acamae/frontend
