@@ -1,6 +1,6 @@
 {
   "name": "@acamae/frontend",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "type": "module",
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.1",
@@ -81,8 +81,6 @@
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.2.1"
-  },
-  "optionalDependencies": {
   },
   "scripts": {
     "start": "npx webpack-dev-server --progress --config ./webpack.config.js --mode development --host 0.0.0.0 --port 3000 --env development",
