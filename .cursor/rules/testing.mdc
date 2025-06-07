@@ -51,6 +51,11 @@ alwaysApply: false
   - Verify action types and payloads
   - Test middleware behavior with proper type checking
   - Use type guards for thunk testing
+  - Disable serialization checks in tests when needed (`serializableCheck: false`)
+  - Use specific selectors instead of returning full state
+  - Configure store with proper middleware and extra arguments
+  - Clean state between tests
+  - Mock external dependencies through `extraArgument`
 
 * **Error Handling in Tests**:
   - Test error scenarios explicitly
@@ -58,3 +63,47 @@ alwaysApply: false
   - Handle async errors properly
   - Test error boundaries when applicable
   - Document expected error behavior
+
+* **Hook Testing Best Practices**:
+  - Create custom wrapper for hook tests
+  - Configure Redux Provider correctly
+  - Handle async operations with `act`
+  - Clean up between tests
+  - Mock external dependencies
+  - Test all hook states (loading, error, success)
+  - Verify state transitions
+  - Test edge cases and error scenarios
+
+* **Test Environment Safety**:
+  - Never modify `process.env` directly in tests
+  - Use `jest.spyOn` for environment variable mocking
+  - Ensure test isolation by restoring all spies and mocks
+  - Design tests to work correctly in parallel execution
+  - Clean up environment modifications to prevent test pollution
+
+* **Test Configuration**:
+  - Configure ALL mocks BEFORE importing the module to test
+  - Use `jest.isolateModules()` to prevent test pollution
+  - Clean mocks and state in `beforeEach`
+  - Restore mocks and spies in `afterEach/afterAll`
+  - Document test purpose with clear comments
+  - Verify environment variables are correctly mocked
+  - Use `expect.any()` for dynamic values instead of hardcoding
+
+* **State Management**:
+  - Clean state between tests
+  - Restore original environment variables
+  - Verify mocks don't affect other tests
+  - Use `beforeEach` for setup and `afterEach` for cleanup
+  - Document test dependencies
+  - Avoid shared state between tests
+  - Verify state is properly restored
+
+* **Test Documentation**:
+  - Explain each test's purpose
+  - Document non-obvious test cases
+  - Explain mock configuration
+  - Document state management
+  - Explain expectations
+  - Document debugging process
+  - Keep documentation updated

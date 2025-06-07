@@ -23,7 +23,7 @@ describe('Redux Hooks', () => {
 
   describe('useAppSelector', () => {
     it('should return the initial state', () => {
-      const { result } = renderHook(() => useAppSelector(state => state), { wrapper });
+      const { result } = renderHook(() => useAppSelector(state => state.auth), { wrapper });
       expect(result.current).toBeDefined();
     });
 
