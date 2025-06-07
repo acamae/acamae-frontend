@@ -83,12 +83,6 @@
     "webpack-dev-server": "^5.2.1"
   },
   "optionalDependencies": {
-    "sass-embedded": "^1.89.0",
-    "sass-embedded-linux-musl-x64": "^1.89.1",
-    "sass-embedded-linux-x64-64": "^1.89.0",
-    "sass-embedded-macos-arm64": "^1.89.0",
-    "sass-embedded-macos-x64": "^1.89.0",
-    "sass-embedded-win32-x64-msvc": "^1.89.0"
   },
   "scripts": {
     "start": "npx webpack-dev-server --progress --config ./webpack.config.js --mode development --host 0.0.0.0 --port 3000 --env development",

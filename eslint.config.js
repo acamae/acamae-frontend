@@ -36,10 +36,17 @@ export default [
       prettier: prettierPlugin,
     },
     rules: {
+      'linebreak-style': 0,
       'no-unused-vars': 'off',
       'react/react-in-jsx-scope': 'off',
       'prettier/prettier': 'error',
       'react/prop-types': 'off',
+      'prettier/prettier': [
+        'error',
+        {
+          endOfLine: 'auto',
+        },
+      ],
       'import/order': [
         'error',
         {

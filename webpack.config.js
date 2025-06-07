@@ -5,9 +5,9 @@ import CopyPlugin from 'copy-webpack-plugin';
 import { config } from 'dotenv';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import sass from 'sass-embedded';
+import * as sass from 'sass';
 import TerserPlugin from 'terser-webpack-plugin';
-import webpack from 'webpack'; // eslint-disable-line
+import webpack from 'webpack';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 const __dirname = _dirname(fileURLToPath(import.meta.url));

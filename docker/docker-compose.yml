@@ -2,6 +2,7 @@ services:
   frontend:
     build:
       context: ../
+    container_name: acamae-frontend
     stdin_open: true
     tty: true
     env_file:
