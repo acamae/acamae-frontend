@@ -1,0 +1,321 @@
+openapi: 3.0.0
+info:
+  title: Acamae API
+  version: 1.0.0
+  description: API para la aplicación Acamae
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        firstName:
+          type: string
+        lastName:
+          type: string
+        isVerified:
+          type: boolean
+        verificationToken:
+          type: string
+        verificationExpiresAt:
+          type: string
+          format: date-time
+        resetToken:
+          type: string
+        resetExpiresAt:
+          type: string
+          format: date-time
+
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+        status:
+          type: integer
+        message:
+          type: string
+        code:
+          type: string
+
+    LoginPayload:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    RegisterPayload:
+      type: object
+      required:
+        - email
+        - password
+        - username
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+paths:
+  /auth/login:
+    post:
+      summary: Iniciar sesión
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginPayload'
+      responses:
+        '200':
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+
+  /auth/register:
+    post:
+      summary: Registrar nuevo usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterPayload'
+      responses:
+        '201':
+          description: Registro exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+
+  /auth/refresh-token:
+    post:
+      summary: Renovar token de acceso
+      responses:
+        '200':
+          description: Token renovado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /auth/logout:
+    post:
+      summary: Cerrar sesión
+      responses:
+        '200':
+          description: Logout exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /auth/verify-email/{token}:
+    get:
+      summary: Verificar email
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Email verificado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /auth/resend-verification:
+    post:
+      summary: Reenviar email de verificación
+      responses:
+        '200':
+          description: Email de verificación reenviado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /auth/forgot-password:
+    post:
+      summary: Solicitar restablecimiento de contraseña
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Email de restablecimiento enviado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /auth/reset-password/{token}:
+    post:
+      summary: Restablecer contraseña
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - newPassword
+              properties:
+                newPassword:
+                  type: string
+      responses:
+        '200':
+          description: Contraseña restablecida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /auth/me:
+    get:
+      summary: Obtener información del usuario actual
+      responses:
+        '200':
+          description: Información del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+
+  /users:
+    get:
+      summary: Obtener todos los usuarios
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+
+  /users/{id}:
+    get:
+      summary: Obtener usuario por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Información del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+
+    put:
+      summary: Actualizar usuario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Usuario actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+
+    delete:
+      summary: Eliminar usuario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Usuario eliminado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
