@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/acamae/acamae-frontend/compare/v0.5.3...v0.6.0) (2025-06-09)
+
+### Features
+
+- **styles:** switch from [@use](https://github.com/use) to [@import](https://github.com/import) for Bootstrap SCSS modules ([332478f](https://github.com/acamae/acamae-frontend/commit/332478f3244cb308e09e541fb341baae82b98225))
+
+# [0.6.0](https://github.com/acamae/acamae-frontend/compare/v0.5.3...v0.6.0) (2025-06-09)
+
+### Features
+
+- **styles:** switch from [@use](https://github.com/use) to [@import](https://github.com/import) for Bootstrap SCSS modules ([332478f](https://github.com/acamae/acamae-frontend/commit/332478f3244cb308e09e541fb341baae82b98225))
+
 ## [0.5.3](https://github.com/acamae/acamae-frontend/compare/v0.5.2...v0.5.3) (2025-06-09)
 
 **Note:** Version bump only for package @acamae/frontend
