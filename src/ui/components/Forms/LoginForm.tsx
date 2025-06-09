@@ -39,16 +39,8 @@ const LoginForm: React.FC = () => {
       [t]
     ),
 
-    onSubmit: async values => {
-      try {
-        await login({ email: values.email, password: values.password });
-      } catch (err: unknown) {
-        const errorMessage =
-          typeof err === 'string'
-            ? err
-            : (err as { message?: string })?.message || t('login.failed');
-        toast.error(errorMessage, t('login.failed'));
-      }
+    onSubmit: values => {
+      login({ email: values.email, password: values.password });
     },
   });
 

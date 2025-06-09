@@ -31,8 +31,10 @@ const authSlice = createSlice({
       })
       .addCase(loginAction.fulfilled, (state, action) => {
         state.loading = false;
-        state.isAuthenticated = true;
         state.user = action.payload?.data ?? null;
+        state.isAuthenticated = !!state.user;
+        state.error =
+          !state.user && action.payload?.message ? action.payload.message : 'unknown error';
       })
       .addCase(loginAction.rejected, (state, action) => {
         state.loading = false;
@@ -59,8 +61,10 @@ const authSlice = createSlice({
       })
       .addCase(registerAction.fulfilled, (state, action) => {
         state.loading = false;
-        state.isAuthenticated = true;
         state.user = action.payload?.data ?? null;
+        state.isAuthenticated = !!state.user;
+        state.error =
+          !state.user && action.payload?.message ? action.payload.message : 'unknown error';
       })
       .addCase(registerAction.rejected, (state, action) => {
         state.loading = false;

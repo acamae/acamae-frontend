@@ -11,10 +11,6 @@ const PrivateHeader: React.FC = () => {
   const { t } = useTranslation();
   const { logout } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-  };
-
   return (
     <div id="header" className="app-header" data-testid="private-header">
       <div className="desktop-toogler">
@@ -65,7 +61,7 @@ const PrivateHeader: React.FC = () => {
           </div>
         </div>
         <div className="menu-item">
-          <button onClick={handleLogout} className="btn btn-danger btn-sm" data-testid="btn-logout">
+          <button onClick={logout} className="btn btn-danger btn-sm" data-testid="btn-logout">
             {t('nav.logout')}
           </button>
         </div>

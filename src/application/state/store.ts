@@ -1,10 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { persistReducer, persistStore } from 'redux-persist';
+import { persistStore } from 'redux-persist';
 
-import { authPersistConfig } from '@application/state/persistConfig';
+import rootReducer from '@application/state/rootReducer';
 import sessionTimerMiddleware from '@application/state/sessionTimerMiddleware';
-import authReducer from '@application/state/slices/authSlice';
-import sessionTimerReducer from '@application/state/slices/sessionTimerSlice';
 import { ForgotPasswordUseCase } from '@application/use-cases/auth/ForgotPasswordUseCase';
 import { LoginUseCase } from '@application/use-cases/auth/LoginUseCase';
 import { LogoutUseCase } from '@application/use-cases/auth/LogoutUseCase';
@@ -14,7 +12,6 @@ import { AuthApiRepository } from '@infrastructure/api/AuthApiRepository';
 
 // Auth repository
 const authRepository = new AuthApiRepository();
-const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 
 // Use cases
 const loginUseCase = new LoginUseCase(authRepository);
@@ -25,10 +22,7 @@ const resetPasswordUseCase = new ResetPasswordUseCase(authRepository);
 
 // Store
 export const store = configureStore({
-  reducer: {
-    auth: persistedAuthReducer,
-    sessionTimer: sessionTimerReducer,
-  },
+  reducer: rootReducer,
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {

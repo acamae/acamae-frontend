@@ -52,7 +52,8 @@ describe('authSlice reducer', () => {
       payload: { data: undefined },
     });
     expect(state.loading).toBe(false);
-    expect(state.isAuthenticated).toBe(true);
+    expect(state.isAuthenticated).toBe(false);
+    expect(state.error).not.toBeNull();
     expect(state.user).toBeNull();
   });
 
@@ -62,7 +63,8 @@ describe('authSlice reducer', () => {
       payload: { data: null },
     });
     expect(state.loading).toBe(false);
-    expect(state.isAuthenticated).toBe(true);
+    expect(state.isAuthenticated).toBe(false);
+    expect(state.error).not.toBeNull();
     expect(state.user).toBeNull();
   });
 
@@ -72,7 +74,8 @@ describe('authSlice reducer', () => {
       payload: {},
     });
     expect(state.loading).toBe(false);
-    expect(state.isAuthenticated).toBe(true);
+    expect(state.isAuthenticated).toBe(false);
+    expect(state.error).not.toBeNull();
     expect(state.user).toBeNull();
   });
 
@@ -201,7 +204,8 @@ describe('authSlice reducer', () => {
       payload: undefined,
     });
     expect(state.loading).toBe(false);
-    expect(state.isAuthenticated).toBe(true);
+    expect(state.isAuthenticated).toBe(false);
+    expect(state.error).not.toBeNull();
     expect(state.user).toBeNull();
   });
 
@@ -211,7 +215,8 @@ describe('authSlice reducer', () => {
       payload: undefined,
     });
     expect(state.loading).toBe(false);
-    expect(state.isAuthenticated).toBe(true);
+    expect(state.isAuthenticated).toBe(false);
+    expect(state.error).not.toBeNull();
     expect(state.user).toBeNull();
   });
 
@@ -221,7 +226,8 @@ describe('authSlice reducer', () => {
       payload: { data: undefined },
     });
     expect(state.loading).toBe(false);
-    expect(state.isAuthenticated).toBe(true);
+    expect(state.isAuthenticated).toBe(false);
+    expect(state.error).not.toBeNull();
     expect(state.user).toBeNull();
   });
 });

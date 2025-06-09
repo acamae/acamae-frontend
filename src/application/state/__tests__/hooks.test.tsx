@@ -2,8 +2,8 @@ import { configureStore } from '@reduxjs/toolkit';
 import { renderHook } from '@testing-library/react';
 import { Provider } from 'react-redux';
 
-import { useAppDispatch, useAppSelector } from '../hooks';
-import rootReducer from '../rootReducer';
+import { useAppDispatch, useAppSelector } from '@application/state/hooks';
+import rootReducer from '@application/state/rootReducer';
 
 describe('Redux Hooks', () => {
   const store = configureStore({

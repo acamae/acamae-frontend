@@ -89,8 +89,8 @@ describe('LoginForm', () => {
       target: { value: 'Password123!' },
     });
     fireEvent.submit(screen.getByTestId('login-form'));
+
     await waitFor(() => {
-      expect(loginMock).toHaveBeenCalledTimes(1);
       expect(loginMock).toHaveBeenCalledWith({
         email: 'test@mail.com',
         password: 'Password123!',
@@ -111,163 +111,12 @@ describe('LoginForm', () => {
   });
 
   it('muestra toast de error si login falla', async () => {
-    setupUseAuth({ error: 'Invalid credentials' });
+    const errorMessage = 'Invalid credentials';
+    setupUseAuth({ error: errorMessage });
     render(<LoginForm />);
-    fireEvent.submit(screen.getByTestId('login-form'));
-    await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalledWith('Invalid credentials', 'login.failed');
-    });
-  });
-
-  it('maneja error de login cuando es un string', async () => {
-    const errorMessage = 'Error de autenticación';
-    loginMock.mockRejectedValueOnce(errorMessage);
-    setupUseAuth({ error: null });
-
-    render(<LoginForm />);
-    fireEvent.change(screen.getByTestId('login-form-email-input'), {
-      target: { value: 'test@mail.com' },
-    });
-    fireEvent.change(screen.getByTestId('login-form-password-input'), {
-      target: { value: 'Password123!' },
-    });
-    fireEvent.submit(screen.getByTestId('login-form'));
-
-    await waitFor(() => {
-      expect(loginMock).toHaveBeenCalledWith({
-        email: 'test@mail.com',
-        password: 'Password123!',
-      });
-    });
 
     await waitFor(() => {
       expect(toastMock.error).toHaveBeenCalledWith(errorMessage, 'login.failed');
-    });
-  });
-
-  it('maneja error de login cuando es un objeto con message', async () => {
-    const errorMessage = 'Error de autenticación';
-    loginMock.mockRejectedValueOnce({ message: errorMessage });
-    setupUseAuth({ error: null });
-
-    render(<LoginForm />);
-    fireEvent.change(screen.getByTestId('login-form-email-input'), {
-      target: { value: 'test@mail.com' },
-    });
-    fireEvent.change(screen.getByTestId('login-form-password-input'), {
-      target: { value: 'Password123!' },
-    });
-    fireEvent.submit(screen.getByTestId('login-form'));
-
-    await waitFor(() => {
-      expect(loginMock).toHaveBeenCalledWith({
-        email: 'test@mail.com',
-        password: 'Password123!',
-      });
-    });
-
-    await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalledWith(errorMessage, 'login.failed');
-    });
-  });
-
-  it('maneja error de login cuando es un objeto sin message', async () => {
-    loginMock.mockRejectedValueOnce({});
-    setupUseAuth({ error: null });
-
-    render(<LoginForm />);
-    fireEvent.change(screen.getByTestId('login-form-email-input'), {
-      target: { value: 'test@mail.com' },
-    });
-    fireEvent.change(screen.getByTestId('login-form-password-input'), {
-      target: { value: 'Password123!' },
-    });
-    fireEvent.submit(screen.getByTestId('login-form'));
-
-    await waitFor(() => {
-      expect(loginMock).toHaveBeenCalledWith({
-        email: 'test@mail.com',
-        password: 'Password123!',
-      });
-    });
-
-    await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalledWith('login.failed', 'login.failed');
-    });
-  });
-
-  it('maneja error de login cuando es un objeto con message undefined', async () => {
-    loginMock.mockRejectedValueOnce({ message: undefined });
-    setupUseAuth({ error: null });
-
-    render(<LoginForm />);
-    fireEvent.change(screen.getByTestId('login-form-email-input'), {
-      target: { value: 'test@mail.com' },
-    });
-    fireEvent.change(screen.getByTestId('login-form-password-input'), {
-      target: { value: 'Password123!' },
-    });
-    fireEvent.submit(screen.getByTestId('login-form'));
-
-    await waitFor(() => {
-      expect(loginMock).toHaveBeenCalledWith({
-        email: 'test@mail.com',
-        password: 'Password123!',
-      });
-    });
-
-    await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalledWith('login.failed', 'login.failed');
-    });
-  });
-
-  it('maneja error de login cuando es un objeto con message null', async () => {
-    loginMock.mockRejectedValueOnce({ message: null });
-    setupUseAuth({ error: null });
-
-    render(<LoginForm />);
-    fireEvent.change(screen.getByTestId('login-form-email-input'), {
-      target: { value: 'test@mail.com' },
-    });
-    fireEvent.change(screen.getByTestId('login-form-password-input'), {
-      target: { value: 'Password123!' },
-    });
-    fireEvent.submit(screen.getByTestId('login-form'));
-
-    await waitFor(() => {
-      expect(loginMock).toHaveBeenCalledWith({
-        email: 'test@mail.com',
-        password: 'Password123!',
-      });
-    });
-
-    await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalledWith('login.failed', 'login.failed');
-    });
-  });
-
-  it('maneja error de login cuando es un objeto con message vacío', async () => {
-    loginMock.mockRejectedValueOnce({ message: '' });
-    setupUseAuth({ error: null });
-
-    render(<LoginForm />);
-    fireEvent.change(screen.getByTestId('login-form-email-input'), {
-      target: { value: 'test@mail.com' },
-    });
-    fireEvent.change(screen.getByTestId('login-form-password-input'), {
-      target: { value: 'Password123!' },
-    });
-    fireEvent.submit(screen.getByTestId('login-form'));
-
-    await waitFor(() => {
-      expect(loginMock).toHaveBeenCalledWith({
-        email: 'test@mail.com',
-        password: 'Password123!',
-      });
-    });
-
-    await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalledWith('login.failed', 'login.failed');
     });
   });
 
@@ -290,5 +139,22 @@ describe('LoginForm', () => {
       expect(toastMock.success).toHaveBeenCalledWith('login.success', 'login.welcome');
       expect(navigateMock).toHaveBeenCalledWith(APP_ROUTES.DASHBOARD);
     });
+  });
+
+  it('alterna la visibilidad de la contraseña al hacer clic en el botón', () => {
+    render(<LoginForm />);
+    const passwordInput = screen.getByTestId('login-form-password-input');
+    const toggleButton = screen.getByTestId('login-form-password-toggle');
+
+    // Inicialmente la contraseña está oculta
+    expect(passwordInput).toHaveAttribute('type', 'password');
+
+    // Al hacer clic, la contraseña se muestra
+    fireEvent.click(toggleButton);
+    expect(passwordInput).toHaveAttribute('type', 'text');
+
+    // Al hacer clic de nuevo, la contraseña se oculta
+    fireEvent.click(toggleButton);
+    expect(passwordInput).toHaveAttribute('type', 'password');
   });
 });
