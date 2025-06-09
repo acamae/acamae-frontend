@@ -1,15 +1,14 @@
 import { resolve as _resolve, dirname as _dirname } from 'path';
 import { fileURLToPath } from 'url';
 
+import autoprefixer from 'autoprefixer';
 import CopyPlugin from 'copy-webpack-plugin';
 import { config } from 'dotenv';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import * as sass from 'sass';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-
 const __dirname = _dirname(fileURLToPath(import.meta.url));
 
 export default env => {
@@ -103,14 +102,23 @@ export default env => {
             {
               loader: 'css-loader',
               options: {
+                modules: false,
                 sourceMap: true,
+              },
+            },
+            {
+              // Loader for webpack to process CSS with PostCSS
+              loader: 'postcss-loader',
+              options: {
+                postcssOptions: {
+                  plugins: [autoprefixer],
+                },
               },
             },
             // Compiles Sass to CSS
             {
               loader: 'sass-loader',
               options: {
-                implementation: sass,
                 // Exclude node_modules from sass-loader processing
                 additionalData: (content, loaderContext) => {
                   if (loaderContext.resourcePath.includes('node_modules')) {
@@ -118,9 +126,15 @@ export default env => {
                   }
                   return content;
                 },
-                api: 'modern-compiler',
-                // Enable source maps
                 sourceMap: true,
+                sassOptions: {
+                  silenceDeprecations: [
+                    'mixed-decls',
+                    'color-functions',
+                    'global-builtin',
+                    'import',
+                  ],
+                },
               },
             },
           ],

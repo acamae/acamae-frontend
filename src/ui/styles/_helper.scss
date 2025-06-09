@@ -1,0 +1,341 @@
+/* Helper Margin */
+.top-auto { top: auto !important; }
+.bottom-auto { bottom: auto !important; }
+.start-auto { left: auto !important; }
+.end-auto { right: auto !important; }
+@include helper-spacing('', 'margin', 'm');
+@include helper-spacing('top', 'margin', 'mt');
+@include helper-spacing('right', 'margin', 'me');
+@include helper-spacing('bottom', 'margin', 'mb');
+@include helper-spacing('left', 'margin', 'ms');
+@include helper-spacing('mx', 'margin', 'mx');
+@include helper-spacing('my', 'margin', 'my');
+
+
+/* Helper Padding */
+@include helper-spacing('', 'padding', 'p');
+@include helper-spacing('top', 'padding', 'pt');
+@include helper-spacing('right', 'padding', 'pe');
+@include helper-spacing('bottom', 'padding', 'pb');
+@include helper-spacing('left', 'padding', 'ps');
+@include helper-spacing('px', 'padding', 'px');
+@include helper-spacing('py', 'padding', 'py');
+
+
+/* Helper Font */
+@include helper-font-size(0, 80);
+@include helper-font-weight(1, 8);
+
+
+/* Helper Position Direction */
+.top-0 { top: 0 !important; }
+.bottom-0 { bottom: 0 !important; }
+.start-0 { left: 0 !important; }
+.end-0 { right: 0 !important; }
+.top-auto { top: auto !important; }
+.bottom-auto { bottom: auto !important; }
+.start-auto { left: auto !important; }
+.end-auto { right: auto !important; }
+
+
+/* Helper Cursor */
+.cursor-pointer { cursor: pointer !important }
+.cursor-text { cursor: text !important }
+.cursor-default { cursor: default !important }
+.cursor-inherit { cursor: inherit !important }
+.cursor-move { cursor: move !important }
+.cursor-progress { cursor: progress !important }
+
+
+/* Helper Position Responsive */
+$positions: (static, relative, absolute, fixed, sticky);
+$transform-values: (none, initial);
+$visibility-values: (none, initial);
+@each $breakpoint, $size in $grid-breakpoints {
+	@each $position in $positions {
+		@if $breakpoint == xs {
+			.position-#{$position} { position: $position !important; }
+		} @else {
+			@media (min-width: $size) {
+				.position-#{$breakpoint}-#{$position} { position: $position !important; }
+			}
+		}
+	}
+	@each $value in $transform-values {
+		@if $breakpoint == xs {
+			.transform-#{$value} { transform: #{$value} !important; }
+		} @else {
+			@media (min-width: $size) {
+				.transform-#{$breakpoint}-#{$value} { transform: #{$value} !important; }
+			}
+		}
+	}
+	@each $value in $visibility-values {
+		@if $breakpoint == xs {
+			.visibility-#{$value} { visibility: #{$value} !important; }
+		} @else {
+			@media (min-width: $size) {
+				.visibility-#{$breakpoint}-#{$value} { visibility: #{$value} !important; }
+			}
+		}
+	}
+	@each $name, $value in $zindex-levels {
+    .z-#{$breakpoint}-#{$name} {
+      @include media-breakpoint-up($breakpoint) {
+        z-index: $value !important;
+      }
+    }
+  }
+}
+
+
+/* Helper Text */
+.text-underline { text-decoration: underline !important; }
+.text-gradient { -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; }
+.line-height-1 { line-height: 1 !important; }
+@for $i from 10 through 20 {
+	.lh-#{$i} {
+		line-height: #{$i * .1} !important;
+	}
+	.rounded-#{$i}px {
+		border-radius: #{$i}px !important;
+	}
+}
+
+
+/* Helper Hover */
+.hover-show:hover .hover-show-elm { display: block !important }
+.hover-bg-component:hover { background-color: var(--#{$prefix}component-bg) !important }
+.hover-bg-body:hover { background-color: var(--#{$prefix}body-bg) !important }
+
+
+/* Helper Max Width & Height */
+.mw-75 { max-width: 75% !important; }
+.mw-50 { max-width: 50% !important; }
+.mw-25 { max-width: 25% !important; }
+.mh-75 { max-height: 75% !important; }
+.mh-50 { max-height: 50% !important; }
+.mh-25 { max-height: 25% !important; }
+
+
+/* Helper Size */
+@include helper-size('w', 'width');
+@include helper-size('h', 'height');
+
+
+/* Helper Color */
+@each $color, $value in $theme-colors {
+	@include helper-color($color, $value);
+}
+@each $color, $value in $colors {
+	@include helper-color($color, $value);
+}
+
+
+/* Helper Background */
+@if $enable-dark-mode {
+	@include color-mode(dark, true) {
+		@each $color, $value in $theme-colors-dark {
+			--#{$prefix}#{$color}: #{$value};
+			--#{$prefix}#{$color}-rgb: #{to-rgb($value)};
+			
+			@include helper-color-dark($color, $value);
+		}
+	}
+}
+.bg-none { background: none !important; }
+.bg-position-center { background-position: center !important; }
+.bg-size-cover { background-size: cover !important; }
+.bg-repeat-no-repeat { background-repeat: no-repeat !important; }
+.bg-gradient-from-transparent { --#{$prefix}bg-gradient-from: transparent; }
+.bg-gradient-to-transparent { --#{$prefix}bg-gradient-to: transparent; }
+.bg-gradient-to-r { background: linear-gradient(to right, var(--#{$prefix}bg-gradient-from) 0%, var(--#{$prefix}bg-gradient-to) 100%); }
+.bg-gradient-to-l { background: linear-gradient(to left, var(--#{$prefix}bg-gradient-from) 0%, var(--#{$prefix}bg-gradient-to) 100%); }
+.bg-gradient-to-t { background: linear-gradient(to top, var(--#{$prefix}bg-gradient-from) 0%, var(--#{$prefix}bg-gradient-to) 100%); }
+.bg-gradient-to-b { background: linear-gradient(to bottom, var(--#{$prefix}bg-gradient-from) 0%, var(--#{$prefix}bg-gradient-to) 100%); }
+.bg-gradient-to-tr { background: linear-gradient(to top right, var(--#{$prefix}bg-gradient-from) 0%, var(--#{$prefix}bg-gradient-to) 100%); }
+.bg-gradient-to-tl { background: linear-gradient(to top left, var(--#{$prefix}bg-gradient-from) 0%, var(--#{$prefix}bg-gradient-to) 100%); }
+.bg-gradient-to-br { background: linear-gradient(to bottom right, var(--#{$prefix}bg-gradient-from) 0%, var(--#{$prefix}bg-gradient-to) 100%); }
+.bg-gradient-to-bl { background: linear-gradient(to bottom left, var(--#{$prefix}bg-gradient-from) 0%, var(--#{$prefix}bg-gradient-to) 100%); }
+.bg-gradient-radial { background: radial-gradient(circle, var(--#{$prefix}bg-gradient-from) 0%, var(--#{$prefix}bg-gradient-to) 100%); }
+.bg-gradient-conic { background: conic-gradient(var(--#{$prefix}bg-gradient-from) 0deg, var(--#{$prefix}bg-gradient-to) 360deg); }
+.bg-gradient-45 { background: linear-gradient(45deg, var(--#{$prefix}bg-gradient-from) 0%, var(--#{$prefix}bg-gradient-to) 100%); }
+.bg-gradient-135 { background: linear-gradient(135deg, var(--#{$prefix}bg-gradient-from) 0%, var(--#{$prefix}bg-gradient-to) 100%); }
+.bg-blur-1 { backdrop-filter: blur(3px) !important; }
+.bg-blur-2 { backdrop-filter: blur(6px) !important; }
+.bg-blur-3 { backdrop-filter: blur(9px) !important; }
+@include background-gradient('bg-gradient-orange-red', lighten($orange, 10%), lighten($red, 10%));
+@include background-gradient('bg-gradient-red-orange', lighten($red, 10%), lighten($orange, 10%));
+@include background-gradient('bg-gradient-red-pink', lighten($red, 10%), lighten($pink, 10));
+@include background-gradient('bg-gradient-yellow-orange', lighten($yellow, 10%), lighten($orange, 10%));
+@include background-gradient('bg-gradient-yellow-red', lighten($yellow, 10%), lighten($red, 10%));
+@include background-gradient('bg-gradient-yellow-green', lighten($yellow, 10%), lighten($green, 10%));
+@include background-gradient('bg-gradient-blue-indigo', $blue, $indigo);
+@include background-gradient('bg-gradient-blue-cyan', $blue, $cyan);
+@include background-gradient('bg-gradient-cyan-blue', $cyan, $blue);
+@include background-gradient('bg-gradient-cyan-indigo', $cyan, $indigo);
+@include background-gradient('bg-gradient-indigo-blue', $indigo, $blue);
+@include background-gradient('bg-gradient-custom-orange', lighten(mix($pink, $orange, 50%), 6%), lighten(mix($pink, $orange, 50%), 13%), right);
+@include background-gradient('bg-gradient-custom-pink', lighten(mix($black, $pink, 20%), 14%), lighten(mix($black, $pink, 20%), 21%), right);
+@include background-gradient('bg-gradient-custom-teal', mix($black, $teal, 18%), $teal, right);
+@include background-gradient('bg-gradient-custom-indigo', lighten(mix($black, $indigo, 5%), 14%), lighten(mix($black, $indigo, 5%), 25%), right);
+@include background-gradient('bg-gradient-custom-blue', $blue, lighten($blue, 10%), right);
+.bg-gradient-indigo-teal {
+  background-image: linear-gradient(to left, $indigo, $blue, $teal) !important;
+}
+@if $enable-dark-mode {
+  @include color-mode(dark, true) {
+  	.invert-dark {
+  		filter: invert(1);
+  	}
+  }
+}
+@for $i from 2 through 9 {
+	.bg-cover-#{$i}:after {
+		background-image: url('images/cover-#{$i}.jpg');
+	}
+	.bg-cover-none:after {
+		background-color: var(--#{$prefix}body-bg);
+	}
+	@if $enable-dark-mode {
+		@include color-mode(dark, true) {
+			&.bg-cover-#{$i}:after {
+				background-image: url('images/cover-#{$i}-dark.jpg');
+			}
+		}
+	}
+}
+
+
+/* Helper Opacity */
+@include helper-opacity(0, 10);
+
+
+/* Helper Sticky Top */
+.desktop-sticky-top {
+	@include media-breakpoint-up(xl) {
+		position: sticky;
+		top: $app-header-height + rem(20px);
+	}
+}
+
+
+/* Helper Outline */
+.outline-none { outline: none !important }
+
+
+/* Helper Shimmer Loader */
+.shimmer-loader {
+	position: relative;
+	overflow: hidden;
+	background: rgba(var(--#{$prefix}body-color-rgb), .15);
+}
+.shimmer-loader::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(90deg, transparent 0%,  rgba(var(--#{$prefix}body-color-rgb), 0.1) 50%, transparent 100%);
+	animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+	0% { left: -100%; }
+	100% { left: 100%; }
+}
+
+
+/* Helper Typing Animation */
+.typing-animation {
+	overflow: hidden;
+	white-space: nowrap;
+	animation: typing 2.5s steps(50, end);
+}
+@keyframes typing { 
+	from { width: 0; } 
+	to { width: 100%; }
+}
+
+
+/* Helper Flex */
+.flex-1 {
+	flex: 1 !important;
+}
+
+
+/* Helper Theme */
+.list-group-item.active,
+.page-item.active .page-link,
+.form-check-input:checked,
+.nav-pills .nav-link.active, 
+.nav-pills .show>.nav-link {
+	background-color: var(--#{$prefix}theme);
+	border-color: var(--#{$prefix}theme);
+}
+.btn-theme {
+	background-color: var(--#{$prefix}theme);
+	border-color: var(--#{$prefix}theme);
+	position: relative;
+	
+	&:before {
+		content: '';
+		position: absolute;
+		top: -1px;
+		left: -1px;
+		right: -1px;
+		bottom: -1px;
+		
+		border-radius: $border-radius;
+		@include transition($btn-transition);
+	}
+	&.disabled,
+	&:disabled {
+		background-color: var(--#{$prefix}theme);
+		border-color: var(--#{$prefix}theme);
+	}
+	&:hover,
+	&:focus,
+	&:active,
+	&.active {
+		background-color: var(--#{$prefix}theme);
+		border-color: var(--#{$prefix}theme);
+		
+		&:before {
+			background: rgba($white, .2);
+		}
+	}
+	&:focus,
+	&:active,
+	&.active:focus, 
+	&:active:focus {
+		@include box-shadow(0 0 0 0.25rem rgba(#{var(--#{$prefix}theme-rgb)}, .5));
+	}
+}
+.btn-outline-theme {
+	color: var(--#{$prefix}theme);
+	border-color: var(--#{$prefix}theme);
+	
+	&:hover,
+	&.active {
+		background-color: var(--#{$prefix}theme);
+		border-color: var(--#{$prefix}theme);
+	}
+	&.disabled,
+	&:disabled {
+		color: var(--#{$prefix}theme);
+	}
+	&:focus,
+	&:active,
+	&.active:focus, 
+	&:active:focus {
+		@include box-shadow(0 0 0 0.25rem rgba(#{var(--#{$prefix}theme-rgb)}, .5));
+	}
+}
+.nav-link {
+	color: var(--#{$prefix}theme);
+	
+	&:hover {
+		color: rgba(#{var(--#{$prefix}theme-rgb)}, .5);
+	}
+}
