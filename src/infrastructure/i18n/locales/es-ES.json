@@ -8,6 +8,10 @@
     "title": "Iniciar sesión",
     "email": "Correo electrónico",
     "password": "Contraseña",
+    "protection_message": "Para tu protección, por favor verifica tu identidad.",
+    "no_account": "¿No tienes cuenta?",
+    "sign_up": "Regístrate",
+    "no_account_suffix": "para crear una.",
     "button": "Acceder",
     "accessing": "Accediendo...",
     "forgot": "¿Olvidaste tu contraseña?",
@@ -41,6 +45,8 @@
     "processing": "Registrando...",
     "message": "¿Aún no tienes cuenta?",
     "toggle_password": "Mostrar/ocultar contraseña",
+    "terms_and_conditions": "Acepto los <url>términos y condiciones</url>",
+    "terms_and_conditions_help": "Al crear una cuenta, aceptas nuestros términos y condiciones.",
     "strength": {
       "weak": "Débil",
       "fair": "Regular",
@@ -77,6 +83,9 @@
       "reset_request": "No se pudo procesar la solicitud. Intenta más tarde."
     },
     "recaptcha": "Error al verificar reCAPTCHA.",
+    "terms": {
+      "required": "Por favor, acepta los términos y condiciones."
+    },
     "session": {
       "start": "No se pudo iniciar sesión.",
       "expired": "Tu sesión ha expirado. Inicia sesión de nuevo.",

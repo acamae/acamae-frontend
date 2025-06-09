@@ -3,37 +3,27 @@
 exports[`LoginPage snapshot render 1`] = `
 <DocumentFragment>
   <div
-    class="py-5 container"
+    class="login"
   >
     <div
-      class="justify-content-center row"
+      class="login-content"
     >
-      <div
-        class="col-xl-5 col-lg-6 col-md-8 col-12"
+      <h1
+        class="text-center"
+        data-testid="login-page-title"
       >
-        <div
-          class="card"
-        >
-          <div
-            class="text-center card-header"
-          >
-            <h2
-              class="mb-4 text-center"
-              data-testid="login-title"
-            >
-              Iniciar sesión
-            </h2>
-          </div>
-          <div
-            class="card-body"
-          >
-            <div
-              data-testid="mock-login-form"
-            >
-              Mocked Login Form
-            </div>
-          </div>
-        </div>
+        Iniciar sesión
+      </h1>
+      <div
+        class="text-inverse text-opacity-50 text-center mb-4"
+        data-testid="login-page-description"
+      >
+        Para tu protección, por favor verifica tu identidad.
+      </div>
+      <div
+        data-testid="mock-login-form"
+      >
+        Mocked Login Form
       </div>
     </div>
   </div>

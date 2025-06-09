@@ -4,15 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { validateEmail, validatePassword } from '@/domain/services/validationService';
+import { APP_ROUTES } from '@/shared/constants/appRoutes';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
 import { useToast } from '@ui/hooks/useToast';
 
-interface LoginFormProps {
-  redirectTo?: string;
-}
-
-const LoginForm: React.FC<LoginFormProps> = ({ redirectTo = '/dashboard' }) => {
+const LoginForm: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const toast = useToast();
@@ -64,15 +61,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ redirectTo = '/dashboard' }) => {
   useEffect(() => {
     if (isAuthenticated) {
       toast.success(t('login.success'), t('login.welcome'));
-      navigate(redirectTo);
+      navigate(APP_ROUTES.DASHBOARD);
     }
-  }, [isAuthenticated, navigate, redirectTo, t, toast]);
+  }, [isAuthenticated, navigate, APP_ROUTES.DASHBOARD, t, toast]);
 
   return (
     <Form onSubmit={handleSubmit} noValidate data-testid="login-form">
       <Form.Group className="mb-3" controlId="email">
         <Form.Label data-testid="login-form-email-label">{t('login.email')}</Form.Label>
         <Form.Control
+          size="lg"
+          className="bg-white bg-opacity-5"
           type="email"
           name="email"
           value={values.email}
@@ -92,6 +91,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ redirectTo = '/dashboard' }) => {
         <Form.Label data-testid="login-form-password-label">{t('login.password')}</Form.Label>
         <InputGroup>
           <Form.Control
+            size="lg"
+            className="bg-white bg-opacity-5"
             type={showPassword ? 'text' : 'password'}
             name="password"
             value={values.password}
@@ -118,12 +119,21 @@ const LoginForm: React.FC<LoginFormProps> = ({ redirectTo = '/dashboard' }) => {
 
       <div className="d-grid">
         <Button
-          variant="primary"
+          variant="outline-theme"
+          size="lg"
+          className="d-block w-100 fw-500 mb-3"
           type="submit"
           disabled={loading || isSubmitting}
           data-testid="login-form-button">
           {loading || isSubmitting ? t('login.accessing') : t('login.button')}
         </Button>
+      </div>
+      <div className="text-center text-inverse text-opacity-50">
+        {t('login.no_account')}{' '}
+        <a href={APP_ROUTES.REGISTER} data-discover="true">
+          {t('login.sign_up')}
+        </a>{' '}
+        {t('login.no_account_suffix')}
       </div>
     </Form>
   );

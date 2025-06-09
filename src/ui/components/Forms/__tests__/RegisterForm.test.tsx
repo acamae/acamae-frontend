@@ -10,6 +10,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import { APP_ROUTES } from '@shared/constants/appRoutes';
 import RegisterForm from '@ui/components/Forms/RegisterForm';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useToast } from '@ui/hooks/useToast';
@@ -74,6 +75,7 @@ describe('RegisterForm', () => {
     expect(screen.getByTestId('register-form-username-input')).toBeInTheDocument();
     expect(screen.getByTestId('register-form-password-input')).toBeInTheDocument();
     expect(screen.getByTestId('register-form-confirm-password-input')).toBeInTheDocument();
+    expect(screen.getByTestId('register-form-terms-checkbox')).toBeInTheDocument();
     expect(screen.getByTestId('register-form-button')).toBeInTheDocument();
   });
 
@@ -91,6 +93,7 @@ describe('RegisterForm', () => {
     fireEvent.change(screen.getByTestId('register-form-confirm-password-input'), {
       target: { name: 'confirmPassword', value: 'Password123!' },
     });
+    fireEvent.click(screen.getByTestId('register-form-terms-checkbox'));
     fireEvent.submit(screen.getByTestId('register-form'));
 
     await waitFor(() => {
@@ -101,7 +104,7 @@ describe('RegisterForm', () => {
         password: 'Password123!',
       });
       expect(toastMock.success).toHaveBeenCalledWith('register.success', 'register.welcome');
-      expect(navigateMock).toHaveBeenCalledWith('/login?registrationSuccess=true');
+      expect(navigateMock).toHaveBeenCalledWith(APP_ROUTES.LOGIN);
     });
   });
 
@@ -131,6 +134,7 @@ describe('RegisterForm', () => {
     fireEvent.change(screen.getByTestId('register-form-confirm-password-input'), {
       target: { name: 'confirmPassword', value: 'invalid-confirm-password' },
     });
+    fireEvent.click(screen.getByTestId('register-form-terms-checkbox'));
     fireEvent.submit(screen.getByTestId('register-form'));
 
     expect(screen.getByText('errors.email.invalid')).toBeInTheDocument();
@@ -167,6 +171,7 @@ describe('RegisterForm', () => {
     fireEvent.change(screen.getByTestId('register-form-confirm-password-input'), {
       target: { name: 'confirmPassword', value: 'Password123!' },
     });
+    fireEvent.click(screen.getByTestId('register-form-terms-checkbox'));
     fireEvent.submit(screen.getByTestId('register-form'));
 
     await waitFor(() => {
@@ -196,6 +201,7 @@ describe('RegisterForm', () => {
     fireEvent.change(screen.getByTestId('register-form-confirm-password-input'), {
       target: { name: 'confirmPassword', value: 'Password123!' },
     });
+    fireEvent.click(screen.getByTestId('register-form-terms-checkbox'));
     fireEvent.submit(screen.getByTestId('register-form'));
 
     await waitFor(() => {
@@ -224,6 +230,7 @@ describe('RegisterForm', () => {
     fireEvent.change(screen.getByTestId('register-form-confirm-password-input'), {
       target: { name: 'confirmPassword', value: 'Password123!' },
     });
+    fireEvent.click(screen.getByTestId('register-form-terms-checkbox'));
     fireEvent.submit(screen.getByTestId('register-form'));
 
     await waitFor(() => {

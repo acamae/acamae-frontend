@@ -2,40 +2,100 @@
 
 exports[`PublicHeader snapshot: renderizado de PublicHeader 1`] = `
 <DocumentFragment>
-  <nav
-    class="navbar navbar-expand-lg navbar-dark bg-dark px-3"
+  <div
+    class="app-header"
+    data-testid="public-header"
+    id="header"
   >
-    <a
-      class="navbar-brand"
-      data-discover="true"
-      data-testid="link-home"
-      href="/"
-    >
-      Gestión eSports
-    </a>
     <div
-      class="ms-auto d-flex align-items-center gap-3"
+      class="desktop-toogler"
     >
-      <div
-        data-testid="mock-language-selector"
-      />
-      <a
-        class="btn btn-outline-light btn-sm"
-        data-discover="true"
-        data-testid="link-login-nav"
-        href="/login"
+      <button
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+        class="menu-toggler btn btn-primary"
+        data-bs-target="#navbarSupportedContent"
+        data-bs-toggle="collapse"
+        type="button"
       >
-        Iniciar sesión
-      </a>
+        <span
+          class="bar"
+        />
+        <span
+          class="bar"
+        />
+        <span
+          class="bar"
+        />
+      </button>
+    </div>
+    <div
+      class="brand"
+    >
       <a
-        class="btn btn-primary btn-sm"
+        class="brand-logo"
         data-discover="true"
-        data-testid="link-register"
-        href="/register"
+        data-testid="link-home"
+        href="/"
       >
-        Registrarse
+        <span
+          class="brand-img"
+        />
+        <span
+          class="brand-text"
+        >
+          Gestión eSports
+        </span>
       </a>
     </div>
-  </nav>
+    <div
+      class="menu"
+    >
+      <div
+        class="menu-item"
+      >
+        <div
+          class="menu-link"
+        >
+          <a
+            class="btn btn-outline-theme btn-md text-nowrap"
+            data-discover="true"
+            data-testid="link-login-nav"
+            href="/login"
+          >
+            Iniciar sesión
+          </a>
+        </div>
+      </div>
+      <div
+        class="menu-item"
+      >
+        <div
+          class="menu-link"
+        >
+          <a
+            class="btn btn-theme btn-md"
+            data-discover="true"
+            data-testid="link-register"
+            href="/register"
+          >
+            Registrarse
+          </a>
+        </div>
+      </div>
+      <div
+        class="menu-item dropdown dropdown-mobile-full"
+      >
+        <div
+          class="menu-link"
+        >
+          <div
+            data-testid="mock-language-selector"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
 </DocumentFragment>
 `;

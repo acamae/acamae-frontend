@@ -1,6 +1,5 @@
 import { screen } from '@testing-library/react';
 
-import i18n from '@infrastructure/i18n';
 import { createTestProviderFactory } from '@shared/utils/renderProvider';
 import RegisterPage from '@ui/pages/RegisterPage';
 
@@ -15,13 +14,9 @@ function renderRegisterPage() {
 }
 
 describe('RegisterPage', () => {
-  it('should render the title', () => {
+  it('should render the title and the RegisterForm', () => {
     renderRegisterPage();
-    expect(screen.getByTestId('register-title')).toHaveTextContent(i18n.t('register.title'));
-  });
-
-  it('should render the form', () => {
-    renderRegisterPage();
+    expect(screen.getByTestId('register-page-title')).toBeInTheDocument();
     expect(screen.getByTestId('mock-register-form')).toBeInTheDocument();
   });
 

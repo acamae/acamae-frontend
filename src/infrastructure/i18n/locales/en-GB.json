@@ -8,6 +8,9 @@
     "title": "Login",
     "email": "Email",
     "password": "Password",
+    "protection_message": "For your protection, please verify your identity.",
+    "no_account": "Don't have an account yet?",
+    "no_account_suffix": "to create one.",
     "button": "Login",
     "accessing": "Accessing...",
     "forgot": "Forgot your password?",
@@ -16,6 +19,7 @@
     "password_help": "Minimum 8 characters, at least one uppercase letter, one lowercase letter and one number.",
     "toggle_password": "Show/hide password",
     "failed": "Login failed",
+    "sign_up": "Sign up",
     "success": "Login successful",
     "welcome": "Welcome back!"
   },
@@ -37,10 +41,12 @@
     "password_help": "Minimum 8 characters, at least one uppercase letter, one lowercase letter and one number.",
     "confirm_password": "Confirm password",
     "confirm_password_help": "Type the same password to verify.",
-    "button": "Register",
-    "processing": "Registering...",
+    "button": "Sign up",
+    "processing": "Signing up...",
     "message": "Don't have an account yet?",
     "toggle_password": "Show/hide password",
+    "terms_and_conditions": "I accept the <url>terms and conditions</url>",
+    "terms_and_conditions_help": "By creating an account, you agree to our terms and conditions.",
     "strength": {
       "weak": "Weak",
       "fair": "Fair",
@@ -77,6 +83,9 @@
       "reset_request": "Could not process request. Please try again later."
     },
     "recaptcha": "Error verifying reCAPTCHA.",
+    "terms": {
+      "required": "Please accept the terms and conditions."
+    },
     "session": {
       "start": "Could not start session.",
       "expired": "Your session has expired. Please log in again.",
@@ -147,7 +156,7 @@
   },
   "nav": {
     "login": "Login",
-    "register": "Register",
+    "register": "Sign up",
     "dashboard": "Dashboard",
     "profile": "Profile",
     "teams": "Teams",

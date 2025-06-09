@@ -1,5 +1,7 @@
 import { jest } from '@jest/globals';
 
+import { API_ROUTES } from '@shared/constants/apiRoutes';
+
 interface StoreState {
   auth: {
     token: string | null;
@@ -71,17 +73,6 @@ jest.mock('@application/state/store', () => ({
   store: storeMock,
 }));
 
-jest.mock('@shared/constants/apiRoutes', () => ({
-  API_ROUTES: {
-    AUTH: {
-      LOGIN: '/auth/login',
-      REGISTER: '/auth/register',
-      REFRESH_TOKEN: '/auth/refresh',
-      ME: '/auth/me',
-    },
-  },
-}));
-
 beforeAll(() => {
   jest.spyOn(global.console, 'log').mockImplementation(() => {});
   jest.spyOn(global.console, 'error').mockImplementation(() => {});
@@ -149,7 +140,7 @@ describe('axiosService unit tests', () => {
 
       const resetTimer = require('@application/state/slices/sessionTimerSlice').resetTimer;
 
-      const response: AxiosResponse = { config: { url: '/auth/login' } };
+      const response: AxiosResponse = { config: { url: API_ROUTES.AUTH.LOGIN } };
       resOk[0](response);
       expect(storeMock.dispatch).toHaveBeenCalledWith(resetTimer());
 
@@ -159,7 +150,7 @@ describe('axiosService unit tests', () => {
 
   it('response interceptor maneja 401 limpiando tokens', () => {
     jest.isolateModules(() => {
-      const { localStorageService } = require('@/infrastructure/storage/localStorageService');
+      const { localStorageService } = require('@infrastructure/storage/localStorageService');
       require('@shared/services/axiosService');
 
       const error401: AxiosResponse & { response: { status: number } } = {

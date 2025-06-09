@@ -6,6 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { AuthState } from '@domain/types/auth';
 import i18n from '@infrastructure/i18n';
 import es from '@infrastructure/i18n/locales/es-ES.json';
+import { APP_ROUTES } from '@shared/constants/appRoutes';
 import { makeTestStore } from '@shared/utils/reduxTestUtils';
 import PrivateHeader from '@ui/components/PrivateHeader';
 import { useAuth } from '@ui/hooks/useAuth';
@@ -87,7 +88,7 @@ describe('PrivateHeader', () => {
     const appNameLink = screen.getByTestId('link-dashboard');
     expect(appNameLink).toBeInTheDocument();
     expect(appNameLink).toHaveTextContent(es.app.name);
-    expect(appNameLink).toHaveAttribute('href', '/dashboard');
+    expect(appNameLink).toHaveAttribute('href', APP_ROUTES.DASHBOARD);
   });
 
   it('debería renderizar el LanguageSelector mockeado', () => {
@@ -97,20 +98,15 @@ describe('PrivateHeader', () => {
 
   it('debería renderizar los enlaces de navegación correctamente', () => {
     setup();
-    const dashboardLink = screen.getByTestId('link-dashboard-nav');
-    expect(dashboardLink).toBeInTheDocument();
-    expect(dashboardLink).toHaveTextContent(es.nav.dashboard);
-    expect(dashboardLink).toHaveAttribute('href', '/dashboard');
-
     const profileLink = screen.getByTestId('link-profile');
     expect(profileLink).toBeInTheDocument();
     expect(profileLink).toHaveTextContent(es.nav.profile);
-    expect(profileLink).toHaveAttribute('href', '/profile');
+    expect(profileLink).toHaveAttribute('href', APP_ROUTES.PROFILE);
 
     const teamsLink = screen.getByTestId('link-teams');
     expect(teamsLink).toBeInTheDocument();
     expect(teamsLink).toHaveTextContent(es.nav.teams);
-    expect(teamsLink).toHaveAttribute('href', '/teams');
+    expect(teamsLink).toHaveAttribute('href', APP_ROUTES.TEAMS);
   });
 
   it('debería renderizar el botón de logout y llamar a logout al hacer click', () => {

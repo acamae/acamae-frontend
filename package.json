@@ -89,6 +89,7 @@
     "preview": "npm run build && echo 'El frontend está listo en /dist para ser servido por NGINX.'",
     "check:coverage": "node scripts/checkCoverage.mjs",
     "test": "jest",
+    "test:update": "jest -u",
     "test:watch": "jest --watch",
     "test:coverage": "jest --clearCache && jest --coverage",
     "test:e2e": "cypress run",

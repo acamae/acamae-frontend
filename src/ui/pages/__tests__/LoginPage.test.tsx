@@ -21,7 +21,8 @@ describe('LoginPage', () => {
 
   it('should render the title', () => {
     renderLoginPage();
-    expect(screen.getByTestId('login-title')).toBeInTheDocument();
+    expect(screen.getByTestId('login-page-title')).toBeInTheDocument();
+    expect(screen.getByTestId('login-page-description')).toBeInTheDocument();
   });
 
   it('snapshot render', () => {

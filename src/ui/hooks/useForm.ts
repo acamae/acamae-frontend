@@ -9,9 +9,10 @@ export type UseFormConfig<T> = {
 
 export type UseFormReturn<T> = {
   values: T;
-  errors: Partial<Record<keyof T, string>>;
+  errors: Partial<Record<keyof T, string | React.ReactNode>>;
   touched: Partial<Record<keyof T, boolean>>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleCheckboxChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (config: UseFormConfig<T>) => (e: React.FormEvent) => void;
   isSubmitting?: boolean;
 };
@@ -22,7 +23,7 @@ export const useForm = <T extends object>({
   validate,
 }: UseFormConfig<T>) => {
   const [values, setValues] = useState<T>(initialValues);
-  const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof T, string | React.ReactNode>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [touched, setTouched] = useState<Record<keyof T, boolean>>({} as Record<keyof T, boolean>);
   const { i18n } = useTranslation();
@@ -55,6 +56,12 @@ export const useForm = <T extends object>({
 
     const validationErrors = validate ? validate({ ...values, [name]: value }) || {} : {};
     setErrors(validationErrors);
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setValues(prev => ({ ...prev, [name]: checked }));
+    setTouched(prev => ({ ...prev, [name]: true }));
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -99,6 +106,7 @@ export const useForm = <T extends object>({
     isSubmitting,
     touched,
     handleChange,
+    handleCheckboxChange,
     handleSubmit,
     resetForm,
   };

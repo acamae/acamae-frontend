@@ -10,6 +10,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import { APP_ROUTES } from '@shared/constants/appRoutes';
 import LoginForm from '@ui/components/Forms/LoginForm';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useToast } from '@ui/hooks/useToast';
@@ -287,17 +288,7 @@ describe('LoginForm', () => {
 
     await waitFor(() => {
       expect(toastMock.success).toHaveBeenCalledWith('login.success', 'login.welcome');
-      expect(navigateMock).toHaveBeenCalledWith('/dashboard');
-    });
-  });
-
-  it('redirige a la ruta personalizada cuando se proporciona', async () => {
-    setupUseAuth({ isAuthenticated: true });
-    render(<LoginForm redirectTo="/custom-route" />);
-
-    await waitFor(() => {
-      expect(toastMock.success).toHaveBeenCalledWith('login.success', 'login.welcome');
-      expect(navigateMock).toHaveBeenCalledWith('/custom-route');
+      expect(navigateMock).toHaveBeenCalledWith(APP_ROUTES.DASHBOARD);
     });
   });
 });

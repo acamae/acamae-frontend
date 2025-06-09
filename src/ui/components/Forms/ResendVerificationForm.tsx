@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import { API_ROUTES } from '@shared/constants/apiRoutes';
+import { APP_ROUTES } from '@shared/constants/appRoutes';
 import api from '@shared/services/axiosService';
 
 const ResendVerificationForm: React.FC = () => {
@@ -17,7 +17,7 @@ const ResendVerificationForm: React.FC = () => {
     setMessage('');
 
     try {
-      await api.post(API_ROUTES.AUTH.RESEND_VERIFICATION, { identifier });
+      await api.post(APP_ROUTES.VERIFY_EMAIL_RESEND, { identifier });
       setStatus('success');
       setMessage(t('verification.resend.success'));
     } catch (err: unknown) {

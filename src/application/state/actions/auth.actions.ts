@@ -11,10 +11,11 @@ import {
   RegisterPayload,
   ResetPasswordPayload,
 } from '@domain/types/apiSchema';
+import { API_ROUTES } from '@shared/constants/apiRoutes';
 
 // Async thunks using use cases
 export const loginAction = createAsyncThunk(
-  'auth/login',
+  API_ROUTES.AUTH.LOGIN,
   async (payload: LoginPayload, { extra }) => {
     const { loginUseCase } = extra as { loginUseCase: LoginUseCase };
     return await loginUseCase.execute(payload);
@@ -22,7 +23,7 @@ export const loginAction = createAsyncThunk(
 );
 
 export const registerAction = createAsyncThunk(
-  'auth/register',
+  API_ROUTES.AUTH.REGISTER,
   async (payload: RegisterPayload, { extra }) => {
     const { registerUseCase } = extra as { registerUseCase: RegisterUseCase };
     return await registerUseCase.execute(payload);
@@ -30,7 +31,7 @@ export const registerAction = createAsyncThunk(
 );
 
 export const forgotPasswordAction = createAsyncThunk(
-  'auth/forgotPassword',
+  API_ROUTES.AUTH.FORGOT_PASSWORD,
   async (payload: ForgotPasswordPayload, { extra }) => {
     const { forgotPasswordUseCase } = extra as { forgotPasswordUseCase: ForgotPasswordUseCase };
     return await forgotPasswordUseCase.execute(payload);
@@ -38,14 +39,14 @@ export const forgotPasswordAction = createAsyncThunk(
 );
 
 export const resetPasswordAction = createAsyncThunk(
-  'auth/resetPassword',
+  API_ROUTES.AUTH.RESET_PASSWORD,
   async (payload: ResetPasswordPayload, { extra }) => {
     const { resetPasswordUseCase } = extra as { resetPasswordUseCase: ResetPasswordUseCase };
     return await resetPasswordUseCase.execute(payload);
   }
 );
 
-export const logoutAction = createAsyncThunk('auth/logout', async (_, { extra }) => {
+export const logoutAction = createAsyncThunk(API_ROUTES.AUTH.LOGOUT, async (_, { extra }) => {
   const { logoutUseCase } = extra as { logoutUseCase: LogoutUseCase };
   return await logoutUseCase.execute();
 });

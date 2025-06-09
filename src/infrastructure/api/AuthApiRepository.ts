@@ -8,6 +8,7 @@ import {
   RegisterPayload,
   ResetPasswordPayload,
 } from '@/domain/types/apiSchema';
+import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { USER_ROLES } from '@domain/constants/user';
 import { User } from '@domain/entities/User';
 import { AuthRepository } from '@domain/repositories/AuthRepository';
@@ -65,7 +66,7 @@ function mapApiAxiosRequestError<T>({
     success: false,
     status: error.status ?? 500,
     message: error.message ?? 'A request error occurred',
-    code: error.code ?? 'REQUEST_ERROR',
+    code: error.code ?? ApiErrorCodes.REQUEST_ERROR,
   };
 }
 
@@ -80,7 +81,7 @@ function mapApiAxiosUnknownError<T>(): ApiResponse<T> {
     success: false,
     status: 500,
     message: 'An unknown error occurred',
-    code: 'UNKNOWN_ERROR',
+    code: ApiErrorCodes.UNKNOWN_ERROR,
   };
 }
 

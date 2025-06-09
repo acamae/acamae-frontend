@@ -104,8 +104,7 @@ jest.mock('@/ui/hooks/useAuth', () => ({
 
 jest.mock('@ui/components/PrivateRoute', () => {
   // Import useAuth from the already-mocked module
-
-  const { useAuth } = require('@/ui/hooks/useAuth');
+  const { useAuth } = require('@ui/hooks/useAuth');
   function MockPrivateRoute({ children }: { children?: React.ReactNode }) {
     const { isAuthenticated, loading } = useAuth();
     if (loading) return <div data-testid="mock-private-route-loading">Loading...</div>;
@@ -116,8 +115,9 @@ jest.mock('@ui/components/PrivateRoute', () => {
   return { __esModule: true, default: MockPrivateRoute };
 });
 
-import { useAuth } from '@/ui/hooks/useAuth';
 import i18n from '@infrastructure/i18n';
+import { APP_ROUTES } from '@shared/constants/appRoutes';
+import { useAuth } from '@ui/hooks/useAuth';
 import AppRoutes from '@ui/routes';
 
 describe('AppRoutes', () => {
@@ -164,20 +164,20 @@ describe('AppRoutes', () => {
   });
 
   it('renders DashboardPage at /dashboard with MainLayout if authenticated', () => {
-    renderAppRoutes('/dashboard', { isAuthenticated: true, loading: false });
+    renderAppRoutes(APP_ROUTES.DASHBOARD, { isAuthenticated: true, loading: false });
     expect(screen.getByTestId('mock-main-layout')).toBeInTheDocument();
     expect(screen.getByTestId('mock-dashboard-page')).toBeInTheDocument();
   });
 
   it('redirects from /dashboard if not authenticated', () => {
-    renderAppRoutes('/dashboard', { isAuthenticated: false, loading: false });
+    renderAppRoutes(APP_ROUTES.DASHBOARD, { isAuthenticated: false, loading: false });
     expect(screen.getByTestId('mock-main-layout')).toBeInTheDocument();
     expect(screen.getByTestId('mock-private-route-redirect')).toBeInTheDocument();
     expect(screen.queryByTestId('mock-dashboard-page')).not.toBeInTheDocument();
   });
 
   it('shows loading state for PrivateRoute if auth is loading', () => {
-    renderAppRoutes('/dashboard', { isAuthenticated: false, loading: true });
+    renderAppRoutes(APP_ROUTES.DASHBOARD, { isAuthenticated: false, loading: true });
     expect(screen.getByTestId('mock-main-layout')).toBeInTheDocument();
     expect(screen.getByTestId('mock-private-route-loading')).toBeInTheDocument();
     expect(screen.queryByTestId('mock-dashboard-page')).not.toBeInTheDocument();

@@ -1,25 +1,20 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Form, Button, InputGroup } from 'react-bootstrap';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
+import { Link, useNavigate } from 'react-router-dom';
 
 import {
   validateEmail,
   validatePassword,
   validateUsername,
 } from '@domain/services/validationService';
+import { APP_ROUTES } from '@shared/constants/appRoutes';
 import PasswordStrengthMeter from '@ui/components/Forms/PasswordStrengthMeter';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
 import { useToast } from '@ui/hooks/useToast';
 
-interface RegisterFormProps {
-  redirectTo?: string;
-}
-
-const RegisterForm: React.FC<RegisterFormProps> = ({
-  redirectTo = '/login?registrationSuccess=true',
-}) => {
+const RegisterForm: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const toast = useToast();
@@ -28,26 +23,43 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { values, errors, touched, handleChange, handleSubmit, isSubmitting } = useForm<{
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleSubmit,
+    isSubmitting,
+    handleCheckboxChange,
+  } = useForm<{
     email: string;
     username: string;
     password: string;
     confirmPassword: string;
+    terms: boolean;
   }>({
     initialValues: {
       email: '',
       username: '',
       password: '',
       confirmPassword: '',
+      terms: false,
     },
 
     validate: useCallback(
-      (values: { email: string; username: string; password: string; confirmPassword: string }) => {
+      (values: {
+        email: string;
+        username: string;
+        password: string;
+        confirmPassword: string;
+        terms: boolean;
+      }) => {
         const errors: Partial<{
           email: string;
           username: string;
           password: string;
           confirmPassword: string;
+          terms: string;
         }> = {};
         if (!validateEmail(values.email)) {
           errors.email = t('errors.email.invalid');
@@ -63,6 +75,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         } else if (values.password !== values.confirmPassword) {
           errors.confirmPassword = t('errors.password.mismatch');
         }
+        if (!values.terms) {
+          errors.terms = t('errors.terms.required');
+        }
         return errors;
       },
       [t]
@@ -76,7 +91,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           username: values.username,
         });
         toast.success(t('register.success'), t('register.welcome'));
-        navigate(redirectTo);
+        navigate(APP_ROUTES.LOGIN);
       } catch (err: unknown) {
         const errorMessage =
           typeof err === 'string'
@@ -200,9 +215,38 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         </Form.Text>
       </Form.Group>
 
+      <Form.Group className="mb-3 has-validation" controlId="terms">
+        <Form.Check
+          type="checkbox"
+          label={
+            <Trans
+              i18nKey="register.terms_and_conditions"
+              components={{ url: <Link to="/terms" /> }}
+            />
+          }
+          id="terms"
+          name="terms"
+          onChange={handleCheckboxChange}
+          className={touched.terms && !!errors.terms ? 'is-invalid' : ''}
+          isInvalid={touched.terms && !!errors.terms}
+          required
+          autoComplete="terms"
+          aria-describedby="termsHelp"
+          data-testid="register-form-terms-checkbox"
+        />
+        <Form.Text id="termsHelp" className="text-muted sr-only">
+          {t('register.terms_and_conditions_help')}{' '}
+        </Form.Text>
+        <Form.Control.Feedback type="invalid" data-testid="register-form-terms-error">
+          {errors.terms}
+        </Form.Control.Feedback>
+      </Form.Group>
+
       <div className="d-grid">
         <Button
-          variant="primary"
+          size="lg"
+          variant="outline-theme"
+          className="d-block w-100 fw-500 mb-3"
           type="submit"
           disabled={loading || isSubmitting}
           data-testid="register-form-button">

@@ -21,11 +21,3 @@ export interface NewPasswordFormData {
   password: string;
   confirm_password: string;
 }
-
-export interface LoginFormProps {
-  redirectTo?: string;
-  onLoginError?: () => void;
-  login: (email: string, password: string) => Promise<boolean>;
-  loading: boolean;
-  error: string | null;
-}
