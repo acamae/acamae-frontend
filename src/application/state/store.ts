@@ -7,6 +7,7 @@ import { ForgotPasswordUseCase } from '@application/use-cases/auth/ForgotPasswor
 import { LoginUseCase } from '@application/use-cases/auth/LoginUseCase';
 import { LogoutUseCase } from '@application/use-cases/auth/LogoutUseCase';
 import { RegisterUseCase } from '@application/use-cases/auth/RegisterUseCase';
+import { ResendVerificationUseCase } from '@application/use-cases/auth/ResendVerificationUseCase';
 import { ResetPasswordUseCase } from '@application/use-cases/auth/ResetPasswordUseCase';
 import { AuthApiRepository } from '@infrastructure/api/AuthApiRepository';
 
@@ -19,6 +20,7 @@ const registerUseCase = new RegisterUseCase(authRepository);
 const logoutUseCase = new LogoutUseCase(authRepository);
 const forgotPasswordUseCase = new ForgotPasswordUseCase(authRepository);
 const resetPasswordUseCase = new ResetPasswordUseCase(authRepository);
+const resendVerificationUseCase = new ResendVerificationUseCase(authRepository);
 
 // Store
 export const store = configureStore({
@@ -36,6 +38,7 @@ export const store = configureStore({
           logoutUseCase,
           forgotPasswordUseCase,
           resetPasswordUseCase,
+          resendVerificationUseCase,
         },
       },
     }).concat(sessionTimerMiddleware),

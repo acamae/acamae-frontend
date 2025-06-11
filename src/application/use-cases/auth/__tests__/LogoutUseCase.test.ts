@@ -1,10 +1,10 @@
-import { AuthRepository } from '@domain/repositories/AuthRepository';
+import { IAuthRepository } from '@domain/repositories/AuthRepository';
 
 import { LogoutUseCase } from '../LogoutUseCase';
 
 describe('LogoutUseCase', () => {
   let logoutUseCase: LogoutUseCase;
-  let mockAuthRepository: jest.Mocked<AuthRepository>;
+  let mockAuthRepository: jest.Mocked<IAuthRepository>;
 
   beforeEach(() => {
     mockAuthRepository = {
@@ -18,7 +18,7 @@ describe('LogoutUseCase', () => {
       findById: jest.fn(),
       save: jest.fn(),
       delete: jest.fn(),
-    } as unknown as jest.Mocked<AuthRepository>;
+    } as unknown as jest.Mocked<IAuthRepository>;
 
     logoutUseCase = new LogoutUseCase(mockAuthRepository);
   });

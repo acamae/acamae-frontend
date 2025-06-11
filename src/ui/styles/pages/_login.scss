@@ -1,23 +1,23 @@
 .login {
-	min-height: calc(100vh - $app-header-height);
-	padding: $spacer * 3 $spacer;
-	display: flex;
-	align-items: center;
-	
-	@include media-breakpoint-down(md) {
-		padding: $spacer;
-	}
-	
-	& .login-content {
-		max-width: rem(360px);
-		margin: 0 auto;
-		position: relative;
-		flex: 1;
-	}
+  min-height: calc(100vh - $app-header-height);
+  padding: $spacer * 3 $spacer;
+  display: flex;
+  align-items: center;
 
-	.app-without-header & {
-		& .login {
-			min-height: 100vh;
-		}
-	}
+  @include media-breakpoint-down(md) {
+    padding: $spacer;
+  }
+
+  & .login-content {
+    max-width: rem(360px);
+    margin: 0 auto;
+    position: relative;
+    flex: 1;
+  }
+
+  .app-without-header & {
+    & .login {
+      min-height: 100vh;
+    }
+  }
 }

@@ -1,11 +1,11 @@
-import { AuthRepository } from '@domain/repositories/AuthRepository';
+import { IAuthRepository } from '@domain/repositories/AuthRepository';
 import { ForgotPasswordPayload } from '@domain/types/apiSchema';
 
 import { ForgotPasswordUseCase } from '../ForgotPasswordUseCase';
 
 describe('ForgotPasswordUseCase', () => {
   let forgotPasswordUseCase: ForgotPasswordUseCase;
-  let mockAuthRepository: jest.Mocked<AuthRepository>;
+  let mockAuthRepository: jest.Mocked<IAuthRepository>;
 
   beforeEach(() => {
     mockAuthRepository = {
@@ -19,7 +19,7 @@ describe('ForgotPasswordUseCase', () => {
       findById: jest.fn(),
       save: jest.fn(),
       delete: jest.fn(),
-    } as unknown as jest.Mocked<AuthRepository>;
+    } as unknown as jest.Mocked<IAuthRepository>;
 
     forgotPasswordUseCase = new ForgotPasswordUseCase(mockAuthRepository);
   });

@@ -1,3 +1,4 @@
+import { ApiError } from '@domain/types/apiSchema';
 import apiService from '@shared/services/axiosService';
 
 /**
@@ -115,8 +116,24 @@ export const setupMockApiServiceCall = <TResponseData = unknown, TRequestData = 
   });
 };
 
-export const promiseMock = (shouldResolve = true) => {
+export interface IPromiseMockParams {
+  error?: string | null;
+}
+
+export interface IPromiseMock {
+  (params?: IPromiseMockParams): jest.Mock;
+}
+
+export const promiseMock: IPromiseMock = ({ error = null }: IPromiseMockParams = {}) => {
   return jest.fn(() =>
-    shouldResolve ? Promise.resolve() : Promise.reject(new Error('mock error'))
+    error
+      ? Promise.reject(
+          new ApiError({
+            success: false,
+            message: error,
+            data: null,
+          })
+        )
+      : Promise.resolve()
   );
 };

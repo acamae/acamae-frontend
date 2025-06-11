@@ -40,7 +40,7 @@ describe('SessionTimeoutModal', () => {
     useAppSelectorMock.mockReset();
   });
 
-  it('no renderiza el modal si showModal es false', () => {
+  it('should not render modal when showModal is false', () => {
     const t = setupUseTranslation();
     useAppSelectorMock.mockImplementation(cb =>
       cb({ sessionTimer: { showModal: false, secondsLeft: 30 } })
@@ -50,7 +50,7 @@ describe('SessionTimeoutModal', () => {
     expect(t).not.toHaveBeenCalledWith('sessionTimeout.title', expect.anything());
   });
 
-  it('renderiza el modal y llama a t con las claves esperadas', () => {
+  it('should render modal and call t with expected keys', () => {
     const t = setupUseTranslation();
     useAppSelectorMock.mockImplementation(cb =>
       cb({ sessionTimer: { showModal: true, secondsLeft: 25 } })
@@ -63,7 +63,7 @@ describe('SessionTimeoutModal', () => {
     expect(t).toHaveBeenCalledWith('sessionTimeout.stayConnected');
   });
 
-  it('dispara las acciones correctas al pulsar los botones', () => {
+  it('should dispatch correct actions when clicking buttons', () => {
     const t = setupUseTranslation();
     useAppSelectorMock.mockImplementation(cb =>
       cb({ sessionTimer: { showModal: true, secondsLeft: 10 } })

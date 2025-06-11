@@ -34,6 +34,7 @@
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/axios": "^0.9.36",
     "@types/crypto-js": "^4.2.2",
     "@types/cypress": "^0.1.6",
@@ -153,5 +154,8 @@
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
+  },
+  "engines": {
+    "node": ">=22.16.0"
   }
 }

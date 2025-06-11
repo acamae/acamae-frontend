@@ -60,7 +60,7 @@ const renderWithProvider = (children: React.ReactNode) =>
   render(<ToastProvider>{children}</ToastProvider>);
 
 describe('ToastProvider', () => {
-  it('muestra un toast genérico', async () => {
+  it('should show a generic toast', async () => {
     renderWithProvider(<Demo />);
     await act(async () => {
       fireEvent.click(screen.getByText('generic'));
@@ -70,7 +70,7 @@ describe('ToastProvider', () => {
     });
   });
 
-  it('limita a máximo 3 toasts simultáneos', async () => {
+  it('should limit to a maximum of 3 simultaneous toasts', async () => {
     renderWithProvider(<Demo />);
 
     // Mostrar 4 toasts genéricos
@@ -87,7 +87,7 @@ describe('ToastProvider', () => {
     });
   });
 
-  it('helpers success y error aplican bg correcto', async () => {
+  it('should apply the correct bg to success and error helpers', async () => {
     renderWithProvider(<Demo />);
     await act(async () => {
       fireEvent.click(screen.getByText('success'));
@@ -100,7 +100,7 @@ describe('ToastProvider', () => {
     });
   });
 
-  it('elimina un toast cuando se hace clic en cerrar', async () => {
+  it('should remove a toast when clicking close', async () => {
     renderWithProvider(<Demo />);
     await act(async () => {
       fireEvent.click(screen.getByText('success'));
@@ -119,7 +119,7 @@ describe('ToastProvider', () => {
     });
   });
 
-  it('muestra toasts con todos los tipos disponibles respetando el límite', async () => {
+  it('should show toasts with all available types respecting the limit', async () => {
     renderWithProvider(<Demo />);
 
     // Mostrar los primeros 3 toasts
@@ -158,7 +158,7 @@ describe('ToastProvider', () => {
     });
   });
 
-  it('muestra toasts con título y mensaje', async () => {
+  it('should show toasts with title and message', async () => {
     renderWithProvider(<ToastWithTitle />);
     await act(async () => {
       fireEvent.click(screen.getByText('Show Toast with Title'));

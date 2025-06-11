@@ -43,7 +43,7 @@ describe('SessionTimerInitializer', () => {
     mockShowModal.mockReturnValue({ type: 'SHOW_MODAL' });
   });
 
-  it('no hace nada cuando el usuario no está autenticado', () => {
+  it('should do nothing when the user is not authenticated', () => {
     (useAppSelector as unknown as jest.Mock).mockReturnValue(false);
     renderHook(() => SessionTimerInitializer());
 
@@ -51,7 +51,7 @@ describe('SessionTimerInitializer', () => {
     expect(mockDispatch).not.toHaveBeenCalled();
   });
 
-  it('despacha logout cuando la sesión ha expirado', () => {
+  it('should dispatch logout when the session has expired', () => {
     (useAppSelector as unknown as jest.Mock).mockReturnValue(true);
     mockGetExpiresAt.mockReturnValue(Date.now() - 1000); // Sesión expirada
 
@@ -61,7 +61,7 @@ describe('SessionTimerInitializer', () => {
     expect(mockDispatch).toHaveBeenCalledWith(mockLogoutAction());
   });
 
-  it('muestra el modal cuando la sesión está cerca de expirar', () => {
+  it('should show the modal when the session is about to expire', () => {
     const warningSeconds = 30;
     const expiresAt = Date.now() + warningSeconds * 1000;
 
@@ -82,7 +82,7 @@ describe('SessionTimerInitializer', () => {
     process.env.REACT_APP_SESSION_TIMEOUT_WARNING_SECONDS = originalEnv;
   });
 
-  it('solo actualiza expiresAt cuando la sesión está lejos de expirar', () => {
+  it('should update expiresAt when the session is far from expiring', () => {
     const warningSeconds = 30;
     const expiresAt = Date.now() + (warningSeconds + 10) * 1000;
 

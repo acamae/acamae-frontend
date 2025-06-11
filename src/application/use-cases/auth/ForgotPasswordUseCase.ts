@@ -1,8 +1,8 @@
-import { ForgotPasswordPayload, ApiPromise } from '@/domain/types/apiSchema';
-import { AuthRepository } from '@domain/repositories/AuthRepository';
+import { IAuthRepository } from '@domain/repositories/AuthRepository';
+import { ForgotPasswordPayload, ApiPromise } from '@domain/types/apiSchema';
 
 export class ForgotPasswordUseCase {
-  constructor(private authRepository: AuthRepository) {}
+  constructor(private authRepository: IAuthRepository) {}
 
   async execute(payload: ForgotPasswordPayload): ApiPromise<void> {
     return await this.authRepository.forgotPassword(payload);

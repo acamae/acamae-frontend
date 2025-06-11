@@ -21,7 +21,7 @@ describe('EmailVerificationSuccess', () => {
     renderEmailVerificationSuccess();
     expect(screen.getByTestId('email-verification-success-login')).toBeInTheDocument();
   });
-  it('snapshot render', () => {
+  it('should render snapshot correctly', () => {
     const { asFragment } = renderEmailVerificationSuccess();
     expect(asFragment()).toMatchSnapshot();
   });

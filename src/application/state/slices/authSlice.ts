@@ -2,97 +2,105 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import {
   loginAction,
-  logoutAction,
   registerAction,
+  logoutAction,
   forgotPasswordAction,
   resetPasswordAction,
 } from '@application/state/actions/auth.actions';
-import { AuthState } from '@domain/types/auth';
+import { User } from '@domain/entities/User';
 
-export const initialAuthState: AuthState = {
-  isAuthenticated: false,
+interface AuthState {
+  // Estado persistente
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  expiresAt: string | null;
+  // Estado transitorio (no persistente)
+  loading: boolean;
+}
+
+const initialState: AuthState = {
   user: null,
   token: null,
+  isAuthenticated: false,
   expiresAt: null,
   loading: false,
-  error: null,
 };
+
+export const initialAuthState = initialState;
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState: initialAuthState,
+  initialState,
   reducers: {},
   extraReducers: builder => {
     builder
       // Login
       .addCase(loginAction.pending, state => {
         state.loading = true;
-        state.error = null;
       })
       .addCase(loginAction.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload?.data ?? null;
-        state.isAuthenticated = !!state.user;
-        state.error =
-          !state.user && action.payload?.message ? action.payload.message : 'unknown error';
+        if (action.payload?.data) {
+          state.user = action.payload.data;
+          state.isAuthenticated = true;
+        } else {
+          state.user = null;
+          state.isAuthenticated = false;
+        }
       })
-      .addCase(loginAction.rejected, (state, action) => {
+      .addCase(loginAction.rejected, state => {
         state.loading = false;
-        state.error = action.error.message ?? null;
-      })
-      // Logout
-      .addCase(logoutAction.pending, state => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(logoutAction.fulfilled, state => {
-        state.loading = false;
-        state.isAuthenticated = false;
-        state.user = null;
-      })
-      .addCase(logoutAction.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message ?? null;
       })
       // Register
       .addCase(registerAction.pending, state => {
         state.loading = true;
-        state.error = null;
       })
       .addCase(registerAction.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload?.data ?? null;
-        state.isAuthenticated = !!state.user;
-        state.error =
-          !state.user && action.payload?.message ? action.payload.message : 'unknown error';
+        if (action.payload?.data) {
+          state.user = action.payload.data;
+          state.isAuthenticated = true;
+        } else {
+          state.user = null;
+          state.isAuthenticated = false;
+        }
       })
-      .addCase(registerAction.rejected, (state, action) => {
+      .addCase(registerAction.rejected, state => {
         state.loading = false;
-        state.error = action.error.message ?? null;
       })
-      // Forgot password
+      // Logout
+      .addCase(logoutAction.pending, state => {
+        state.loading = true;
+      })
+      .addCase(logoutAction.fulfilled, state => {
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        state.loading = false;
+      })
+      .addCase(logoutAction.rejected, state => {
+        state.loading = false;
+      })
+      // Forgot Password
       .addCase(forgotPasswordAction.pending, state => {
         state.loading = true;
-        state.error = null;
       })
       .addCase(forgotPasswordAction.fulfilled, state => {
         state.loading = false;
       })
-      .addCase(forgotPasswordAction.rejected, (state, action) => {
+      .addCase(forgotPasswordAction.rejected, state => {
         state.loading = false;
-        state.error = action.error.message ?? null;
       })
-      // Reset password
+      // Reset Password
       .addCase(resetPasswordAction.pending, state => {
         state.loading = true;
-        state.error = null;
       })
       .addCase(resetPasswordAction.fulfilled, state => {
         state.loading = false;
       })
-      .addCase(resetPasswordAction.rejected, (state, action) => {
+      .addCase(resetPasswordAction.rejected, state => {
         state.loading = false;
-        state.error = action.error.message ?? null;
       });
   },
 });

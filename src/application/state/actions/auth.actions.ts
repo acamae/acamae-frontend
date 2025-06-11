@@ -4,12 +4,14 @@ import { ForgotPasswordUseCase } from '@application/use-cases/auth/ForgotPasswor
 import { LoginUseCase } from '@application/use-cases/auth/LoginUseCase';
 import { LogoutUseCase } from '@application/use-cases/auth/LogoutUseCase';
 import { RegisterUseCase } from '@application/use-cases/auth/RegisterUseCase';
+import { ResendVerificationUseCase } from '@application/use-cases/auth/ResendVerificationUseCase';
 import { ResetPasswordUseCase } from '@application/use-cases/auth/ResetPasswordUseCase';
 import {
   ForgotPasswordPayload,
   LoginPayload,
   RegisterPayload,
   ResetPasswordPayload,
+  ResendVerificationPayload,
 } from '@domain/types/apiSchema';
 import { API_ROUTES } from '@shared/constants/apiRoutes';
 
@@ -50,3 +52,13 @@ export const logoutAction = createAsyncThunk(API_ROUTES.AUTH.LOGOUT, async (_, {
   const { logoutUseCase } = extra as { logoutUseCase: LogoutUseCase };
   return await logoutUseCase.execute();
 });
+
+export const resendVerificationAction = createAsyncThunk(
+  API_ROUTES.AUTH.VERIFY_EMAIL_RESEND,
+  async (payload: ResendVerificationPayload, { extra }) => {
+    const { resendVerificationUseCase } = extra as {
+      resendVerificationUseCase: ResendVerificationUseCase;
+    };
+    return await resendVerificationUseCase.execute(payload);
+  }
+);

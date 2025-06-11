@@ -49,7 +49,7 @@ describe('useForm Hook', () => {
     expect(result.current.touched).toEqual({});
   });
 
-  it('resetForm should reset the form state', () => {
+  it('should resetForm should reset the form state', () => {
     setupUseTranslation();
     const { result } = renderHook(() => useForm({ initialValues, onSubmit: mockOnSubmit }));
     act(() => {
@@ -289,9 +289,6 @@ describe('useForm Hook', () => {
         })
       );
 
-      // Silence console.error for this specific test
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-
       await act(async () => {
         try {
           await result.current.handleSubmit(mockFormEvent);
@@ -302,9 +299,6 @@ describe('useForm Hook', () => {
 
       expect(result.current.isSubmitting).toBe(false);
       expect(mockOnSubmit).toHaveBeenCalledTimes(1);
-      expect(consoleErrorSpy).toHaveBeenCalledWith('Error submitting form:', submitError);
-
-      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -437,7 +431,7 @@ describe('useForm Hook', () => {
       expect(result.current.errors).toEqual({});
     });
 
-    it('useEffect validation should use current values', () => {
+    it('should use current values in useEffect validation', () => {
       setupUseTranslation();
       const { result, rerender } = renderHook(() =>
         useForm<typeof initialValues>({

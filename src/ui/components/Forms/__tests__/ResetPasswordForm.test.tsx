@@ -1,34 +1,29 @@
-jest.mock('@ui/hooks/useAuth');
-jest.mock('@ui/hooks/useToast');
-jest.mock('react-i18next');
-
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
+import { MemoryRouter } from 'react-router-dom';
 
+import { IPromiseMock, promiseMock } from '@shared/utils/apiTestUtils';
 import ResetPasswordForm from '@ui/components/Forms/ResetPasswordForm';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useToast } from '@ui/hooks/useToast';
 
+jest.mock('@ui/hooks/useAuth');
+jest.mock('@ui/hooks/useToast');
+jest.mock('react-i18next');
+
+const toastMock = { error: jest.fn(), success: jest.fn() };
+
 function setupUseAuth({
   loading = false,
-  resetPassword = jest.fn(),
-  error = null,
+  resetPassword = promiseMock(),
 }: {
   loading?: boolean;
-  resetPassword?: jest.Mock;
-  error?: string | null;
+  resetPassword?: IPromiseMock;
 } = {}) {
   (useAuth as jest.Mock).mockReturnValue({
     loading,
     resetPassword,
-    error,
   });
-  return { resetPassword };
-}
-
-function setupUseToast({ success = jest.fn(), error = jest.fn() } = {}) {
-  (useToast as jest.Mock).mockReturnValue({ success, error });
-  return { success, error };
 }
 
 const changeLanguageMock = jest.fn();
@@ -46,316 +41,197 @@ function setupUseTranslation({
   });
 }
 
-function renderResetPasswordForm(props = { token: 'mock-token' }) {
-  return render(<ResetPasswordForm {...props} />);
+function setupUseToast() {
+  (useToast as jest.Mock).mockReturnValue(toastMock);
+}
+
+function renderResetPasswordForm(props = { tokenProp: 'mock-token' }) {
+  return render(
+    <MemoryRouter>
+      <ResetPasswordForm {...props} />
+    </MemoryRouter>
+  );
 }
 
 describe('ResetPasswordForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    setupUseTranslation();
     setupUseToast();
     setupUseAuth();
+    setupUseTranslation();
   });
 
-  it('renderiza correctamente los campos', () => {
+  it('should render correctly the fields', () => {
     renderResetPasswordForm();
-    expect(screen.getByTestId('input-password')).toBeInTheDocument();
-    expect(screen.getByTestId('btn-reset-password')).toBeInTheDocument();
+    expect(screen.getByTestId('reset-password-form-password-input')).toBeInTheDocument();
+    expect(screen.getByTestId('reset-password-form-button')).toBeInTheDocument();
+    expect(screen.getByTestId('reset-password-form-password-help')).toHaveTextContent(
+      'register.password_help'
+    );
+    expect(screen.getByTestId('reset-password-form-password-error')).toBeEmptyDOMElement();
+    expect(screen.getByTestId('reset-password-form-password-input')).toHaveAttribute(
+      'type',
+      'password'
+    );
+    expect(screen.getByTestId('btn-toggle-password')).toBeInTheDocument();
+    expect(screen.getByTestId('btn-toggle-password')).toHaveTextContent('👁️');
+    expect(screen.getByTestId('reset-password-form')).toBeInTheDocument();
+    expect(screen.getByTestId('label-reset-password')).toHaveTextContent('reset.password');
   });
 
-  it('muestra error de validación si el password es inválido', () => {
+  it('should render alert when there is no token', () => {
+    renderResetPasswordForm({ tokenProp: '' });
+    expect(screen.getByTestId('alert-error')).toHaveTextContent('reset.invalid_token');
+    expect(screen.queryByTestId('reset-password-form')).not.toBeInTheDocument();
+  });
+
+  it('should show success message after successful submit', async () => {
+    const resetPasswordMock = promiseMock();
+    setupUseAuth({ resetPassword: resetPasswordMock });
     renderResetPasswordForm();
-    fireEvent.change(screen.getByTestId('input-password'), {
-      target: { value: '' },
+
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
+        target: { value: 'Password123!' },
+      });
+      fireEvent.click(screen.getByTestId('reset-password-form-button'));
     });
-    fireEvent.click(screen.getByTestId('btn-reset-password'));
+
+    await waitFor(() => {
+      expect(resetPasswordMock).toHaveBeenCalledWith({
+        token: 'mock-token',
+        newPassword: 'Password123!',
+      });
+      expect(toastMock.success).toHaveBeenCalledWith('reset.success');
+    });
+  });
+
+  it('should show validation error when password is invalid', async () => {
+    renderResetPasswordForm();
+
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
+        target: { value: '' },
+      });
+      fireEvent.click(screen.getByTestId('reset-password-form-button'));
+    });
+
     expect(screen.getByText('errors.password.required')).toBeInTheDocument();
   });
 
-  it('muestra mensaje de éxito tras submit correcto', async () => {
-    const resetPassword = jest.fn().mockResolvedValue({
-      payload: { success: true, message: 'reset.password_updated' },
-    });
-    setupUseAuth({ resetPassword });
-    renderResetPasswordForm();
-    fireEvent.change(screen.getByTestId('input-password'), {
-      target: { value: 'Password123' },
-    });
-    fireEvent.click(screen.getByTestId('btn-reset-password'));
-    await waitFor(() => {
-      expect(screen.getByTestId('alert-success')).toBeInTheDocument();
-      expect(screen.getByTestId('alert-success')).toHaveTextContent('reset.success');
-    });
-  });
-
-  it('muestra mensaje de error si el token es inválido', async () => {
-    renderResetPasswordForm({ token: '' });
-    expect(screen.getByTestId('alert-error')).toBeInTheDocument();
+  it('should show error when token is invalid', () => {
+    setupUseToast();
+    renderResetPasswordForm({ tokenProp: '' });
     expect(screen.getByTestId('alert-error')).toHaveTextContent('reset.invalid_token');
   });
 
-  it('deshabilita el botón de submit mientras loading es true', () => {
+  it('should disable submit button when loading is true', () => {
     setupUseAuth({ loading: true });
     renderResetPasswordForm();
-    expect(screen.getByTestId('btn-reset-password')).toBeDisabled();
+    expect(screen.getByTestId('reset-password-form-button')).toBeDisabled();
   });
 
-  it('deshabilita el botón de submit mientras isSubmitting es true', () => {
-    setupUseAuth({ loading: true });
+  it('should handle reset error when it is a string', async () => {
+    const error = 'Error de reset';
+    const resetPasswordMock = promiseMock({ error });
+    setupUseAuth({ resetPassword: resetPasswordMock });
     renderResetPasswordForm();
-    expect(screen.getByTestId('btn-reset-password')).toBeDisabled();
-  });
 
-  it('snapshot render', () => {
-    const { asFragment } = renderResetPasswordForm();
-    expect(asFragment()).toMatchSnapshot();
-  });
-
-  it('maneja error de reset cuando es un string', async () => {
-    const errorMessage = 'Error de reset';
-    const resetPassword = jest.fn().mockResolvedValue({
-      payload: { success: false, message: errorMessage },
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
+        target: { value: 'Password123!' },
+      });
+      fireEvent.click(screen.getByTestId('reset-password-form-button'));
     });
-    setupUseAuth({ resetPassword, error: errorMessage });
-    const { error } = setupUseToast();
-
-    renderResetPasswordForm();
-    fireEvent.change(screen.getByTestId('input-password'), {
-      target: { value: 'Password123!' },
-    });
-    fireEvent.click(screen.getByTestId('btn-reset-password'));
 
     await waitFor(() => {
-      expect(resetPassword).toHaveBeenCalledWith({
+      expect(resetPasswordMock).toHaveBeenCalledWith({
         token: 'mock-token',
         newPassword: 'Password123!',
       });
-    });
-
-    await waitFor(() => {
-      expect(screen.getByTestId('alert-error')).toBeInTheDocument();
-      expect(screen.getByTestId('alert-error')).toHaveTextContent('reset.failed');
-      expect(error).toHaveBeenCalledWith(errorMessage);
+      expect(toastMock.error).toHaveBeenCalledWith('reset.failed', error);
     });
   });
 
-  it('maneja error de reset cuando es un objeto con message', async () => {
-    const errorMessage = 'Error de reset';
-    const resetPassword = jest.fn().mockResolvedValue({
-      payload: { success: false, message: errorMessage },
-    });
-    setupUseAuth({ resetPassword, error: errorMessage });
-    const { error } = setupUseToast();
-
-    renderResetPasswordForm();
-    fireEvent.change(screen.getByTestId('input-password'), {
-      target: { value: 'Password123!' },
-    });
-    fireEvent.click(screen.getByTestId('btn-reset-password'));
-
-    await waitFor(() => {
-      expect(resetPassword).toHaveBeenCalledWith({
-        token: 'mock-token',
-        newPassword: 'Password123!',
-      });
-    });
-
-    await waitFor(() => {
-      expect(screen.getByTestId('alert-error')).toBeInTheDocument();
-      expect(screen.getByTestId('alert-error')).toHaveTextContent('reset.failed');
-      expect(error).toHaveBeenCalledWith(errorMessage);
-    });
-  });
-
-  it('maneja error de reset cuando es un objeto sin message', async () => {
-    const resetPassword = jest.fn().mockResolvedValue({
-      payload: { success: false },
-    });
-    setupUseAuth({ resetPassword, error: 'reset.failed' });
-    const { error } = setupUseToast();
-
-    renderResetPasswordForm();
-    fireEvent.change(screen.getByTestId('input-password'), {
-      target: { value: 'Password123!' },
-    });
-    fireEvent.click(screen.getByTestId('btn-reset-password'));
-
-    await waitFor(() => {
-      expect(resetPassword).toHaveBeenCalledWith({
-        token: 'mock-token',
-        newPassword: 'Password123!',
-      });
-    });
-
-    await waitFor(() => {
-      expect(screen.getByTestId('alert-error')).toBeInTheDocument();
-      expect(screen.getByTestId('alert-error')).toHaveTextContent('reset.failed');
-      expect(error).toHaveBeenCalledWith('reset.failed');
-    });
-  });
-
-  it('maneja error global de reset', async () => {
-    const errorMessage = 'Error global de reset';
-    const resetPassword = jest.fn().mockResolvedValue({
-      payload: { success: false, message: errorMessage },
-    });
-    setupUseAuth({ resetPassword, error: errorMessage });
-    const { error } = setupUseToast();
-
-    renderResetPasswordForm();
-    fireEvent.change(screen.getByTestId('input-password'), {
-      target: { value: 'Password123!' },
-    });
-    fireEvent.click(screen.getByTestId('btn-reset-password'));
-
-    await waitFor(() => {
-      expect(resetPassword).toHaveBeenCalledWith({
-        token: 'mock-token',
-        newPassword: 'Password123!',
-      });
-    });
-
-    await waitFor(() => {
-      expect(screen.getByTestId('alert-error')).toBeInTheDocument();
-      expect(screen.getByTestId('alert-error')).toHaveTextContent('reset.failed');
-      expect(error).toHaveBeenCalledWith(errorMessage);
-    });
-  });
-
-  it('alterna la visibilidad de la contraseña', () => {
+  it('should toggle password visibility', async () => {
     renderResetPasswordForm();
 
-    const passwordInput = screen.getByTestId('input-password');
+    const passwordInput = screen.getByTestId('reset-password-form-password-input');
     const toggleButton = screen.getByTestId('btn-toggle-password');
 
     expect(passwordInput).toHaveAttribute('type', 'password');
     expect(toggleButton).toHaveTextContent('👁️');
 
-    fireEvent.click(toggleButton);
+    await act(async () => {
+      fireEvent.click(toggleButton);
+    });
 
     expect(passwordInput).toHaveAttribute('type', 'text');
     expect(toggleButton).toHaveTextContent('🙈');
 
-    fireEvent.click(toggleButton);
+    await act(async () => {
+      fireEvent.click(toggleButton);
+    });
 
     expect(passwordInput).toHaveAttribute('type', 'password');
     expect(toggleButton).toHaveTextContent('👁️');
   });
 
-  it('muestra el estado inicial sin mensaje', () => {
-    renderResetPasswordForm();
-    expect(screen.queryByTestId('alert-error')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('alert-success')).not.toBeInTheDocument();
+  /*
+  @TODO: Implement test for the case of the token being different from the one in the URL
+  it('should handle error when token does not match', async () => {
+
   });
+  */
 
-  it('muestra error cuando no hay token', () => {
-    const resetPassword = jest.fn();
-    setupUseAuth({ resetPassword });
-    const { error } = setupUseToast();
+  it('should handle error when token becomes invalid', async () => {
+    const resetPasswordMock = promiseMock();
+    setupUseAuth({ resetPassword: resetPasswordMock });
+    const { rerender } = renderResetPasswordForm({ tokenProp: 'valid-token' });
 
-    renderResetPasswordForm({ token: '' });
-
-    expect(screen.getByTestId('alert-error')).toBeInTheDocument();
-    expect(screen.getByTestId('alert-error')).toHaveTextContent('reset.invalid_token');
-    expect(resetPassword).not.toHaveBeenCalled();
-    expect(error).not.toHaveBeenCalled();
-  });
-
-  it('muestra error cuando el token es undefined', () => {
-    const resetPassword = jest.fn();
-    setupUseAuth({ resetPassword });
-    const { error } = setupUseToast();
-
-    // @ts-expect-error - Testing invalid token case
-    renderResetPasswordForm({ token: undefined });
-
-    expect(screen.getByTestId('alert-error')).toBeInTheDocument();
-    expect(screen.getByTestId('alert-error')).toHaveTextContent('reset.invalid_token');
-    expect(resetPassword).not.toHaveBeenCalled();
-    expect(error).not.toHaveBeenCalled();
-  });
-
-  it('inicializa el estado de message como null', () => {
-    const { container } = renderResetPasswordForm();
-    expect(container.querySelector('[data-testid="alert-error"]')).not.toBeInTheDocument();
-    expect(container.querySelector('[data-testid="alert-success"]')).not.toBeInTheDocument();
-    expect(screen.getByTestId('input-password')).toBeInTheDocument();
-  });
-
-  it('maneja error en onSubmit cuando no hay token', async () => {
-    const resetPassword = jest.fn();
-    setupUseAuth({ resetPassword });
-    const { error } = setupUseToast();
+    expect(screen.getByTestId('reset-password-form-password-input')).toBeInTheDocument();
 
     await act(async () => {
-      renderResetPasswordForm({ token: '' });
+      rerender(
+        <MemoryRouter>
+          <ResetPasswordForm tokenProp="" />
+        </MemoryRouter>
+      );
     });
 
-    expect(screen.getByTestId('alert-error')).toBeInTheDocument();
     expect(screen.getByTestId('alert-error')).toHaveTextContent('reset.invalid_token');
-    expect(resetPassword).not.toHaveBeenCalled();
-    expect(error).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('reset-password-form')).not.toBeInTheDocument();
+    expect(resetPasswordMock).not.toHaveBeenCalled();
+    expect(toastMock.error).not.toHaveBeenCalled();
   });
 
-  it('maneja error en onSubmit cuando el token es undefined', async () => {
-    const resetPassword = jest.fn();
-    setupUseAuth({ resetPassword });
-    const { error } = setupUseToast();
-
-    await act(async () => {
-      // @ts-expect-error - Testing invalid token case
-      renderResetPasswordForm({ token: undefined });
-    });
-
-    expect(screen.getByTestId('alert-error')).toBeInTheDocument();
-    expect(screen.getByTestId('alert-error')).toHaveTextContent('reset.invalid_token');
-    expect(resetPassword).not.toHaveBeenCalled();
-    expect(error).not.toHaveBeenCalled();
-  });
-
-  it('maneja error en onSubmit cuando el token se vuelve inválido', async () => {
-    const resetPassword = jest.fn();
-    setupUseAuth({ resetPassword });
-    const { error } = setupUseToast();
-
-    const { rerender } = renderResetPasswordForm({ token: 'valid-token' });
-
-    // Primero verificamos que el formulario está presente
-    expect(screen.getByTestId('input-password')).toBeInTheDocument();
-
-    // Luego cambiamos el token a inválido
-    await act(async () => {
-      rerender(<ResetPasswordForm token="" />);
-    });
-
-    // Verificamos que se muestra el mensaje de error
-    expect(screen.getByTestId('alert-error')).toBeInTheDocument();
-    expect(screen.getByTestId('alert-error')).toHaveTextContent('reset.invalid_token');
-    expect(resetPassword).not.toHaveBeenCalled();
-    expect(error).not.toHaveBeenCalled();
-  });
-
-  it('muestra error cuando el password no cumple las reglas de validación', async () => {
-    const resetPassword = jest.fn();
-    setupUseAuth({ resetPassword });
-    const { error } = setupUseToast();
-
+  it('should show error when password does not meet validation rules', async () => {
+    const resetPasswordMock = promiseMock();
+    setupUseAuth({ resetPassword: resetPasswordMock });
     renderResetPasswordForm();
 
-    // Envolvemos las interacciones en act()
     await act(async () => {
-      fireEvent.change(screen.getByTestId('input-password'), {
+      fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
         target: { value: 'weak' },
       });
-      fireEvent.click(screen.getByTestId('btn-reset-password'));
+      fireEvent.click(screen.getByTestId('reset-password-form-button'));
     });
 
-    // Verificamos que se muestra el error de validación
     expect(screen.getByText('errors.password.invalid')).toBeInTheDocument();
+    expect(resetPasswordMock).not.toHaveBeenCalled();
+    expect(toastMock.error).not.toHaveBeenCalled();
+  });
 
-    // Verificamos que no se llama a resetPassword
-    expect(resetPassword).not.toHaveBeenCalled();
-    expect(error).not.toHaveBeenCalled();
+  it('should render token correctly in the form', () => {
+    renderResetPasswordForm({ tokenProp: 'test-token' });
+    const tokenInput = screen.getByTestId('reset-password-form-token');
+    expect(tokenInput).toHaveAttribute('value', 'test-token');
+    expect(tokenInput).toHaveAttribute('type', 'hidden');
+    expect(tokenInput).toHaveAttribute('readonly');
+  });
+
+  it('should render snapshot correctly', () => {
+    const { asFragment } = renderResetPasswordForm();
+    expect(asFragment()).toMatchSnapshot();
   });
 });

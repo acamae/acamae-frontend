@@ -15,7 +15,7 @@ const NotFoundPage: React.FC = () => {
         {t('not_found.message', 'La ruta que intentas acceder no existe.')}
       </p>
       <Link to="/" className="btn btn-primary mt-3" data-testid="link-back-home">
-        {t('not_found.backHome', 'Volver al inicio')}
+        {t('not_found.back_to_home', 'Volver al inicio')}
       </Link>
     </Container>
   );

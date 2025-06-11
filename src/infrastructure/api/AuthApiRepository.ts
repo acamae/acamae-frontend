@@ -7,11 +7,12 @@ import {
   LoginPayload,
   RegisterPayload,
   ResetPasswordPayload,
+  ResendVerificationPayload,
 } from '@/domain/types/apiSchema';
 import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { USER_ROLES } from '@domain/constants/user';
 import { User } from '@domain/entities/User';
-import { AuthRepository } from '@domain/repositories/AuthRepository';
+import { IAuthRepository } from '@domain/repositories/AuthRepository';
 import { UserResponse } from '@domain/types/api';
 import {
   API_ROUTES,
@@ -111,26 +112,42 @@ function handleApiSuccess<T>({
  */
 function handleApiError<T>(error: unknown): ApiResponse<T> {
   if (error instanceof AxiosError && error.response) {
-    // The request was made and the server responded with a status code
-    // that falls out of the range of 2xx
+    // {
+    //   success: false,
+    //   data: response.data,
+    //   status: response.status
+    // }
     return mapApiAxiosResponseError({ response: error.response });
   } else if (error instanceof AxiosError && error.request) {
-    // The request was made but no response was received
-    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-    // http.ClientRequest in node.js
+    // {
+    //   success: false,
+    //   status: error.status ?? 500,
+    //   message: error.message ?? 'A request error occurred',
+    //   code: error.code ?? ApiErrorCodes.REQUEST_ERROR,
+    // }
     return mapApiAxiosRequestError({ error });
   }
-
-  // Something happened in setting up the request that triggered an Error
+  // {
+  //   success: false,
+  //   status: 500,
+  //   message: 'An unknown error occurred',
+  //   code: ApiErrorCodes.UNKNOWN_ERROR,
+  // }
   return mapApiAxiosUnknownError();
 }
 
-export class AuthApiRepository implements AuthRepository {
+export class AuthApiRepository implements IAuthRepository {
   async login(payload: LoginPayload): ApiPromise<User> {
     try {
       const response = await api.post(API_ROUTES.AUTH.LOGIN, {
         ...payload,
       });
+
+      // {
+      //   success: true,
+      //   data: response.data,
+      //   status: response.status, // 2xx response with data
+      // }
       return handleApiSuccess({
         response: {
           ...response,
@@ -159,6 +176,7 @@ export class AuthApiRepository implements AuthRepository {
   async forgotPassword(payload: ForgotPasswordPayload): ApiPromise<void> {
     try {
       const response = await api.post(API_ROUTES.AUTH.FORGOT_PASSWORD, payload);
+      console.log('response', response);
       return handleApiSuccess({ response });
     } catch (error) {
       return handleApiError(error);
@@ -248,6 +266,15 @@ export class AuthApiRepository implements AuthRepository {
   async delete(id: string): ApiPromise<void> {
     try {
       const response = await api.delete(getDeleteUserByIdUrl(id));
+      return handleApiSuccess({ response });
+    } catch (error) {
+      return handleApiError(error);
+    }
+  }
+
+  async resendVerification(payload: ResendVerificationPayload): ApiPromise<void> {
+    try {
+      const response = await api.post(API_ROUTES.AUTH.VERIFY_EMAIL_RESEND, payload);
       return handleApiSuccess({ response });
     } catch (error) {
       return handleApiError(error);

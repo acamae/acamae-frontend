@@ -46,7 +46,7 @@ describe('sessionTimerMiddleware', () => {
     jest.useRealTimers();
   });
 
-  it('dispatch resetTimer => setExpiresAt con timestamp futuro', () => {
+  it('should dispatch resetTimer => setExpiresAt with future timestamp', () => {
     const store = createTestStore();
     store.dispatch(resetTimer());
 
@@ -54,7 +54,7 @@ describe('sessionTimerMiddleware', () => {
     expect(actions.expiresAt).toBeGreaterThan(0);
   });
 
-  it('al recibir setExpiresAt programa interval y muestra modal / logout', () => {
+  it('should program interval and show modal / logout when receiving setExpiresAt', () => {
     const store = createTestStore();
 
     // 1 minute session and warning at 30 seconds
@@ -75,28 +75,28 @@ describe('sessionTimerMiddleware', () => {
     expect(store.getState().sessionTimer.expiresAt).toBe(0);
   });
 
-  it('removeExpiresAt cancela temporizador y limpia storage', () => {
+  it('should cancel timer and clear storage when receiving removeExpiresAt', () => {
     const store = createTestStore();
     store.dispatch(removeExpiresAt());
     expect(sessionExpiryService.removeExpiresAt).toHaveBeenCalled();
   });
 
-  it('no muestra el modal si ya está visible cuando se alcanza el tiempo de advertencia', () => {
+  it('should not show modal if it is already visible when the warning time is reached', () => {
     const store = createTestStore();
 
     // 1 minute session and warning at 30 seconds
     const expiresAt = Date.now() + 60_000;
     store.dispatch(setExpiresAt(expiresAt));
 
-    // Mostrar el modal manualmente
+    // Show the modal manually
     store.dispatch(showModal());
     expect(store.getState().sessionTimer.showModal).toBe(true);
 
-    // Avanzar al punto de advertencia (30 segundos antes de la expiración)
+    // Advance to the warning point (30 seconds before expiration)
     jest.advanceTimersByTime(30_000);
     jest.setSystemTime(30_000);
 
-    // El modal debe seguir visible pero no debe haber cambiado su estado
+    // The modal should remain visible but its state should not have changed
     expect(store.getState().sessionTimer.showModal).toBe(true);
   });
 });

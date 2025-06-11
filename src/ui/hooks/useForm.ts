@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 export type UseFormConfig<T> = {
   initialValues: T;
-  onSubmit: (values: T) => void;
+  onSubmit: (values: T) => Promise<void>;
   validate?: (values: T) => Partial<Record<keyof T, string>>;
 };
 
@@ -85,9 +85,9 @@ export const useForm = <T extends object>({
     setIsSubmitting(true);
 
     try {
-      await onSubmit(values);
+      return await onSubmit(values);
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.log('error', error);
       throw error;
     } finally {
       setIsSubmitting(false);

@@ -6,5 +6,4 @@ export interface AuthState {
   token: string | null;
   expiresAt: string | null; // ISO string
   loading: boolean;
-  error: string | null;
 }

@@ -2,21 +2,22 @@ import React, { useCallback } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
+import { ForgotPasswordPayload } from '@/domain/types/apiSchema';
 import { validateEmail } from '@domain/services/validationService';
-import api from '@shared/services/axiosService';
+import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
 import { useToast } from '@ui/hooks/useToast';
 
 const ForgotPasswordForm: React.FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-
+  const { forgotPassword, loading } = useAuth();
   const validate = useCallback(
-    (values: { email: string }) => {
-      const errors: Partial<{ email: string }> = {};
-      if (!values.email) {
+    (values: ForgotPasswordPayload) => {
+      const errors: Partial<ForgotPasswordPayload> = {};
+      if (!values.email || !validateEmail(values.email)) {
         errors.email = t('errors.email.required');
-      } else if (!validateEmail(values.email)) {
+      } else if (!values.email || !validateEmail(values.email)) {
         errors.email = t('errors.email.invalid');
       }
       return errors;
@@ -24,29 +25,26 @@ const ForgotPasswordForm: React.FC = () => {
     [t]
   );
 
-  const { values, errors, touched, isSubmitting, handleChange, handleSubmit } = useForm<{
-    email: string;
-  }>({
-    initialValues: { email: '' },
-    validate,
-    onSubmit: async ({ email }) => {
-      try {
-        await api.post('/auth/forgot-password', { email });
-        toast.success(t('forgot.success'), t('forgot.check_email'));
-      } catch (err: unknown) {
-        // Assume standard API error structure
-        const code = (err as { response?: { data?: { code?: string } } })?.response?.data?.code;
-        if (code === 'USER_NOT_FOUND') {
-          toast.error(t('errors.email.not_found'), t('forgot.failed'));
-        } else {
-          toast.error(t('forgot.unknown_error'), t('forgot.failed'));
+  const { values, errors, touched, isSubmitting, handleChange, handleSubmit } =
+    useForm<ForgotPasswordPayload>({
+      initialValues: { email: '' },
+      validate,
+      onSubmit: async (payload: ForgotPasswordPayload) => {
+        try {
+          await forgotPassword(payload);
+          toast.success(t('forgot.success'), t('forgot.check_email'));
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            toast.error(t('forgot.failed'), error.message);
+          } else {
+            toast.error(t('forgot.failed'));
+          }
         }
-      }
-    },
-  });
+      },
+    });
 
   return (
-    <Form onSubmit={handleSubmit} noValidate>
+    <Form onSubmit={handleSubmit} noValidate data-testid="forgot-password-form">
       <Form.Group className="mb-3" controlId="email">
         <Form.Label>{t('forgot.email')}</Form.Label>
         <Form.Control
@@ -58,21 +56,26 @@ const ForgotPasswordForm: React.FC = () => {
           required
           autoComplete="email"
           aria-describedby="emailHelp"
-          data-testid="input-email"
+          data-testid="forgot-password-form-email-input"
         />
-        <Form.Text id="emailHelp" className="text-muted">
+        <Form.Text
+          id="emailHelp"
+          className="text-muted"
+          data-testid="forgot-password-form-email-help">
           {t('forgot.email_help')}
         </Form.Text>
-        <Form.Control.Feedback type="invalid">{errors.email}</Form.Control.Feedback>
+        <Form.Control.Feedback type="invalid" data-testid="forgot-password-form-email-error">
+          {errors.email}
+        </Form.Control.Feedback>
       </Form.Group>
       <div className="d-grid">
         <Button
           variant="primary"
           type="submit"
-          data-testid="btn-forgot-password"
-          disabled={isSubmitting}
-          aria-busy={isSubmitting}>
-          {t('forgot.submit')}
+          disabled={isSubmitting || loading}
+          aria-busy={isSubmitting || loading}
+          data-testid="forgot-password-form-button">
+          {isSubmitting || loading ? t('forgot.loading') : t('forgot.submit')}
         </Button>
       </div>
     </Form>

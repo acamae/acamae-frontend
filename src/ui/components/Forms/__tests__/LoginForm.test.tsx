@@ -1,3 +1,13 @@
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { useTranslation } from 'react-i18next';
+import { MemoryRouter, useNavigate } from 'react-router-dom';
+
+import { APP_ROUTES } from '@shared/constants/appRoutes';
+import { IPromiseMock, promiseMock } from '@shared/utils/apiTestUtils';
+import LoginForm from '@ui/components/Forms/LoginForm';
+import { useAuth } from '@ui/hooks/useAuth';
+import { useToast } from '@ui/hooks/useToast';
+
 jest.mock('react-i18next');
 jest.mock('@ui/hooks/useAuth');
 jest.mock('@ui/hooks/useToast');
@@ -6,34 +16,22 @@ jest.mock('react-router-dom', () => ({
   useNavigate: jest.fn(),
 }));
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-
-import { APP_ROUTES } from '@shared/constants/appRoutes';
-import LoginForm from '@ui/components/Forms/LoginForm';
-import { useAuth } from '@ui/hooks/useAuth';
-import { useToast } from '@ui/hooks/useToast';
-
-const loginMock = jest.fn();
 const toastMock = { error: jest.fn(), success: jest.fn() };
 const navigateMock = jest.fn();
-const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => {});
 
 function setupUseAuth({
   loading = false,
-  error = null,
   isAuthenticated = false,
+  login = promiseMock(),
 }: {
   loading?: boolean;
-  error?: string | null;
   isAuthenticated?: boolean;
+  login?: IPromiseMock;
 } = {}) {
   (useAuth as jest.Mock).mockReturnValue({
-    login: loginMock,
     loading,
-    error,
     isAuthenticated,
+    login,
   });
 }
 
@@ -60,28 +58,38 @@ function setupUseTranslation({
   });
 }
 
-beforeEach(() => {
-  jest.clearAllMocks();
-  setupUseTranslation();
-  setupUseAuth();
-  setupUseToast();
-  setupUseNavigate();
-});
-
-afterAll(() => {
-  consoleErrorMock.mockRestore();
-});
-
+function renderLoginForm() {
+  return render(
+    <MemoryRouter>
+      <LoginForm />
+    </MemoryRouter>
+  );
+}
 describe('LoginForm', () => {
-  it('renderiza correctamente', () => {
-    render(<LoginForm />);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    setupUseTranslation();
+    setupUseAuth();
+    setupUseToast();
+    setupUseNavigate();
+  });
+
+  it('should render correctly', () => {
+    renderLoginForm();
     expect(screen.getByTestId('login-form-email-input')).toBeInTheDocument();
     expect(screen.getByTestId('login-form-password-input')).toBeInTheDocument();
+    expect(screen.getByTestId('login-form-password-toggle')).toBeInTheDocument();
+    expect(screen.getByTestId('login-form-email-help')).toHaveTextContent('login.email_help');
+    expect(screen.getByTestId('login-form-password-help')).toHaveTextContent('login.password_help');
+    expect(screen.queryByTestId('login-form-email-error')).toBeEmptyDOMElement();
+    expect(screen.queryByTestId('login-form-password-error')).toBeEmptyDOMElement();
     expect(screen.getByTestId('login-form-button')).toBeInTheDocument();
   });
 
-  it('llama a login con los valores correctos al hacer submit', async () => {
-    render(<LoginForm />);
+  it('should call login with the correct values when submitting', async () => {
+    const loginMock = promiseMock();
+    setupUseAuth({ login: loginMock, isAuthenticated: true });
+    renderLoginForm();
     fireEvent.change(screen.getByTestId('login-form-email-input'), {
       target: { value: 'test@mail.com' },
     });
@@ -95,11 +103,13 @@ describe('LoginForm', () => {
         email: 'test@mail.com',
         password: 'Password123!',
       });
+      expect(toastMock.success).toHaveBeenCalledWith('login.success', 'login.welcome');
+      expect(navigateMock).toHaveBeenCalledWith(APP_ROUTES.DASHBOARD);
     });
   });
 
-  it('muestra errores de validación', () => {
-    render(<LoginForm />);
+  it('should show validation errors', () => {
+    renderLoginForm();
     fireEvent.change(screen.getByTestId('login-form-email-input'), {
       target: { value: 'invalid-email' },
     });
@@ -110,30 +120,52 @@ describe('LoginForm', () => {
     expect(screen.getByText('errors.password.invalid')).toBeInTheDocument();
   });
 
-  it('muestra toast de error si login falla', async () => {
-    const errorMessage = 'Invalid credentials';
-    setupUseAuth({ error: errorMessage });
-    render(<LoginForm />);
+  it('should disable the button when loading is true', () => {
+    setupUseAuth({ loading: true });
+    renderLoginForm();
+    expect(screen.getByTestId('login-form-button')).toBeDisabled();
+  });
+
+  it('should show error toast when login fails', async () => {
+    const loginMock = promiseMock({ error: 'Invalid credentials' });
+    setupUseAuth({ login: loginMock });
+    renderLoginForm();
+
+    fireEvent.change(screen.getByTestId('login-form-email-input'), {
+      target: { value: 'test@mail.com' },
+    });
+    fireEvent.change(screen.getByTestId('login-form-password-input'), {
+      target: { value: 'Password123!' },
+    });
+    fireEvent.submit(screen.getByTestId('login-form'));
 
     await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalledWith(errorMessage, 'login.failed');
+      expect(toastMock.error).toHaveBeenCalledWith('login.failed', 'Invalid credentials');
     });
   });
 
-  it('maneja error de login desde el estado de error', async () => {
-    const errorMessage = 'Error desde el estado';
-    setupUseAuth({ error: errorMessage });
+  it('should handle error from login state', async () => {
+    const loginMock = promiseMock({ error: 'Error desde el estado' });
+    setupUseAuth({ login: loginMock });
+    renderLoginForm();
 
-    render(<LoginForm />);
+    fireEvent.change(screen.getByTestId('login-form-email-input'), {
+      target: { value: 'test@mail.com' },
+    });
+    fireEvent.change(screen.getByTestId('login-form-password-input'), {
+      target: { value: 'Password123!' },
+    });
+    fireEvent.submit(screen.getByTestId('login-form'));
 
     await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalledWith(errorMessage, 'login.failed');
+      expect(toastMock.error).toHaveBeenCalledWith('login.failed', 'Error desde el estado');
     });
   });
 
-  it('redirige al dashboard cuando el login es exitoso', async () => {
-    setupUseAuth({ isAuthenticated: true });
-    render(<LoginForm />);
+  it('should redirect to dashboard when login is successful', async () => {
+    const loginMock = promiseMock();
+    setupUseAuth({ login: loginMock, isAuthenticated: true });
+    renderLoginForm();
 
     await waitFor(() => {
       expect(toastMock.success).toHaveBeenCalledWith('login.success', 'login.welcome');
@@ -141,19 +173,21 @@ describe('LoginForm', () => {
     });
   });
 
-  it('alterna la visibilidad de la contraseña al hacer clic en el botón', () => {
-    render(<LoginForm />);
+  it('should toggle password visibility when clicking the button', () => {
+    const loginMock = promiseMock();
+    setupUseAuth({ login: loginMock, isAuthenticated: false });
+    renderLoginForm();
     const passwordInput = screen.getByTestId('login-form-password-input');
     const toggleButton = screen.getByTestId('login-form-password-toggle');
 
-    // Inicialmente la contraseña está oculta
+    // Initially the password is hidden
     expect(passwordInput).toHaveAttribute('type', 'password');
 
-    // Al hacer clic, la contraseña se muestra
+    // When clicked, the password is shown
     fireEvent.click(toggleButton);
     expect(passwordInput).toHaveAttribute('type', 'text');
 
-    // Al hacer clic de nuevo, la contraseña se oculta
+    // When clicked again, the password is hidden
     fireEvent.click(toggleButton);
     expect(passwordInput).toHaveAttribute('type', 'password');
   });

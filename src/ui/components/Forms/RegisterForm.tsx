@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { Form, Button, InputGroup } from 'react-bootstrap';
 import { Trans, useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
@@ -9,7 +9,7 @@ import {
   validateUsername,
 } from '@domain/services/validationService';
 import { APP_ROUTES } from '@shared/constants/appRoutes';
-import PasswordStrengthMeter from '@ui/components/Forms/PasswordStrengthMeter';
+import PasswordStrengthMeter from '@ui/components/PasswordStrengthMeter';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
 import { useToast } from '@ui/hooks/useToast';
@@ -18,10 +18,37 @@ const RegisterForm: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const toast = useToast();
-  const { register, loading, error } = useAuth();
+  const { register, loading } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const validate = useCallback(
+    (values: { email: string; username: string; password: string; confirmPassword: string }) => {
+      const errors: Partial<{
+        email: string;
+        username: string;
+        password: string;
+        confirmPassword: string;
+      }> = {};
+      if (!validateEmail(values.email)) {
+        errors.email = t('errors.email.invalid');
+      }
+      if (!validateUsername(values.username)) {
+        errors.username = t('errors.username.invalid');
+      }
+      if (!validatePassword(values.password)) {
+        errors.password = t('errors.password.invalid');
+      }
+      if (!values.confirmPassword) {
+        errors.confirmPassword = t('errors.password.confirm_required');
+      } else if (values.password !== values.confirmPassword) {
+        errors.confirmPassword = t('errors.password.mismatch');
+      }
+      return errors;
+    },
+    [t]
+  );
 
   const {
     values,
@@ -45,68 +72,21 @@ const RegisterForm: React.FC = () => {
       confirmPassword: '',
       terms: false,
     },
-
-    validate: useCallback(
-      (values: {
-        email: string;
-        username: string;
-        password: string;
-        confirmPassword: string;
-        terms: boolean;
-      }) => {
-        const errors: Partial<{
-          email: string;
-          username: string;
-          password: string;
-          confirmPassword: string;
-          terms: string;
-        }> = {};
-        if (!validateEmail(values.email)) {
-          errors.email = t('errors.email.invalid');
-        }
-        if (!validateUsername(values.username)) {
-          errors.username = t('errors.username.invalid');
-        }
-        if (!validatePassword(values.password)) {
-          errors.password = t('errors.password.invalid');
-        }
-        if (!values.confirmPassword) {
-          errors.confirmPassword = t('errors.password.confirm_required');
-        } else if (values.password !== values.confirmPassword) {
-          errors.confirmPassword = t('errors.password.mismatch');
-        }
-        if (!values.terms) {
-          errors.terms = t('errors.terms.required');
-        }
-        return errors;
-      },
-      [t]
-    ),
-
-    onSubmit: async () => {
+    validate,
+    onSubmit: async data => {
       try {
-        await register({
-          email: values.email,
-          password: values.password,
-          username: values.username,
-        });
+        await register(data);
         toast.success(t('register.success'), t('register.welcome'));
         navigate(APP_ROUTES.LOGIN);
-      } catch (err: unknown) {
-        const errorMessage =
-          typeof err === 'string'
-            ? err
-            : (err as { message?: string })?.message || t('register.failed');
-        toast.error(errorMessage, t('register.failed'));
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          toast.error(error.message, t('register.failed'));
+        } else {
+          toast.error(t('register.failed'));
+        }
       }
     },
   });
-
-  useEffect(() => {
-    if (error) {
-      toast.error(error, t('register.failed'));
-    }
-  }, [error, t, toast]);
 
   return (
     <Form onSubmit={handleSubmit} noValidate data-testid="register-form">

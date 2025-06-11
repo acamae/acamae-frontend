@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PublicHeader snapshot: renderizado de PublicHeader 1`] = `
+exports[`PublicHeader should render snapshot correctly 1`] = `
 <DocumentFragment>
   <div
     class="app-header"

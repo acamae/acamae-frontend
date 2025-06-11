@@ -1,13 +1,13 @@
 import { USER_ROLES } from '@domain/constants/user';
 import { User } from '@domain/entities/User';
-import { AuthRepository } from '@domain/repositories/AuthRepository';
+import { IAuthRepository } from '@domain/repositories/AuthRepository';
 import { LoginPayload } from '@domain/types/apiSchema';
 
 import { LoginUseCase } from '../LoginUseCase';
 
 describe('LoginUseCase', () => {
   let loginUseCase: LoginUseCase;
-  let mockAuthRepository: jest.Mocked<AuthRepository>;
+  let mockAuthRepository: jest.Mocked<IAuthRepository>;
 
   beforeEach(() => {
     mockAuthRepository = {
@@ -21,7 +21,7 @@ describe('LoginUseCase', () => {
       findById: jest.fn(),
       save: jest.fn(),
       delete: jest.fn(),
-    } as unknown as jest.Mocked<AuthRepository>;
+    } as unknown as jest.Mocked<IAuthRepository>;
 
     loginUseCase = new LoginUseCase(mockAuthRepository);
   });

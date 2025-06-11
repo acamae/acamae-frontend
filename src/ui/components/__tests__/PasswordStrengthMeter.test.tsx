@@ -9,7 +9,8 @@ import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import translations from '@infrastructure/i18n/locales/es-ES.json';
-import PasswordStrengthMeter from '@ui/components/Forms/PasswordStrengthMeter';
+import PasswordStrengthMeter from '@ui/components/PasswordStrengthMeter';
+
 afterEach(() => {
   cleanup();
   jest.clearAllMocks();
@@ -93,7 +94,7 @@ describe('PasswordStrengthMeter integration test', () => {
     expect(screen.getByTestId('password-strength-bar')).toHaveClass('bg-success');
   });
 
-  it('renderiza un span con texto', async () => {
+  it('should render a span with text', async () => {
     render(<PasswordStrengthMeter password="mediapass" t={mockT} />);
     await waitFor(() => {
       const label = screen.getByTestId('password-strength-label');

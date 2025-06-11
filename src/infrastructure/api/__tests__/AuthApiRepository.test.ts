@@ -51,7 +51,7 @@ beforeEach(() => {
 });
 
 describe('AuthApiRepository', () => {
-  it('login – success mapea correctamente la respuesta', async () => {
+  it('should login and map the response correctly', async () => {
     getMock().post.mockResolvedValue({ data: userResponse, status: 200 });
 
     const result = await repo.login({ email: 'a@b.com', password: '123456' });
@@ -64,7 +64,7 @@ describe('AuthApiRepository', () => {
     expect(result.data?.email).toBe('a@b.com');
   });
 
-  it('login – error http 400 devuelve success=false', async () => {
+  it('should login and return success=false when http 400', async () => {
     const error = new AxiosError('Bad request') as MockAxiosError;
     error.response = {
       status: 400,
@@ -81,7 +81,7 @@ describe('AuthApiRepository', () => {
     expect(result.status).toBe(400);
   });
 
-  it('forgotPassword – network error devuelve success=false status 500', async () => {
+  it('should forgotPassword and return success=false when network error', async () => {
     const netErr = new AxiosError('Network') as MockAxiosError;
     netErr.request = {};
     getMock().post.mockRejectedValue(netErr);
@@ -95,7 +95,7 @@ describe('AuthApiRepository', () => {
     expect(result.status).toBe(500);
   });
 
-  it('register – success', async () => {
+  it('should register and return success', async () => {
     getMock().post.mockResolvedValue({ data: userResponse, status: 201 });
     const result = await repo.register({ email: 'x@y.com', password: 'pwd', username: 'user' });
     expect(getMock().post).toHaveBeenCalledWith(API_ROUTES.AUTH.REGISTER, {
@@ -106,14 +106,14 @@ describe('AuthApiRepository', () => {
     expect(result.success).toBe(true);
   });
 
-  it('logout – success', async () => {
+  it('should logout and return success', async () => {
     getMock().post.mockResolvedValue({ data: undefined, status: 200 });
     const result = await repo.logout();
     expect(getMock().post).toHaveBeenCalledWith(API_ROUTES.AUTH.LOGOUT);
     expect(result.success).toBe(true);
   });
 
-  it('findAll – devuelve arreglo de usuarios', async () => {
+  it('should findAll and return array of users', async () => {
     getMock().get.mockResolvedValue({ data: [userResponse], status: 200 });
     const result = await repo.findAll();
     expect(getMock().get).toHaveBeenCalledWith(API_ROUTES.USERS.GET_ALL);
@@ -121,7 +121,7 @@ describe('AuthApiRepository', () => {
     expect(result.data?.length).toBe(1);
   });
 
-  it('handleApiSuccess - mapea correctamente respuesta exitosa', async () => {
+  it('should handleApiSuccess and map the response correctly', async () => {
     getMock().get.mockResolvedValue({ data: userResponse, status: 200 });
     const result = await repo.getCurrentUser();
     expect(result.success).toBe(true);
@@ -134,7 +134,7 @@ describe('AuthApiRepository', () => {
     );
   });
 
-  it('handleApiError - maneja error de respuesta', async () => {
+  it('should handleApiError and handle response error', async () => {
     const error = new AxiosError('Server Error') as MockAxiosError;
     error.response = {
       status: 500,
@@ -149,7 +149,7 @@ describe('AuthApiRepository', () => {
     expect(result.status).toBe(500);
   });
 
-  it('handleApiError - maneja error de red', async () => {
+  it('should handleApiError and handle network error', async () => {
     const error = new AxiosError('Network Error') as MockAxiosError;
     error.request = {};
     getMock().get.mockRejectedValue(error);
@@ -159,7 +159,7 @@ describe('AuthApiRepository', () => {
     expect(result.code).toBe('REQUEST_ERROR');
   });
 
-  it('handleApiError - maneja error desconocido', async () => {
+  it('should handleApiError and handle unknown error', async () => {
     getMock().get.mockRejectedValue(new Error('Unknown Error'));
     const result = await repo.getCurrentUser();
     expect(result.success).toBe(false);
@@ -167,7 +167,7 @@ describe('AuthApiRepository', () => {
     expect(result.code).toBe('UNKNOWN_ERROR');
   });
 
-  it('findById - success', async () => {
+  it('should findById and return success', async () => {
     getMock().get.mockResolvedValue({ data: userResponse, status: 200 });
     const result = await repo.findById('1');
     expect(getMock().get).toHaveBeenCalledWith(expect.stringContaining('/users/1'));
@@ -180,7 +180,7 @@ describe('AuthApiRepository', () => {
     );
   });
 
-  it('findById - error', async () => {
+  it('should findById and return error', async () => {
     const error = new AxiosError('Not Found') as MockAxiosError;
     error.response = {
       status: 404,
@@ -195,7 +195,7 @@ describe('AuthApiRepository', () => {
     expect(result.status).toBe(404);
   });
 
-  it('save - success', async () => {
+  it('should save and return success', async () => {
     const updatedUser = { ...userResponse, username: 'updated' };
     getMock().put.mockResolvedValue({ data: updatedUser, status: 200 });
     const result = await repo.save({
@@ -218,7 +218,7 @@ describe('AuthApiRepository', () => {
     expect(result.data?.username).toBe('updated');
   });
 
-  it('save - error', async () => {
+  it('should save and return error', async () => {
     const error = new AxiosError('Bad Request') as MockAxiosError;
     error.response = {
       status: 400,
@@ -240,7 +240,7 @@ describe('AuthApiRepository', () => {
     expect(result.status).toBe(400);
   });
 
-  it('delete - success', async () => {
+  it('should delete and return success', async () => {
     getMock().delete.mockResolvedValue({ data: undefined, status: 204 });
     const result = await repo.delete('1');
     expect(getMock().delete).toHaveBeenCalledWith(expect.stringContaining('/users/1'));
@@ -248,7 +248,7 @@ describe('AuthApiRepository', () => {
     expect(result.status).toBe(204);
   });
 
-  it('delete - error', async () => {
+  it('should delete and return error', async () => {
     const error = new AxiosError('Not Found') as MockAxiosError;
     error.response = {
       status: 404,
@@ -263,7 +263,7 @@ describe('AuthApiRepository', () => {
     expect(result.status).toBe(404);
   });
 
-  it('resetPassword - success', async () => {
+  it('should resetPassword and return success', async () => {
     getMock().post.mockResolvedValue({ data: undefined, status: 200 });
     const result = await repo.resetPassword({ token: 'valid-token', newPassword: 'new-password' });
     expect(getMock().post).toHaveBeenCalledWith(
@@ -273,7 +273,7 @@ describe('AuthApiRepository', () => {
     expect(result.success).toBe(true);
   });
 
-  it('resetPassword - error', async () => {
+  it('should resetPassword and return error', async () => {
     const error = new AxiosError('Invalid token') as MockAxiosError;
     error.response = {
       status: 400,
@@ -291,7 +291,7 @@ describe('AuthApiRepository', () => {
     expect(result.status).toBe(400);
   });
 
-  it('logout - error', async () => {
+  it('should logout and return error', async () => {
     const error = new AxiosError('Server Error') as MockAxiosError;
     error.response = {
       status: 500,
@@ -306,7 +306,7 @@ describe('AuthApiRepository', () => {
     expect(result.status).toBe(500);
   });
 
-  it('getCurrentUser - error', async () => {
+  it('should getCurrentUser and return error', async () => {
     const error = new AxiosError('Unauthorized') as MockAxiosError;
     error.response = {
       status: 401,
@@ -321,7 +321,7 @@ describe('AuthApiRepository', () => {
     expect(result.status).toBe(401);
   });
 
-  it('findById - error with network issue', async () => {
+  it('should findById and return error with network issue', async () => {
     const error = new AxiosError('Network Error') as MockAxiosError;
     error.request = {};
     getMock().get.mockRejectedValue(error);

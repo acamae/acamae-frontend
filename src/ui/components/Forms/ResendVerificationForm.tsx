@@ -1,75 +1,85 @@
-import React, { useState } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import React, { useCallback } from 'react';
+import { Form, Button } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import { APP_ROUTES } from '@shared/constants/appRoutes';
-import api from '@shared/services/axiosService';
+import { validateEmail } from '@/domain/services/validationService';
+import { ResendVerificationPayload } from '@/domain/types/apiSchema';
+import { useAuth } from '@ui/hooks/useAuth';
+import { useForm } from '@ui/hooks/useForm';
+import { useToast } from '@ui/hooks/useToast';
 
 const ResendVerificationForm: React.FC = () => {
   const { t } = useTranslation();
-  const [identifier, setIdentifier] = useState('');
-  const [status, setStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
-  const [message, setMessage] = useState('');
+  const { resendVerification, loading } = useAuth();
+  const toast = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus('loading');
-    setMessage('');
-
-    try {
-      await api.post(APP_ROUTES.VERIFY_EMAIL_RESEND, { identifier });
-      setStatus('success');
-      setMessage(t('verification.resend.success'));
-    } catch (err: unknown) {
-      setStatus('error');
-      let finalErrorMessage = t('errors.unknown');
-      if (err instanceof Error && err.message) {
-        if (err.message === 'USER_NOT_FOUND') {
-          finalErrorMessage = t('errors.email.not_found');
-        } else if (err.message === 'ALREADY_VERIFIED') {
-          finalErrorMessage = t('email.verification_repeat');
-        }
+  const validate = useCallback(
+    (values: ResendVerificationPayload) => {
+      const errors: Partial<ResendVerificationPayload> = {};
+      if (!values.identifier || !validateEmail(values.identifier)) {
+        errors.identifier = t('errors.email.invalid');
       }
-      setMessage(finalErrorMessage);
-    }
-  };
+      return errors;
+    },
+    [t]
+  );
+
+  const { values, errors, touched, handleChange, handleSubmit, isSubmitting } =
+    useForm<ResendVerificationPayload>({
+      initialValues: {
+        identifier: '',
+      },
+      validate,
+      onSubmit: async (payload: ResendVerificationPayload) => {
+        try {
+          await resendVerification(payload);
+          toast.success(t('verification.resend.success'));
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            toast.error(t('verification.resend.failed'), error.message);
+          } else {
+            toast.error(t('verification.resend.failed'));
+          }
+        }
+      },
+    });
 
   return (
-    <>
-      {status !== 'idle' && (
-        <Alert
-          variant={status === 'success' ? 'success' : 'danger'}
-          data-testid={status === 'success' ? 'alert-success' : 'alert-error'}>
-          {message}
-        </Alert>
-      )}
+    <Form onSubmit={handleSubmit} noValidate data-testid="resend-verification-form">
+      <Form.Group className="mb-3" controlId="identifier">
+        <Form.Label data-testid="resend-verification-form-identifier-label">
+          {t('verification.resend.label')}
+        </Form.Label>
+        <Form.Control
+          type="text"
+          name="identifier"
+          value={values.identifier}
+          onChange={handleChange}
+          isInvalid={touched.identifier && !!errors.identifier}
+          required
+          autoFocus
+          data-testid="resend-verification-form-identifier-input"
+        />
+        <Form.Control.Feedback
+          type="invalid"
+          data-testid="resend-verification-form-identifier-error">
+          {errors.identifier}
+        </Form.Control.Feedback>
+      </Form.Group>
 
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3" controlId="identifier">
-          <Form.Label>{t('verification.resend.label')}</Form.Label>
-          <Form.Control
-            type="text"
-            value={identifier}
-            onChange={e => setIdentifier(e.target.value.trim())}
-            required
-            autoFocus
-            data-testid="input-email-username"
-          />
-        </Form.Group>
-
-        <div className="d-grid">
-          <Button
-            variant="primary"
-            type="submit"
-            disabled={status === 'loading'}
-            data-testid="btn-resend-verification">
-            {status === 'loading'
-              ? t('verification.resend.loading')
-              : t('verification.resend.button')}
-          </Button>
-        </div>
-      </Form>
-    </>
+      <div className="d-grid">
+        <Button
+          variant="primary"
+          type="submit"
+          disabled={isSubmitting || loading}
+          aria-busy={isSubmitting || loading}
+          data-testid="resend-verification-form-button">
+          {isSubmitting || loading
+            ? t('verification.resend.loading')
+            : t('verification.resend.button')}
+        </Button>
+      </div>
+    </Form>
   );
 };
 

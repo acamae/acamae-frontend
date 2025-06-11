@@ -25,7 +25,6 @@ const baseAuthState: AuthState = {
   token: null,
   expiresAt: null,
   loading: false,
-  error: null,
 };
 
 // Configurar el mock store de Redux
@@ -70,13 +69,13 @@ describe('PrivateRoute', () => {
     );
   };
 
-  it('debería mostrar el mensaje de carga cuando loading es true', () => {
+  it('should show loading message when loading is true', () => {
     renderWithRouterAndRedux({ loading: true, isAuthenticated: false }); // Aquí isAuthenticated es opcional, pero baseAuthState lo tiene
     expect(screen.getByTestId('session-checking')).toBeInTheDocument();
     expect(screen.getByText(es.session.checking)).toBeInTheDocument();
   });
 
-  it('debería renderizar children cuando está autenticado y no está cargando', () => {
+  it('should render children when authenticated and not loading', () => {
     renderWithRouterAndRedux({
       isAuthenticated: true,
       user: { id: '1', username: 'test', email: 'test@example.com', role: 'user' },
@@ -84,11 +83,9 @@ describe('PrivateRoute', () => {
     expect(screen.getByTestId('protected-content')).toBeInTheDocument();
   });
 
-  it('debería redirigir a /login cuando no está autenticado y no está cargando', () => {
+  it('should redirect to /login when not authenticated and not loading', () => {
     renderWithRouterAndRedux({ isAuthenticated: false });
-    // Verifica que el contenido protegido no está
     expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
-    // Verifica que la nueva ubicación es /login
     expect(screen.getByTestId('location-display')).toHaveTextContent('/login');
   });
 });

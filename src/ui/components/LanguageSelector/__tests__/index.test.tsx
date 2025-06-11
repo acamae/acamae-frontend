@@ -1,6 +1,6 @@
 jest.mock('react-i18next');
 
-import { screen, fireEvent, render, waitFor } from '@testing-library/react';
+import { screen, fireEvent, render, waitFor, act } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
 
 import LanguageSelector from '@ui/components/LanguageSelector';
@@ -39,7 +39,7 @@ describe('LanguageSelector', () => {
     setItemSpy.mockRestore();
   });
 
-  it('Should render the selector with the current language selected (es)', () => {
+  it('should render the selector with the current language selected (es)', () => {
     setupUseTranslation();
     renderLanguageSelector();
     const selectElement = screen.getByTestId('language-picker-select') as HTMLSelectElement;
@@ -47,14 +47,14 @@ describe('LanguageSelector', () => {
     expect(selectElement.value).toBe('es-ES');
   });
 
-  it('Should render the selector with the current language selected (en)', () => {
+  it('should render the selector with the current language selected (en)', () => {
     setupUseTranslation({ lang: 'en-GB' });
     renderLanguageSelector();
     const selectElement = screen.getByTestId('language-picker-select') as HTMLSelectElement;
     expect(selectElement.value).toBe('en-GB');
   });
 
-  it('Should call the changeLanguage function of the hook and localStorage.setItem when changing the language', async () => {
+  it('should call the changeLanguage function of the hook and localStorage.setItem when changing the language', async () => {
     const changeLanguageMock = createChangeLanguageMock(); // success
     setupUseTranslation({ changeLanguage: changeLanguageMock });
     renderLanguageSelector();
@@ -67,7 +67,7 @@ describe('LanguageSelector', () => {
     });
   });
 
-  it('Should not call changeLanguage or localStorage.setItem if the same language is selected', async () => {
+  it('should not call changeLanguage or localStorage.setItem if the same language is selected', async () => {
     const changeLanguageMock = createChangeLanguageMock(false); // error
     setupUseTranslation({ changeLanguage: changeLanguageMock });
     renderLanguageSelector();
@@ -80,14 +80,14 @@ describe('LanguageSelector', () => {
     });
   });
 
-  it('Should have a hidden label for accessibility', () => {
+  it('should have a hidden label for accessibility', () => {
     setupUseTranslation();
     renderLanguageSelector();
     const label = screen.getByLabelText('language.selector_label');
     expect(label).toBeInTheDocument();
   });
 
-  it('Should not call changeLanguage with unsupported language', async () => {
+  it('should not call changeLanguage with unsupported language', async () => {
     const changeLanguageMock = createChangeLanguageMock(false);
     setupUseTranslation({ changeLanguage: changeLanguageMock });
     renderLanguageSelector();
@@ -100,17 +100,51 @@ describe('LanguageSelector', () => {
     });
   });
 
-  it('Should show the available options', () => {
+  it('should show the available options', () => {
     setupUseTranslation();
     renderLanguageSelector();
     expect(screen.getByTestId('language-picker__option_es-ES')).toBeInTheDocument();
     expect(screen.getByTestId('language-picker__option_en-GB')).toBeInTheDocument();
   });
 
-  it('snapshot: render of the selector', () => {
+  it('should render snapshot correctly', () => {
     setupUseTranslation();
     renderLanguageSelector();
     const { asFragment } = renderLanguageSelector();
     expect(asFragment()).toMatchSnapshot();
+  });
+
+  it('should change language when selecting a different option', async () => {
+    const changeLanguage = createChangeLanguageMock();
+    setupUseTranslation({ changeLanguage });
+    render(<LanguageSelector />);
+
+    const select = screen.getByTestId('language-picker-select');
+    await act(async () => {
+      fireEvent.change(select, { target: { value: 'en-GB' } });
+    });
+
+    expect(changeLanguage).toHaveBeenCalledWith('en-GB');
+  });
+
+  it('should show current language as selected', () => {
+    setupUseTranslation({ lang: 'es-ES' });
+    render(<LanguageSelector />);
+
+    const select = screen.getByTestId('language-picker-select') as HTMLSelectElement;
+    expect(select.value).toBe('es-ES');
+  });
+
+  it('should save language in localStorage when changed', async () => {
+    const changeLanguage = createChangeLanguageMock();
+    setupUseTranslation({ changeLanguage });
+    render(<LanguageSelector />);
+
+    const select = screen.getByTestId('language-picker-select');
+    await act(async () => {
+      fireEvent.change(select, { target: { value: 'en-GB' } });
+    });
+
+    expect(setItemSpy).toHaveBeenCalledWith('i18nextLng', 'en-GB');
   });
 });

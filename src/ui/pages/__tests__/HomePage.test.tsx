@@ -15,7 +15,7 @@ describe('HomePage', () => {
     expect(screen.getByTestId('home-page-description')).toBeInTheDocument();
   });
 
-  it('snapshot render', () => {
+  it('should render snapshot correctly', () => {
     const { asFragment } = renderHomePage();
     expect(asFragment()).toMatchSnapshot();
   });

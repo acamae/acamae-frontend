@@ -1,11 +1,11 @@
-import { AuthRepository } from '@domain/repositories/AuthRepository';
+import { IAuthRepository } from '@domain/repositories/AuthRepository';
 import { ResetPasswordPayload } from '@domain/types/apiSchema';
 
 import { ResetPasswordUseCase } from '../ResetPasswordUseCase';
 
 describe('ResetPasswordUseCase', () => {
   let resetPasswordUseCase: ResetPasswordUseCase;
-  let mockAuthRepository: jest.Mocked<AuthRepository>;
+  let mockAuthRepository: jest.Mocked<IAuthRepository>;
 
   beforeEach(() => {
     mockAuthRepository = {
@@ -19,7 +19,7 @@ describe('ResetPasswordUseCase', () => {
       findById: jest.fn(),
       save: jest.fn(),
       delete: jest.fn(),
-    } as unknown as jest.Mocked<AuthRepository>;
+    } as unknown as jest.Mocked<IAuthRepository>;
 
     resetPasswordUseCase = new ResetPasswordUseCase(mockAuthRepository);
   });

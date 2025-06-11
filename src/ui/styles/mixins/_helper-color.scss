@@ -1,47 +1,60 @@
 @mixin helper-color($color, $value) {
   .bg-gradient-#{$color} {
-		background-color: $value !important;
-		background-image: linear-gradient(to bottom, lighten($value, 10%), darken($value, 5%)) !important;
+    background-color: $value !important;
+    background-image: linear-gradient(
+      to bottom,
+      lighten($value, 10%),
+      darken($value, 5%)
+    ) !important;
   }
   .bg-gradient-from-#{$color} {
-		--#{$prefix}bg-gradient-from: #{$value};
-	}
-	.bg-gradient-to-#{$color} {
-		--#{$prefix}bg-gradient-to: #{$value};
-	}
-	.hover-bg-#{$color}:hover {
-		&:not([class*="bg-opacity-"]) {
-			--#{$prefix}bg-opacity: 1.0;
-		}
-		background-color: rgba(var(--#{$prefix}#{$color}-rgb), var(--#{$prefix}bg-opacity)) !important;
-	}
+    --#{$prefix}bg-gradient-from: #{$value};
+  }
+  .bg-gradient-to-#{$color} {
+    --#{$prefix}bg-gradient-to: #{$value};
+  }
+  .hover-bg-#{$color}:hover {
+    &:not([class*='bg-opacity-']) {
+      --#{$prefix}bg-opacity: 1;
+    }
+    background-color: rgba(var(--#{$prefix}#{$color}-rgb), var(--#{$prefix}bg-opacity)) !important;
+  }
   .border-#{$color} {
-  	@if ($color == 'theme') {
-			border-color: var(--#{$prefix}theme) !important;
-  	}
+    @if ($color == 'theme') {
+      border-color: var(--#{$prefix}theme) !important;
+    }
   }
   :root .theme-#{$color} {
-		--#{$prefix}theme: #{$value} !important;
-		--#{$prefix}theme-rgb: #{to-rgb($value)} !important;
-		--#{$prefix}theme-color: #{color-contrast($value)} !important;
-		--#{$prefix}theme-color-rgb: #{to-rgb(color-contrast($value))} !important;
-	}
-	@for $i from 1 through 4 {
-		.text-#{$color}-#{$i * 100} {
-			--#{$prefix}text-opacity: 1;
-			color: rgba(tint-color($value, (100 - ($i * 20)) * 1%), var(--#{$prefix}text-opacity)) !important;
-		}
-		.bg-#{$color}-#{$i * 100} {
-			--#{$prefix}bg-opacity: 1;
-			background-color: rgba(tint-color($value, (100 - ($i * 20)) * 1%), var(--#{$prefix}bg-opacity)) !important;
-		}
-		.text-#{$color}-#{($i + 5) * 100} {
-			--#{$prefix}text-opacity: 1;
-			color: rgba(shade-color($value, ($i * 20) * 1%), var(--#{$prefix}text-opacity))  !important;
-		}
-		.bg-#{$color}-#{($i + 5) * 100} {
-			--#{$prefix}bg-opacity: 1;
-			background-color: rgba(shade-color($value, ($i * 20) * 1%), var(--#{$prefix}bg-opacity)) !important;
-		}
+    --#{$prefix}theme: #{$value} !important;
+    --#{$prefix}theme-rgb: #{to-rgb($value)} !important;
+    --#{$prefix}theme-color: #{color-contrast($value)} !important;
+    --#{$prefix}theme-color-rgb: #{to-rgb(color-contrast($value))} !important;
+  }
+  @for $i from 1 through 4 {
+    .text-#{$color}-#{$i * 100} {
+      --#{$prefix}text-opacity: 1;
+      color: rgba(
+        tint-color($value, (100 - ($i * 20)) * 1%),
+        var(--#{$prefix}text-opacity)
+      ) !important;
+    }
+    .bg-#{$color}-#{$i * 100} {
+      --#{$prefix}bg-opacity: 1;
+      background-color: rgba(
+        tint-color($value, (100 - ($i * 20)) * 1%),
+        var(--#{$prefix}bg-opacity)
+      ) !important;
+    }
+    .text-#{$color}-#{($i + 5) * 100} {
+      --#{$prefix}text-opacity: 1;
+      color: rgba(shade-color($value, ($i * 20) * 1%), var(--#{$prefix}text-opacity)) !important;
+    }
+    .bg-#{$color}-#{($i + 5) * 100} {
+      --#{$prefix}bg-opacity: 1;
+      background-color: rgba(
+        shade-color($value, ($i * 20) * 1%),
+        var(--#{$prefix}bg-opacity)
+      ) !important;
+    }
   }
 }

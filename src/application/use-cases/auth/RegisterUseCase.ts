@@ -1,9 +1,9 @@
-import { User } from '@/domain/entities/User';
-import { ApiPromise, RegisterPayload } from '@/domain/types/apiSchema';
-import { AuthRepository } from '@domain/repositories/AuthRepository';
+import { User } from '@domain/entities/User';
+import { IAuthRepository } from '@domain/repositories/AuthRepository';
+import { ApiPromise, RegisterPayload } from '@domain/types/apiSchema';
 
 export class RegisterUseCase {
-  constructor(private authRepository: AuthRepository) {}
+  constructor(private authRepository: IAuthRepository) {}
 
   async execute(payload: RegisterPayload): ApiPromise<User> {
     return await this.authRepository.register(payload);

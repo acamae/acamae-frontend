@@ -151,39 +151,39 @@ describe('AppRoutes', () => {
     );
   };
 
-  it('renders HomePage at root path with PublicLayout', () => {
+  it('should render HomePage at root path with PublicLayout', () => {
     renderAppRoutes('/');
     expect(screen.getByTestId('mock-public-layout')).toBeInTheDocument();
     expect(screen.getByTestId('mock-home-page')).toBeInTheDocument();
   });
 
-  it('renders LoginPage at /login with PublicLayout', () => {
+  it('should render LoginPage at /login with PublicLayout', () => {
     renderAppRoutes('/login');
     expect(screen.getByTestId('mock-public-layout')).toBeInTheDocument();
     expect(screen.getByTestId('mock-login-page')).toBeInTheDocument();
   });
 
-  it('renders DashboardPage at /dashboard with MainLayout if authenticated', () => {
+  it('should render DashboardPage at /dashboard with MainLayout if authenticated', () => {
     renderAppRoutes(APP_ROUTES.DASHBOARD, { isAuthenticated: true, loading: false });
     expect(screen.getByTestId('mock-main-layout')).toBeInTheDocument();
     expect(screen.getByTestId('mock-dashboard-page')).toBeInTheDocument();
   });
 
-  it('redirects from /dashboard if not authenticated', () => {
+  it('should redirect from /dashboard if not authenticated', () => {
     renderAppRoutes(APP_ROUTES.DASHBOARD, { isAuthenticated: false, loading: false });
     expect(screen.getByTestId('mock-main-layout')).toBeInTheDocument();
     expect(screen.getByTestId('mock-private-route-redirect')).toBeInTheDocument();
     expect(screen.queryByTestId('mock-dashboard-page')).not.toBeInTheDocument();
   });
 
-  it('shows loading state for PrivateRoute if auth is loading', () => {
+  it('should show loading state for PrivateRoute if auth is loading', () => {
     renderAppRoutes(APP_ROUTES.DASHBOARD, { isAuthenticated: false, loading: true });
     expect(screen.getByTestId('mock-main-layout')).toBeInTheDocument();
     expect(screen.getByTestId('mock-private-route-loading')).toBeInTheDocument();
     expect(screen.queryByTestId('mock-dashboard-page')).not.toBeInTheDocument();
   });
 
-  it('renders NotFoundPage for unknown route', () => {
+  it('should render NotFoundPage for unknown route', () => {
     renderAppRoutes('/unknown-route');
     expect(screen.getByTestId('mock-not-found-page')).toBeInTheDocument();
   });

@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { validateEmail, validatePassword } from '@/domain/services/validationService';
-import { APP_ROUTES } from '@/shared/constants/appRoutes';
+import { validateEmail, validatePassword } from '@domain/services/validationService';
+import { LoginPayload } from '@domain/types/apiSchema';
+import { APP_ROUTES } from '@shared/constants/appRoutes';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
 import { useToast } from '@ui/hooks/useToast';
@@ -13,49 +14,50 @@ const LoginForm: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const toast = useToast();
-  const { login, loading, error, isAuthenticated } = useAuth();
+  const { login, loading, isAuthenticated } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
-  const { values, errors, touched, handleChange, handleSubmit, isSubmitting } = useForm<{
-    email: string;
-    password: string;
-  }>({
-    initialValues: {
-      email: '',
-      password: '',
+  const validate = useCallback(
+    (values: LoginPayload) => {
+      const errors: Partial<LoginPayload> = {};
+      if (!values.email || !validateEmail(values.email)) {
+        errors.email = t('errors.email.invalid');
+      }
+      if (!values.password || !validatePassword(values.password)) {
+        errors.password = t('errors.password.invalid');
+      }
+      return errors;
     },
+    [t]
+  );
 
-    validate: useCallback(
-      (values: { email: string; password: string }) => {
-        const errors: Partial<{ email: string; password: string }> = {};
-        if (!validateEmail(values.email)) {
-          errors.email = t('errors.email.invalid');
-        }
-        if (!validatePassword(values.password)) {
-          errors.password = t('errors.password.invalid');
-        }
-        return errors;
+  const { values, errors, touched, handleChange, handleSubmit, isSubmitting } =
+    useForm<LoginPayload>({
+      initialValues: {
+        email: '',
+        password: '',
       },
-      [t]
-    ),
-
-    onSubmit: values => {
-      login({ email: values.email, password: values.password });
-    },
-  });
-
-  useEffect(() => {
-    if (error) {
-      toast.error(error, t('login.failed'));
-    }
-  }, [error, t, toast]);
+      validate,
+      onSubmit: async (payload: LoginPayload) => {
+        try {
+          await login(payload);
+        } catch (error: unknown) {
+          console.log('error', error);
+          if (error instanceof Error) {
+            toast.error(t('login.failed'), error.message);
+          } else {
+            toast.error(t('login.failed'));
+          }
+        }
+      },
+    });
 
   useEffect(() => {
     if (isAuthenticated) {
       toast.success(t('login.success'), t('login.welcome'));
       navigate(APP_ROUTES.DASHBOARD);
     }
-  }, [isAuthenticated, navigate, APP_ROUTES.DASHBOARD, t, toast]);
+  }, [isAuthenticated, navigate, t, toast]);
 
   return (
     <Form onSubmit={handleSubmit} noValidate data-testid="login-form">
@@ -115,16 +117,14 @@ const LoginForm: React.FC = () => {
           size="lg"
           className="d-block w-100 fw-500 mb-3"
           type="submit"
-          disabled={loading || isSubmitting}
+          disabled={isSubmitting || loading}
+          aria-busy={isSubmitting || loading}
           data-testid="login-form-button">
-          {loading || isSubmitting ? t('login.accessing') : t('login.button')}
+          {isSubmitting || loading ? t('login.accessing') : t('login.button')}
         </Button>
       </div>
       <div className="text-center text-inverse text-opacity-50">
-        {t('login.no_account')}{' '}
-        <a href={APP_ROUTES.REGISTER} data-discover="true">
-          {t('login.sign_up')}
-        </a>{' '}
+        {t('login.no_account')} <Link to={APP_ROUTES.REGISTER}>{t('login.sign_up')}</Link>{' '}
         {t('login.no_account_suffix')}
       </div>
     </Form>

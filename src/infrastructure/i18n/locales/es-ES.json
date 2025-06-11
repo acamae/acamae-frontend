@@ -29,7 +29,9 @@
     "email_help": "Introduce el correo electrónico asociado a tu cuenta.",
     "submit": "Enviar enlace de recuperación",
     "sending": "Enviando...",
-    "success": "Si tu correo existe en nuestro sistema, recibirás un enlace para restablecer tu contraseña."
+    "success": "Si tu correo existe en nuestro sistema, recibirás un enlace para restablecer tu contraseña.",
+    "check_email": "Revisa tu correo electrónico",
+    "failed": "No se pudo enviar el correo"
   },
   "register": {
     "title": "Crear cuenta",
@@ -145,7 +147,7 @@
   "not_found": {
     "title": "Página no encontrada",
     "message": "La ruta que intentas acceder no existe.",
-    "backHome": "Volver al inicio"
+    "back_to_home": "Volver al inicio"
   },
   "dashboard": {
     "title": "Panel de usuario",

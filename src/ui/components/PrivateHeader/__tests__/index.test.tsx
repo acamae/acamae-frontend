@@ -42,7 +42,6 @@ const baseAuthState: AuthState = {
   token: null,
   expiresAt: null,
   loading: false,
-  error: null,
 };
 
 describe('PrivateHeader', () => {
@@ -83,7 +82,7 @@ describe('PrivateHeader', () => {
     }));
   });
 
-  it('debería renderizar el nombre de la app como un enlace al dashboard', () => {
+  it('should render the app name as a link to the dashboard', () => {
     setup();
     const appNameLink = screen.getByTestId('link-dashboard');
     expect(appNameLink).toBeInTheDocument();
@@ -91,12 +90,12 @@ describe('PrivateHeader', () => {
     expect(appNameLink).toHaveAttribute('href', APP_ROUTES.DASHBOARD);
   });
 
-  it('debería renderizar el LanguageSelector mockeado', () => {
+  it('should render the mocked LanguageSelector', () => {
     setup();
     expect(screen.getByTestId('mock-language-selector')).toBeInTheDocument();
   });
 
-  it('debería renderizar los enlaces de navegación correctamente', () => {
+  it('should render navigation links correctly', () => {
     setup();
     const profileLink = screen.getByTestId('link-profile');
     expect(profileLink).toBeInTheDocument();
@@ -109,7 +108,7 @@ describe('PrivateHeader', () => {
     expect(teamsLink).toHaveAttribute('href', APP_ROUTES.TEAMS);
   });
 
-  it('debería renderizar el botón de logout y llamar a logout al hacer click', () => {
+  it('should render logout button and call logout on click', () => {
     setup();
     const logoutButton = screen.getByTestId('btn-logout');
     expect(logoutButton).toBeInTheDocument();

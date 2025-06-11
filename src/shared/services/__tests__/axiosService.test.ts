@@ -87,14 +87,14 @@ describe('axiosService unit tests', () => {
     jest.clearAllMocks();
   });
 
-  it('carga el módulo y expone la instancia', () => {
+  it('should load the module and expose the instance', () => {
     jest.isolateModules(() => {
       const api = require('@shared/services/axiosService').default;
       expect(api).toBeDefined();
     });
   });
 
-  it('crea la instancia de axios con la configuración base', () => {
+  it('should create the axios instance with the base configuration', () => {
     jest.isolateModules(() => {
       require('@shared/services/axiosService');
       const axios = require('axios');
@@ -108,7 +108,7 @@ describe('axiosService unit tests', () => {
     });
   });
 
-  it('request interceptor añade Authorization header cuando hay token', () => {
+  it('should add Authorization header when there is a token', () => {
     jest.isolateModules(() => {
       storeMock.getState.mockReturnValueOnce({ auth: { token: 'abc123' } } as StoreState);
 
@@ -121,7 +121,7 @@ describe('axiosService unit tests', () => {
     });
   });
 
-  it('request interceptor no añade header cuando no hay token', () => {
+  it('should not add header when there is no token', () => {
     jest.isolateModules(() => {
       storeMock.getState.mockReturnValueOnce({ auth: { token: null } } as StoreState);
       require('@shared/services/axiosService');
@@ -131,7 +131,7 @@ describe('axiosService unit tests', () => {
     });
   });
 
-  it('response interceptor renueva sesión para endpoints definidos', () => {
+  it('should renew session for defined endpoints', () => {
     jest.isolateModules(() => {
       const jsonSpy = jest.spyOn(JSON, 'parse').mockReturnValue(false as unknown);
 
@@ -148,7 +148,7 @@ describe('axiosService unit tests', () => {
     });
   });
 
-  it('response interceptor maneja 401 limpiando tokens', () => {
+  it('should handle 401 by clearing tokens', () => {
     jest.isolateModules(() => {
       const { localStorageService } = require('@infrastructure/storage/localStorageService');
       require('@shared/services/axiosService');

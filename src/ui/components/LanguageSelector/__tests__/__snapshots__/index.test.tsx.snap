@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`LanguageSelector snapshot: render of the selector 1`] = `
+exports[`LanguageSelector should render snapshot correctly 1`] = `
 <DocumentFragment>
   <div
     class="d-flex align-items-center language-picker"

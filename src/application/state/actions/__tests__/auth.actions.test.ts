@@ -44,7 +44,7 @@ describe('auth.actions thunks', () => {
       { email: 'c@d.com', password: 'pwd', username: 'u' },
     ],
   ])(
-    '%sAction ejecuta UseCase correspondiente',
+    'should execute the corresponding UseCase for %sAction',
     async (_n, thunkCreator: unknown, key: string, payload) => {
       if (!isThunkCreator(thunkCreator)) {
         throw new Error('Invalid thunk creator');
@@ -55,7 +55,7 @@ describe('auth.actions thunks', () => {
     }
   );
 
-  it('forgotPasswordAction maneja error', async () => {
+  it('should handle error in forgotPasswordAction', async () => {
     const execute = jest.fn().mockRejectedValue(new Error('fail'));
     const result = await forgotPasswordAction({ email: 'x@y.com' })(dispatch, getState, {
       forgotPasswordUseCase: { execute },
@@ -67,7 +67,7 @@ describe('auth.actions thunks', () => {
   it.each([
     ['login', loginAction],
     ['register', registerAction],
-  ])('%s action creator', (_name, thunkCreator: unknown) => {
+  ])('should have the correct action creator for %s', (_name, thunkCreator: unknown) => {
     if (!isThunkCreator(thunkCreator)) {
       throw new Error('Invalid thunk creator');
     }

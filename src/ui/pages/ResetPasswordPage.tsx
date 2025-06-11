@@ -21,7 +21,7 @@ const ResetPasswordPage: React.FC = () => {
               </h2>
             </Card.Header>
             <Card.Body>
-              <ResetPasswordForm token={token} />
+              <ResetPasswordForm tokenProp={token} />
             </Card.Body>
           </Card>
         </Col>

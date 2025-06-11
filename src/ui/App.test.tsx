@@ -10,7 +10,7 @@ jest.mock('@ui/routes', () => {
 });
 
 describe('App Component', () => {
-  it('debería renderizar AppRoutes dentro del Provider de Redux', () => {
+  it('should render AppRoutes inside the Redux Provider', () => {
     render(<App />);
     expect(screen.getByTestId('mock-app-routes')).toBeInTheDocument();
   });

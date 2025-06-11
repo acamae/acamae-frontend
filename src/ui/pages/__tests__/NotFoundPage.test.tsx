@@ -14,10 +14,12 @@ describe('NotFoundPage', () => {
     renderNotFoundPage();
     expect(screen.getByTestId('not-found-title')).toHaveTextContent(i18n.t('not_found.title'));
     expect(screen.getByTestId('not-found-message')).toHaveTextContent(i18n.t('not_found.message'));
-    expect(screen.getByTestId('link-back-home')).toHaveTextContent(i18n.t('not_found.backHome'));
+    expect(screen.getByTestId('link-back-home')).toHaveTextContent(
+      i18n.t('not_found.back_to_home')
+    );
   });
 
-  it('snapshot render', () => {
+  it('should render snapshot correctly', () => {
     const { asFragment } = renderNotFoundPage();
     expect(asFragment()).toMatchSnapshot();
   });

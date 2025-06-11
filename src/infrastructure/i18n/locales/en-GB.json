@@ -29,7 +29,9 @@
     "email_help": "Enter the email address associated with your account.",
     "submit": "Send Recovery Link",
     "sending": "Sending...",
-    "success": "If your email exists in our system, you will receive a password reset link."
+    "success": "If your email exists in our system, you will receive a password reset link.",
+    "check_email": "Check your email",
+    "failed": "Could not send email"
   },
   "register": {
     "title": "Create account",
@@ -144,10 +146,12 @@
   },
   "not_found": {
     "title": "Page not found",
-    "message": "The page you are looking for does not exist."
+    "message": "The page you are looking for does not exist.",
+    "back_to_home": "Back to home"
   },
   "dashboard": {
-    "title": "User dashboard"
+    "title": "User dashboard",
+    "welcome_message": "Welcome. This is your private area."
   },
   "language": {
     "label": "Language selector",

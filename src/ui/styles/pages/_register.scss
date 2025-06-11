@@ -1,23 +1,23 @@
 .register {
-	min-height: calc(100vh - $app-header-height);
-	padding: $spacer * 3 $spacer;
-	display: flex;
-	align-items: center;
-	
-	@include media-breakpoint-down(md) {
-		padding: $spacer;
-	}
-	
-	& .register-content {
-		flex: 1;
-		max-width: rem(360px);
-		margin: 0 auto;
-		position: relative;
-	}
+  min-height: calc(100vh - $app-header-height);
+  padding: $spacer * 3 $spacer;
+  display: flex;
+  align-items: center;
 
-	.app-without-header & {
-		& .register {
-			min-height: 100vh;
-		}
-	}
+  @include media-breakpoint-down(md) {
+    padding: $spacer;
+  }
+
+  & .register-content {
+    flex: 1;
+    max-width: rem(360px);
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .app-without-header & {
+    & .register {
+      min-height: 100vh;
+    }
+  }
 }

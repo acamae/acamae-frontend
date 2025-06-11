@@ -20,7 +20,7 @@ describe('RegisterPage', () => {
     expect(screen.getByTestId('mock-register-form')).toBeInTheDocument();
   });
 
-  it('snapshot render', () => {
+  it('should render snapshot correctly', () => {
     const { asFragment } = renderRegisterPage();
     expect(asFragment()).toMatchSnapshot();
   });

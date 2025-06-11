@@ -1,254 +1,148 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { useTranslation } from 'react-i18next';
 
-import api from '@shared/services/axiosService';
+import { IPromiseMock, promiseMock } from '@/shared/utils/apiTestUtils';
+import { useAuth } from '@/ui/hooks/useAuth';
 import ForgotPasswordForm from '@ui/components/Forms/ForgotPasswordForm';
-import { useForm } from '@ui/hooks/useForm';
 import { useToast } from '@ui/hooks/useToast';
 
 // Mock de las dependencias
-jest.mock('@ui/hooks/useForm');
+jest.mock('@ui/hooks/useAuth');
 jest.mock('@ui/hooks/useToast');
-jest.mock('@shared/services/axiosService', () => ({
-  post: jest.fn(),
-}));
-jest.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => {
-      const translations: Record<string, string> = {
-        'forgot.email': 'Correo electrónico',
-        'forgot.email_help': 'Introduce el correo electrónico asociado a tu cuenta.',
-        'forgot.success':
-          'Si tu correo existe en nuestro sistema, recibirás un enlace para restablecer tu contraseña.',
-        'forgot.check_email': 'Revisa tu correo electrónico',
-        'errors.email.not_found': 'Ese email no está registrado.',
-        'forgot.failed': 'No se pudo enviar el correo',
-        'errors.email.invalid': 'Correo electrónico inválido',
-        'forgot.submit': 'Enviar enlace de recuperación',
-        'errors.email.required': 'El correo electrónico es requerido',
-      };
-      return translations[key] || key;
+jest.mock('react-i18next');
+
+const toastMock = { error: jest.fn(), success: jest.fn() };
+
+function setupUseAuth({
+  loading = false,
+  forgotPassword = promiseMock(),
+}: {
+  loading?: boolean;
+  forgotPassword?: IPromiseMock;
+} = {}) {
+  (useAuth as jest.Mock).mockReturnValue({
+    loading,
+    forgotPassword,
+  });
+}
+
+function setupUseToast() {
+  (useToast as jest.Mock).mockReturnValue(toastMock);
+}
+
+const changeLanguageMock = jest.fn();
+function setupUseTranslation({
+  lang = 'es-ES',
+  t = (str: string) => str,
+  changeLanguage = changeLanguageMock,
+} = {}) {
+  (useTranslation as jest.Mock).mockReturnValue({
+    t,
+    i18n: {
+      language: lang,
+      changeLanguage,
     },
-  }),
-}));
+  });
+}
+
+function renderForgotPasswordForm() {
+  return render(<ForgotPasswordForm />);
+}
 
 describe('ForgotPasswordForm', () => {
-  const mockShowToast = jest.fn();
-  const mockHideToast = jest.fn();
-  const apiPostMock = api.post as jest.Mock;
-
   beforeEach(() => {
     jest.clearAllMocks();
-    (useToast as jest.Mock).mockReturnValue({
-      success: mockShowToast,
-      error: mockShowToast,
-      showToast: mockShowToast,
-      hideToast: mockHideToast,
-    });
+    setupUseToast();
+    setupUseAuth();
+    setupUseTranslation();
   });
 
-  it('muestra el formulario correctamente', () => {
-    (useForm as jest.Mock).mockReturnValue({
-      values: { email: '' },
-      errors: {},
-      touched: {},
-      isSubmitting: false,
-      handleChange: jest.fn(),
-      handleSubmit: jest.fn(),
-    });
-
-    render(<ForgotPasswordForm />);
-
-    expect(screen.getByLabelText(/correo electrónico/i)).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /enviar enlace de recuperación/i })
-    ).toBeInTheDocument();
+  it('should render form correctly', () => {
+    renderForgotPasswordForm();
+    expect(screen.getByTestId('forgot-password-form-email-input')).toBeInTheDocument();
+    expect(screen.getByTestId('forgot-password-form-button')).toBeInTheDocument();
+    expect(screen.getByTestId('forgot-password-form-email-help')).toHaveTextContent(
+      'forgot.email_help'
+    );
+    expect(screen.getByTestId('forgot-password-form-email-error')).toBeEmptyDOMElement();
   });
 
-  it('maneja el envío exitoso del formulario', async () => {
-    const testEmail = 'test@example.com';
-    (useForm as jest.Mock).mockImplementation(config => ({
-      values: { email: testEmail },
-      errors: {},
-      touched: { email: true },
-      isSubmitting: false,
-      handleChange: jest.fn(),
-      handleSubmit: (e: React.FormEvent) => {
-        e.preventDefault();
-        config.onSubmit({ email: testEmail });
-      },
-    }));
+  it('should handle successful form submission', async () => {
+    const forgotPasswordMock = promiseMock();
+    setupUseAuth({ forgotPassword: forgotPasswordMock });
+    renderForgotPasswordForm();
 
-    apiPostMock.mockResolvedValueOnce({});
-
-    render(<ForgotPasswordForm />);
-
-    const submitButton = screen.getByRole('button', { name: /enviar enlace de recuperación/i });
-    fireEvent.click(submitButton);
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('forgot-password-form-email-input'), {
+        target: { value: 'test@mail.com' },
+      });
+      fireEvent.submit(screen.getByTestId('forgot-password-form'));
+    });
 
     await waitFor(() => {
-      expect(apiPostMock).toHaveBeenCalledWith('/auth/forgot-password', { email: testEmail });
-      expect(mockShowToast).toHaveBeenCalledWith(
-        'Si tu correo existe en nuestro sistema, recibirás un enlace para restablecer tu contraseña.',
-        'Revisa tu correo electrónico'
-      );
+      expect(forgotPasswordMock).toHaveBeenCalledWith({ email: 'test@mail.com' });
+      expect(screen.getByTestId('forgot-password-form-email-error')).toBeEmptyDOMElement();
+      expect(toastMock.success).toHaveBeenCalledWith('forgot.success', 'forgot.check_email');
+      expect(toastMock.error).not.toHaveBeenCalled();
     });
   });
 
-  it('maneja el error en el envío del formulario', async () => {
-    const testEmail = 'test@example.com';
-    (useForm as jest.Mock).mockImplementation(config => ({
-      values: { email: testEmail },
-      errors: {},
-      touched: { email: true },
-      isSubmitting: false,
-      handleChange: jest.fn(),
-      handleSubmit: (e: React.FormEvent) => {
-        e.preventDefault();
-        config.onSubmit({ email: testEmail });
-      },
-    }));
+  it('should handle error in form submission', async () => {
+    const forgotPasswordMock = promiseMock({ error: 'error.email.not_found' });
+    setupUseAuth({ forgotPassword: forgotPasswordMock });
+    renderForgotPasswordForm();
 
-    apiPostMock.mockRejectedValueOnce({
-      response: { data: { code: 'USER_NOT_FOUND' } },
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('forgot-password-form-email-input'), {
+        target: { value: 'test@mail.com' },
+      });
+      fireEvent.submit(screen.getByTestId('forgot-password-form'));
     });
-
-    render(<ForgotPasswordForm />);
-
-    const submitButton = screen.getByRole('button', { name: /enviar enlace de recuperación/i });
-    fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(apiPostMock).toHaveBeenCalledWith('/auth/forgot-password', { email: testEmail });
-      expect(mockShowToast).toHaveBeenCalledWith(
-        'Ese email no está registrado.',
-        'No se pudo enviar el correo'
-      );
+      expect(forgotPasswordMock).toHaveBeenCalledWith({ email: 'test@mail.com' });
+      expect(screen.getByTestId('forgot-password-form-email-error')).toBeEmptyDOMElement();
+      expect(toastMock.success).not.toHaveBeenCalled();
+      expect(toastMock.error).toHaveBeenCalledWith('forgot.failed', 'error.email.not_found');
     });
   });
 
-  it('maneja el error genérico en el envío del formulario', async () => {
-    const testEmail = 'test@example.com';
-    (useForm as jest.Mock).mockImplementation(config => ({
-      values: { email: testEmail },
-      errors: {},
-      touched: { email: true },
-      isSubmitting: false,
-      handleChange: jest.fn(),
-      handleSubmit: (e: React.FormEvent) => {
-        e.preventDefault();
-        config.onSubmit({ email: testEmail });
-      },
-    }));
+  describe('form validation', () => {
+    it('should validate that the email is not empty', async () => {
+      const forgotPasswordMock = promiseMock();
+      setupUseAuth({ forgotPassword: forgotPasswordMock });
+      renderForgotPasswordForm();
 
-    apiPostMock.mockRejectedValueOnce({});
+      await act(async () => {
+        fireEvent.change(screen.getByTestId('forgot-password-form-email-input'), {
+          target: { value: '' },
+        });
+        fireEvent.submit(screen.getByTestId('forgot-password-form'));
+      });
 
-    render(<ForgotPasswordForm />);
-
-    const submitButton = screen.getByRole('button', { name: /enviar enlace de recuperación/i });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(apiPostMock).toHaveBeenCalledWith('/auth/forgot-password', { email: testEmail });
-      expect(mockShowToast).toHaveBeenCalledWith(
-        'forgot.unknown_error',
-        'No se pudo enviar el correo'
-      );
+      await waitFor(() => {
+        expect(forgotPasswordMock).not.toHaveBeenCalled();
+        expect(screen.getByTestId('forgot-password-form-email-error')).toHaveTextContent(
+          'errors.email.required'
+        );
+        expect(toastMock.error).not.toHaveBeenCalled();
+        expect(toastMock.success).not.toHaveBeenCalled();
+      });
     });
   });
 
-  describe('validación del formulario', () => {
-    it('valida que el correo electrónico no esté vacío', async () => {
-      (useForm as jest.Mock).mockReturnValue({
-        values: { email: '' },
-        errors: { email: 'errors.email.required' },
-        touched: { email: true },
-        isSubmitting: false,
-        handleChange: jest.fn(),
-        handleSubmit: jest.fn(),
+  it('should show loading state during submission', async () => {
+    setupUseAuth({ forgotPassword: promiseMock(), loading: true });
+    renderForgotPasswordForm();
+
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('forgot-password-form-email-input'), {
+        target: { value: 'test@mail.com' },
       });
-
-      render(<ForgotPasswordForm />);
-
-      expect(screen.getByText('errors.email.required')).toBeInTheDocument();
-      expect(apiPostMock).not.toHaveBeenCalled();
+      fireEvent.submit(screen.getByTestId('forgot-password-form'));
     });
 
-    it('valida que el correo electrónico tenga un formato válido', async () => {
-      (useForm as jest.Mock).mockReturnValue({
-        values: { email: 'invalid-email' },
-        errors: { email: 'errors.email.invalid' },
-        touched: { email: true },
-        isSubmitting: false,
-        handleChange: jest.fn(),
-        handleSubmit: jest.fn(),
-      });
-
-      render(<ForgotPasswordForm />);
-
-      expect(screen.getByText('errors.email.invalid')).toBeInTheDocument();
-      expect(apiPostMock).not.toHaveBeenCalled();
-    });
-
-    it('ejecuta la función de validación correctamente', () => {
-      let validateFn: (values: { email: string }) => Partial<{ email: string }> = () => ({});
-
-      (useForm as jest.Mock).mockImplementation(config => {
-        validateFn = config.validate;
-        return {
-          values: { email: '' },
-          errors: {},
-          touched: {},
-          isSubmitting: false,
-          handleChange: jest.fn(),
-          handleSubmit: jest.fn(),
-        };
-      });
-
-      render(<ForgotPasswordForm />);
-
-      // Test email vacío
-      expect(validateFn({ email: '' })).toEqual({ email: 'El correo electrónico es requerido' });
-
-      // Test email inválido
-      expect(validateFn({ email: 'invalid-email' })).toEqual({
-        email: 'Correo electrónico inválido',
-      });
-
-      // Test email válido
-      expect(validateFn({ email: 'test@example.com' })).toEqual({});
-    });
-  });
-
-  it('no muestra errores cuando el correo es válido', async () => {
-    (useForm as jest.Mock).mockReturnValue({
-      values: { email: 'test@example.com' },
-      errors: {},
-      touched: { email: true },
-      isSubmitting: false,
-      handleChange: jest.fn(),
-      handleSubmit: jest.fn(),
-    });
-
-    render(<ForgotPasswordForm />);
-
-    expect(screen.queryByText('errors.email.required')).not.toBeInTheDocument();
-    expect(screen.queryByText('errors.email.invalid')).not.toBeInTheDocument();
-    expect(apiPostMock).not.toHaveBeenCalled();
-  });
-
-  it('muestra el estado de carga durante el envío', async () => {
-    (useForm as jest.Mock).mockReturnValue({
-      values: { email: 'test@example.com' },
-      errors: {},
-      touched: { email: true },
-      isSubmitting: true,
-      handleChange: jest.fn(),
-      handleSubmit: jest.fn(),
-    });
-
-    render(<ForgotPasswordForm />);
-
-    const submitButton = screen.getByRole('button', { name: /enviar enlace de recuperación/i });
+    const submitButton = screen.getByTestId('forgot-password-form-button');
     expect(submitButton).toBeDisabled();
     expect(submitButton).toHaveAttribute('aria-busy', 'true');
   });

@@ -1,37 +1,46 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ResendVerificationForm snapshot render 1`] = `
+exports[`ResendVerificationForm should render snapshot correctly 1`] = `
 <DocumentFragment>
   <form
     class=""
+    data-testid="resend-verification-form"
+    novalidate=""
   >
     <div
       class="mb-3"
     >
       <label
         class="form-label"
+        data-testid="resend-verification-form-identifier-label"
         for="identifier"
       >
-        Correo electrónico o nombre de usuario
+        verification.resend.label
       </label>
       <input
         class="form-control"
-        data-testid="input-email-username"
+        data-testid="resend-verification-form-identifier-input"
         id="identifier"
+        name="identifier"
         required=""
         type="text"
         value=""
+      />
+      <div
+        class="invalid-feedback"
+        data-testid="resend-verification-form-identifier-error"
       />
     </div>
     <div
       class="d-grid"
     >
       <button
+        aria-busy="false"
         class="btn btn-primary"
-        data-testid="btn-resend-verification"
+        data-testid="resend-verification-form-button"
         type="submit"
       >
-        Reenviar verificación
+        verification.resend.button
       </button>
     </div>
   </form>

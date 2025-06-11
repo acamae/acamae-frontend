@@ -1,5 +1,34 @@
 import { User } from '@domain/entities/User';
 
+export class ApiError extends Error {
+  status?: number;
+  success?: boolean;
+  code?: string;
+  data?: unknown;
+  message: string;
+
+  constructor({
+    success,
+    message,
+    status,
+    code,
+    data,
+  }: {
+    success: boolean;
+    message?: string;
+    status?: number;
+    code?: string;
+    data?: unknown;
+  }) {
+    super(message);
+    this.success = success;
+    this.message = message ?? 'An unknown error occurred';
+    this.status = status;
+    this.code = code;
+    this.data = data;
+  }
+}
+
 export type ApiPromise<T = unknown> = Promise<ApiResponse<T>>;
 
 /**
@@ -34,4 +63,11 @@ export type ForgotPasswordPayload = Pick<User, 'email'>;
 export interface ResetPasswordPayload {
   token: string;
   newPassword: string;
+}
+
+/**
+ * Resend verification
+ */
+export interface ResendVerificationPayload {
+  identifier: string;
 }

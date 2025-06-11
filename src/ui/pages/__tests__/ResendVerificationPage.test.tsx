@@ -26,7 +26,7 @@ describe('ResendVerificationPage', () => {
     expect(screen.getByTestId('mock-resend-verification-form')).toBeInTheDocument();
   });
 
-  it('snapshot render', () => {
+  it('should render snapshot correctly', () => {
     const { asFragment } = renderResendVerificationPage();
     expect(asFragment()).toMatchSnapshot();
   });

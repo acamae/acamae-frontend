@@ -25,7 +25,7 @@ describe('LoginPage', () => {
     expect(screen.getByTestId('login-page-description')).toBeInTheDocument();
   });
 
-  it('snapshot render', () => {
+  it('should render snapshot correctly', () => {
     const { asFragment } = renderLoginPage();
     expect(asFragment()).toMatchSnapshot();
   });

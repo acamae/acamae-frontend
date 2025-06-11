@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`RegisterPage snapshot render 1`] = `
+exports[`RegisterPage should render snapshot correctly 1`] = `
 <DocumentFragment>
   <div
     class="register"

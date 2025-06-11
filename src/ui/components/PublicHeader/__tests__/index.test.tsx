@@ -23,7 +23,7 @@ function renderPublicHeader() {
 }
 
 describe('PublicHeader', () => {
-  it('debería renderizar el nombre de la app como un enlace a la home', () => {
+  it('should render app name as a link to home', () => {
     renderPublicHeader();
     const appNameLink = screen.getByTestId('link-home');
     expect(appNameLink).toBeInTheDocument();
@@ -31,12 +31,12 @@ describe('PublicHeader', () => {
     expect(appNameLink).toHaveAttribute('href', '/');
   });
 
-  it('debería renderizar el LanguageSelector mockeado', () => {
+  it('should render mocked LanguageSelector', () => {
     renderPublicHeader();
     expect(screen.getByTestId('mock-language-selector')).toBeInTheDocument();
   });
 
-  it('debería renderizar los enlaces de login y registro correctamente', () => {
+  it('should render login and register links correctly', () => {
     renderPublicHeader();
     const loginLink = screen.getByTestId('link-login-nav');
     expect(loginLink).toBeInTheDocument();
@@ -49,7 +49,7 @@ describe('PublicHeader', () => {
     expect(registerLink).toHaveAttribute('href', '/register');
   });
 
-  it('snapshot: renderizado de PublicHeader', () => {
+  it('should render snapshot correctly', () => {
     const { asFragment } = renderPublicHeader();
     expect(asFragment()).toMatchSnapshot();
   });

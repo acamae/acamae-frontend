@@ -4,7 +4,7 @@ import { ToastProvider } from '@shared/services/ToastProvider';
 import { useToast } from '@ui/hooks/useToast';
 
 describe('useToast', () => {
-  it('permite mostrar un toast', () => {
+  it('should allow showing a toast', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <ToastProvider>{children}</ToastProvider>
     );
