@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/acamae/acamae-frontend/compare/v0.6.1...v0.7.0) (2025-06-11)
+
+### Features
+
+- **auth:** implement resend verification and improve auth flow ([d75ffab](https://github.com/acamae/acamae-frontend/commit/d75ffab9c483c278516091fb50c1b9173a47d034))
+
+# [0.7.0](https://github.com/acamae/acamae-frontend/compare/v0.6.1...v0.7.0) (2025-06-11)
+
+### Features
+
+- **auth:** implement resend verification and improve auth flow ([d75ffab](https://github.com/acamae/acamae-frontend/commit/d75ffab9c483c278516091fb50c1b9173a47d034))
+
 ## [0.6.1](https://github.com/acamae/acamae-frontend/compare/v0.6.0...v0.6.1) (2025-06-09)
 
 **Note:** Version bump only for package @acamae/frontend
