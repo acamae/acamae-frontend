@@ -29,7 +29,7 @@ describe('PublicLayout', () => {
     expect(appContainer).not.toHaveClass('app-without-header');
     expect(appContainer).toHaveClass('app-without-sidebar');
     expect(appContainer).not.toHaveClass('app-sidebar-collapsed');
-    expect(appContainer).not.toHaveClass('app-footer-fixed');
+    expect(appContainer).toHaveClass('app-footer-fixed');
     expect(appContainer).not.toHaveClass('app-with-top-nav');
     expect(appContainer).not.toHaveClass('has-scroll');
   });

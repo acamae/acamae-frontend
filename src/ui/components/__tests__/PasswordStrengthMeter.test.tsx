@@ -1,15 +1,15 @@
-jest.mock('zxcvbn');
-jest.mock('react-i18next');
-jest.mock('@ui/hooks/useAuth');
-jest.mock('@ui/hooks/useForm');
-jest.mock('@ui/hooks/useToast');
-
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import translations from '@infrastructure/i18n/locales/es-ES.json';
 import PasswordStrengthMeter from '@ui/components/PasswordStrengthMeter';
+
+jest.mock('zxcvbn');
+jest.mock('react-i18next');
+jest.mock('@ui/hooks/useAuth');
+jest.mock('@ui/hooks/useForm');
+jest.mock('@ui/hooks/useToast');
 
 afterEach(() => {
   cleanup();

@@ -1,7 +1,8 @@
+import { ForgotPasswordUseCase } from '@application/use-cases/auth/ForgotPasswordUseCase';
+import { ApiErrorCodes } from '@domain/constants/errorCodes';
+import { ApiSuccessCodes } from '@domain/constants/successCodes';
 import { IAuthRepository } from '@domain/repositories/AuthRepository';
 import { ForgotPasswordPayload } from '@domain/types/apiSchema';
-
-import { ForgotPasswordUseCase } from '../ForgotPasswordUseCase';
 
 describe('ForgotPasswordUseCase', () => {
   let forgotPasswordUseCase: ForgotPasswordUseCase;
@@ -31,9 +32,10 @@ describe('ForgotPasswordUseCase', () => {
 
     mockAuthRepository.forgotPassword.mockResolvedValue({
       success: true,
+      data: null,
       message: 'Password reset email sent',
       status: 200,
-      code: 'SUCCESS',
+      code: ApiSuccessCodes.SUCCESS,
     });
 
     const result = await forgotPasswordUseCase.execute(mockPayload);
@@ -41,9 +43,10 @@ describe('ForgotPasswordUseCase', () => {
     expect(mockAuthRepository.forgotPassword).toHaveBeenCalledWith(mockPayload);
     expect(result).toEqual({
       success: true,
+      data: null,
       message: 'Password reset email sent',
       status: 200,
-      code: 'SUCCESS',
+      code: ApiSuccessCodes.SUCCESS,
     });
   });
 
@@ -54,9 +57,10 @@ describe('ForgotPasswordUseCase', () => {
 
     mockAuthRepository.forgotPassword.mockResolvedValue({
       success: false,
+      data: null,
       message: 'Email not found',
       status: 404,
-      code: 'NOT_FOUND',
+      code: ApiErrorCodes.RESOURCE_NOT_FOUND,
     });
 
     const result = await forgotPasswordUseCase.execute(mockPayload);
@@ -64,9 +68,10 @@ describe('ForgotPasswordUseCase', () => {
     expect(mockAuthRepository.forgotPassword).toHaveBeenCalledWith(mockPayload);
     expect(result).toEqual({
       success: false,
+      data: null,
       message: 'Email not found',
       status: 404,
-      code: 'NOT_FOUND',
+      code: ApiErrorCodes.RESOURCE_NOT_FOUND,
     });
   });
 });

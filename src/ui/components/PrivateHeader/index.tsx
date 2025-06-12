@@ -3,7 +3,7 @@ import { Button } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-import { APP_ROUTES } from '@/shared/constants/appRoutes';
+import { APP_ROUTES } from '@shared/constants/appRoutes';
 import LanguageSelector from '@ui/components/LanguageSelector';
 import { useAuth } from '@ui/hooks/useAuth';
 

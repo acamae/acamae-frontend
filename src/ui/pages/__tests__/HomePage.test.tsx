@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 
-import HomePage from '@/ui/pages/HomePage';
 import { createTestProviderFactory } from '@shared/utils/renderProvider';
+import HomePage from '@ui/pages/HomePage';
 
 function renderHomePage() {
   const renderWithProviders = createTestProviderFactory();

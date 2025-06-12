@@ -2,8 +2,9 @@ import React, { useCallback } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import { ForgotPasswordPayload } from '@/domain/types/apiSchema';
 import { validateEmail } from '@domain/services/validationService';
+import { ForgotPasswordPayload } from '@domain/types/apiSchema';
+import { ForgotPasswordFormData } from '@domain/types/forms';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
 import { useToast } from '@ui/hooks/useToast';
@@ -26,7 +27,7 @@ const ForgotPasswordForm: React.FC = () => {
   );
 
   const { values, errors, touched, isSubmitting, handleChange, handleSubmit } =
-    useForm<ForgotPasswordPayload>({
+    useForm<ForgotPasswordFormData>({
       initialValues: { email: '' },
       validate,
       onSubmit: async (payload: ForgotPasswordPayload) => {

@@ -20,7 +20,6 @@
     "typeRoots": ["./node_modules/@types", "./src/domain/types"],
     "types": ["node", "jest", "cypress"],
     "paths": {
-      "@/*": ["src/*"],
       "@ui/*": ["src/ui/*"],
       "@domain/*": ["src/domain/*"],
       "@application/*": ["src/application/*"],

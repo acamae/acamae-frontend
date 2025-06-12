@@ -42,7 +42,7 @@ components:
           type: string
           format: date-time
 
-    ApiResponse:
+    ApiSuccessResponse:
       type: object
       properties:
         success:
@@ -51,10 +51,23 @@ components:
           type: object
         status:
           type: integer
+
+    ApiErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          optional: true
+        status:
+          type: integer
         message:
           type: string
+          optional: true
         code:
           type: string
+          optional: true
 
     LoginPayload:
       type: object
@@ -82,9 +95,25 @@ components:
           type: string
         username:
           type: string
-        firstName:
+
+    ForgotPasswordPayload:
+      type: object
+      required:
+        - email
+      properties:
+        email:
           type: string
-        lastName:
+          format: email
+
+    ResetPasswordPayload:
+      type: object
+      required:
+        - password
+        - token
+      properties:
+        password:
+          type: string
+        token:
           type: string
 
 paths:
@@ -103,7 +132,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiSuccessResponse'
                 properties:
                   data:
                     $ref: '#/components/schemas/User'
@@ -123,7 +152,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiSuccessResponse'
                 properties:
                   data:
                     $ref: '#/components/schemas/User'
@@ -137,7 +166,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiSuccessResponse'
 
   /auth/logout:
     post:
@@ -148,7 +177,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiSuccessResponse'
 
   /auth/verify-email/{token}:
     get:
@@ -165,7 +194,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiSuccessResponse'
 
   /auth/resend-verification:
     post:
@@ -176,7 +205,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiSuccessResponse'
 
   /auth/forgot-password:
     post:
@@ -186,20 +215,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - email
-              properties:
-                email:
-                  type: string
-                  format: email
+              $ref: '#/components/schemas/ForgotPasswordPayload'
       responses:
         '200':
           description: Email de restablecimiento enviado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiSuccessResponse'
 
   /auth/reset-password/{token}:
     post:
@@ -210,24 +233,24 @@ paths:
           required: true
           schema:
             type: string
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - newPassword
-              properties:
-                newPassword:
-                  type: string
+              $ref: '#/components/schemas/ResetPasswordPayload'
       responses:
         '200':
           description: Contraseña restablecida exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiSuccessResponse'
 
   /auth/me:
     get:
@@ -238,7 +261,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiSuccessResponse'
                 properties:
                   data:
                     $ref: '#/components/schemas/User'
@@ -252,7 +275,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiSuccessResponse'
                 properties:
                   data:
                     type: array
@@ -274,7 +297,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiSuccessResponse'
                 properties:
                   data:
                     $ref: '#/components/schemas/User'
@@ -299,7 +322,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiSuccessResponse'
                 properties:
                   data:
                     $ref: '#/components/schemas/User'
@@ -318,4 +341,4 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/ApiSuccessResponse'

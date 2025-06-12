@@ -9,7 +9,6 @@ export interface User extends Entity {
   username: string;
   email: string;
   password?: string; // Optional to not expose in responses
-  passwordHash?: string; // Solo para operaciones internas
   firstName?: string;
   lastName?: string;
   role: UserRole;

@@ -1,8 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import ResendVerificationPage from '@/ui/pages/ResendVerificationPage';
-import ResetPasswordPage from '@/ui/pages/ResetPasswordPage';
 import { APP_ROUTES } from '@shared/constants/appRoutes';
 import PrivateRoute from '@ui/components/PrivateRoute';
 import MainLayout from '@ui/layouts/MainLayout';
@@ -17,15 +15,14 @@ import HomePage from '@ui/pages/HomePage';
 import LoginPage from '@ui/pages/LoginPage';
 import NotFoundPage from '@ui/pages/NotFoundPage';
 import RegisterPage from '@ui/pages/RegisterPage';
+import ResendVerificationPage from '@ui/pages/ResendVerificationPage';
+import ResetPasswordPage from '@ui/pages/ResetPasswordPage';
 
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
       {/* Public routes with PublicLayout */}
       <Route element={<PublicLayout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path={APP_ROUTES.LOGIN} element={<LoginPage />} />
-        <Route path={APP_ROUTES.REGISTER} element={<RegisterPage />} />
         <Route path={APP_ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
         <Route path={APP_ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
         <Route path={APP_ROUTES.VERIFY_EMAIL_SENT} element={<EmailVerificationSentPage />} />
@@ -33,6 +30,20 @@ const AppRoutes: React.FC = () => {
         <Route path={APP_ROUTES.VERIFY_EMAIL_EXPIRED} element={<EmailVerificationExpired />} />
         <Route path={APP_ROUTES.VERIFY_EMAIL_ALREADY_VERIFIED} element={<EmailAlreadyVerified />} />
         <Route path={APP_ROUTES.VERIFY_EMAIL_RESEND} element={<ResendVerificationPage />} />
+      </Route>
+
+      {/* Home page */}
+      <Route
+        element={
+          <PublicLayout
+            options={{
+              appContentFullHeight: true,
+            }}
+          />
+        }>
+        <Route path="/" element={<HomePage />} />
+        <Route path={APP_ROUTES.LOGIN} element={<LoginPage />} />
+        <Route path={APP_ROUTES.REGISTER} element={<RegisterPage />} />
       </Route>
 
       {/* Private routes with MainLayout */}
@@ -48,7 +59,17 @@ const AppRoutes: React.FC = () => {
       </Route>
 
       {/* 404 page */}
-      <Route path="*" element={<NotFoundPage />} />
+      <Route
+        element={
+          <PublicLayout
+            options={{
+              appHeader: false,
+              appContentFullHeight: true,
+            }}
+          />
+        }>
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
     </Routes>
   );
 };

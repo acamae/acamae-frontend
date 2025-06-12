@@ -1,4 +1,7 @@
 {
+  "global": {
+    "accessing": "Accediendo..."
+  },
   "home": {
     "title": "Bienvenido a Gestión eSports",
     "description": "Gestiona tus equipos de eSports con seguridad y facilidad",
@@ -13,7 +16,6 @@
     "sign_up": "Regístrate",
     "no_account_suffix": "para crear una.",
     "button": "Acceder",
-    "accessing": "Accediendo...",
     "forgot": "¿Olvidaste tu contraseña?",
     "remember": "Mantener sesión iniciada",
     "email_help": "Introduce tu correo electrónico registrado.",
@@ -39,6 +41,7 @@
     "username_help": "3-32 caracteres, sin acentos ni símbolos especiales.",
     "email": "Correo electrónico",
     "email_help": "Necesario para confirmar tu cuenta y recuperar la contraseña.",
+    "failed": "Error al registrarse",
     "password": "Contraseña",
     "password_help": "Mínimo 8 caracteres, al menos una letra mayúscula, una minúscula y un número.",
     "confirm_password": "Confirmar contraseña",
@@ -142,12 +145,15 @@
     "confirm_password": "Confirmar nueva contraseña",
     "submit": "Actualizar contraseña",
     "saving": "Actualizando...",
-    "invalid_token": "El enlace de restablecimiento no es válido o ha expirado."
+    "invalid_token": "El enlace de restablecimiento no es válido o ha expirado.",
+    "failed": "Error al restablecer la contraseña"
   },
   "not_found": {
     "title": "Página no encontrada",
     "message": "La ruta que intentas acceder no existe.",
-    "back_to_home": "Volver al inicio"
+    "help_message": "Aquí hay algunos enlaces útiles:",
+    "back_to_home": "Volver al inicio",
+    "go_back": "Volver"
   },
   "dashboard": {
     "title": "Panel de usuario",

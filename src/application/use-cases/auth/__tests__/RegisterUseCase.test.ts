@@ -1,9 +1,10 @@
+import { RegisterUseCase } from '@application/use-cases/auth/RegisterUseCase';
+import { ApiErrorCodes } from '@domain/constants/errorCodes';
+import { ApiSuccessCodes } from '@domain/constants/successCodes';
 import { USER_ROLES } from '@domain/constants/user';
 import { User } from '@domain/entities/User';
 import { IAuthRepository } from '@domain/repositories/AuthRepository';
 import { RegisterPayload } from '@domain/types/apiSchema';
-
-import { RegisterUseCase } from '../RegisterUseCase';
 
 describe('RegisterUseCase', () => {
   let registerUseCase: RegisterUseCase;
@@ -51,7 +52,7 @@ describe('RegisterUseCase', () => {
       data: mockUser,
       message: 'Registration successful',
       status: 201,
-      code: 'CREATED',
+      code: ApiSuccessCodes.SUCCESS,
     });
 
     const result = await registerUseCase.execute(mockPayload);
@@ -62,7 +63,7 @@ describe('RegisterUseCase', () => {
       data: mockUser,
       message: 'Registration successful',
       status: 201,
-      code: 'CREATED',
+      code: ApiSuccessCodes.SUCCESS,
     });
   });
 
@@ -77,10 +78,10 @@ describe('RegisterUseCase', () => {
 
     mockAuthRepository.register.mockResolvedValue({
       success: false,
-      data: undefined,
+      data: null,
       message: 'Email already exists',
       status: 400,
-      code: 'BAD_REQUEST',
+      code: ApiErrorCodes.VALIDATION_FAILED,
     });
 
     const result = await registerUseCase.execute(mockPayload);
@@ -88,10 +89,10 @@ describe('RegisterUseCase', () => {
     expect(mockAuthRepository.register).toHaveBeenCalledWith(mockPayload);
     expect(result).toEqual({
       success: false,
-      data: undefined,
+      data: null,
       message: 'Email already exists',
       status: 400,
-      code: 'BAD_REQUEST',
+      code: ApiErrorCodes.VALIDATION_FAILED,
     });
   });
 });

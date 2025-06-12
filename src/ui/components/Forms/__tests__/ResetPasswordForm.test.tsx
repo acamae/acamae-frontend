@@ -100,7 +100,7 @@ describe('ResetPasswordForm', () => {
     await waitFor(() => {
       expect(resetPasswordMock).toHaveBeenCalledWith({
         token: 'mock-token',
-        newPassword: 'Password123!',
+        password: 'Password123!',
       });
       expect(toastMock.success).toHaveBeenCalledWith('reset.success');
     });
@@ -147,7 +147,7 @@ describe('ResetPasswordForm', () => {
     await waitFor(() => {
       expect(resetPasswordMock).toHaveBeenCalledWith({
         token: 'mock-token',
-        newPassword: 'Password123!',
+        password: 'Password123!',
       });
       expect(toastMock.error).toHaveBeenCalledWith('reset.failed', error);
     });

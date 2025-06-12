@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { validateEmail, validatePassword } from '@domain/services/validationService';
 import { LoginPayload } from '@domain/types/apiSchema';
+import { LoginFormData } from '@domain/types/forms';
 import { APP_ROUTES } from '@shared/constants/appRoutes';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
@@ -32,7 +33,7 @@ const LoginForm: React.FC = () => {
   );
 
   const { values, errors, touched, handleChange, handleSubmit, isSubmitting } =
-    useForm<LoginPayload>({
+    useForm<LoginFormData>({
       initialValues: {
         email: '',
         password: '',
@@ -42,7 +43,6 @@ const LoginForm: React.FC = () => {
         try {
           await login(payload);
         } catch (error: unknown) {
-          console.log('error', error);
           if (error instanceof Error) {
             toast.error(t('login.failed'), error.message);
           } else {
@@ -120,7 +120,7 @@ const LoginForm: React.FC = () => {
           disabled={isSubmitting || loading}
           aria-busy={isSubmitting || loading}
           data-testid="login-form-button">
-          {isSubmitting || loading ? t('login.accessing') : t('login.button')}
+          {isSubmitting || loading ? t('global.accessing') : t('login.button')}
         </Button>
       </div>
       <div className="text-center text-inverse text-opacity-50">

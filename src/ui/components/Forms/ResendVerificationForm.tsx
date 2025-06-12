@@ -2,8 +2,9 @@ import React, { useCallback } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import { validateEmail } from '@/domain/services/validationService';
-import { ResendVerificationPayload } from '@/domain/types/apiSchema';
+import { validateEmail } from '@domain/services/validationService';
+import { ResendVerificationPayload } from '@domain/types/apiSchema';
+import { ResendVerificationFormData } from '@domain/types/forms';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
 import { useToast } from '@ui/hooks/useToast';
@@ -25,7 +26,7 @@ const ResendVerificationForm: React.FC = () => {
   );
 
   const { values, errors, touched, handleChange, handleSubmit, isSubmitting } =
-    useForm<ResendVerificationPayload>({
+    useForm<ResendVerificationFormData>({
       initialValues: {
         identifier: '',
       },

@@ -1,7 +1,8 @@
+import { ResetPasswordUseCase } from '@application/use-cases/auth/ResetPasswordUseCase';
+import { ApiErrorCodes } from '@domain/constants/errorCodes';
+import { ApiSuccessCodes } from '@domain/constants/successCodes';
 import { IAuthRepository } from '@domain/repositories/AuthRepository';
 import { ResetPasswordPayload } from '@domain/types/apiSchema';
-
-import { ResetPasswordUseCase } from '../ResetPasswordUseCase';
 
 describe('ResetPasswordUseCase', () => {
   let resetPasswordUseCase: ResetPasswordUseCase;
@@ -27,14 +28,15 @@ describe('ResetPasswordUseCase', () => {
   it('should call repository resetPassword method with correct payload', async () => {
     const mockPayload: ResetPasswordPayload = {
       token: 'valid-reset-token',
-      newPassword: 'newPassword123',
+      password: 'newPassword123',
     };
 
     mockAuthRepository.resetPassword.mockResolvedValue({
       success: true,
+      data: null,
       message: 'Password reset successful',
       status: 200,
-      code: 'SUCCESS',
+      code: ApiSuccessCodes.SUCCESS,
     });
 
     const result = await resetPasswordUseCase.execute(mockPayload);
@@ -42,23 +44,25 @@ describe('ResetPasswordUseCase', () => {
     expect(mockAuthRepository.resetPassword).toHaveBeenCalledWith(mockPayload);
     expect(result).toEqual({
       success: true,
+      data: null,
       message: 'Password reset successful',
       status: 200,
-      code: 'SUCCESS',
+      code: ApiSuccessCodes.SUCCESS,
     });
   });
 
   it('should handle reset password failure with invalid token', async () => {
     const mockPayload: ResetPasswordPayload = {
       token: 'invalid-reset-token',
-      newPassword: 'newPassword123',
+      password: 'newPassword123',
     };
 
     mockAuthRepository.resetPassword.mockResolvedValue({
       success: false,
+      data: null,
       message: 'Invalid or expired reset token',
       status: 400,
-      code: 'BAD_REQUEST',
+      code: ApiErrorCodes.AUTH_TOKEN_INVALID,
     });
 
     const result = await resetPasswordUseCase.execute(mockPayload);
@@ -66,23 +70,25 @@ describe('ResetPasswordUseCase', () => {
     expect(mockAuthRepository.resetPassword).toHaveBeenCalledWith(mockPayload);
     expect(result).toEqual({
       success: false,
+      data: null,
       message: 'Invalid or expired reset token',
       status: 400,
-      code: 'BAD_REQUEST',
+      code: ApiErrorCodes.AUTH_TOKEN_INVALID,
     });
   });
 
   it('should handle reset password failure with expired token', async () => {
     const mockPayload: ResetPasswordPayload = {
       token: 'expired-reset-token',
-      newPassword: 'newPassword123',
+      password: 'newPassword123',
     };
 
     mockAuthRepository.resetPassword.mockResolvedValue({
       success: false,
+      data: null,
       message: 'Reset token has expired',
       status: 410,
-      code: 'GONE',
+      code: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
     });
 
     const result = await resetPasswordUseCase.execute(mockPayload);
@@ -90,9 +96,10 @@ describe('ResetPasswordUseCase', () => {
     expect(mockAuthRepository.resetPassword).toHaveBeenCalledWith(mockPayload);
     expect(result).toEqual({
       success: false,
+      data: null,
       message: 'Reset token has expired',
       status: 410,
-      code: 'GONE',
+      code: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
     });
   });
 });

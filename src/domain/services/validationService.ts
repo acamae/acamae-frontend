@@ -20,7 +20,7 @@ export const validateEmail = (email: string): boolean => {
  * @param password Contraseña a validar
  * @returns true si la contraseña cumple los requisitos
  */
-export const validatePassword = (password: string): boolean => {
+export const validatePassword = (password = ''): boolean => {
   return PASSWORD_REGEX.test(password);
 };
 

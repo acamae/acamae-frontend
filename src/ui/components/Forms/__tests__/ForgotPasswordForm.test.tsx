@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
 
-import { IPromiseMock, promiseMock } from '@/shared/utils/apiTestUtils';
-import { useAuth } from '@/ui/hooks/useAuth';
+import { IPromiseMock, promiseMock } from '@shared/utils/apiTestUtils';
 import ForgotPasswordForm from '@ui/components/Forms/ForgotPasswordForm';
+import { useAuth } from '@ui/hooks/useAuth';
 import { useToast } from '@ui/hooks/useToast';
 
 // Mock de las dependencias

@@ -8,6 +8,8 @@ import {
   validatePassword,
   validateUsername,
 } from '@domain/services/validationService';
+import { RegisterPayload } from '@domain/types/apiSchema';
+import { RegisterFormData } from '@domain/types/forms';
 import { APP_ROUTES } from '@shared/constants/appRoutes';
 import PasswordStrengthMeter from '@ui/components/PasswordStrengthMeter';
 import { useAuth } from '@ui/hooks/useAuth';
@@ -24,13 +26,8 @@ const RegisterForm: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validate = useCallback(
-    (values: { email: string; username: string; password: string; confirmPassword: string }) => {
-      const errors: Partial<{
-        email: string;
-        username: string;
-        password: string;
-        confirmPassword: string;
-      }> = {};
+    (values: RegisterFormData) => {
+      const errors: Partial<Record<keyof RegisterFormData, string>> = {};
       if (!validateEmail(values.email)) {
         errors.email = t('errors.email.invalid');
       }
@@ -45,6 +42,9 @@ const RegisterForm: React.FC = () => {
       } else if (values.password !== values.confirmPassword) {
         errors.confirmPassword = t('errors.password.mismatch');
       }
+      if (!values.terms) {
+        errors.terms = t('errors.terms.required');
+      }
       return errors;
     },
     [t]
@@ -58,13 +58,7 @@ const RegisterForm: React.FC = () => {
     handleSubmit,
     isSubmitting,
     handleCheckboxChange,
-  } = useForm<{
-    email: string;
-    username: string;
-    password: string;
-    confirmPassword: string;
-    terms: boolean;
-  }>({
+  } = useForm<RegisterFormData>({
     initialValues: {
       email: '',
       username: '',
@@ -73,7 +67,7 @@ const RegisterForm: React.FC = () => {
       terms: false,
     },
     validate,
-    onSubmit: async data => {
+    onSubmit: async (data: RegisterPayload) => {
       try {
         await register(data);
         toast.success(t('register.success'), t('register.welcome'));
@@ -161,7 +155,7 @@ const RegisterForm: React.FC = () => {
         <Form.Text id="passwordHelp" className="text-muted">
           {t('register.password_help')}
         </Form.Text>
-        <PasswordStrengthMeter password={values.password} t={t} />
+        <PasswordStrengthMeter password={values.password ?? ''} t={t} />
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="confirmPassword">
@@ -230,7 +224,7 @@ const RegisterForm: React.FC = () => {
           type="submit"
           disabled={loading || isSubmitting}
           data-testid="register-form-button">
-          {loading || isSubmitting ? t('register.accessing') : t('register.button')}
+          {loading || isSubmitting ? t('global.accessing') : t('register.button')}
         </Button>
       </div>
     </Form>

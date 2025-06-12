@@ -1,8 +1,8 @@
 import axios, { AxiosHeaders } from 'axios';
 
-import { localStorageService } from '@/infrastructure/storage/localStorageService';
 import { resetTimer } from '@application/state/slices/sessionTimerSlice';
 import { store } from '@application/state/store';
+import { localStorageService } from '@infrastructure/storage/localStorageService';
 import { API_ROUTES } from '@shared/constants/apiRoutes';
 
 const SESSION_RENEWAL_ENDPOINTS = [

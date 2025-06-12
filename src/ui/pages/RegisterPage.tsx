@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import RegisterForm from '@/ui/components/Forms/RegisterForm';
+import RegisterForm from '@ui/components/Forms/RegisterForm';
 
 const RegisterPage: React.FC = () => {
   const { t } = useTranslation();

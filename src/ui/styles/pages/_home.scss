@@ -1,4 +1,4 @@
-.register {
+.home {
   min-height: calc(100vh - $app-header-height - $app-footer-height);
   padding: $spacer * 3 $spacer;
   display: flex;
@@ -8,11 +8,11 @@
     padding: $spacer;
   }
 
-  & .register-content {
-    flex: 1;
+  & .home-content {
     max-width: rem(360px);
     margin: 0 auto;
     position: relative;
+    flex: 1;
   }
 
   .app-without-header {

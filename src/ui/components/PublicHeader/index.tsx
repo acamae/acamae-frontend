@@ -26,7 +26,7 @@ const PublicHeader: React.FC = () => {
       </div>
 
       <div className="brand">
-        <Link to="/" className="brand-logo" data-testid="link-home">
+        <Link to={APP_ROUTES.HOME} className="brand-logo" data-testid="link-home">
           <span className="brand-img"></span>
           <span className="brand-text">{t('app.name')}</span>
         </Link>

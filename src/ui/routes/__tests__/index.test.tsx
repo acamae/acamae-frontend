@@ -98,7 +98,7 @@ jest.mock('@ui/layouts/MainLayout', () => ({
 }));
 
 // Mock useAuth hook
-jest.mock('@/ui/hooks/useAuth', () => ({
+jest.mock('@ui/hooks/useAuth', () => ({
   useAuth: jest.fn(() => mockAuthReduxState),
 }));
 

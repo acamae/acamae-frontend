@@ -1,7 +1,5 @@
 export type LayoutOptions = {
   appMode: 'dark' | 'light';
-  appTheme: string;
-  appCover: string;
   appHeader: boolean;
   appSidebar: boolean;
   appSidebarCollapsed: boolean;

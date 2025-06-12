@@ -12,8 +12,10 @@ describe('validationService', () => {
   });
 
   it('should validatePassword strength', () => {
-    expect(validatePassword('Abcdef12')).toBe(true); // good
+    expect(validatePassword('Abcdef12')).toBe(true);
     expect(validatePassword('short')).toBe(false);
+    expect(validatePassword('')).toBe(false);
+    expect(validatePassword()).toBe(false);
   });
 
   it('should validateUsername', () => {

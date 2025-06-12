@@ -307,12 +307,15 @@ $visibility-values: (none, initial);
   );
 }
 .bg-blur-1 {
+  -webkit-backdrop-filter: blur(3px) !important;
   backdrop-filter: blur(3px) !important;
 }
 .bg-blur-2 {
+  -webkit-backdrop-filter: blur(6px) !important;
   backdrop-filter: blur(6px) !important;
 }
 .bg-blur-3 {
+  -webkit-backdrop-filter: blur(9px) !important;
   backdrop-filter: blur(9px) !important;
 }
 @include background-gradient('bg-gradient-orange-red', lighten($orange, 10%), lighten($red, 10%));
@@ -386,6 +389,7 @@ $visibility-values: (none, initial);
 /* Helper Sticky Top */
 .desktop-sticky-top {
   @include media-breakpoint-up(xl) {
+    position: -webkit-sticky;
     position: sticky;
     top: $app-header-height + rem(20px);
   }

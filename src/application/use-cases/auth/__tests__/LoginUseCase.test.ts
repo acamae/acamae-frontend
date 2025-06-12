@@ -1,9 +1,10 @@
+import { LoginUseCase } from '@application/use-cases/auth/LoginUseCase';
+import { ApiErrorCodes } from '@domain/constants/errorCodes';
+import { ApiSuccessCodes } from '@domain/constants/successCodes';
 import { USER_ROLES } from '@domain/constants/user';
 import { User } from '@domain/entities/User';
 import { IAuthRepository } from '@domain/repositories/AuthRepository';
 import { LoginPayload } from '@domain/types/apiSchema';
-
-import { LoginUseCase } from '../LoginUseCase';
 
 describe('LoginUseCase', () => {
   let loginUseCase: LoginUseCase;
@@ -46,7 +47,7 @@ describe('LoginUseCase', () => {
       data: mockUser,
       message: 'Login successful',
       status: 200,
-      code: 'SUCCESS',
+      code: ApiSuccessCodes.SUCCESS,
     });
 
     const result = await loginUseCase.execute(mockPayload);
@@ -57,7 +58,7 @@ describe('LoginUseCase', () => {
       data: mockUser,
       message: 'Login successful',
       status: 200,
-      code: 'SUCCESS',
+      code: ApiSuccessCodes.SUCCESS,
     });
   });
 
@@ -69,10 +70,10 @@ describe('LoginUseCase', () => {
 
     mockAuthRepository.login.mockResolvedValue({
       success: false,
-      data: undefined,
+      data: null,
       message: 'Invalid credentials',
       status: 401,
-      code: 'UNAUTHORIZED',
+      code: ApiErrorCodes.AUTH_INVALID_CREDENTIALS,
     });
 
     const result = await loginUseCase.execute(mockPayload);
@@ -80,10 +81,10 @@ describe('LoginUseCase', () => {
     expect(mockAuthRepository.login).toHaveBeenCalledWith(mockPayload);
     expect(result).toEqual({
       success: false,
-      data: undefined,
+      data: null,
       message: 'Invalid credentials',
       status: 401,
-      code: 'UNAUTHORIZED',
+      code: ApiErrorCodes.AUTH_INVALID_CREDENTIALS,
     });
   });
 });

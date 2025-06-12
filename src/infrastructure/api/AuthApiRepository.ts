@@ -1,19 +1,22 @@
 import { AxiosError, AxiosResponse } from 'axios';
 
+import { ApiErrorCode } from '@domain/constants/apiCodes';
+import { ApiErrorCodes } from '@domain/constants/errorCodes';
+import { ApiSuccessCodes } from '@domain/constants/successCodes';
+import { USER_ROLES } from '@domain/constants/user';
+import { User } from '@domain/entities/User';
+import { IAuthRepository } from '@domain/repositories/AuthRepository';
+import { UserResponse } from '@domain/types/api';
 import {
   ApiPromise,
-  ApiResponse,
+  ApiErrorResponse,
+  ApiSuccessResponse,
   ForgotPasswordPayload,
   LoginPayload,
   RegisterPayload,
   ResetPasswordPayload,
   ResendVerificationPayload,
-} from '@/domain/types/apiSchema';
-import { ApiErrorCodes } from '@domain/constants/errorCodes';
-import { USER_ROLES } from '@domain/constants/user';
-import { User } from '@domain/entities/User';
-import { IAuthRepository } from '@domain/repositories/AuthRepository';
-import { UserResponse } from '@domain/types/api';
+} from '@domain/types/apiSchema';
 import {
   API_ROUTES,
   getUserByIdUrl,
@@ -34,105 +37,63 @@ function mapUserResponse(data: UserResponse): User {
   };
 }
 
-/**
- * Map the response from the AxiosResponse type to the ApiResponseSuccess type
- * @param response AxiosResponse
- * @description 2xx response with data
- * @returns ApiResponseSuccess
- */
 function mapApiAxiosResponseError<T>({
-  response,
-}: {
-  response: AxiosResponse<T>; // data, status, statusText, headers, config, request?
-}): ApiResponse<T> {
-  return {
-    data: response.data,
-    status: response.status,
-    success: false,
-  };
-}
-
-/**
- * Map the error from the AxiosError type to the ApiError type
- * @param error AxiosError
- * @description 4xx or 5xx response with error
- * @returns ApiError
- */
-function mapApiAxiosRequestError<T>({
   error,
 }: {
-  error: AxiosError<T>; // response, request, status, cause, code, message, name, stack, toJSON
-}): ApiResponse<T> {
+  error: AxiosError<T>; // message, code, config, request, response
+}): ApiErrorResponse<T> {
   return {
     success: false,
+    data: null,
+    status: error.response?.status ?? 500,
+    message: error.message,
+    code: (error.code as ApiErrorCode) ?? ApiErrorCodes.ERR_BAD_RESPONSE,
+  };
+}
+
+export function mapApiAxiosRequestError<T>({
+  error,
+}: {
+  error: Partial<AxiosError<T>>;
+}): ApiErrorResponse<T> {
+  return {
+    success: false,
+    data: null,
     status: error.status ?? 500,
     message: error.message ?? 'A request error occurred',
-    code: error.code ?? ApiErrorCodes.REQUEST_ERROR,
+    code: (error.code as ApiErrorCode) ?? ApiErrorCodes.ERR_BAD_REQUEST,
   };
 }
 
-/**
- * Map the unknown error from the AxiosError type to the ApiError type
- * @param error AxiosError
- * @description unknown error
- * @returns ApiError
- */
-function mapApiAxiosUnknownError<T>(): ApiResponse<T> {
+function mapApiAxiosUnknownError<T>(): ApiErrorResponse<T> {
   return {
     success: false,
+    data: null,
     status: 500,
-    message: 'An unknown error occurred',
+    message: ApiErrorCodes.UNKNOWN_ERROR,
     code: ApiErrorCodes.UNKNOWN_ERROR,
-  };
+  } as ApiErrorResponse<T>;
 }
 
-/**
- * Map the response from the AxiosResponse type to the ApiResponseSuccess type
- * @param response AxiosResponse
- * @description 2xx response with data
- * @returns ApiResponseSuccess
- */
 function handleApiSuccess<T>({
   response,
 }: {
   response: AxiosResponse<T>; // data, status, statusText, headers, config, request?
-}): ApiResponse<T> {
+}): ApiSuccessResponse<T> {
   return {
-    data: response.data,
+    data: response.data ?? null,
     status: response.status,
-    success: response.status >= 200 && response.status < 300,
+    success: true,
+    code: ApiSuccessCodes.SUCCESS,
   };
 }
 
-/**
- * Map the error from the AxiosError type to the ApiError type
- * @param error AxiosError
- * @description 4xx or 5xx response with error
- * @returns ApiError
- */
-function handleApiError<T>(error: unknown): ApiResponse<T> {
+function handleApiError<T>(error: unknown): ApiErrorResponse<T> {
   if (error instanceof AxiosError && error.response) {
-    // {
-    //   success: false,
-    //   data: response.data,
-    //   status: response.status
-    // }
-    return mapApiAxiosResponseError({ response: error.response });
+    return mapApiAxiosResponseError({ error });
   } else if (error instanceof AxiosError && error.request) {
-    // {
-    //   success: false,
-    //   status: error.status ?? 500,
-    //   message: error.message ?? 'A request error occurred',
-    //   code: error.code ?? ApiErrorCodes.REQUEST_ERROR,
-    // }
     return mapApiAxiosRequestError({ error });
   }
-  // {
-  //   success: false,
-  //   status: 500,
-  //   message: 'An unknown error occurred',
-  //   code: ApiErrorCodes.UNKNOWN_ERROR,
-  // }
   return mapApiAxiosUnknownError();
 }
 
@@ -142,12 +103,6 @@ export class AuthApiRepository implements IAuthRepository {
       const response = await api.post(API_ROUTES.AUTH.LOGIN, {
         ...payload,
       });
-
-      // {
-      //   success: true,
-      //   data: response.data,
-      //   status: response.status, // 2xx response with data
-      // }
       return handleApiSuccess({
         response: {
           ...response,
@@ -176,7 +131,6 @@ export class AuthApiRepository implements IAuthRepository {
   async forgotPassword(payload: ForgotPasswordPayload): ApiPromise<void> {
     try {
       const response = await api.post(API_ROUTES.AUTH.FORGOT_PASSWORD, payload);
-      console.log('response', response);
       return handleApiSuccess({ response });
     } catch (error) {
       return handleApiError(error);
@@ -186,7 +140,7 @@ export class AuthApiRepository implements IAuthRepository {
   async resetPassword(payload: ResetPasswordPayload): ApiPromise<void> {
     try {
       const response = await api.post(getAuthResetPasswordUrl(payload.token), {
-        newPassword: payload.newPassword,
+        password: payload.password,
       });
       return handleApiSuccess({ response });
     } catch (error) {

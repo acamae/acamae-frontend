@@ -1,6 +1,7 @@
+import { LogoutUseCase } from '@application/use-cases/auth/LogoutUseCase';
+import { ApiErrorCodes } from '@domain/constants/errorCodes';
+import { ApiSuccessCodes } from '@domain/constants/successCodes';
 import { IAuthRepository } from '@domain/repositories/AuthRepository';
-
-import { LogoutUseCase } from '../LogoutUseCase';
 
 describe('LogoutUseCase', () => {
   let logoutUseCase: LogoutUseCase;
@@ -26,9 +27,10 @@ describe('LogoutUseCase', () => {
   it('should call repository logout method', async () => {
     mockAuthRepository.logout.mockResolvedValue({
       success: true,
+      data: null,
       message: 'Logout successful',
       status: 200,
-      code: 'SUCCESS',
+      code: ApiSuccessCodes.SUCCESS,
     });
 
     const result = await logoutUseCase.execute();
@@ -36,18 +38,20 @@ describe('LogoutUseCase', () => {
     expect(mockAuthRepository.logout).toHaveBeenCalled();
     expect(result).toEqual({
       success: true,
+      data: null,
       message: 'Logout successful',
       status: 200,
-      code: 'SUCCESS',
+      code: ApiSuccessCodes.SUCCESS,
     });
   });
 
   it('should handle logout failure', async () => {
     mockAuthRepository.logout.mockResolvedValue({
       success: false,
+      data: null,
       message: 'Logout failed',
       status: 500,
-      code: 'INTERNAL_SERVER_ERROR',
+      code: ApiErrorCodes.ERR_NETWORK,
     });
 
     const result = await logoutUseCase.execute();
@@ -55,9 +59,10 @@ describe('LogoutUseCase', () => {
     expect(mockAuthRepository.logout).toHaveBeenCalled();
     expect(result).toEqual({
       success: false,
+      data: null,
       message: 'Logout failed',
       status: 500,
-      code: 'INTERNAL_SERVER_ERROR',
+      code: ApiErrorCodes.ERR_NETWORK,
     });
   });
 });

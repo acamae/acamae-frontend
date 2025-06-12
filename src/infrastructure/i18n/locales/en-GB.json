@@ -1,4 +1,7 @@
 {
+  "global": {
+    "accessing": "Accessing..."
+  },
   "home": {
     "title": "Welcome to eSports Management",
     "description": "Manage your eSports teams with security and ease",
@@ -12,7 +15,6 @@
     "no_account": "Don't have an account yet?",
     "no_account_suffix": "to create one.",
     "button": "Login",
-    "accessing": "Accessing...",
     "forgot": "Forgot your password?",
     "remember": "Keep me logged in",
     "email_help": "Enter your registered email address.",
@@ -39,6 +41,7 @@
     "username_help": "3-32 characters, no accents or special symbols.",
     "email": "Email",
     "email_help": "Required to confirm your account and recover password.",
+    "failed": "Registration failed",
     "password": "Password",
     "password_help": "Minimum 8 characters, at least one uppercase letter, one lowercase letter and one number.",
     "confirm_password": "Confirm password",
@@ -137,6 +140,7 @@
   "reset": {
     "title": "Reset password",
     "email_sent": "If your email exists, you will receive a password reset email.",
+    "failed": "Password reset failed",
     "success": "Password updated. Redirecting...",
     "password": "New password",
     "confirm_password": "Confirm new password",
@@ -147,7 +151,9 @@
   "not_found": {
     "title": "Page not found",
     "message": "The page you are looking for does not exist.",
-    "back_to_home": "Back to home"
+    "help_message": "Here are some helpful links instead:",
+    "back_to_home": "Back to home",
+    "go_back": "Go back"
   },
   "dashboard": {
     "title": "User dashboard",

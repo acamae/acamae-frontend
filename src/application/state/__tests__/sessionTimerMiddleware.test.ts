@@ -99,4 +99,18 @@ describe('sessionTimerMiddleware', () => {
     // The modal should remain visible but its state should not have changed
     expect(store.getState().sessionTimer.showModal).toBe(true);
   });
+
+  it('should handle null or undefined expiresAt value', () => {
+    const store = createTestStore();
+
+    // Set expiresAt to 0 (which is equivalent to null/undefined in this context)
+    store.dispatch(setExpiresAt(0));
+
+    // Advance time to trigger the interval
+    jest.advanceTimersByTime(1000);
+
+    // Verify that secondsLeft is 0 and no modal is shown
+    expect(store.getState().sessionTimer.showModal).toBe(false);
+    expect(store.getState().sessionTimer.expiresAt).toBe(0);
+  });
 });

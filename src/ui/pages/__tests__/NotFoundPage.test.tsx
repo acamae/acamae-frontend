@@ -1,26 +1,53 @@
-import { screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter, useNavigate } from 'react-router-dom';
 
-import i18n from '@infrastructure/i18n';
-import { createTestProviderFactory } from '@shared/utils/renderProvider';
-import NotFoundPage from '@ui/pages/NotFoundPage';
+import NotFoundPage from '../NotFoundPage';
 
-function renderNotFoundPage() {
-  const renderWithProviders = createTestProviderFactory();
-  return renderWithProviders(<NotFoundPage />);
-}
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: jest.fn(),
+}));
 
 describe('NotFoundPage', () => {
-  it('should render the title, the message and the link', () => {
-    renderNotFoundPage();
-    expect(screen.getByTestId('not-found-title')).toHaveTextContent(i18n.t('not_found.title'));
-    expect(screen.getByTestId('not-found-message')).toHaveTextContent(i18n.t('not_found.message'));
-    expect(screen.getByTestId('link-back-home')).toHaveTextContent(
-      i18n.t('not_found.back_to_home')
-    );
+  const mockNavigate = jest.fn();
+
+  beforeEach(() => {
+    (useNavigate as jest.Mock).mockReturnValue(mockNavigate);
   });
 
-  it('should render snapshot correctly', () => {
-    const { asFragment } = renderNotFoundPage();
-    expect(asFragment()).toMatchSnapshot();
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should render the not found page', () => {
+    render(
+      <MemoryRouter>
+        <NotFoundPage />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('not-found-page')).toBeInTheDocument();
+    expect(screen.getByTestId('not-found-title')).toBeInTheDocument();
+    expect(screen.getByTestId('not-found-message')).toBeInTheDocument();
+  });
+
+  it('should navigate back when clicking the back button', () => {
+    render(
+      <MemoryRouter>
+        <NotFoundPage />
+      </MemoryRouter>
+    );
+    const backButton = screen.getByTestId('button-back');
+    fireEvent.click(backButton);
+    expect(mockNavigate).toHaveBeenCalledWith(-1);
+  });
+
+  it('should render home and login links', () => {
+    render(
+      <MemoryRouter>
+        <NotFoundPage />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('link-back-home')).toBeInTheDocument();
+    expect(screen.getByTestId('link-login')).toBeInTheDocument();
   });
 });

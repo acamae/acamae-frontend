@@ -16,7 +16,7 @@ const mockLogoutFn = jest.fn();
 const mockLoginFn = jest.fn();
 const mockRegisterFn = jest.fn();
 
-jest.mock('@/ui/hooks/useAuth', () => ({
+jest.mock('@ui/hooks/useAuth', () => ({
   useAuth: jest.fn(() => ({
     user: { id: '1', username: 'testuser', email: 'test@example.com', role: 'user' },
     isAuthenticated: true,

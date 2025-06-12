@@ -1,3 +1,4 @@
+import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { ApiError } from '@domain/types/apiSchema';
 import apiService from '@shared/services/axiosService';
 
@@ -132,6 +133,8 @@ export const promiseMock: IPromiseMock = ({ error = null }: IPromiseMockParams =
             success: false,
             message: error,
             data: null,
+            status: 999,
+            code: ApiErrorCodes.ERR_BAD_REQUEST,
           })
         )
       : Promise.resolve()

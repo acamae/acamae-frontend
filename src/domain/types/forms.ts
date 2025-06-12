@@ -1,23 +1,18 @@
-export interface LoginFormData {
-  email: string;
-  password: string;
-  [key: string]: string;
+import { User } from '@domain/entities/User';
+
+export interface LoginFormData extends Pick<User, 'email' | 'password'> {}
+
+export interface RegisterFormData extends Pick<User, 'email' | 'password' | 'username'> {
+  confirmPassword: string;
+  terms: boolean;
 }
 
-export interface RegisterFormData extends LoginFormData {
-  confirm_password: string;
-  username: string;
+export interface ForgotPasswordFormData extends Pick<User, 'email'> {}
+
+export interface ResetPasswordFormData extends Pick<User, 'password'> {
+  token: string;
 }
 
-export interface ForgotPasswordFormData {
-  email: string;
-}
-
-export interface ResetPasswordFormData {
-  email: string;
-}
-
-export interface NewPasswordFormData {
-  password: string;
-  confirm_password: string;
+export interface ResendVerificationFormData {
+  identifier: string;
 }

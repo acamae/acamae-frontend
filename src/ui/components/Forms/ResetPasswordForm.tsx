@@ -2,8 +2,9 @@ import React, { useState, useCallback } from 'react';
 import { Form, Button, InputGroup, Alert } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-import { ResetPasswordPayload } from '@/domain/types/apiSchema';
 import { validatePassword } from '@domain/services/validationService';
+import { ResetPasswordPayload } from '@domain/types/apiSchema';
+import { ResetPasswordFormData } from '@domain/types/forms';
 import PasswordStrengthMeter from '@ui/components/PasswordStrengthMeter';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
@@ -22,10 +23,10 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
   const validate = useCallback(
     (values: ResetPasswordPayload) => {
       const errors: Partial<ResetPasswordPayload> = {};
-      if (!values.newPassword) {
-        errors.newPassword = t('errors.password.required');
-      } else if (!validatePassword(values.newPassword)) {
-        errors.newPassword = t('errors.password.invalid');
+      if (!values.password) {
+        errors.password = t('errors.password.required');
+      } else if (!validatePassword(values.password)) {
+        errors.password = t('errors.password.invalid');
       }
       return errors;
     },
@@ -33,8 +34,8 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
   );
 
   const { values, errors, touched, handleChange, handleSubmit, isSubmitting } =
-    useForm<ResetPasswordPayload>({
-      initialValues: { newPassword: '', token: tokenProp },
+    useForm<ResetPasswordFormData>({
+      initialValues: { password: '', token: tokenProp },
       validate,
       onSubmit: async (payload: ResetPasswordPayload) => {
         if (!payload.token) {
@@ -80,10 +81,10 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
         <InputGroup hasValidation>
           <Form.Control
             type={showPassword ? 'text' : 'password'}
-            name="newPassword"
-            value={values.newPassword}
+            name="password"
+            value={values.password}
             onChange={handleChange}
-            isInvalid={touched.newPassword && !!errors.newPassword}
+            isInvalid={touched.password && !!errors.password}
             required
             autoComplete="new-password"
             aria-describedby="passwordHelp"
@@ -105,9 +106,9 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
           {t('register.password_help')}
         </Form.Text>
         <Form.Control.Feedback type="invalid" data-testid="reset-password-form-password-error">
-          {errors.newPassword}
+          {errors.password}
         </Form.Control.Feedback>
-        <PasswordStrengthMeter password={values.newPassword} t={t} />
+        <PasswordStrengthMeter password={values.password || ''} t={t} />
       </Form.Group>
       <div className="d-grid">
         <Button

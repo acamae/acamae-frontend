@@ -56,7 +56,7 @@ jest.mock('axios', () => {
   };
 });
 
-jest.mock('@/infrastructure/storage/localStorageService', () => ({
+jest.mock('@infrastructure/storage/localStorageService', () => ({
   localStorageService: { remove: jest.fn() },
 }));
 

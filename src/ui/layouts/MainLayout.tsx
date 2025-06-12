@@ -2,8 +2,9 @@ import React from 'react';
 import { Container } from 'react-bootstrap';
 import { Outlet } from 'react-router-dom';
 
-import { LayoutOptions } from '@/domain/types/layoutOptions';
-import { DEFAULT_LAYOUT_OPTIONS } from '@/shared/constants/layoutOptions';
+import { LayoutOptions } from '@domain/types/layoutOptions';
+import { DEFAULT_LAYOUT_OPTIONS } from '@shared/constants/layoutOptions';
+import PrivateFooter from '@ui/components/PrivateFooter';
 import PrivateHeader from '@ui/components/PrivateHeader';
 import SessionTimeoutModal from '@ui/components/SessionTimeoutModal/SessionTimeoutModal';
 import SessionTimerInitializer from '@ui/components/SessionTimerInitializer/SessionTimerInitializer';
@@ -42,7 +43,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ options = {} }) => {
             <Outlet />
           </Container>
         )}
-        {/* LAYOUT_OPTIONS.appFooter && (<PrivateFooter />) */}
+        {LAYOUT_OPTIONS.appFooter && <PrivateFooter />}
       </div>
       <SessionTimeoutModal />
     </>

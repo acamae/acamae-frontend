@@ -156,7 +156,7 @@ describe('AuthApiRepository', () => {
     const result = await repo.getCurrentUser();
     expect(result.success).toBe(false);
     expect(result.status).toBe(500);
-    expect(result.code).toBe('REQUEST_ERROR');
+    expect(result.code).toBe('ERR_BAD_REQUEST');
   });
 
   it('should handleApiError and handle unknown error', async () => {
@@ -265,10 +265,10 @@ describe('AuthApiRepository', () => {
 
   it('should resetPassword and return success', async () => {
     getMock().post.mockResolvedValue({ data: undefined, status: 200 });
-    const result = await repo.resetPassword({ token: 'valid-token', newPassword: 'new-password' });
+    const result = await repo.resetPassword({ token: 'valid-token', password: 'new-password' });
     expect(getMock().post).toHaveBeenCalledWith(
       expect.stringContaining('/auth/reset-password/valid-token'),
-      { newPassword: 'new-password' }
+      { password: 'new-password' }
     );
     expect(result.success).toBe(true);
   });
@@ -285,7 +285,7 @@ describe('AuthApiRepository', () => {
     getMock().post.mockRejectedValue(error);
     const result = await repo.resetPassword({
       token: 'invalid-token',
-      newPassword: 'new-password',
+      password: 'new-password',
     });
     expect(result.success).toBe(false);
     expect(result.status).toBe(400);
@@ -328,6 +328,6 @@ describe('AuthApiRepository', () => {
     const result = await repo.findById('1');
     expect(result.success).toBe(false);
     expect(result.status).toBe(500);
-    expect(result.code).toBe('REQUEST_ERROR');
+    expect(result.code).toBe('ERR_BAD_REQUEST');
   });
 });

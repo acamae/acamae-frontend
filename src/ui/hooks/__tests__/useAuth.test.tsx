@@ -13,6 +13,7 @@ import {
   ForgotPasswordPayload,
   ResetPasswordPayload,
   ResendVerificationPayload,
+  ApiSuccessResponse,
 } from '@domain/types/apiSchema';
 import { AuthState } from '@domain/types/auth';
 import { useAuth } from '@ui/hooks/useAuth';
@@ -481,7 +482,7 @@ describe('useAuth', () => {
 
       const resetPasswordPayload = {
         token: 'reset-token',
-        newPassword: 'newpassword123',
+        password: 'newpassword123',
       };
       const successResponse = {
         success: true,
@@ -510,9 +511,9 @@ describe('useAuth', () => {
     it('should handle reset password error', async () => {
       const { result } = renderHook(() => useAuth(), { wrapper: getWrapper(store) });
 
-      const resetPasswordPayload = {
+      const resetPasswordPayload: ResetPasswordPayload = {
         token: 'invalid-token',
-        newPassword: 'newpassword123',
+        password: 'newpassword123',
       };
       const errorResponse = {
         success: false,
@@ -536,8 +537,10 @@ describe('useAuth', () => {
     it('should handle successful verification resend', async () => {
       const { result } = renderHook(() => useAuth(), { wrapper: getWrapper(store) });
 
-      const resendVerificationPayload = { identifier: 'test@example.com' };
-      const successResponse = {
+      const resendVerificationPayload: ResendVerificationPayload = {
+        identifier: 'test@example.com',
+      };
+      const successResponse: ApiSuccessResponse<null> = {
         success: true,
         data: null,
         message: 'Verification email sent',

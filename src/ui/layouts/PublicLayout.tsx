@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 
 import { LayoutOptions } from '@domain/types/layoutOptions';
 import { DEFAULT_LAYOUT_OPTIONS } from '@shared/constants/layoutOptions';
+import PublicFooter from '@ui/components/PublicFooter';
 import PublicHeader from '@ui/components/PublicHeader';
 
 interface PublicLayoutProps {
@@ -14,6 +15,8 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ options = {} }) => {
     ...DEFAULT_LAYOUT_OPTIONS,
     ...options,
   };
+
+  console.log(LAYOUT_OPTIONS);
 
   return (
     <div
@@ -37,7 +40,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ options = {} }) => {
           <Outlet />
         </div>
       )}
-      {/* LAYOUT_OPTIONS.appFooter && (<PublicFooter />) */}
+      {LAYOUT_OPTIONS.appFooter && <PublicFooter />}
     </div>
   );
 };
