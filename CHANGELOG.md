@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/acamae/acamae-frontend/compare/v0.7.0...v0.8.0) (2025-06-12)
+
+### Features
+
+- **ui:** implement new layout components and improve existing ones ([8daad1a](https://github.com/acamae/acamae-frontend/commit/8daad1afd34c84252cbce12177e43b7c2fdef88b))
+
+# [0.8.0](https://github.com/acamae/acamae-frontend/compare/v0.7.0...v0.8.0) (2025-06-12)
+
+### Features
+
+- **ui:** implement new layout components and improve existing ones ([8daad1a](https://github.com/acamae/acamae-frontend/commit/8daad1afd34c84252cbce12177e43b7c2fdef88b))
+
 # [0.7.0](https://github.com/acamae/acamae-frontend/compare/v0.6.1...v0.7.0) (2025-06-11)
 
 ### Features
