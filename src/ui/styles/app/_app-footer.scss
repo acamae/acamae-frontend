@@ -20,3 +20,9 @@
     margin: 0 $app-content-sm-padding-x;
   }
 }
+
+.app-without-sidebar {
+  & .app-footer {
+    margin-left: $app-content-padding-x;
+  }
+}
