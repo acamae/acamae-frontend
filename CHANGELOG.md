@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.9.0](https://github.com/acamae/acamae-frontend/compare/v0.8.0...v0.9.0) (2025-06-13)
+
+### Features
+
+- **forms:** add terms and conditions offcanvas with language support ([3345320](https://github.com/acamae/acamae-frontend/commit/3345320f974024cd639ea926a98855e2d6cf9246))
+
+# [0.9.0](https://github.com/acamae/acamae-frontend/compare/v0.8.0...v0.9.0) (2025-06-13)
+
+### Features
+
+- **forms:** add terms and conditions offcanvas with language support ([3345320](https://github.com/acamae/acamae-frontend/commit/3345320f974024cd639ea926a98855e2d6cf9246))
+
 # [0.8.0](https://github.com/acamae/acamae-frontend/compare/v0.7.0...v0.8.0) (2025-06-12)
 
 ### Features
