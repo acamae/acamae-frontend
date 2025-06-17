@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.2](https://github.com/acamae/acamae-frontend/compare/v0.10.1...v0.10.2) (2025-06-17)
+
+### Bug Fixes
+
+- **ci:** simplify Lerna workflow to prevent CHANGELOG duplication ([deebd31](https://github.com/acamae/acamae-frontend/commit/deebd313cea27b76a8168482618abf4c2776c8a8))
+
+## [0.10.2](https://github.com/acamae/acamae-frontend/compare/v0.10.1...v0.10.2) (2025-06-17)
+
+### Bug Fixes
+
+- **ci:** simplify Lerna workflow to prevent CHANGELOG duplication ([deebd31](https://github.com/acamae/acamae-frontend/commit/deebd313cea27b76a8168482618abf4c2776c8a8))
+
 ## [0.10.1](https://github.com/acamae/acamae-frontend/compare/v0.10.0...v0.10.1) (2025-06-17)
 
 ### Bug Fixes
