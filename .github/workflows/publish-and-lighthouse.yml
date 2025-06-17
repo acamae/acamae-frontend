@@ -47,14 +47,14 @@ jobs:
         run: |
           git fetch --tags
           git config --global --add safe.directory /github/workspace
+          rm -f CHANGELOG.md
 
       # Step 2: Versioning and Publishing
       - name: Publish to GitHub Packages
         run: |
           if npx lerna changed; then
             echo "Changes detected, proceeding with version and publish"
-            npx lerna version --yes
-            npx lerna publish from-git --yes
+            npx lerna publish --yes
           else
             echo "No changes detected, skipping version and publish"
           fi
