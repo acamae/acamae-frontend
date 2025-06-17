@@ -16,10 +16,16 @@
         "sameFile": true,
         "header": "# Change Log\n\nAll notable changes to this project will be documented in this file.\nSee [Conventional Commits](https://conventionalcommits.org) for commit guidelines.\n\n",
         "append": false,
-        "outputUnreleased": false
+        "outputUnreleased": true
       },
       "allowBranch": ["main"],
-      "ignoreChanges": ["**/*.md", "**/test/**", "**/tests/**", "**/__tests__/**", "**/coverage/**"],
+      "ignoreChanges": [
+        "**/*.md",
+        "**/test/**",
+        "**/tests/**",
+        "**/__tests__/**",
+        "**/coverage/**"
+      ],
       "exact": true,
       "forcePublish": false,
       "preid": "",
