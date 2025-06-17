@@ -44,13 +44,21 @@ jobs:
 
       # Step 1: Versioning - Update CHANGELOG, version, create commit and push
       - name: Update version and CHANGELOG
-        run: 'npx lerna version --conventional-commits --yes --create-release github --message "chore(release): %s [skip ci]"'
+        run: 'npx lerna version --conventional-commits --yes --create-release github --message "chore(release): %s [skip ci]" --no-push'
         env:
           GH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
 
-      # Step 2: Publish to GitHub Packages
+      # Step 2: Push changes
+      - name: Push changes
+        run: |
+          git push origin HEAD:main
+          git push --tags
+        env:
+          GH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+
+      # Step 3: Publish to GitHub Packages
       - name: Publish to GitHub Packages
-        run: npx lerna publish from-git --yes
+        run: npx lerna publish from-git --yes --no-git-tag-version
         env:
           NPM_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
 

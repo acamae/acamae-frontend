@@ -14,17 +14,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - **docker:** improve development environment setup ([9897049](https://github.com/acamae/acamae-frontend/commit/98970492ccbfb12971fbfb4029c223077e2ec060))
 
-# [0.10.0](https://github.com/acamae/acamae-frontend/compare/v0.9.0...v0.10.0) (2025-06-17)
-
-### Bug Fixes
-
-- **eslint:** resolve module path aliases and tsconfig parsing ([7c1b96b](https://github.com/acamae/acamae-frontend/commit/7c1b96ba51c55033d01e7b66762cb13f80bb5e7b))
-- **eslint:** resolve tsconfig.json path resolution in ESLint config ([9325ceb](https://github.com/acamae/acamae-frontend/commit/9325ceb7d0260c7f58ec8fa12386d422620c4f25))
-
-### Features
-
-- **docker:** improve development environment setup ([9897049](https://github.com/acamae/acamae-frontend/commit/98970492ccbfb12971fbfb4029c223077e2ec060))
-
 # [0.9.0](https://github.com/acamae/acamae-frontend/compare/v0.8.0...v0.9.0) (2025-06-13)
 
 ### Features
