@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## <small>0.10.5 (2025-06-17)</small>
+
+- fix(ci): ensure CHANGELOG generation in Lerna workflow ([d54f84d](https://github.com/acamae/acamae-frontend/commit/d54f84d))
+- fix(ci): improve Lerna versioning and changelog generation ([dbc1731](https://github.com/acamae/acamae-frontend/commit/dbc1731))
+
+## <small>0.10.5 (2025-06-17)</small>
+
+- fix(ci): ensure CHANGELOG generation in Lerna workflow ([d54f84d](https://github.com/acamae/acamae-frontend/commit/d54f84d))
+- fix(ci): improve Lerna versioning and changelog generation ([dbc1731](https://github.com/acamae/acamae-frontend/commit/dbc1731))
+
 ## <small>0.10.4 (2025-06-17)</small>
 
 - fix(changelog): prevent duplicate entries and improve formatting ([0108a06](https://github.com/acamae/acamae-frontend/commit/0108a06))
