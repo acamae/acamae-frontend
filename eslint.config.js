@@ -1,3 +1,6 @@
+import { dirname, resolve } from 'path';
+import { fileURLToPath } from 'url';
+
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
 import importPlugin from 'eslint-plugin-import';
@@ -5,17 +8,21 @@ import prettierPlugin from 'eslint-plugin-prettier';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 export default [
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
+    ignores: ['eslint.config.js'],
     languageOptions: {
       parser: tsparser,
       parserOptions: {
         ecmaFeatures: { jsx: true },
         ecmaVersion: 'latest',
         sourceType: 'module',
-        project: './tsconfig.json',
-        tsconfigRootDir: process.cwd(),
+        project: resolve(__dirname, 'tsconfig.json'),
+        tsconfigRootDir: __dirname,
       },
       globals: {
         jest: true,
@@ -74,11 +81,23 @@ export default [
       'import/resolver': {
         typescript: {
           alwaysTryTypes: true,
-          project: './tsconfig.json',
+          project: resolve(__dirname, 'tsconfig.json'),
           extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.mjs'],
         },
         node: {
           extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs'],
+        },
+        alias: {
+          map: [
+            ['@domain', resolve(__dirname, 'src/domain')],
+            ['@shared', resolve(__dirname, 'src/shared')],
+            ['@ui', resolve(__dirname, 'src/ui')],
+            ['@application', resolve(__dirname, 'src/application')],
+            ['@infrastructure', resolve(__dirname, 'src/infrastructure')],
+            ['@i18n', resolve(__dirname, 'src/infrastructure/i18n')],
+            ['@styles', resolve(__dirname, 'src/ui/styles')],
+          ],
+          extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
         },
       },
     },
