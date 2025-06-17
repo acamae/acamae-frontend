@@ -42,25 +42,13 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      # Step 1: Versioning - Update CHANGELOG, version, create commit and push
-      - name: Update version and CHANGELOG
-        run: 'npx lerna version --conventional-commits --yes --create-release github --message "chore(release): %s [skip ci]" --no-push'
-        env:
-          GH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-
-      # Step 2: Push changes
-      - name: Push changes
-        run: |
-          git push origin HEAD:main
-          git push --tags
-        env:
-          GH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-
-      # Step 3: Publish to GitHub Packages
+      # Step 1: Versioning and Publishing
       - name: Publish to GitHub Packages
-        run: npx lerna publish from-git --yes --no-git-tag-version
+        run: |
+          npx lerna publish --conventional-commits --yes --create-release github --message "chore(release): %s [skip ci]" --no-private
         env:
           NPM_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
 
   lighthouse:
     runs-on: ubuntu-latest
