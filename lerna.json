@@ -12,8 +12,20 @@
       "changelog": {
         "preset": "conventionalcommits",
         "releaseCount": 0,
-        "outputUnreleased": true
-      }
+        "infile": "CHANGELOG.md",
+        "sameFile": true,
+        "header": "# Change Log\n\nAll notable changes to this project will be documented in this file.\nSee [Conventional Commits](https://conventionalcommits.org) for commit guidelines.\n\n",
+        "append": false,
+        "outputUnreleased": false
+      },
+      "allowBranch": ["main"],
+      "ignoreChanges": ["**/*.md", "**/test/**", "**/tests/**", "**/__tests__/**", "**/coverage/**"],
+      "exact": true,
+      "forcePublish": false,
+      "preid": "",
+      "conventionalGraduate": false,
+      "preDistTag": "next",
+      "distTag": "latest"
     }
   }
 }

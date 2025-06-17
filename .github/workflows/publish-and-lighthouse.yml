@@ -42,9 +42,22 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      # Step 1: Versioning and Publishing
+      # Step 1: Prepare environment
+      - name: Prepare environment
+        run: |
+          git fetch --tags
+          git config --global --add safe.directory /github/workspace
+
+      # Step 2: Versioning and Publishing
       - name: Publish to GitHub Packages
-        run: npx lerna publish --yes
+        run: |
+          if npx lerna changed; then
+            echo "Changes detected, proceeding with version and publish"
+            npx lerna version --yes --no-push
+            npx lerna publish from-git --yes
+          else
+            echo "No changes detected, skipping version and publish"
+          fi
         env:
           NPM_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
