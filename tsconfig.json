@@ -29,6 +29,13 @@
       "@shared/*": ["src/shared/*"]
     }
   },
-  "include": ["cypress/**/*.ts", "src/**/*", "*.config.js", "*.setup.ts", "scripts/**/*.js"],
+  "include": [
+    "cypress/**/*.ts",
+    "src/**/*",
+    "*.config.js",
+    "*.setup.ts",
+    "scripts/**/*.js",
+    ".husky/**/*.js"
+  ],
   "exclude": ["node_modules"]
 }

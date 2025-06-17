@@ -1,21 +1,2 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-COMMIT_MSG=$(git log -1 --pretty=%B)
-echo "Commit message: $COMMIT_MSG"
-
-if echo "$COMMIT_MSG" | grep -q '\[skip ci\]'; then
-  echo "⏩ Pre-commit hook skipped for Lerna version commit."
-  exit 0
-fi
-
-npx tsc --noEmit
-
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|jsx|ts|tsx)$' | tr '\n' ' ')
-if [ -n "$STAGED_FILES" ]; then
-  echo "🧪 Ejecutando tests..."
-  npx jest --bail --findRelatedTests --passWithNoTests $STAGED_FILES
-fi
-
-echo "🧪 Ejecutando linter..."
-npx lint-staged
+node "$(dirname "$0")/pre-commit.js"

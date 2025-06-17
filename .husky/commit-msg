@@ -1,4 +1,2 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-npx --no-install commitlint --edit "$1"
+node "$(dirname "$0")/commit-msg.js" "$1"
