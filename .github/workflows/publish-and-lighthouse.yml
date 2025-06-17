@@ -44,8 +44,7 @@ jobs:
 
       # Step 1: Versioning and Publishing
       - name: Publish to GitHub Packages
-        run: |
-          npx lerna publish --conventional-commits --yes --create-release github --message "chore(release): %s [skip ci]" --no-private
+        run: npx lerna publish --yes
         env:
           NPM_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}

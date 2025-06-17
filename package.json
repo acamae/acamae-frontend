@@ -52,6 +52,7 @@
     "@typescript-eslint/parser": "^8.33.1",
     "autoprefixer": "^10.4.20",
     "commitizen": "^4.3.1",
+    "conventional-changelog-conventionalcommits": "^9.0.0",
     "copy-webpack-plugin": "^13.0.0",
     "cross-env": "^7.0.3",
     "css-loader": "^6.10.0",
@@ -125,7 +126,8 @@
     "depcruise:svg": "dot -Tsvg dependency-graph.dot -o dependency-graph.svg",
     "depcruise:kpi": "node scripts/depcruise-kpi.js",
     "generate-ssl": "node ./scripts/generate-ssl.js",
-    "postinstall": "node ./scripts/generate-ssl.js"
+    "postinstall": "node ./scripts/generate-ssl.js",
+    "release": "lerna publish --yes"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

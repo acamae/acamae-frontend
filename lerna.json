@@ -1,5 +1,14 @@
 {
   "packages": ["."],
   "version": "0.10.2",
-  "npmClient": "npm"
+  "npmClient": "npm",
+  "command": {
+    "publish": {
+      "conventionalCommits": true,
+      "changelogPreset": "conventionalcommits",
+      "message": "chore(release): %s [skip ci]",
+      "noPrivate": true,
+      "createRelease": "github"
+    }
+  }
 }
