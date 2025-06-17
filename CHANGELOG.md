@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## <small>0.10.4 (2025-06-17)</small>
+
+- fix(changelog): prevent duplicate entries and improve formatting ([0108a06](https://github.com/acamae/acamae-frontend/commit/0108a06))
+
+## <small>0.10.4 (2025-06-17)</small>
+
+- fix(changelog): prevent duplicate entries and improve formatting ([0108a06](https://github.com/acamae/acamae-frontend/commit/0108a06))
+
 ## [0.10.3](https://github.com/acamae/acamae-frontend/compare/v0.10.2...v0.10.3) (2025-06-17)
 
 ### Chores
