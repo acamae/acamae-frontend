@@ -65,10 +65,7 @@ export default env => {
             overlay: true,
           },
           watchFiles: {
-            paths: [
-              `${_resolve(__dirname, 'src')}/**/*`,
-              `${_resolve(__dirname, 'src')}/infrastructure/i18n/locales/*.json`,
-            ],
+            paths: [`${_resolve(__dirname, 'src')}/**/*`],
             options: {
               usePolling: true,
               interval: 2000,
@@ -76,6 +73,10 @@ export default env => {
           },
           headers: {
             'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers':
+              'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization',
+            'Access-Control-Expose-Headers': 'Content-Length,Content-Range',
           },
         }
       : undefined,
@@ -119,13 +120,6 @@ export default env => {
             {
               loader: 'sass-loader',
               options: {
-                // Exclude node_modules from sass-loader processing
-                additionalData: (content, loaderContext) => {
-                  if (loaderContext.resourcePath.includes('node_modules')) {
-                    return content;
-                  }
-                  return content;
-                },
                 sourceMap: true,
                 sassOptions: {
                   silenceDeprecations: [
@@ -204,25 +198,29 @@ export default env => {
       splitChunks: {
         chunks: 'all',
         cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
           react: {
             test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom)[\\/]/,
             name: 'react-vendor',
             chunks: 'all',
+            priority: 20,
           },
           redux: {
             test: /[\\/]node_modules[\\/](@reduxjs|react-redux)[\\/]/,
             name: 'redux-vendor',
             chunks: 'all',
+            priority: 15,
           },
           i18n: {
             test: /[\\/]node_modules[\\/](i18next|react-i18next)[\\/]/,
             name: 'i18n-vendor',
             chunks: 'all',
+            priority: 10,
+          },
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+            priority: 5,
           },
         },
       },
@@ -232,8 +230,8 @@ export default env => {
     },
     performance: {
       hints: isProduction ? 'warning' : false,
-      maxEntrypointSize: 512000,
-      maxAssetSize: 512000,
+      maxEntrypointSize: 1024000,
+      maxAssetSize: 1024000,
     },
   };
 };

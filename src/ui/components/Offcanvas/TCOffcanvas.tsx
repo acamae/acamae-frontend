@@ -15,7 +15,6 @@ const TCOffcanvas: React.FC<TCOffcanvasProps> = ({ show, onHide }) => {
       show={show}
       onHide={onHide}
       placement="end"
-      responsive="lg"
       data-testid="terms-and-conditions-offcanvas">
       <Offcanvas.Header closeButton>
         <Offcanvas.Title>

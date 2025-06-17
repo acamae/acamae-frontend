@@ -37,23 +37,22 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
 
-      - name: Publish to GitHub Packages
-        run: npx lerna publish from-git --yes
-        env:
-          NPM_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-
       - name: Configure git user
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Lerna version (conventional commits)
+      # Step 1: Versioning - Update CHANGELOG, version, create commit and push
+      - name: Update version and CHANGELOG
         run: 'npx lerna version --conventional-commits --yes --create-release github --message "chore(release): %s [skip ci]"'
         env:
           GH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
 
+      # Step 2: Publish to GitHub Packages
       - name: Publish to GitHub Packages
         run: npx lerna publish from-git --yes
+        env:
+          NPM_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
 
   lighthouse:
     runs-on: ubuntu-latest
@@ -64,7 +63,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '22.16.0'
           cache: 'npm'
 
       - name: Install dependencies
@@ -92,4 +91,3 @@ jobs:
         with:
           name: lighthouse-results
           path: .lighthouseci
-

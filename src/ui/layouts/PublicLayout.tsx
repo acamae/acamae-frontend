@@ -16,8 +16,6 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ options = {} }) => {
     ...options,
   };
 
-  console.log(LAYOUT_OPTIONS);
-
   return (
     <div
       className={
