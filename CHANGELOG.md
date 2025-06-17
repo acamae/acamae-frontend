@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## <small>0.10.3 (2025-06-17)</small>
+
+- chore(release): add lerna publish script to package.json ([e3ffffe](https://github.com/acamae/acamae-frontend/commit/e3ffffe))
+
+## <small>0.10.3 (2025-06-17)</small>
+
+- chore(release): add lerna publish script to package.json ([e3ffffe](https://github.com/acamae/acamae-frontend/commit/e3ffffe))
+
 ## [0.10.2](https://github.com/acamae/acamae-frontend/compare/v0.10.1...v0.10.2) (2025-06-17)
 
 ### Bug Fixes
