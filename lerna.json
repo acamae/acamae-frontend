@@ -8,7 +8,12 @@
       "changelogPreset": "conventionalcommits",
       "message": "chore(release): %s [skip ci]",
       "noPrivate": true,
-      "createRelease": "github"
+      "createRelease": "github",
+      "changelog": {
+        "preset": "conventionalcommits",
+        "releaseCount": 0,
+        "outputUnreleased": true
+      }
     }
   }
 }
