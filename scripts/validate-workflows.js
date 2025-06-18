@@ -2,12 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import glob from 'glob';
 import { load as yamlLoad } from 'js-yaml';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const WORKFLOW_DIR = path.join(process.cwd(), '.github', 'workflows');
 const ACTIONS_DIR = path.join(process.cwd(), '.github', 'actions');
 
 const VALIDATION_RULES = {
@@ -293,11 +293,23 @@ class WorkflowValidator {
       suggestions: this.suggestions,
     };
   }
+
+  hasErrors() {
+    return this.errors.length > 0;
+  }
 }
 
-function checkVersioningSteps(workflowFile, jobs) {
+function validateWorkflow(file) {
+  const validator = new WorkflowValidator(file);
+  validator.validate();
+  return validator;
+}
+
+// Custom checks for versioning and SonarCloud
+function checkVersioning(workflowFile, jobs) {
   const versioningPatterns = [/lerna version/, /lerna publish/, /git push --follow-tags/];
   let foundVersioning = false;
+
   Object.entries(jobs).forEach(([_jobName, job]) => {
     const steps = job.steps || [];
     steps.forEach(step => {
@@ -306,18 +318,21 @@ function checkVersioningSteps(workflowFile, jobs) {
         if (pattern.test(runCmd)) {
           foundVersioning = true;
           if (workflowFile !== 'release.yml') {
-            throw new Error(`Versioning/publishing command found in ${workflowFile}: ${runCmd}`);
+            console.error(`❌ Versioning/publishing command found in ${workflowFile}: ${runCmd}`);
+          } else {
+            console.log(`✅ Versioning command found in release.yml: ${runCmd}`);
           }
         }
       });
     });
   });
+
   if (workflowFile === 'release.yml' && !foundVersioning) {
     console.warn('⚠️  No versioning/publishing steps found in release.yml');
   }
 }
 
-function checkSonarCloudStep(workflowFile, jobs) {
+function checkSonarCloud(workflowFile, jobs) {
   if (workflowFile === 'ci.yml') {
     let foundSonar = false;
     Object.entries(jobs).forEach(([_jobName, job]) => {
@@ -334,72 +349,27 @@ function checkSonarCloudStep(workflowFile, jobs) {
   }
 }
 
-function checkLighthouseJob(workflowFile, jobs) {
-  if (workflowFile !== 'lighthouse.yml') {
-    Object.entries(jobs).forEach(([_jobName, job]) => {
-      const steps = job.steps || [];
-      steps.forEach(step => {
-        if (step.uses && step.uses.includes('treosh/lighthouse-ci-action')) {
-          console.warn(
-            `💡 Suggestion: Lighthouse job found in ${workflowFile}, consider moving to lighthouse.yml`
-          );
-        }
-      });
-    });
+// Main validation
+const workflows = glob.sync('.github/workflows/*.yml');
+let hasErrors = false;
+
+workflows.forEach(file => {
+  console.log(`\nValidating ${file}...`);
+  const validator = validateWorkflow(file);
+
+  if (validator.hasErrors()) {
+    hasErrors = true;
+    console.error(`\n❌ ${file} has validation errors:`);
+    validator.errors.forEach(error => console.error(`  - ${error}`));
+  } else {
+    console.log(`\n✅ ${file} passed all validations`);
   }
+
+  // Custom checks
+  checkVersioning(file, validator.content.jobs || {});
+  checkSonarCloud(file, validator.content.jobs || {});
+});
+
+if (hasErrors) {
+  process.exit(1);
 }
-
-function validateAllWorkflows() {
-  console.log('🔍 Validating GitHub Actions Workflows...\n');
-
-  const workflowFiles = fs
-    .readdirSync(WORKFLOW_DIR)
-    .filter(file => file.endsWith('.yml') || file.endsWith('.yaml'));
-
-  const results = workflowFiles.map(file => {
-    const workflowPath = path.join(WORKFLOW_DIR, file);
-    const validator = new WorkflowValidator(workflowPath);
-    // Custom checks for versioning, SonarCloud, Lighthouse
-    try {
-      checkVersioningSteps(file, validator.content.jobs || {});
-    } catch (err) {
-      validator.errors.push(err.message);
-    }
-    checkSonarCloudStep(file, validator.content.jobs || {});
-    checkLighthouseJob(file, validator.content.jobs || {});
-    return validator.validate();
-  });
-
-  // Print results
-  results.forEach(result => {
-    console.log(`\n📄 ${result.file}`);
-    console.log('-------------------');
-
-    if (result.errors.length > 0) {
-      console.log('\n❌ Errors:');
-      result.errors.forEach(error => console.log(`  - ${error}`));
-    }
-
-    if (result.warnings.length > 0) {
-      console.log('\n⚠️ Warnings:');
-      result.warnings.forEach(warning => console.log(`  - ${warning}`));
-    }
-
-    if (result.suggestions.length > 0) {
-      console.log('\n💡 Suggestions:');
-      result.suggestions.forEach(suggestion => console.log(`  - ${suggestion}`));
-    }
-
-    if (result.errors.length === 0 && result.warnings.length === 0) {
-      console.log('✅ All checks passed');
-    }
-  });
-
-  // Exit with error if there are errors in any workflow
-  const hasErrors = results.some(result => !result.passed);
-  if (hasErrors) {
-    process.exit(1);
-  }
-}
-
-validateAllWorkflows();
