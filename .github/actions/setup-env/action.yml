@@ -37,6 +37,16 @@ runs:
       run: |
         echo "::group::Analysing dependencies of all package.json"
 
+        # Detect hash command
+        if command -v sha256sum >/dev/null 2>&1; then
+          HASH_CMD="sha256sum"
+        elif command -v gsha256sum >/dev/null 2>&1; then
+          HASH_CMD="gsha256sum"
+        else
+          echo "sha256sum not found"
+          exit 1
+        fi
+
         extract_deps() {
           local file=$1
           echo "📦 Analising $file:"
@@ -70,7 +80,7 @@ runs:
         }
 
         echo "Generating hash of dependencies..."
-        DEPS_HASH=$(find . -name 'package.json' -type f -exec bash -c 'extract_deps "$0"' {} \; | sort | tee /tmp/all_deps | sha256sum | cut -d' ' -f1)
+        DEPS_HASH=$(find . -name 'package.json' -type f -exec bash -c 'extract_deps "$0"' {} \; | sort | tee /tmp/all_deps | $HASH_CMD | cut -d' ' -f1)
 
         echo "Total dependencies found (excluding workspace:*):"
         wc -l < /tmp/all_deps
