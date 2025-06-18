@@ -15,13 +15,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  prepare:
-    runs-on: ${{ matrix.os }}
+  ci-all:
+    runs-on: ubuntu-latest
     environment: development
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node-version: [22]
     steps:
       - uses: actions/checkout@v4
       - name: Install GNU coreutils (for sha256sum)
@@ -32,93 +28,19 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-    permissions:
-      contents: read
-      packages: read
-      pull-requests: read
 
-  validate:
-    needs: prepare
-    runs-on: ${{ matrix.os }}
-    environment: development
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node-version: [22]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup environment
-        uses: ./.github/actions/setup-env
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+      # VALIDATE
       - run: node scripts/validate-critical-config.js
       - run: node scripts/validate-workflows.js
-    permissions:
-      contents: read
-      packages: read
-      pull-requests: read
 
-  lint:
-    needs: validate
-    runs-on: ${{ matrix.os }}
-    environment: development
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node-version: [22]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup environment
-        uses: ./.github/actions/setup-env
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+      # LINT
       - run: npm run lint:fix
       - run: npm run lint
-    permissions:
-      contents: read
-      packages: read
-      pull-requests: read
 
-  test:
-    needs: lint
-    runs-on: ${{ matrix.os }}
-    environment: development
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node-version: [22]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup environment
-        uses: ./.github/actions/setup-env
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+      # BUILD
       - run: npm run build
-    permissions:
-      contents: read
-      packages: read
-      pull-requests: read
 
-  sonarqube:
-    needs: test
-    name: SonarQube
-    environment: development
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node-version: [22]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup environment
-        uses: ./.github/actions/setup-env
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      # SONARQUBE
       - name: Test and coverage
         run: npm run test:coverage
       - name: Check coverage

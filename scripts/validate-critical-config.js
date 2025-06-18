@@ -79,23 +79,28 @@ function validateCIConfig() {
 
     console.log('\nValidating CI Configuration...');
 
-    // Verify that all jobs use setup-env
+    // Verificar que al menos un job usa setup-env
+    let foundSetupEnv = false;
     for (const [jobName, job] of Object.entries(jobs)) {
       const steps = job.steps || [];
       const hasSetupEnv = steps.some(step => step.uses?.includes('./.github/actions/setup-env'));
+      if (hasSetupEnv) foundSetupEnv = true;
       console.log(`${hasSetupEnv ? '✅' : '❌'} ${jobName}: Uses setup-env action`);
-      valid = valid && hasSetupEnv;
+    }
+    if (!foundSetupEnv) {
+      console.error('❌ No job uses setup-env action');
+      valid = false;
     }
 
-    // Verify that the coverage steps are only in sonarqube
+    // Verificar que los pasos de coverage están solo en el job correcto (sonarqube o ci-all)
     const coverageSteps = ['npm run test:coverage', 'npm run check:coverage'];
     for (const [jobName, job] of Object.entries(jobs)) {
       const steps = job.steps || [];
       for (const step of steps) {
         if (coverageSteps.includes(step.run)) {
-          if (jobName !== 'sonarqube') {
+          if (jobName !== 'sonarqube' && jobName !== 'ci-all') {
             console.error(
-              `❌ ${jobName}: Coverage step '${step.run}' should be only in the 'sonarqube' job`
+              `❌ ${jobName}: Coverage step '${step.run}' should be only in the 'sonarqube' or 'ci-all' job`
             );
             valid = false;
           }

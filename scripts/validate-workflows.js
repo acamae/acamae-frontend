@@ -269,9 +269,9 @@ class WorkflowValidator {
       const steps = job.steps || [];
       steps.forEach(step => {
         if (coverageSteps.includes(step.run)) {
-          if (jobName !== 'sonarqube') {
+          if (jobName !== 'sonarqube' && jobName !== 'ci-all') {
             this.errors.push(
-              `Coverage step '${step.run}' debe estar solo en el job 'sonarqube' (actual: ${jobName})`
+              `Coverage step '${step.run}' debe estar solo en el job 'sonarqube' o 'ci-all' (actual: ${jobName})`
             );
           }
         }
