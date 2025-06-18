@@ -262,12 +262,29 @@ class WorkflowValidator {
     });
   }
 
+  validateCoverageSteps() {
+    const jobs = this.content.jobs || {};
+    const coverageSteps = ['npm run test:coverage', 'npm run check:coverage'];
+    Object.entries(jobs).forEach(([jobName, job]) => {
+      const steps = job.steps || [];
+      steps.forEach(step => {
+        if (coverageSteps.includes(step.run)) {
+          if (jobName !== 'sonarqube') {
+            this.errors.push(
+              `Coverage step '${step.run}' debe estar solo en el job 'sonarqube' (actual: ${jobName})`
+            );
+          }
+        }
+      });
+    });
+  }
+
   validate() {
     this.validateSecurity();
     this.validateConfiguration();
     this.validateLogic();
     this.findDuplicates();
-
+    this.validateCoverageSteps();
     return {
       file: path.basename(this.workflowPath),
       passed: this.errors.length === 0,

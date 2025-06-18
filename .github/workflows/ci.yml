@@ -94,8 +94,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
       - run: npm run build
-      - run: npm run test:coverage
-      - run: npm run check:coverage
     permissions:
       contents: read
       packages: read
@@ -116,6 +114,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Test and coverage
+        run: npm run test:coverage
+      - name: Check coverage
+        run: npm run check:coverage
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:

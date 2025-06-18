@@ -87,6 +87,22 @@ function validateCIConfig() {
       valid = valid && hasSetupEnv;
     }
 
+    // Verify that the coverage steps are only in sonarqube
+    const coverageSteps = ['npm run test:coverage', 'npm run check:coverage'];
+    for (const [jobName, job] of Object.entries(jobs)) {
+      const steps = job.steps || [];
+      for (const step of steps) {
+        if (coverageSteps.includes(step.run)) {
+          if (jobName !== 'sonarqube') {
+            console.error(
+              `❌ ${jobName}: Coverage step '${step.run}' should be only in the 'sonarqube' job`
+            );
+            valid = false;
+          }
+        }
+      }
+    }
+
     return valid;
   } catch (error) {
     console.error('❌ Error reading CI configuration:', error.message);
