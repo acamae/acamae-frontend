@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  version-and-publish:
+    runs-on: ubuntu-latest
+    environment: development
+    permissions:
+      contents: write
+      packages: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+      - run: npm run build
+      - name: Lerna version
+        run: npx lerna version --yes
+      - name: Push tags
+        run: git push --follow-tags
+      - name: Lerna publish
+        run: npx lerna publish from-package --yes
