@@ -124,6 +124,8 @@ alwaysApply: true
 - **Validation Rules**:
   - MUST restrict versioning job to `main` branch in CI workflow
   - MUST NOT generate versions/tags in feature/fix branches
+  - MUST ensure all keys in action.yml are compatible with GitHub Actions composite actions
+  - MUST check the latest official GitHub Actions documentation before adding or assuming new keys
 
 ## Core Persona & Approach {.section}
 
@@ -396,5 +398,7 @@ compliance:
   showProgress={true}
 />
 ```
+
+
 
 

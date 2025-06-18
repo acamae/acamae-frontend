@@ -20,10 +20,6 @@ inputs:
     description: 'Git user email to configure'
     required: false
     default: 'github-actions[bot]@users.noreply.github.com'
-  timeout-minutes:
-    description: 'Timeout for npm ci in minutes'
-    required: false
-    default: '15'
 
 runs:
   using: "composite"
@@ -194,7 +190,6 @@ runs:
     - name: Install dependencies
       if: steps.check-deps.outputs.needs_install == 'true'
       shell: bash
-      timeout-minutes: ${{ inputs.timeout-minutes }}
       run: |
         echo "::group::Installing dependencies"
         npm ci
