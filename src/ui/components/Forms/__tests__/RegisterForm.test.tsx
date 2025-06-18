@@ -5,6 +5,10 @@ jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: jest.fn(),
 }));
+jest.mock('@ui/components/Offcanvas/TCOffcanvas', () => ({
+  __esModule: true,
+  default: () => null,
+}));
 
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
@@ -144,22 +148,47 @@ describe('RegisterForm', () => {
       fireEvent.change(screen.getByTestId('register-form-email-input'), {
         target: { name: 'email', value: 'invalid-email' },
       });
+      fireEvent.blur(screen.getByTestId('register-form-email-input'));
+
       fireEvent.change(screen.getByTestId('register-form-username-input'), {
-        target: { name: 'username', value: 'invalid-username' },
+        target: { name: 'username', value: 'a' },
       });
+      fireEvent.blur(screen.getByTestId('register-form-username-input'));
+
       fireEvent.change(screen.getByTestId('register-form-password-input'), {
-        target: { name: 'password', value: 'invalid-password' },
+        target: { name: 'password', value: 'weak' },
       });
+      fireEvent.blur(screen.getByTestId('register-form-password-input'));
+
       fireEvent.change(screen.getByTestId('register-form-confirm-password-input'), {
-        target: { name: 'confirmPassword', value: 'invalid-confirm-password' },
+        target: { name: 'confirmPassword', value: 'different' },
       });
-      fireEvent.click(screen.getByTestId('register-form-terms-checkbox'));
+      fireEvent.blur(screen.getByTestId('register-form-confirm-password-input'));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('register-form-email-error')).toHaveTextContent(
+        'errors.email.invalid'
+      );
+      expect(screen.getByTestId('register-form-username-error')).toHaveTextContent(
+        'errors.username.invalid'
+      );
+      expect(screen.getByTestId('register-form-password-error')).toHaveTextContent(
+        'errors.password.invalid'
+      );
+      expect(screen.getByTestId('register-form-confirm-password-error')).toHaveTextContent(
+        'errors.password.mismatch'
+      );
+    });
+
+    await act(async () => {
       fireEvent.submit(screen.getByTestId('register-form'));
     });
 
-    expect(screen.getByText('errors.email.invalid')).toBeInTheDocument();
-    expect(screen.getByText('errors.username.invalid')).toBeInTheDocument();
-    expect(screen.getByText('errors.password.invalid')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('register-form-button')).toBeInTheDocument();
+      expect(screen.getByTestId('register-form-button')).not.toBeDisabled();
+    });
   });
 
   it('should disable the button when loading is true', () => {
