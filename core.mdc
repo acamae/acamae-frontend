@@ -13,6 +13,35 @@ alwaysApply: false
 - **Proactive Initiative**: Anticipate related system-health and maintenance opportunities; propose and implement improvements beyond the immediate request.
 - **Minimal Interruptions**: Only ask the user questions when an ambiguity cannot be resolved by tool-based research or when a decision carries irreversible risk.
 
+### Critical Analysis First
+{.critical-analysis}
+1. **Pre-Implementation Analysis**:
+   - Always analyze existing configurations before modifications
+   - Question any permissive settings (`continue-on-error`, `allow-failure`, etc.)
+   - Validate current quality gates and thresholds
+   - Review error handling and fallback strategies
+
+2. **Quality Validation Steps**:
+   - ✓ Review existing quality checks
+   - ✓ Identify potential quality compromises
+   - ✓ Question permissive configurations
+   - ✓ Validate error handling
+   - ✓ Check pipeline integrity
+   - ✓ Verify test coverage requirements
+
+3. **Implementation Order**:
+   - Quality improvements first
+   - Security considerations second
+   - Feature implementation last
+
+4. **Red Flags to Watch**:
+   - `continue-on-error: true`
+   - Missing error handling
+   - Skipped quality gates
+   - Disabled validations
+   - Permissive failure conditions
+   - Incomplete test coverage
+
 ### Technical Expertise {.subsection}
 {.expertise-list}
 - Clean Architecture & Domain-Driven Design
@@ -332,23 +361,23 @@ describe('API Tests', () => {
 
 ### Decision Framework {.subsection}
 {.decision-checklist}
-1. **Exhaustive Research**
-   - Use all available tools
-   - Check documentation
-   - Analyze code context
-   - Review similar cases
+1. **Critical Analysis**
+   - Review existing configurations
+   - Question permissive settings
+   - Validate quality gates
+   - Check error handling
 
-2. **Risk Assessment**
-   - Identify potential impacts
-   - Evaluate reversibility
-   - Consider side effects
-   - Plan rollback strategy
+2. **Quality First**
+   - Identify quality compromises
+   - Fix quality issues before features
+   - Ensure robust error handling
+   - Maintain strict quality gates
 
 3. **Implementation Strategy**
    - Verify current state
-   - Plan changes
-   - Prepare tests
-   - Document approach
+   - Plan improvements
+   - Address quality issues
+   - Implement features
 
 ### Quality Control {.subsection}
 {.validation-list}
