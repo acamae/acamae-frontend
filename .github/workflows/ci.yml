@@ -2,159 +2,77 @@ name: CI
 
 on:
   push:
-    branches-ignore:
+    branches:
       - main
+      - feature/*
+      - fix/*
   pull_request:
-    types: [opened, synchronize, reopened]
     branches:
       - main
 
-# Ensure that no multiple workflows are executed for the same PR/push
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: read
-      pull-requests: write # Para poder comentar en PRs si hay fallos
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [22]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Setup environment
-        uses: ./.github/actions/setup-env
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-env
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-      - name: Validate critical configurations
-        run: node scripts/validate-critical-config.js
-
-      - name: Validate workflows
-        run: node scripts/validate-workflows.js
+      - run: node scripts/validate-critical-config.js
+      - run: node scripts/validate-workflows.js
 
   lint:
     needs: validate
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: read
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [22]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
-          persist-credentials: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup environment
-        uses: ./.github/actions/setup-env
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-env
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-
-      - name: Run linter with --fix
-        run: npm run lint:fix
-
-      - name: Run linter (fail on remaining errors)
-        run: npm run lint
+      - run: npm run lint:fix
+      - run: npm run lint
 
   test:
     needs: lint
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         node-version: [22]
-    permissions:
-      contents: read
-      packages: read
-      pull-requests: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
-          persist-credentials: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup environment
-        uses: ./.github/actions/setup-env
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-env
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-
-      - name: Run build
-        run: npm run build
-
-      - name: Run tests with coverage
-        run: npm run test:coverage
-
-      - name: Check coverage thresholds
-        run: npm run check:coverage
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage-report-${{ matrix.os }}-node-${{ matrix.node-version }}
-          path: ./coverage
-          retention-days: 7
-
-  test-summary:
-    needs: [test, lint]
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Setup environment
-        uses: ./.github/actions/setup-env
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-      - name: Check test matrix status
-        run: |
-          if [ "${{ needs.test.result }}" != "success" ]; then
-            echo "::error::Test matrix failed"
-            exit 1
-          fi
+      - run: npm run build
+      - run: npm run test:coverage
+      - run: npm run check:coverage
 
   version:
     if: github.ref == 'refs/heads/main'
-    needs: [test-summary, lint]
+    needs: [test, lint]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
-      pull-requests: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Setup environment
-        uses: ./.github/actions/setup-env
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-env
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
           setup-git-identity: 'true'
-
-      - name: Version and tag
-        run: |
-          # Extraer el tipo de rama (feature o fix)
-          BRANCH_TYPE=$(echo ${{ github.ref }} | sed -n 's/refs\/heads\/\(feature\|fix\)\/.*/\1/p')
-
-          # Generar versión prerelease
-          npx lerna version --no-push --preid=${BRANCH_TYPE} --pre-dist-tag ${BRANCH_TYPE}
-
-          # Pushear cambios y tags
-          git push --follow-tags
-
+      - run: npx lerna version --no-push --yes
+      - run: git push --follow-tags

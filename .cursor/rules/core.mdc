@@ -7,6 +7,28 @@ alwaysApply: true
 
 ## Architectural Decisions {.section}
 
+### Branch & CI/CD Strategy {.subsection}
+{.decision-list}
+- **Decision**: Adopt strict main branch protection and scalable CI/CD flows for large teams
+- **Status**: ACCEPTED
+- **Date**: 2025-06-18
+- **Context**: Need to ensure quality, traceability, and efficiency in large development teams
+- **Consequences**:
+  - main is protected: only merge via Pull Request, never direct push
+  - Mandatory review and successful CI before merging to main
+  - CI (lint, test, validations) on every push to feature/*, fix/*, and main, and on every PR to main
+  - Versioning and publishing only on main after successful CI
+  - feature/* and fix/* are not strictly protected, but have basic CI
+  - Flow compatible with monorepo and multiple active branches
+- **Validation Rules**:
+  - MUST protect main with branch protection rules (review, CI, up-to-date)
+  - MUST run CI on push to main, feature/*, fix/*, and on PRs to main
+  - MUST allow merging to main only via PR with CI and review
+  - MUST version/publish only on main
+  - MUST avoid versioning/publishing on feature/* and fix/*
+  - SHOULD allow fast work on feature/fix without unnecessary blockers
+  - SHOULD scale to large teams and multiple branches
+
 ### Coverage Validation Strategy {.subsection}
 {.decision-list}
 - **Decision**: Use dedicated `check-coverage.js` script instead of CI workflow logic
