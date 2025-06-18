@@ -79,7 +79,7 @@ function validateCIConfig() {
 
     console.log('\nValidating CI Configuration...');
 
-    // Verificar que todos los jobs usen setup-env
+    // Verify that all jobs use setup-env
     for (const [jobName, job] of Object.entries(jobs)) {
       const steps = job.steps || [];
       const hasSetupEnv = steps.some(step => step.uses?.includes('./.github/actions/setup-env'));
@@ -100,17 +100,30 @@ function validateNpmConfig() {
 
   console.log('\nValidating NPM Configuration...');
 
-  // Verificar package.json
+  // Verify package.json
   const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
   const hasCorrectRegistry = packageJson.publishConfig?.registry === 'https://npm.pkg.github.com/';
   console.log(`${hasCorrectRegistry ? '✅' : '❌'} Package.json registry configuration`);
+  if (!hasCorrectRegistry) {
+    console.error('❌ Package.json registry configuration is incorrect.');
+  }
 
-  // Verificar lerna.json
+  // Verify lerna.json
   const lernaJson = JSON.parse(fs.readFileSync(lernaPath, 'utf8'));
   const hasCorrectNpmClient = lernaJson.npmClient === 'npm';
   console.log(`${hasCorrectNpmClient ? '✅' : '❌'} Lerna npm client configuration`);
+  if (!hasCorrectNpmClient) {
+    console.error('❌ Lerna npm client configuration is incorrect.');
+  }
 
-  return hasCorrectRegistry && hasCorrectNpmClient;
+  // Verify that lerna.json only allows versioning/publishing in the 'release' branch
+  const hasCorrectAllowBranch = lernaJson.command?.version?.allowBranch.includes('release');
+  console.log(`${hasCorrectAllowBranch ? '✅' : '❌'} Lerna allowBranch configuration`);
+  if (!hasCorrectAllowBranch) {
+    console.error('❌ Lerna allowBranch configuration is incorrect.');
+  }
+
+  return hasCorrectRegistry && hasCorrectNpmClient && hasCorrectAllowBranch;
 }
 
 function main() {

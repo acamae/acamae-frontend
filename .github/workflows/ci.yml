@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
+  prepare:
     runs-on: ${{ matrix.os }}
     environment: development
     strategy:
@@ -32,8 +32,31 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: read
+
+  validate:
+    needs: prepare
+    runs-on: ${{ matrix.os }}
+    environment: development
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [22]
+    steps:
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
       - run: node scripts/validate-critical-config.js
       - run: node scripts/validate-workflows.js
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: read
 
   lint:
     needs: validate
@@ -44,10 +67,6 @@ jobs:
         os: [ubuntu-latest]
         node-version: [22]
     steps:
-      - uses: actions/checkout@v4
-      - name: Install GNU coreutils (for sha256sum)
-        if: runner.os == 'macOS'
-        run: brew install coreutils
       - name: Setup environment
         uses: ./.github/actions/setup-env
         with:
@@ -55,6 +74,10 @@ jobs:
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
       - run: npm run lint:fix
       - run: npm run lint
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: read
 
   test:
     needs: lint
@@ -65,10 +88,6 @@ jobs:
         os: [ubuntu-latest]
         node-version: [22]
     steps:
-      - uses: actions/checkout@v4
-      - name: Install GNU coreutils (for sha256sum)
-        if: runner.os == 'macOS'
-        run: brew install coreutils
       - name: Setup environment
         uses: ./.github/actions/setup-env
         with:
@@ -77,10 +96,31 @@ jobs:
       - run: npm run build
       - run: npm run test:coverage
       - run: npm run check:coverage
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: read
+
+  sonarqube:
+    needs: test
+    name: SonarQube
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [22]
+    steps:
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
         with:
-          projectBaseDir: .
+          token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: read
