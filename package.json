@@ -92,7 +92,8 @@
     "webpack": "^5.99.5",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.2.1"
+    "webpack-dev-server": "^5.2.1",
+    "js-yaml": "^4.1.0"
   },
   "scripts": {
     "env:dev": "cross-env NODE_ENV=development",
@@ -127,7 +128,10 @@
     "depcruise:kpi": "node scripts/depcruise-kpi.js",
     "generate-ssl": "node ./scripts/generate-ssl.js",
     "postinstall": "node ./scripts/generate-ssl.js",
-    "release": "lerna publish --yes"
+    "release": "lerna publish --yes",
+    "validate:workflows": "node scripts/validate-workflows.js",
+    "validate:config": "node scripts/validate-critical-config.js",
+    "validate": "npm run validate:config && npm run validate:workflows"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -136,6 +140,9 @@
     ],
     "*.{json,css,md}": [
       "prettier --write"
+    ],
+    "*": [
+      "npm run validate:config"
     ]
   },
   "config": {

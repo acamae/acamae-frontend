@@ -1,0 +1,58 @@
+name: 'Setup Environment'
+description: 'Sets up Node.js environment with npm registry configuration'
+
+inputs:
+  token:
+    description: 'GitHub token for checkout'
+    required: true
+  npm-token:
+    description: 'Token for npm registry authentication'
+    required: true
+  setup-git-identity:
+    description: 'Whether to setup git identity'
+    required: false
+    default: 'false'
+  git-user-name:
+    description: 'Git user name to configure'
+    required: false
+    default: 'github-actions[bot]'
+  git-user-email:
+    description: 'Git user email to configure'
+    required: false
+    default: 'github-actions[bot]@users.noreply.github.com'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        token: ${{ inputs.token }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 22
+        registry-url: 'https://npm.pkg.github.com'
+        scope: '@acamae'
+
+    - name: Create .npmrc file
+      shell: bash
+      run: |
+        echo "@acamae:registry=https://npm.pkg.github.com" > .npmrc
+        echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> .npmrc
+        cat .npmrc
+      env:
+        NPM_TOKEN: ${{ inputs.npm-token }}
+
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
+
+    - name: Setup Git Identity
+      if: ${{ inputs.setup-git-identity == 'true' }}
+      shell: bash
+      run: |
+        git config --global user.name "${{ inputs.git-user-name }}"
+        git config --global user.email "${{ inputs.git-user-email }}"

@@ -19,24 +19,12 @@ jobs:
       issues: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
         with:
-          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Git Identity
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-      - name: Install dependencies
-        run: npm ci
+          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+          setup-git-identity: 'true'
 
       - name: Build
         run: npm run build
@@ -44,7 +32,7 @@ jobs:
       - name: Version and Publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           git pull origin main
           npx lerna version --yes
@@ -54,14 +42,32 @@ jobs:
   lighthouse:
     needs: check-and-publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: write # In order to comment in PRs if there are errors
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Build
+        run: npm run build
 
       - name: Audit URLs using Lighthouse
         uses: treosh/lighthouse-ci-action@v10
         with:
-          urls: |
-            https://acamae.es
+          configPath: './lighthouserc.json'
           uploadArtifacts: true
           temporaryPublicStorage: true
-          configPath: './lighthouserc.json'
+
+      - name: Upload Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results
+          path: .lighthouseci
+          retention-days: 7
