@@ -47,20 +47,22 @@ jobs:
         run: |
           git fetch --tags
           git config --global --add safe.directory /github/workspace
-          rm -f CHANGELOG.md
 
-      # Step 2: Versioning and Publishing
-      - name: Publish to GitHub Packages
+      # Step 2: Debug Lerna Process
+      - name: Debug Lerna Process
         run: |
           if npx lerna changed; then
-            echo "Changes detected, proceeding with version and publish"
-            npx lerna publish --yes
+            echo "Changes detected, proceeding with debug mode"
+            export DEBUG=lerna*
+            npx lerna publish --dry-run --yes
+            echo "Debug output completed. Review the logs above."
           else
             echo "No changes detected, skipping version and publish"
           fi
         env:
           NPM_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+          DEBUG: "lerna*"
 
   lighthouse:
     runs-on: ubuntu-latest
