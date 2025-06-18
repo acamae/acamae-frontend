@@ -1,4 +1,4 @@
-name: Publish & Lighthouse
+name: Publish and Lighthouse
 
 on:
   push:
@@ -6,14 +6,16 @@ on:
       - main
 
 jobs:
-  lerna-publish:
+  publish:
     runs-on: ubuntu-latest
-    permissions: write-all
-    environment:
-      name: development
+    permissions:
+      contents: write
+      packages: write
+      pull-requests: write
+      issues: write
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -21,122 +23,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.16.0'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@acamae'
-          cache: 'npm'
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
 
-      - name: Install system dependencies
+      - name: Git Identity
         run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
-
-      - name: Create .npmrc file
-        run: |
-          echo "@acamae:registry=https://npm.pkg.github.com" > .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> .npmrc
-          cat .npmrc
-        env:
-          NPM_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-
-      - name: Install dependencies
-        run: npm ci
-        env:
-          NPM_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-
-      - name: Configure git user
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global --add safe.directory /github/workspace
-
-      - name: Sync with remote
-        run: |
-          git fetch --tags --force
-          git pull --rebase origin main || {
-            echo "Failed to rebase on main"
-            git rebase --abort
-            exit 1
-          }
-
-      - name: Check for changes
-        id: check
-        run: |
-          # Ensure jq is available
-          if ! command -v jq &> /dev/null; then
-            echo "Error: jq is not installed"
-            exit 1
-          fi
-
-          if npx lerna changed --json | jq -e 'length > 0' >/dev/null; then
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-            echo "Changes detected in the following packages:"
-            npx lerna changed
-          else
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-            echo "No changes detected"
-          fi
-
-      - name: Version and publish
-        if: steps.check.outputs.has_changes == 'true'
-        run: |
-          # Backup CHANGELOG with verification
-          if [ -f CHANGELOG.md ]; then
-            cp CHANGELOG.md CHANGELOG.md.backup
-            if ! cmp -s CHANGELOG.md CHANGELOG.md.backup; then
-              echo "Error: CHANGELOG backup failed"
-              exit 1
-            fi
-          fi
-
-          # Run version command
-          npx lerna version --yes || {
-            echo "Version command failed"
-            [ -f CHANGELOG.md.backup ] && mv CHANGELOG.md.backup CHANGELOG.md
-            exit 1
-          }
-
-          # Verify CHANGELOG was updated
-          if [ ! -f CHANGELOG.md ]; then
-            echo "Error: CHANGELOG.md is missing after version command"
-            [ -f CHANGELOG.md.backup ] && mv CHANGELOG.md.backup CHANGELOG.md
-            exit 1
-          fi
-
-          # Verify git tags
-          LATEST_TAG=$(git describe --tags --abbrev=0)
-          if [ -z "$LATEST_TAG" ]; then
-            echo "Error: No tags found after version command"
-            [ -f CHANGELOG.md.backup ] && mv CHANGELOG.md.backup CHANGELOG.md
-            exit 1
-          fi
-
-          # Publish to npm
-          npx lerna publish from-package --yes || {
-            echo "Publish command failed"
-            git tag -d $LATEST_TAG
-            [ -f CHANGELOG.md.backup ] && mv CHANGELOG.md.backup CHANGELOG.md
-            exit 1
-          }
-
-          # Cleanup backup only if everything succeeded
-          [ -f CHANGELOG.md.backup ] && rm CHANGELOG.md.backup
-        env:
-          NPM_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-
-  lighthouse:
-    runs-on: ubuntu-latest
-    needs: lerna-publish
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.16.0'
-          cache: 'npm'
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
       - name: Install dependencies
         run: npm ci
@@ -144,38 +37,27 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Start static server
+      - name: Version and Publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          npx serve dist -s &
-          SERVER_PID=$!
+          git pull origin main
+          npx lerna version --yes
+          git push origin main --follow-tags
+          npx lerna publish from-package --yes
 
-          # Wait for server with timeout
-          COUNTER=0
-          until curl -s http://localhost:3000 >/dev/null || [ $COUNTER -eq 30 ]; do
-            echo "Waiting for server... (${COUNTER}/30)"
-            sleep 1
-            ((COUNTER++))
-          done
+  lighthouse:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-          if [ $COUNTER -eq 30 ]; then
-            echo "Server failed to start within 30 seconds"
-            kill $SERVER_PID
-            exit 1
-          fi
-
-          echo "Server is ready!"
-
-      - name: Run Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v9
+      - name: Audit URLs using Lighthouse
+        uses: treosh/lighthouse-ci-action@v10
         with:
-          configPath: './lighthouserc.json'
+          urls: |
+            https://acamae.es
           uploadArtifacts: true
           temporaryPublicStorage: true
-        continue-on-error: true
-
-      - name: Save results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: lighthouse-results
-          path: .lighthouseci
+          configPath: './lighthouserc.json'
