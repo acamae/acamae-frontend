@@ -55,7 +55,7 @@
           }
         ]
       },
-      "allowBranch": ["main"],
+      "allowBranch": ["release"],
       "ignoreChanges": [
         "**/*.md",
         "**/test/**",
@@ -75,7 +75,7 @@
       "conventionalCommits": true,
       "createRelease": "github",
       "message": "chore(release): %s [skip ci]",
-      "allowBranch": ["main"],
+      "allowBranch": ["release"],
       "ignoreChanges": ["**/*.md", "**/test/**", "**/tests/**", "**/__tests__/**", "**/coverage/**"]
     }
   }

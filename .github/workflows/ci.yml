@@ -15,12 +15,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node-version: [22]
+  ci-all:
+    runs-on: ubuntu-latest
+    environment: development
     steps:
       - uses: actions/checkout@v4
       - name: Install GNU coreutils (for sha256sum)
@@ -31,64 +28,28 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+
+      # VALIDATE
       - run: node scripts/validate-critical-config.js
       - run: node scripts/validate-workflows.js
 
-  lint:
-    needs: validate
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node-version: [22]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install GNU coreutils (for sha256sum)
-        if: runner.os == 'macOS'
-        run: brew install coreutils
-      - name: Setup environment
-        uses: ./.github/actions/setup-env
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+      # LINT
       - run: npm run lint:fix
       - run: npm run lint
 
-  test:
-    needs: lint
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node-version: [22]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install GNU coreutils (for sha256sum)
-        if: runner.os == 'macOS'
-        run: brew install coreutils
-      - name: Setup environment
-        uses: ./.github/actions/setup-env
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+      # BUILD
       - run: npm run build
-      - run: npm run test:coverage
-      - run: npm run check:coverage
 
-  version:
-    if: github.ref == 'refs/heads/main'
-    needs: [test, lint]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install GNU coreutils (for sha256sum)
-        if: runner.os == 'macOS'
-        run: brew install coreutils
-      - name: Setup environment
-        uses: ./.github/actions/setup-env
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-          setup-git-identity: 'true'
-      - run: npx lerna version --no-push --yes
-      - run: git push --follow-tags
+      # SONARQUBE
+      - name: Test and coverage
+        run: npm run test:coverage
+      - name: Check coverage
+        run: npm run check:coverage
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: read

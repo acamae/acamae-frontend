@@ -85,7 +85,7 @@ class WorkflowValidator {
   validateSecurity() {
     const jobs = this.content.jobs || {};
 
-    // Validar tokens
+    // Validate tokens
     Object.entries(jobs).forEach(([jobName, job]) => {
       const steps = job.steps || [];
       steps.forEach((step, index) => {
@@ -102,7 +102,7 @@ class WorkflowValidator {
           }
         }
 
-        // Validar tokens en los pasos de la acción compuesta
+        // Validate tokens in composite action steps
         const compositeSteps = this.getCompositeActionSteps(step);
         compositeSteps.forEach((compositeStep, compositeIndex) => {
           if (compositeStep.with?.token) {
@@ -120,7 +120,7 @@ class WorkflowValidator {
         });
       });
 
-      // Validar permisos
+      // Validate permissions
       if (!job.permissions) {
         this.warnings.push(`Job "${jobName}": Missing explicit permissions`);
       } else {
@@ -143,13 +143,13 @@ class WorkflowValidator {
       const steps = job.steps || [];
       let allSteps = [];
 
-      // Recolectar todos los pasos, incluyendo los de acciones compuestas
+      // Collect all steps, including composite actions
       steps.forEach(step => {
         allSteps.push(step);
         allSteps = allSteps.concat(this.getCompositeActionSteps(step));
       });
 
-      // Validar configuración de Node.js
+      // Validate Node.js configuration
       const nodeSetup = allSteps.find(step => step.name?.includes('Setup Node.js'));
       if (nodeSetup) {
         VALIDATION_RULES.configuration.nodeSetup.required.forEach(prop => {
@@ -169,7 +169,7 @@ class WorkflowValidator {
         );
       }
 
-      // Validar secuencia de pasos
+      // Validate step sequence
       const stepNames = allSteps.map(step => step.name);
       const requiredSteps = VALIDATION_RULES.configuration.npmConfig.requiredSteps;
       const missingSteps = requiredSteps.filter(
@@ -182,7 +182,7 @@ class WorkflowValidator {
         });
       }
 
-      // Validar orden de los pasos
+      // Validate step order
       const sequence = VALIDATION_RULES.configuration.npmConfig.sequence;
       let lastFoundIndex = -1;
       sequence.forEach(stepName => {
@@ -236,7 +236,7 @@ class WorkflowValidator {
     Object.entries(jobs).forEach(([jobName, job]) => {
       const steps = job.steps || [];
       steps.forEach((step, index) => {
-        if (step.uses?.includes('setup-env')) return; // Ignorar la acción compuesta
+        if (step.uses?.includes('setup-env')) return; // Ignore composite action
 
         const signature = JSON.stringify({
           name: step.name,
@@ -262,12 +262,29 @@ class WorkflowValidator {
     });
   }
 
+  validateCoverageSteps() {
+    const jobs = this.content.jobs || {};
+    const coverageSteps = ['npm run test:coverage', 'npm run check:coverage'];
+    Object.entries(jobs).forEach(([jobName, job]) => {
+      const steps = job.steps || [];
+      steps.forEach(step => {
+        if (coverageSteps.includes(step.run)) {
+          if (jobName !== 'sonarqube' && jobName !== 'ci-all') {
+            this.errors.push(
+              `Coverage step '${step.run}' debe estar solo en el job 'sonarqube' o 'ci-all' (actual: ${jobName})`
+            );
+          }
+        }
+      });
+    });
+  }
+
   validate() {
     this.validateSecurity();
     this.validateConfiguration();
     this.validateLogic();
     this.findDuplicates();
-
+    this.validateCoverageSteps();
     return {
       file: path.basename(this.workflowPath),
       passed: this.errors.length === 0,
@@ -275,6 +292,60 @@ class WorkflowValidator {
       warnings: this.warnings,
       suggestions: this.suggestions,
     };
+  }
+}
+
+function checkVersioningSteps(workflowFile, jobs) {
+  const versioningPatterns = [/lerna version/, /lerna publish/, /git push --follow-tags/];
+  let foundVersioning = false;
+  Object.entries(jobs).forEach(([_jobName, job]) => {
+    const steps = job.steps || [];
+    steps.forEach(step => {
+      const runCmd = step.run || '';
+      versioningPatterns.forEach(pattern => {
+        if (pattern.test(runCmd)) {
+          foundVersioning = true;
+          if (workflowFile !== 'release.yml') {
+            throw new Error(`Versioning/publishing command found in ${workflowFile}: ${runCmd}`);
+          }
+        }
+      });
+    });
+  });
+  if (workflowFile === 'release.yml' && !foundVersioning) {
+    console.warn('⚠️  No versioning/publishing steps found in release.yml');
+  }
+}
+
+function checkSonarCloudStep(workflowFile, jobs) {
+  if (workflowFile === 'ci.yml') {
+    let foundSonar = false;
+    Object.entries(jobs).forEach(([_jobName, job]) => {
+      const steps = job.steps || [];
+      steps.forEach(step => {
+        if (step.uses && step.uses.includes('SonarSource/sonarqube-scan-action')) {
+          foundSonar = true;
+        }
+      });
+    });
+    if (!foundSonar) {
+      console.warn('💡 Suggestion: SonarQube scan step not found in ci.yml');
+    }
+  }
+}
+
+function checkLighthouseJob(workflowFile, jobs) {
+  if (workflowFile !== 'lighthouse.yml') {
+    Object.entries(jobs).forEach(([_jobName, job]) => {
+      const steps = job.steps || [];
+      steps.forEach(step => {
+        if (step.uses && step.uses.includes('treosh/lighthouse-ci-action')) {
+          console.warn(
+            `💡 Suggestion: Lighthouse job found in ${workflowFile}, consider moving to lighthouse.yml`
+          );
+        }
+      });
+    });
   }
 }
 
@@ -288,10 +359,18 @@ function validateAllWorkflows() {
   const results = workflowFiles.map(file => {
     const workflowPath = path.join(WORKFLOW_DIR, file);
     const validator = new WorkflowValidator(workflowPath);
+    // Custom checks for versioning, SonarCloud, Lighthouse
+    try {
+      checkVersioningSteps(file, validator.content.jobs || {});
+    } catch (err) {
+      validator.errors.push(err.message);
+    }
+    checkSonarCloudStep(file, validator.content.jobs || {});
+    checkLighthouseJob(file, validator.content.jobs || {});
     return validator.validate();
   });
 
-  // Imprimir resultados
+  // Print results
   results.forEach(result => {
     console.log(`\n📄 ${result.file}`);
     console.log('-------------------');
@@ -316,7 +395,7 @@ function validateAllWorkflows() {
     }
   });
 
-  // Salir con error si hay errores en algún workflow
+  // Exit with error if there are errors in any workflow
   const hasErrors = results.some(result => !result.passed);
   if (hasErrors) {
     process.exit(1);
