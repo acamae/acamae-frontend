@@ -17,6 +17,7 @@ concurrency:
 jobs:
   validate:
     runs-on: ${{ matrix.os }}
+    environment: development
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -37,6 +38,7 @@ jobs:
   lint:
     needs: validate
     runs-on: ${{ matrix.os }}
+    environment: development
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -57,6 +59,7 @@ jobs:
   test:
     needs: lint
     runs-on: ${{ matrix.os }}
+    environment: development
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -74,21 +77,10 @@ jobs:
       - run: npm run build
       - run: npm run test:coverage
       - run: npm run check:coverage
-
-  version:
-    if: github.ref == 'refs/heads/main'
-    needs: [test, lint]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install GNU coreutils (for sha256sum)
-        if: runner.os == 'macOS'
-        run: brew install coreutils
-      - name: Setup environment
-        uses: ./.github/actions/setup-env
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-          setup-git-identity: 'true'
-      - run: npx lerna version --no-push --yes
-      - run: git push --follow-tags
+          projectBaseDir: .
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

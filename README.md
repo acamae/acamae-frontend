@@ -7,6 +7,33 @@ Designed for accessibility, internationalization, and maintainability.
 
 ---
 
+## Quick Start for New Developers
+
+- **Branching & Release Strategy:**
+  - `main`: Protected. All development is merged here via Pull Request (PR) after passing CI and review.
+  - `release`: All versioning, tagging, and publishing is automated here. To create a release, merge `main` into `release`.
+  - `feature/*`, `fix/*`: For new features and bugfixes. Open PRs to `main`.
+- **CI/CD & Quality Gates:**
+  - CI runs on all pushes and PRs to `main`, `feature/*`, and `fix/*` (see below for details).
+  - Release workflow runs only on `release` branch and automates versioning, tagging, and publishing.
+  - SonarCloud and Lighthouse are integrated for code quality and performance audits.
+- **Environments & Secrets:**
+  - Use the `development` environment for secrets like `SONAR_TOKEN`.
+  - Jobs specify `environment: development` to access these secrets.
+- **How to Release:**
+  1. Develop and merge to `main` via PR.
+  2. When ready to release, merge `main` into `release`.
+  3. The `release` workflow will build, version, tag, and publish automatically.
+- **Useful Commands:**
+  - `npm run dev` – Start local dev server
+  - `npm run lint` – Lint code
+  - `npm run test` – Run unit tests
+  - `npm run test:coverage` – Run tests with coverage
+  - `npm run docker-start` – Start with Docker (dev)
+  - `npm run docker-prod` – Start with Docker (prod)
+
+---
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -162,24 +189,25 @@ npm run update:snapshots
 
 #### GitHub Actions
 
-- **CI general (`ci.yml`)**: Se ejecuta en todas las ramas y PRs. Valida el código con linter (auto-fix y estricto), build, tests unitarios y cobertura. Sube los reportes de cobertura como artefacto.
-- **Release & Lighthouse (`publish-and-lighthouse.yml`)**: Solo en `main`. Versiona y publica automáticamente con Lerna usando Conventional Commits, sube el paquete a GitHub Packages y audita el build con Lighthouse CI. Los resultados de Lighthouse se suben como artefacto y no bloquean el flujo de publicación.
+- **CI (`ci.yml`)**: Runs on all pushes and PRs to `main`, `feature/*`, and `fix/*`. Validates code with linter (auto-fix and strict), build, unit tests, coverage, and SonarCloud analysis.
+- **Release (`release.yml`)**: Runs only on `release` branch. Automates versioning, tagging, and publishing with Lerna using Conventional Commits. Only `release` branch is allowed for versioning/publishing.
+- **Lighthouse (`lighthouse.yml`)**: Runs after CI on `main`. Audits performance, accessibility, and best practices. Uploads Lighthouse reports as artifacts and creates issues on regression.
 
 #### Husky + lint-staged
 
 - **Pre-commit**:
-  - Salta automáticamente en commits de versionado de Lerna (detectando `[skip ci]` en el mensaje).
-  - Chequeo de tipos con TypeScript (`tsc --noEmit`).
-  - Ejecuta tests unitarios solo en los archivos staged relevantes.
-  - Linter y formateo automático en los archivos staged mediante lint-staged (ESLint y Prettier).
-  - Si queda algún error tras el auto-fix, el commit es bloqueado.
-- **Commit-msg**: Valida que todos los mensajes de commit sigan el estándar Conventional Commits usando commitlint.
+  - Skips automatically on Lerna versioning commits (detects `[skip ci]` in the message).
+  - Type checking with TypeScript (`tsc --noEmit`).
+  - Runs unit tests only on staged files.
+  - Linter and auto-formatting on staged files via lint-staged (ESLint and Prettier).
+  - If any error remains after auto-fix, the commit is blocked.
+- **Commit-msg**: Validates that all commit messages follow Conventional Commits using commitlint.
 
 #### Other best practices
 
 - `.gitattributes` and `.prettierrc` enforce LF line endings to avoid cross-platform issues.
 - Workflows are separated for clarity and efficiency.
-- Main branch protection: only publishes and audits on `main` after all quality checks pass.
+- Main branch protection: only PRs to `main`, no direct pushes, all checks must pass.
 
 ---
 
@@ -195,6 +223,26 @@ npm run update:snapshots
 ```
 npm run docker-prod
 ```
+
+---
+
+## SonarCloud & Code Quality
+
+- **SonarCloud**: Static code analysis, code smells, coverage, and security.
+  - Configured via `sonar-project.properties`.
+  - Requires `SONAR_TOKEN` in the `development` environment.
+  - Automatically runs in CI after tests and coverage.
+- **Coverage**: Minimum 90% enforced. Reports generated with Jest and uploaded to SonarCloud.
+- **Lighthouse**: Performance and accessibility audits after each CI on `main`.
+
+---
+
+## Further Reading
+
+- [SonarCloud Documentation](https://sonarcloud.io/documentation)
+- [Lerna Documentation](https://lerna.js.org/)
+- [Conventional Commits](https://www.conventionalcommits.org/)
+- [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci)
 
 ---
 
