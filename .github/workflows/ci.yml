@@ -56,7 +56,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-          timeout-minutes: 15
 
       - name: Run linter with --fix
         run: npm run lint:fix
@@ -89,7 +88,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-          timeout-minutes: 15
 
       - name: Run build
         run: npm run build

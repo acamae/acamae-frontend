@@ -41,7 +41,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
           setup-git-identity: true
-          timeout-minutes: 15
 
       - name: Build
         id: build
@@ -94,7 +93,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-          timeout-minutes: 15
 
       - name: Build
         run: npm run build
