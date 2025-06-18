@@ -8,10 +8,18 @@ on:
     branches:
       - main
 
+# Ensure that no multiple workflows are executed for the same PR/push
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check-and-publish:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: write
       packages: write
@@ -19,17 +27,30 @@ jobs:
       issues: write
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Setup environment
         uses: ./.github/actions/setup-env
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-          setup-git-identity: 'true'
+          setup-git-identity: true
+          timeout-minutes: 15
 
       - name: Build
-        run: npm run build
+        id: build
+        run: |
+          npm run build
+          echo "build_status=$?" >> $GITHUB_OUTPUT
 
       - name: Version and Publish
+        if: steps.build.outputs.build_status == '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
@@ -39,25 +60,54 @@ jobs:
           git push origin main --follow-tags
           npx lerna publish from-package --yes
 
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Publication failed',
+              body: `The publication workflow failed in the commit ${context.sha}.\n\nPlease review the logs for more details.`
+            });
+
   lighthouse:
     needs: check-and-publish
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       packages: read
       pull-requests: write # In order to comment in PRs if there are errors
-
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Setup environment
         uses: ./.github/actions/setup-env
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+          timeout-minutes: 15
 
       - name: Build
         run: npm run build
 
-      - name: Audit URLs using Lighthouse
+      - name: Start local server
+        id: server
+        run: |
+          npx serve dist -s &
+          echo "server_pid=$!" >> $GITHUB_OUTPUT
+          echo "Waiting for server to be ready..."
+          timeout 30s bash -c 'until curl -s http://localhost:3000 > /dev/null; do sleep 1; done' || (echo "Server failed to start" && exit 1)
+
+      - name: Run Lighthouse CI
         uses: treosh/lighthouse-ci-action@v10
         with:
           configPath: './lighthouserc.json'
@@ -71,3 +121,20 @@ jobs:
           name: lighthouse-results
           path: .lighthouseci
           retention-days: 7
+
+      - name: Stop local server
+        if: always() && steps.server.outputs.server_pid
+        run: kill ${{ steps.server.outputs.server_pid }} || true
+
+      - name: Notify on performance regression
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '📉 Regression detected',
+              body: `A performance regression has been detected in the commit ${context.sha}.\n\nPlease review the Lighthouse report for more details.`,
+              labels: ['performance', 'regression']
+            });

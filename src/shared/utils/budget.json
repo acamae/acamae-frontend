@@ -6,15 +6,33 @@
     "seo": 90
   },
   "metrics": {
-    "largest-contentful-paint": [2500, 4000],
-    "first-input-delay": [100, 300],
-    "cumulative-layout-shift": [0.1, 0.25],
-    "first-contentful-paint": [1800, 3000],
-    "interactive": [3800, 7300],
-    "total-blocking-time": [200, 600],
-    "speed-index": [3400, 5800]
+    "largest-contentful-paint": [2000, 2500],
+    "first-input-delay": [80, 100],
+    "cumulative-layout-shift": [0.05, 0.1],
+    "first-contentful-paint": [1500, 1800],
+    "interactive": [3000, 3800],
+    "total-blocking-time": [150, 200],
+    "speed-index": [2800, 3400]
   },
   "timing": {
-    "server-response-time": 600
+    "server-response-time": 300,
+    "first-byte": 800,
+    "interactive": 3800,
+    "complete": 5000
+  },
+  "resourceSizes": {
+    "script": [250, 300],
+    "image": [100, 200],
+    "stylesheet": [50, 75],
+    "font": [75, 100],
+    "total": [500, 750]
+  },
+  "resourceCounts": {
+    "script": [10, 15],
+    "image": [15, 25],
+    "stylesheet": [3, 5],
+    "font": [3, 4],
+    "third-party": [5, 10],
+    "total": [40, 60]
   }
 }

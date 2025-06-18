@@ -1,6 +1,5 @@
 export default {
   rootDir: '.',
-  cwd: process.cwd(),
   preset: 'ts-jest',
   testEnvironment: 'jest-fixed-jsdom',
   verbose: true,

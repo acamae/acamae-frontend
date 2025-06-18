@@ -10,20 +10,56 @@ on:
     branches:
       - main
 
+# Ensure that no multiple workflows are executed for the same PR/push
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build-lint-test:
+  validate:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: read
       pull-requests: write # Para poder comentar en PRs si hay fallos
-
     steps:
       - name: Setup environment
         uses: ./.github/actions/setup-env
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate critical configurations
+        run: node scripts/validate-critical-config.js
+
+      - name: Validate workflows
+        run: node scripts/validate-workflows.js
+
+  lint:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+          timeout-minutes: 15
 
       - name: Run linter with --fix
         run: npm run lint:fix
@@ -31,13 +67,39 @@ jobs:
       - name: Run linter (fail on remaining errors)
         run: npm run lint
 
+  test:
+    needs: validate
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node-version: [18, 20, 22]
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+          timeout-minutes: 15
+
       - name: Run build
         run: npm run build
 
       - name: Run tests with coverage
-        run: |
-          npm run test:coverage
-          ls -la coverage/
+        run: npm run test:coverage
 
       - name: Check coverage thresholds
         run: npm run check:coverage
@@ -46,19 +108,35 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: coverage-report
+          name: coverage-report-${{ matrix.os }}-node-${{ matrix.node-version }}
           path: ./coverage
           retention-days: 7
 
+  test-summary:
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+      - name: Check test matrix status
+        run: |
+          if [ "${{ needs.test.result }}" != "success" ]; then
+            echo "::error::Test matrix failed"
+            exit 1
+          fi
+
   version:
-    needs: build-lint-test
+    needs: [test-summary, lint]
     if: ${{ github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature/') || startsWith(github.ref, 'refs/heads/fix/')) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
       pull-requests: write
-
     steps:
       - name: Setup environment
         uses: ./.github/actions/setup-env
