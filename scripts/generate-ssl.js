@@ -8,12 +8,12 @@ const __dirname = dirname(__filename);
 
 const targetDir = path.join(__dirname, '../docker/ssl');
 
-// Crear el directorio de destino si no existe
+// Create the target directory if it doesn't exist
 if (!fs.existsSync(targetDir)) {
   fs.mkdirSync(targetDir, { recursive: true });
 }
 
-// Función para verificar si OpenSSL está instalado
+// Function to check if OpenSSL is installed
 function isOpenSSLInstalled() {
   try {
     execSync('openssl version', { stdio: 'ignore' });
@@ -23,18 +23,18 @@ function isOpenSSLInstalled() {
   }
 }
 
-// Función para generar certificados usando OpenSSL
+// Function to generate certificates using OpenSSL
 function generateCertificates() {
   try {
     console.log('Generando certificados SSL...');
 
-    // Comando compatible con Windows, Linux y macOS
+    // Command compatible with Windows, Linux and macOS
     const command =
       process.platform === 'win32'
         ? 'openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout selfsigned.key -out selfsigned.crt -subj "//CN=localhost"'
         : 'openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout selfsigned.key -out selfsigned.crt -subj "/CN=localhost"';
 
-    // Ejecutar el comando en el directorio de destino
+    // Execute the command in the target directory
     execSync(command, {
       cwd: targetDir,
       stdio: 'inherit',
@@ -47,7 +47,7 @@ function generateCertificates() {
   }
 }
 
-// Función principal
+// Main function
 function main() {
   if (!isOpenSSLInstalled()) {
     console.error('OpenSSL no está instalado. Por favor, instala OpenSSL:');

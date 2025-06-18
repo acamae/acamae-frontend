@@ -1,5 +1,6 @@
 export default {
   rootDir: '.',
+  cwd: process.cwd(),
   preset: 'ts-jest',
   testEnvironment: 'jest-fixed-jsdom',
   verbose: true,
@@ -34,7 +35,8 @@ export default {
   restoreMocks: true,
   moduleDirectories: ['node_modules'],
   coverageDirectory: 'coverage',
-  coverageReporters: ['text', 'lcov'],
+  coveragePathIgnorePatterns: ['/node_modules/'],
+  coverageReporters: ['text', 'lcov', ['json-summary', { file: 'coverage-summary.json' }]],
   coverageThreshold: {
     global: {
       branches: 90,

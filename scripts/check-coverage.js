@@ -5,14 +5,17 @@ import * as path from 'path';
 const summaryPath = path.resolve('coverage/coverage-summary.json');
 const threshold = 90;
 
+// Check if the coverage summary file exists
 if (!fs.existsSync(summaryPath)) {
   console.error('❌ No se encontró coverage-summary.json. ¿Ejecutaste "npm run test"?');
   exit(1);
 }
 
+// Read the coverage summary file
 const content = fs.readFileSync(summaryPath, 'utf-8');
 const { total } = JSON.parse(content);
 
+// Calculate the coverage results
 const results = {
   statements: total.statements.pct,
   branches: total.branches.pct,
@@ -20,8 +23,10 @@ const results = {
   lines: total.lines.pct,
 };
 
+// Check if the coverage meets the threshold
 const meetsThreshold = Object.values(results).every(value => value >= threshold);
 
+// If the coverage does not meet the threshold, exit with an error
 if (!meetsThreshold) {
   console.error(`\n❌ La cobertura total no alcanza el umbral del ${threshold}%`);
   console.error('Cobertura actual:');
