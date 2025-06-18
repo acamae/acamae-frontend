@@ -1,7 +1,7 @@
 ---
-description: Generar commit messages
+description:
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 # Commit Message Guidelines
 
