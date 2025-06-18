@@ -3,6 +3,8 @@
 Modern React application for professional esports management.
 Designed for accessibility, internationalization, and maintainability.
 
+![coverage](https://img.shields.io/badge/coverage-90%25-green) [![CI](https://github.com/acamae/acamae-frontend/actions/workflows/ci.yml/badge.svg)](https://github.com/acamae/acamae-frontend/actions/workflows/ci.yml) ![GitHub Release](https://img.shields.io/github/v/release/acamae/acamae-frontend) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/acamae/acamae-frontend/blob/main/LICENSE)
+
 ---
 
 ## Table of Contents
