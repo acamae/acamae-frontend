@@ -2,9 +2,8 @@ name: CI
 
 on:
   push:
-    branches:
-      - 'feature/**'
-      - 'fix/**'
+    branches-ignore:
+      - main
   pull_request:
     types: [opened, synchronize, reopened]
     branches:
@@ -130,8 +129,8 @@ jobs:
           fi
 
   version:
+    if: github.ref == 'refs/heads/main'
     needs: [test-summary, lint]
-    if: ${{ github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature/') || startsWith(github.ref, 'refs/heads/fix/')) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write

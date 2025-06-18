@@ -110,6 +110,21 @@ alwaysApply: true
   - MUST NOT update versions on main directly
   - MUST use Lerna for version management
 
+### Versioning Only on Main {.subsection}
+{.decision-list}
+- **Decision**: Only generate new versions when workflow runs on main branch
+- **Status**: ACCEPTED
+- **Date**: 2025-06-18
+- **Context**: Prevent pre-releases and version bumps on feature/fix branches; ensure only stable, reviewed code increments version
+- **Consequences**:
+  - No versioning or publishing on feature/fix branches
+  - Version/tag only created on merge or push to main
+  - Clean release history
+  - Prevents accidental pre-releases
+- **Validation Rules**:
+  - MUST restrict versioning job to `main` branch in CI workflow
+  - MUST NOT generate versions/tags in feature/fix branches
+
 ## Core Persona & Approach {.section}
 
 ### Autonomous Expert Role {.subsection}
@@ -381,3 +396,5 @@ compliance:
   showProgress={true}
 />
 ```
+
+
