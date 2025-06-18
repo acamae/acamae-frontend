@@ -105,6 +105,7 @@ jobs:
   sonarqube:
     needs: test
     name: SonarQube
+    environment: development
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
