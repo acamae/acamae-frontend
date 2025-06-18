@@ -25,6 +25,185 @@ alwaysApply: false
 - Accessibility (WCAG2.1)
 - Internationalization (i18n)
 
+## Analysis Framework {.section}
+
+### Multi-Level Analysis {.subsection}
+{.analysis-levels}
+1. **Surface Level**
+   - Syntax and structure validation
+   - Code style compliance
+   - Basic functionality checks
+   - Immediate error detection
+
+2. **Interaction Level**
+   - Tool interactions and dependencies
+   - Configuration overlaps
+   - Integration points
+   - Cross-component effects
+
+3. **System Level**
+   - Overall architecture impact
+   - Performance implications
+   - Security considerations
+   - Scalability effects
+
+### Configuration Analysis {.subsection}
+{.config-checklist}
+- Map all configuration sources and their relationships
+- Identify duplicate or conflicting settings
+- Verify configuration hierarchies
+- Document dependencies between configs
+- Check for redundant tool configurations
+- Validate environment-specific settings
+
+### Tool Interaction Matrix {.subsection}
+{.tool-matrix}
+```yaml
+analysis_points:
+  - tool_identification:
+      - List all tools involved
+      - Document version requirements
+      - Map tool dependencies
+  - configuration_mapping:
+      - Locate all config files
+      - Identify shared settings
+      - Document override patterns
+  - interaction_patterns:
+      - Tool execution order
+      - Data flow between tools
+      - Resource sharing
+      - Conflict potential
+```
+
+## Root Cause Investigation {.section}
+
+### Investigation Protocol {.subsection}
+{.investigation-steps}
+1. **Question Assumptions**
+   - Challenge existing configurations
+   - Verify necessity of each component
+   - Question traditional approaches
+
+2. **Deep Dive Analysis**
+   - Examine tool interactions
+   - Review configuration layers
+   - Analyze historical changes
+   - Study similar patterns
+
+3. **Impact Assessment**
+   - Document direct effects
+   - Map indirect consequences
+   - Identify potential risks
+   - Plan mitigation strategies
+
+### Verification Framework {.subsection}
+{.verification-matrix}
+```yaml
+verification_levels:
+  component:
+    - Individual file correctness
+    - Syntax validation
+    - Style compliance
+  integration:
+    - Cross-tool compatibility
+    - Configuration consistency
+    - Resource management
+  system:
+    - Overall functionality
+    - Performance impact
+    - Security implications
+```
+
+## Solution Design {.section}
+
+### Design Principles {.subsection}
+{.design-principles}
+- Minimize configuration redundancy
+- Ensure single source of truth
+- Maintain clear dependency paths
+- Document all assumptions
+- Plan for failure scenarios
+- Consider scaling implications
+
+### Implementation Strategy {.subsection}
+{.implementation-steps}
+1. **Preparation**
+   - Document current state
+   - Map affected components
+   - Identify risk points
+   - Create backup strategy
+
+2. **Execution**
+   - Implement changes incrementally
+   - Validate each step
+   - Document modifications
+   - Track side effects
+
+3. **Verification**
+   - Test individual components
+   - Verify integrations
+   - Validate system behavior
+   - Check performance impact
+
+## Quality Assurance {.section}
+
+### Testing Protocol {.subsection}
+{.testing-matrix}
+```yaml
+test_levels:
+  unit:
+    - Component functionality
+    - Edge cases
+    - Error handling
+  integration:
+    - Tool interaction
+    - Configuration consistency
+    - Resource management
+  system:
+    - End-to-end functionality
+    - Performance metrics
+    - Security validation
+```
+
+### Validation Checklist {.subsection}
+{.validation-checklist}
+- [ ] Configuration consistency
+- [ ] Tool compatibility
+- [ ] Resource management
+- [ ] Error handling
+- [ ] Performance impact
+- [ ] Security implications
+- [ ] Documentation completeness
+
+## Error Prevention {.section}
+
+### Pre-execution Checklist {.subsection}
+{.execution-checklist}
+- [ ] Tool version verification
+- [ ] Configuration validation
+- [ ] Dependency check
+- [ ] Resource availability
+- [ ] Backup verification
+- [ ] Rollback capability
+
+### Risk Assessment {.subsection}
+{.risk-matrix}
+```yaml
+risk_categories:
+  configuration:
+    - Duplicate settings
+    - Conflicting values
+    - Missing dependencies
+  integration:
+    - Tool conflicts
+    - Resource contention
+    - Version mismatches
+  operation:
+    - Performance impact
+    - Security vulnerabilities
+    - Data integrity
+```
+
 ## Project-Specific Guidelines {.section}
 
 ### Architecture Compliance {.subsection}
@@ -180,32 +359,11 @@ describe('API Tests', () => {
 - i18n verification
 - Test coverage analysis
 
-## Error Prevention {.section}
-
-### Pre-execution Checklist {.subsection}
-{.execution-checklist}
-- [ ] Tool version verification
-- [ ] Path validation
-- [ ] Side effect analysis
-- [ ] Rollback capability
-- [ ] Resource availability
-- [ ] Security implications
-- [ ] Performance impact
-
-### Response Validation {.subsection}
-{.response-checklist}
-- [ ] Code compilation
-- [ ] Test execution
-- [ ] Linting checks
-- [ ] Type verification
-- [ ] Security scan
-- [ ] Performance check
-
 {.metadata}
 ```yaml
-version: 2.0.0
+version: 3.0.0
 author: AI Assistant
-last_updated: 2024-03-20
+last_updated: 2024-03-21
 format: MDC
 schema_version: 1.0
 compliance:
@@ -241,37 +399,52 @@ compliance:
   margin-top: 1em;
 }
 
-.code-block {
-  background: #f8f9fa;
+.matrix {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5em;
   padding: 1em;
+  background: #f8f9fa;
   border-radius: 4px;
-  margin: 1em 0;
 }
 
-.validation-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1em;
-  padding: 1em;
+.steps {
+  counter-reset: step;
+  list-style-type: none;
+  padding-left: 2em;
+}
+
+.steps li::before {
+  counter-increment: step;
+  content: counter(step);
+  color: #fff;
+  background: #3498db;
+  border-radius: 50%;
+  width: 1.5em;
+  height: 1.5em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.5em;
 }
 ```
 
 {.components}
 ```jsx
-<CheckList
-  items={checklistItems}
-  onComplete={handleComplete}
-  validateItem={validateChecklistItem}
+<AnalysisMatrix
+  levels={analysisLevels}
+  onLevelComplete={handleLevelComplete}
+  validateLevel={validateAnalysisLevel}
 />
 
-<CodeBlock
-  language="typescript"
-  content={codeContent}
-  highlight={true}
+<ConfigurationValidator
+  configs={configFiles}
+  onValidate={handleConfigValidation}
+  showDependencies={true}
 />
 
-<ValidationList
-  items={validationItems}
-  onValidate={handleValidation}
-  showProgress={true}
+<RiskAssessment
+  categories={riskCategories}
+  onRiskIdentified={handleRisk}
+  threshold={riskThreshold}
 />
