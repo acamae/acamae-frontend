@@ -1,6 +1,6 @@
 {
   "packages": ["."],
-  "version": "0.10.6",
+  "version": "0.10.7",
   "npmClient": "npm",
   "command": {
     "publish": {
@@ -13,16 +13,46 @@
         "infile": "CHANGELOG.md",
         "header": "# Change Log\n\nAll notable changes to this project will be documented in this file.\nSee [Conventional Commits](https://conventionalcommits.org) for commit guidelines.\n\n",
         "types": [
-          {"type": "feat", "section": "Features"},
-          {"type": "fix", "section": "Bug Fixes"},
-          {"type": "docs", "section": "Documentation"},
-          {"type": "style", "section": "Styles"},
-          {"type": "refactor", "section": "Code Refactoring"},
-          {"type": "perf", "section": "Performance Improvements"},
-          {"type": "test", "section": "Tests"},
-          {"type": "build", "section": "Build System"},
-          {"type": "ci", "section": "Continuous Integration"},
-          {"type": "chore", "section": "Chores"}
+          {
+            "type": "feat",
+            "section": "Features"
+          },
+          {
+            "type": "fix",
+            "section": "Bug Fixes"
+          },
+          {
+            "type": "docs",
+            "section": "Documentation"
+          },
+          {
+            "type": "style",
+            "section": "Styles"
+          },
+          {
+            "type": "refactor",
+            "section": "Code Refactoring"
+          },
+          {
+            "type": "perf",
+            "section": "Performance Improvements"
+          },
+          {
+            "type": "test",
+            "section": "Tests"
+          },
+          {
+            "type": "build",
+            "section": "Build System"
+          },
+          {
+            "type": "ci",
+            "section": "Continuous Integration"
+          },
+          {
+            "type": "chore",
+            "section": "Chores"
+          }
         ]
       },
       "allowBranch": ["main"],
