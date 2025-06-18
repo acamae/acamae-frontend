@@ -1,7 +1,7 @@
 ---
 description:
 globs:
-alwaysApply: true
+alwaysApply: false
 ---
 # AI Assistant Core Configuration {.title}
 
@@ -275,4 +275,3 @@ compliance:
   onValidate={handleValidation}
   showProgress={true}
 />
-```
