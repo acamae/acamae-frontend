@@ -280,3 +280,11 @@ npm run docker-prod
 ## License
 
 [MIT](LICENSE)
+
+## 🛠️ Herramientas y Tecnologías
+
+- **Frontend**: React, TypeScript, TailwindCSS
+- **Testing**: Jest, React Testing Library
+- **CI/CD**: GitHub Actions
+- **Calidad de Código**: SonarCloud
+- **Gestión de Paquetes**: NPM, Lerna

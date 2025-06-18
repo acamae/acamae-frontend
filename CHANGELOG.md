@@ -188,3 +188,9 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Features
 
 - **core:** first commit ([6228c35](https://github.com/acamae/acamae-frontend/commit/6228c350c4a964fe109a5b957c8f9f041dc50e48))
+
+## [Unreleased]
+
+### Removed
+
+- **ci:** Eliminado Lighthouse y su configuración relacionada para simplificar el pipeline
