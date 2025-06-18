@@ -22,16 +22,15 @@ jobs:
       packages: read
       pull-requests: write # Para poder comentar en PRs si hay fallos
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Setup environment
         uses: ./.github/actions/setup-env
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Validate critical configurations
         run: node scripts/validate-critical-config.js
 
@@ -52,7 +51,6 @@ jobs:
           submodules: recursive
           persist-credentials: true
           token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Setup environment
         uses: ./.github/actions/setup-env
         with:
@@ -67,7 +65,7 @@ jobs:
         run: npm run lint
 
   test:
-    needs: validate
+    needs: lint
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -86,7 +84,6 @@ jobs:
           submodules: recursive
           persist-credentials: true
           token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Setup environment
         uses: ./.github/actions/setup-env
         with:
@@ -112,10 +109,14 @@ jobs:
           retention-days: 7
 
   test-summary:
-    needs: test
+    needs: [test, lint]
     runs-on: ubuntu-latest
     if: always()
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Setup environment
         uses: ./.github/actions/setup-env
         with:
@@ -137,6 +138,10 @@ jobs:
       packages: write
       pull-requests: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Setup environment
         uses: ./.github/actions/setup-env
         with:
