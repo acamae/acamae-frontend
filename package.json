@@ -73,6 +73,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-fixed-jsdom": "^0.0.9",
+    "js-yaml": "^4.1.0",
     "lerna": "^8.2.2",
     "lint-staged": "^15.5.1",
     "mini-css-extract-plugin": "^2.9.2",
@@ -92,7 +93,8 @@
     "webpack": "^5.99.5",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.2.1"
+    "webpack-dev-server": "^5.2.1",
+    "yaml-lint": "^1.7.0"
   },
   "scripts": {
     "env:dev": "cross-env NODE_ENV=development",
@@ -127,7 +129,10 @@
     "depcruise:kpi": "node scripts/depcruise-kpi.js",
     "generate-ssl": "node ./scripts/generate-ssl.js",
     "postinstall": "node ./scripts/generate-ssl.js",
-    "release": "lerna publish --yes"
+    "release": "lerna publish --yes",
+    "validate:workflows": "node scripts/validate-workflows.js",
+    "validate:config": "node scripts/validate-critical-config.js",
+    "validate": "npm run validate:config && npm run validate:workflows"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -136,6 +141,9 @@
     ],
     "*.{json,css,md}": [
       "prettier --write"
+    ],
+    "*": [
+      "npm run validate:config"
     ]
   },
   "config": {

@@ -1,40 +1,78 @@
 ---
-description: Generar commit messages
-globs: 
-alwaysApply: false
+description:
+globs:
+alwaysApply: true
 ---
-**Commit Message Guidelines**
+# Commit Message Guidelines
 
-* **Format**:
-  ```
-  type(scope): concise description
+## Format
+```
+type(scope): concise description
 
-  - Optional bullet points for details
-  ```
+- Optional bullet points for details
+```
 
-* **Types**:
-  - `feat`: New feature
-  - `fix`: Bug fix
-  - `docs`: Documentation changes
-  - `style`: Code style changes (formatting, etc)
-  - `refactor`: Code changes that neither fix bugs nor add features
-  - `test`: Adding or modifying tests
-  - `chore`: Changes to build process, tools, etc
+## Critical Rules
+- ⚠️ **Header Length**: Must not exceed 100 characters (type + scope + description)
+- Use imperative mood ("add" not "added")
+- No period at the end
+- Scope is optional but recommended
 
-* **Rules**:
-  - Keep first line under 100 characters
-  - Use imperative mood ("add" not "added")
-  - No period at the end
-  - Scope is optional but recommended
-  - Bullet points should be under 100 characters
-  - Prefer single-line messages when possible
-  - Use English for all messages
+## Types
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc)
+- `refactor`: Code changes that neither fix bugs nor add features
+- `test`: Adding or modifying tests
+- `chore`: Changes to build process, tools, etc
+- `ci`: Changes to CI configuration files and scripts
 
-* **Examples**:
-  ```
-  feat(auth): add OpenAPI documentation for authentication endpoints
-  fix(api): handle null response in user service
-  docs(readme): update installation instructions
-  test(hooks): add unit tests for useAuth hook
-  refactor(store): simplify Redux middleware configuration
-  ```
+## Best Practices
+- Keep bullet points under 100 characters
+- Prefer single-line messages when possible
+- Use English for all messages
+- Break down large commits into smaller ones
+- Separate subject from body with a blank line
+
+## Examples
+✅ Good:
+```
+feat(auth): implement OAuth2 login flow
+fix(api): handle null responses in user service
+docs(readme): update installation steps
+test(hooks): add unit tests for useAuth hook
+refactor(store): simplify Redux middleware configuration
+```
+
+❌ Bad:
+```
+feat(authentication): implement comprehensive OAuth2 authentication flow with Google, Facebook, and Twitter providers including token refresh mechanism
+fix: fixed some bugs
+Updated stuff
+```
+
+## Common Errors
+1. **Header Too Long** (✖ header must not be longer than 100 characters)
+   - Bad: `feat(user-management): implement comprehensive user authentication system with email verification, password recovery, and two-factor authentication`
+   - Good: `feat(auth): implement user authentication system`
+
+2. **Missing Type**
+   - Bad: `update user service`
+   - Good: `fix(user): update service error handling`
+
+3. **Wrong Tense**
+   - Bad: `feat(api): added new endpoint`
+   - Good: `feat(api): add new endpoint`
+
+## Metadata
+```yaml
+version: 1.0.0
+last_updated: 2024-03-20
+author: AI Assistant
+category: conventions
+tags:
+  - git
+  - commits
+  - standards
+```

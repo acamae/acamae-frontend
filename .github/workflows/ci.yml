@@ -2,28 +2,60 @@ name: CI
 
 on:
   push:
-    branches:
-      - '**'
+    branches-ignore:
+      - main
   pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+# Ensure that no multiple workflows are executed for the same PR/push
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-lint-test:
+  validate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: write # Para poder comentar en PRs si hay fallos
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
         with:
-          node-version: 22
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@acamae'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+      - name: Validate critical configurations
+        run: node scripts/validate-critical-config.js
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Validate workflows
+        run: node scripts/validate-workflows.js
+
+  lint:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Run linter with --fix
         run: npm run lint:fix
@@ -31,48 +63,98 @@ jobs:
       - name: Run linter (fail on remaining errors)
         run: npm run lint
 
+  test:
+    needs: lint
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node-version: [22]
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+
       - name: Run build
         run: npm run build
 
       - name: Run tests with coverage
-        run: |
-          npm run test:coverage
-          ls -la coverage/
+        run: npm run test:coverage
 
       - name: Check coverage thresholds
-        run: |
-          COVERAGE_FILE="./coverage/coverage-summary.json"
-          if [ ! -f "$COVERAGE_FILE" ]; then
-            echo "Error: Coverage file not found"
-            exit 1
-          fi
-
-          LINES=$(jq '.total.lines.pct' "$COVERAGE_FILE")
-          STATEMENTS=$(jq '.total.statements.pct' "$COVERAGE_FILE")
-          FUNCTIONS=$(jq '.total.functions.pct' "$COVERAGE_FILE")
-          BRANCHES=$(jq '.total.branches.pct' "$COVERAGE_FILE")
-
-          THRESHOLD=80
-
-          if (( $(echo "$LINES < $THRESHOLD" | bc -l) )) || \
-             (( $(echo "$STATEMENTS < $THRESHOLD" | bc -l) )) || \
-             (( $(echo "$FUNCTIONS < $THRESHOLD" | bc -l) )) || \
-             (( $(echo "$BRANCHES < $THRESHOLD" | bc -l) )); then
-            echo "Coverage is below threshold of ${THRESHOLD}%:"
-            echo "Lines: ${LINES}%"
-            echo "Statements: ${STATEMENTS}%"
-            echo "Functions: ${FUNCTIONS}%"
-            echo "Branches: ${BRANCHES}%"
-            exit 1
-          fi
-
-          echo "✅ All coverage thresholds met (${THRESHOLD}%)"
+        run: npm run check:coverage
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: coverage-report
+          name: coverage-report-${{ matrix.os }}-node-${{ matrix.node-version }}
           path: ./coverage
           retention-days: 7
+
+  test-summary:
+    needs: [test, lint]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+      - name: Check test matrix status
+        run: |
+          if [ "${{ needs.test.result }}" != "success" ]; then
+            echo "::error::Test matrix failed"
+            exit 1
+          fi
+
+  version:
+    if: github.ref == 'refs/heads/main'
+    needs: [test-summary, lint]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+          setup-git-identity: 'true'
+
+      - name: Version and tag
+        run: |
+          # Extraer el tipo de rama (feature o fix)
+          BRANCH_TYPE=$(echo ${{ github.ref }} | sed -n 's/refs\/heads\/\(feature\|fix\)\/.*/\1/p')
+
+          # Generar versión prerelease
+          npx lerna version --no-push --preid=${BRANCH_TYPE} --pre-dist-tag ${BRANCH_TYPE}
+
+          # Pushear cambios y tags
+          git push --follow-tags
 

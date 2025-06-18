@@ -5,6 +5,128 @@ alwaysApply: true
 ---
 # AI Assistant Core Configuration {.title}
 
+## Architectural Decisions {.section}
+
+### Coverage Validation Strategy {.subsection}
+{.decision-list}
+- **Decision**: Use dedicated `check-coverage.js` script instead of CI workflow logic
+- **Status**: ACCEPTED
+- **Date**: 2025-06-18
+- **Context**: Need for consistent and maintainable test coverage validation
+- **Consequences**:
+  - Centralized validation logic
+  - Consistent error messages in Spanish
+  - Single source for threshold (90%)
+  - Better maintainability
+  - Reusable in CI and locally
+- **Validation Rules**:
+  - MUST use `npm run check:coverage` in CI workflows
+  - MUST NOT implement coverage checks in bash/shell scripts
+  - MUST NOT duplicate threshold values
+  - MUST maintain Spanish error messages
+
+### Environment Setup Strategy {.subsection}
+{.decision-list}
+- **Decision**: Use composite action `setup-env` for Node.js and npm configuration
+- **Status**: ACCEPTED
+- **Date**: 2025-06-18
+- **Context**: Need for standardized environment setup across workflows
+- **Consequences**:
+  - Consistent configuration
+  - Centralized token handling
+  - DRY principle applied
+  - Improved security
+- **Validation Rules**:
+  - MUST use `./.github/actions/setup-env` in all workflows
+  - MUST NOT configure Node.js/npm directly in workflows
+  - MUST provide required tokens via inputs
+  - MUST maintain consistent registry configuration
+
+### Performance Validation Strategy {.subsection}
+{.decision-list}
+- **Decision**: Use comprehensive Lighthouse configuration with local server
+- **Status**: ACCEPTED
+- **Date**: 2025-06-18
+- **Context**: Need for robust performance validation
+- **Consequences**:
+  - More reliable metrics
+  - Detailed resource budgets
+  - Controlled test environment
+  - Early performance issue detection
+- **Validation Rules**:
+  - MUST use local server for testing
+  - MUST maintain multiple test runs
+  - MUST enforce resource budgets
+  - MUST validate core web vitals
+
+### Critical Configuration Validation {.subsection}
+{.decision-list}
+- **Decision**: Implement automated validation for critical configurations
+- **Status**: ACCEPTED
+- **Date**: 2025-06-18
+- **Context**: Need to ensure critical configurations are present and correct
+- **Consequences**:
+  - Early detection of misconfigurations
+  - Standardized npm and GitHub configurations
+  - Consistent token handling
+  - Reduced deployment failures
+- **Validation Rules**:
+  - MUST validate npm registry configuration
+  - MUST validate GitHub token permissions
+  - MUST check composite action inputs
+  - MUST verify workflow permissions
+
+### GitHub Workflow Validation {.subsection}
+{.decision-list}
+- **Decision**: Implement automated workflow validation
+- **Status**: ACCEPTED
+- **Date**: 2025-06-18
+- **Context**: Need to prevent common workflow issues and ensure best practices
+- **Consequences**:
+  - Consistent workflow structure
+  - Proper permission handling
+  - Secure token usage
+  - Standardized job configurations
+- **Validation Rules**:
+  - MUST validate job dependencies
+  - MUST check for proper checkout before local actions
+  - MUST verify required permissions
+  - MUST ensure proper token handling
+
+### Branch Strategy {.subsection}
+{.decision-list}
+- **Decision**: Use feature/* and fix/* branches with pre-release versions
+- **Status**: ACCEPTED
+- **Date**: 2025-06-18
+- **Context**: Need for clear versioning and branch management strategy
+- **Consequences**:
+  - Clear version tracking
+  - Proper pre-release handling
+  - Automated version bumping
+  - Clean git history
+- **Validation Rules**:
+  - MUST use feature/* for new features
+  - MUST use fix/* for bug fixes
+  - MUST NOT update versions on main directly
+  - MUST use Lerna for version management
+
+### Versioning Only on Main {.subsection}
+{.decision-list}
+- **Decision**: Only generate new versions when workflow runs on main branch
+- **Status**: ACCEPTED
+- **Date**: 2025-06-18
+- **Context**: Prevent pre-releases and version bumps on feature/fix branches; ensure only stable, reviewed code increments version
+- **Consequences**:
+  - No versioning or publishing on feature/fix branches
+  - Version/tag only created on merge or push to main
+  - Clean release history
+  - Prevents accidental pre-releases
+- **Validation Rules**:
+  - MUST restrict versioning job to `main` branch in CI workflow
+  - MUST NOT generate versions/tags in feature/fix branches
+  - MUST ensure all keys in action.yml are compatible with GitHub Actions composite actions
+  - MUST check the latest official GitHub Actions documentation before adding or assuming new keys
+
 ## Core Persona & Approach {.section}
 
 ### Autonomous Expert Role {.subsection}
@@ -276,3 +398,7 @@ compliance:
   showProgress={true}
 />
 ```
+
+
+
+

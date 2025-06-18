@@ -55,7 +55,7 @@
           }
         ]
       },
-      "allowBranch": ["main"],
+      "allowBranch": ["main", "feature/*", "fix/*"],
       "ignoreChanges": [
         "**/*.md",
         "**/test/**",
@@ -66,10 +66,17 @@
       "exact": true,
       "skipGit": false,
       "skipNpm": false,
-      "yes": true
+      "yes": true,
+      "preid": "pr",
+      "prerelease": true
     },
     "version": {
-      "skipChangelog": true
+      "skipChangelog": false,
+      "conventionalCommits": true,
+      "createRelease": "github",
+      "message": "chore(release): %s [skip ci]",
+      "allowBranch": ["feature/*", "fix/*"],
+      "ignoreChanges": ["**/*.md", "**/test/**", "**/tests/**", "**/__tests__/**", "**/coverage/**"]
     }
   }
 }
