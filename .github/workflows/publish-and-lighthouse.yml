@@ -1,12 +1,16 @@
 name: Publish and Lighthouse
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
     branches:
       - main
 
 jobs:
-  publish:
+  check-and-publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -48,7 +52,7 @@ jobs:
           npx lerna publish from-package --yes
 
   lighthouse:
-    needs: publish
+    needs: check-and-publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

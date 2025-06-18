@@ -34,12 +34,41 @@ jobs:
       - name: Run build
         run: npm run build
 
-      - name: Run coverage (continue-on-error)
+      - name: Run tests with coverage
         run: npm run test:coverage
-        continue-on-error: true
+
+      - name: Check coverage thresholds
+        run: |
+          COVERAGE_FILE="./coverage/coverage-summary.json"
+          if [ ! -f "$COVERAGE_FILE" ]; then
+            echo "Error: Coverage file not found"
+            exit 1
+          fi
+
+          LINES=$(jq '.total.lines.pct' "$COVERAGE_FILE")
+          STATEMENTS=$(jq '.total.statements.pct' "$COVERAGE_FILE")
+          FUNCTIONS=$(jq '.total.functions.pct' "$COVERAGE_FILE")
+          BRANCHES=$(jq '.total.branches.pct' "$COVERAGE_FILE")
+
+          THRESHOLD=80
+
+          if (( $(echo "$LINES < $THRESHOLD" | bc -l) )) || \
+             (( $(echo "$STATEMENTS < $THRESHOLD" | bc -l) )) || \
+             (( $(echo "$FUNCTIONS < $THRESHOLD" | bc -l) )) || \
+             (( $(echo "$BRANCHES < $THRESHOLD" | bc -l) )); then
+            echo "Coverage is below threshold of ${THRESHOLD}%:"
+            echo "Lines: ${LINES}%"
+            echo "Statements: ${STATEMENTS}%"
+            echo "Functions: ${FUNCTIONS}%"
+            echo "Branches: ${BRANCHES}%"
+            exit 1
+          fi
+
+          echo "✅ All coverage thresholds met (${THRESHOLD}%)"
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: coverage-report
           path: ./coverage
