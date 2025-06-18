@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## <small>0.10.6 (2025-06-18)</small>
+
+- fix(ci): improve GitHub Actions workflow robustness and reliability ([d294595](https://github.com/acamae/acamae-frontend/commit/d294595))
+- fix(ci): resolve CHANGELOG duplication with simplified Lerna workflow ([4d060fc](https://github.com/acamae/acamae-frontend/commit/4d060fc))
+- chore(ci): add Lerna debug mode for changelog investigation ([1ac3d80](https://github.com/acamae/acamae-frontend/commit/1ac3d80))
+
+## <small>0.10.6 (2025-06-18)</small>
+
+- fix(ci): improve GitHub Actions workflow robustness and reliability ([d294595](https://github.com/acamae/acamae-frontend/commit/d294595))
+- fix(ci): resolve CHANGELOG duplication with simplified Lerna workflow ([4d060fc](https://github.com/acamae/acamae-frontend/commit/4d060fc))
+- chore(ci): add Lerna debug mode for changelog investigation ([1ac3d80](https://github.com/acamae/acamae-frontend/commit/1ac3d80))
+
 ## <small>0.10.5 (2025-06-17)</small>
 
 - fix(ci): ensure CHANGELOG generation in Lerna workflow ([d54f84d](https://github.com/acamae/acamae-frontend/commit/d54f84d))
