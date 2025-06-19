@@ -1,12 +1,25 @@
-import { encryptToken, decryptToken } from '@application/state/tokenTransform';
+// dynamic import handled in beforeEach
+
+let encryptToken: typeof import('../tokenTransform').encryptToken;
+let decryptToken: typeof import('../tokenTransform').decryptToken;
+let tokenTransform: typeof import('../tokenTransform').tokenTransform;
+
+async function loadModule() {
+  const mod = await import('../tokenTransform');
+  encryptToken = mod.encryptToken;
+  decryptToken = mod.decryptToken;
+  tokenTransform = mod.tokenTransform;
+}
 
 describe('tokenTransform', () => {
   const ORIGINAL_ENV = process.env;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.resetModules();
     process.env = { ...ORIGINAL_ENV };
     process.env.REACT_APP_TOKEN_SECRET = 'test_secret';
+
+    await loadModule();
   });
 
   afterEach(() => {
@@ -55,13 +68,11 @@ describe('tokenTransform', () => {
 
   describe('tokenTransform', () => {
     it('should be created with correct configuration', async () => {
-      const { tokenTransform } = await import('../tokenTransform');
       expect(tokenTransform).toBeDefined();
       expect(typeof tokenTransform).toBe('object');
     });
 
     it('should encrypt and decrypt using the transform', async () => {
-      const { encryptToken, decryptToken } = await import('../tokenTransform');
       const token = 'test-token';
       const encrypted = encryptToken(token);
       const decrypted = decryptToken(encrypted);

@@ -18,24 +18,18 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   timeout: Number(process.env.REACT_APP_API_TIMEOUT) || 10000,
-  withCredentials: true, // Send cookies in cross-origin requests
+  withCredentials: true, // Send cookies in cross-origin requests (CORS)
 });
 
 api.interceptors.request.use(
   config => {
-    // Get authentication token from local storage
-
+    // Get authentication token from local storage (localStorage)
     const token = store.getState().auth.token;
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    // If there is a token, add it to the headers
 
     if (token) {
-      if (!config.headers) config.headers = {} as AxiosHeaders;
-      config.headers.Authorization = `Bearer ${token}`;
+      // Ensure headers exists and add Authorization only once
+      const headers = (config.headers ??= {} as AxiosHeaders);
+      headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
@@ -54,7 +48,7 @@ api.interceptors.response.use(
       console.log('Analytics tracking enabled for API calls');
     }
 
-    // If the URL is in the list of endpoints that renew the session
+    // If the URL is in the list of endpoints that renew the session (token expiration)
     if (SESSION_RENEWAL_ENDPOINTS.some(endpoint => url.includes(endpoint))) {
       store.dispatch(resetTimer());
     }
@@ -65,31 +59,25 @@ api.interceptors.response.use(
   error => {
     const url = error.config?.url ?? '';
 
-    // Optionally, we can perform specific actions based on the error status
     if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
       console.error('Response:', error.response);
 
-      // If the status is 401, clear the token
+      // If the status is 401, clear the token (unauthorized)
       if (error.response?.status === 401) {
         localStorageService.remove('REACT_APP_AUTH_TOKEN_KEY');
         localStorageService.remove('REACT_APP_REFRESH_TOKEN_KEY');
       }
 
-      // If the URL is in the list of endpoints that renew the session
+      // If the URL is in the list of endpoints that renew the session (token expiration)
       if (SESSION_RENEWAL_ENDPOINTS.some(endpoint => url.includes(endpoint))) {
         store.dispatch(resetTimer());
       }
     } else if (error.request) {
-      // The request was made but no response was received
       console.error('No response received. Request:', error.message, error.code);
     } else {
-      // Something happened in setting up the request that triggered an Error
       console.error('Request Error:', error.message, error.code);
     }
 
-    // We can choose to rethrow the error or handle it as needed
     return Promise.reject(error instanceof Error ? error : new Error(String(error)));
   }
 );
