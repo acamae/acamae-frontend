@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.10.8 (2025-06-19)
+
+**Note:** Version bump only for package @acamae/frontend
+
+## 0.10.8 (2025-06-19)
+
+**Note:** Version bump only for package @acamae/frontend
+
 ## [0.10.7](https://github.com/acamae/acamae-frontend/compare/v0.10.6...v0.10.7) (2025-06-18)
 
 **Note:** Version bump only for package @acamae/frontend
