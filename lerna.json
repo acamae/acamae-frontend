@@ -74,7 +74,7 @@
       "skipChangelog": false,
       "conventionalCommits": true,
       "createRelease": "github",
-      "message": "chore(release): %s [skip ci]",
+      "message": "chore(release): %s",
       "allowBranch": ["release"],
       "ignoreChanges": ["**/*.md", "**/test/**", "**/tests/**", "**/__tests__/**", "**/coverage/**"]
     }

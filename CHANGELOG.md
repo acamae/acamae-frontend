@@ -7,19 +7,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @acamae/frontend
 
-## 0.10.10 (2025-06-19)
-
-**Note:** Version bump only for package @acamae/frontend
-
 ## 0.10.9 (2025-06-19)
-
-**Note:** Version bump only for package @acamae/frontend
-
-## 0.10.9 (2025-06-19)
-
-**Note:** Version bump only for package @acamae/frontend
-
-## 0.10.8 (2025-06-19)
 
 **Note:** Version bump only for package @acamae/frontend
 
@@ -30,16 +18,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ## [0.10.7](https://github.com/acamae/acamae-frontend/compare/v0.10.6...v0.10.7) (2025-06-18)
 
 **Note:** Version bump only for package @acamae/frontend
-
-## [0.10.7](https://github.com/acamae/acamae-frontend/compare/v0.10.6...v0.10.7) (2025-06-18)
-
-**Note:** Version bump only for package @acamae/frontend
-
-## <small>0.10.6 (2025-06-18)</small>
-
-- fix(ci): improve GitHub Actions workflow robustness and reliability ([d294595](https://github.com/acamae/acamae-frontend/commit/d294595))
-- fix(ci): resolve CHANGELOG duplication with simplified Lerna workflow ([4d060fc](https://github.com/acamae/acamae-frontend/commit/4d060fc))
-- chore(ci): add Lerna debug mode for changelog investigation ([1ac3d80](https://github.com/acamae/acamae-frontend/commit/1ac3d80))
 
 ## <small>0.10.6 (2025-06-18)</small>
 
