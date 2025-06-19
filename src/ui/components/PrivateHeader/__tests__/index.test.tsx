@@ -11,7 +11,7 @@ import { makeTestStore } from '@shared/utils/reduxTestUtils';
 import PrivateHeader from '@ui/components/PrivateHeader';
 import { useAuth } from '@ui/hooks/useAuth';
 
-// Mockear useAuth
+// Mock useAuth
 const mockLogoutFn = jest.fn();
 const mockLoginFn = jest.fn();
 const mockRegisterFn = jest.fn();
@@ -28,14 +28,14 @@ jest.mock('@ui/hooks/useAuth', () => ({
   })),
 }));
 
-// Mockear LanguageSelector
+// Mock LanguageSelector
 jest.mock('@ui/components/LanguageSelector', () => {
   const MockLanguageSelector = () => <div data-testid="mock-language-selector"></div>;
   MockLanguageSelector.displayName = 'MockLanguageSelector';
   return MockLanguageSelector;
 });
 
-// Configuración del mock store de Redux
+// Configure the mock Redux store
 const baseAuthState: AuthState = {
   isAuthenticated: true,
   user: { id: '1', username: 'testuser', email: 'test@example.com', role: 'user' },

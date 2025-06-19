@@ -7,5 +7,5 @@ describe('Home Page', () => {
     cy.get('body').should('be.visible');
   });
 
-  // Añade más pruebas específicas según tu aplicación
-}); 
+  // @TODO: Add more specific tests based on your application
+});

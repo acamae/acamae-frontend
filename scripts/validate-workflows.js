@@ -84,56 +84,9 @@ class WorkflowValidator {
 
   validateSecurity() {
     const jobs = this.content.jobs || {};
-
-    // Validate tokens
-    Object.entries(jobs).forEach(([jobName, job]) => {
-      const steps = job.steps || [];
-      steps.forEach((step, index) => {
-        if (step.with?.token) {
-          const tokenValue = step.with.token;
-          if (
-            VALIDATION_RULES.security.tokens.patterns.incorrect.some(pattern =>
-              pattern.test(tokenValue)
-            )
-          ) {
-            this.errors.push(
-              `Job "${jobName}" step ${index + 1}: Incorrect token usage pattern: ${tokenValue}`
-            );
-          }
-        }
-
-        // Validate tokens in composite action steps
-        const compositeSteps = this.getCompositeActionSteps(step);
-        compositeSteps.forEach((compositeStep, compositeIndex) => {
-          if (compositeStep.with?.token) {
-            const tokenValue = compositeStep.with.token;
-            if (
-              VALIDATION_RULES.security.tokens.patterns.incorrect.some(pattern =>
-                pattern.test(tokenValue)
-              )
-            ) {
-              this.errors.push(
-                `Job "${jobName}" composite step ${compositeIndex + 1}: Incorrect token usage pattern: ${tokenValue}`
-              );
-            }
-          }
-        });
-      });
-
-      // Validate permissions
-      if (!job.permissions) {
-        this.warnings.push(`Job "${jobName}": Missing explicit permissions`);
-      } else {
-        const missingPermissions = VALIDATION_RULES.security.permissions.required.filter(
-          perm => !job.permissions[perm]
-        );
-        if (missingPermissions.length > 0) {
-          this.warnings.push(
-            `Job "${jobName}": Missing required permissions: ${missingPermissions.join(', ')}`
-          );
-        }
-      }
-    });
+    for (const [jobName, job] of Object.entries(jobs)) {
+      this.validateJobSecurity(jobName, job);
+    }
   }
 
   validateConfiguration() {
@@ -296,6 +249,51 @@ class WorkflowValidator {
 
   hasErrors() {
     return this.errors.length > 0;
+  }
+
+  // ---------- Helper methods to keep validateSecurity simple ----------
+
+  isIncorrectToken(tokenValue) {
+    return VALIDATION_RULES.security.tokens.patterns.incorrect.some(pattern =>
+      pattern.test(tokenValue)
+    );
+  }
+
+  validateTokens(jobName, steps) {
+    steps.forEach((step, i) => {
+      if (step.with?.token && this.isIncorrectToken(step.with.token)) {
+        this.errors.push(
+          `Job "${jobName}" step ${i + 1}: Incorrect token usage pattern: ${step.with.token}`
+        );
+      }
+
+      // Composite actions
+      this.getCompositeActionSteps(step).forEach((cStep, j) => {
+        if (cStep.with?.token && this.isIncorrectToken(cStep.with.token)) {
+          this.errors.push(
+            `Job "${jobName}" composite step ${j + 1}: Incorrect token usage pattern: ${cStep.with.token}`
+          );
+        }
+      });
+    });
+  }
+
+  validatePermissions(jobName, permissions) {
+    if (!permissions) {
+      this.warnings.push(`Job "${jobName}": Missing explicit permissions`);
+      return;
+    }
+
+    const missing = VALIDATION_RULES.security.permissions.required.filter(p => !permissions[p]);
+    if (missing.length) {
+      this.warnings.push(`Job "${jobName}": Missing required permissions: ${missing.join(', ')}`);
+    }
+  }
+
+  validateJobSecurity(jobName, job) {
+    const steps = job.steps || [];
+    this.validateTokens(jobName, steps);
+    this.validatePermissions(jobName, job.permissions);
   }
 }
 

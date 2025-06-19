@@ -16,9 +16,9 @@ interface MockToastComponent extends React.FC<MockToastProps> {
 
 jest.mock('react-bootstrap', () => {
   const MockToast: MockToastComponent = ({ children, bg, onClose }) => (
-    <div data-testid={`toast-${bg || 'primary'}`} onClick={onClose}>
+    <button type="button" data-testid={`toast-${bg ?? 'primary'}`} onClick={onClose}>
       {children}
-    </div>
+    </button>
   );
   MockToast.Header = ({ children }) => <div>{children}</div>;
   MockToast.Body = ({ children }) => <div>{children}</div>;

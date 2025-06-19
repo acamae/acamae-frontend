@@ -105,7 +105,7 @@ jest.mock('@ui/hooks/useAuth', () => ({
 jest.mock('@ui/components/PrivateRoute', () => {
   // Import useAuth from the already-mocked module
   const { useAuth } = require('@ui/hooks/useAuth');
-  function MockPrivateRoute({ children }: { children?: React.ReactNode }) {
+  function MockPrivateRoute({ children }: { readonly children?: React.ReactNode }) {
     const { isAuthenticated, loading } = useAuth();
     if (loading) return <div data-testid="mock-private-route-loading">Loading...</div>;
     if (isAuthenticated) return <>{children}</>;

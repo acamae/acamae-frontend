@@ -69,48 +69,40 @@ function validateSetupEnv() {
   return valid;
 }
 
+const COVERAGE_STEPS = ['npm run test:coverage', 'npm run check:coverage'];
+
+const usesSetupEnv = job =>
+  (job.steps || []).some(s => s.uses?.includes('./.github/actions/setup-env'));
+
+const hasInvalidCoverage = (name, job) =>
+  (job.steps || []).some(
+    s => COVERAGE_STEPS.includes(s.run) && !['sonarqube', 'ci-all'].includes(name)
+  );
+
 function validateCIConfig() {
   const ciPath = path.join(process.cwd(), CRITICAL_FILES.ci);
 
   try {
-    const content = yamlLoad(fs.readFileSync(ciPath, 'utf8'));
-    const jobs = content.jobs || {};
-    let valid = true;
-
+    const { jobs = {} } = yamlLoad(fs.readFileSync(ciPath, 'utf8'));
     console.log('\nValidating CI Configuration...');
 
-    // Verificar que al menos un job usa setup-env
-    let foundSetupEnv = false;
-    for (const [jobName, job] of Object.entries(jobs)) {
-      const steps = job.steps || [];
-      const hasSetupEnv = steps.some(step => step.uses?.includes('./.github/actions/setup-env'));
-      if (hasSetupEnv) foundSetupEnv = true;
-      console.log(`${hasSetupEnv ? '✅' : '❌'} ${jobName}: Uses setup-env action`);
-    }
-    if (!foundSetupEnv) {
-      console.error('❌ No job uses setup-env action');
-      valid = false;
-    }
+    const setupEnvOk = Object.entries(jobs).some(([name, job]) => {
+      const ok = usesSetupEnv(job);
+      console.log(`${ok ? '✅' : '❌'} ${name}: Uses setup-env action`);
+      return ok;
+    });
 
-    // Verificar que los pasos de coverage están solo en el job correcto (sonarqube o ci-all)
-    const coverageSteps = ['npm run test:coverage', 'npm run check:coverage'];
-    for (const [jobName, job] of Object.entries(jobs)) {
-      const steps = job.steps || [];
-      for (const step of steps) {
-        if (coverageSteps.includes(step.run)) {
-          if (jobName !== 'sonarqube' && jobName !== 'ci-all') {
-            console.error(
-              `❌ ${jobName}: Coverage step '${step.run}' should be only in the 'sonarqube' or 'ci-all' job`
-            );
-            valid = false;
-          }
-        }
-      }
-    }
+    const coverageErrors = Object.entries(jobs).filter(([name, job]) =>
+      hasInvalidCoverage(name, job)
+    );
 
-    return valid;
-  } catch (error) {
-    console.error('❌ Error reading CI configuration:', error.message);
+    coverageErrors.forEach(([name]) =>
+      console.error(`❌ ${name}: Coverage step sólo en 'sonarqube' o 'ci-all'`)
+    );
+
+    return setupEnvOk && coverageErrors.length === 0;
+  } catch (e) {
+    console.error('❌ Error reading CI configuration:', e.message);
     return false;
   }
 }

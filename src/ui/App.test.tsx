@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 
 import App from '@ui/App';
 
-// Mockear AppRoutes con displayName para evitar error de linter
+// Mock AppRoutes with displayName to avoid linter error
 jest.mock('@ui/routes', () => {
   const MockAppRoutes = () => <div data-testid="mock-app-routes">Mock AppRoutes</div>;
   MockAppRoutes.displayName = 'MockAppRoutes';

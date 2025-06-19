@@ -3,7 +3,7 @@ import { createTransform } from 'redux-persist';
 
 import { AuthState } from '@domain/types/auth';
 
-const SECRET_KEY = process.env.REACT_APP_TOKEN_SECRET || 'default_secret';
+const SECRET_KEY = process.env.REACT_APP_TOKEN_SECRET ?? 'default_secret';
 
 /**
  * Encrypts a token string using AES.

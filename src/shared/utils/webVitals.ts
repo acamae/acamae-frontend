@@ -1,8 +1,8 @@
-import { type Metric, onCLS, onFID, onFCP, onLCP, onTTFB } from 'web-vitals';
+import { type Metric, onCLS, onINP, onFCP, onLCP, onTTFB } from 'web-vitals';
 
 interface WebVitalsReport {
   CLS: number;
-  FID: number;
+  INP: number;
   LCP: number;
   FCP: number;
   TTFB: number;
@@ -29,14 +29,20 @@ const shouldReportWebVitals = (): boolean => {
 
 const formatMetricValue = (metric: Metric): string => {
   const value = metric.value.toFixed(2);
-  const delta = metric.delta ? ` (${metric.delta > 0 ? '+' : ''}${metric.delta.toFixed(2)})` : '';
+
+  let delta = '';
+  if (metric.delta) {
+    const sign = metric.delta > 0 ? '+' : '';
+    delta = ` (${sign}${metric.delta.toFixed(2)})`;
+  }
+
   return `${value}${delta}`;
 };
 
 const reportWebVitals = (onPerfEntry?: (metric: Metric) => void) => {
   if (onPerfEntry && onPerfEntry instanceof Function) {
     onCLS(onPerfEntry);
-    onFID(onPerfEntry);
+    onINP(onPerfEntry);
     onFCP(onPerfEntry);
     onLCP(onPerfEntry);
     onTTFB(onPerfEntry);
@@ -46,7 +52,7 @@ const reportWebVitals = (onPerfEntry?: (metric: Metric) => void) => {
 export const generateWebVitalsReport = (): WebVitalsReport => {
   const report: WebVitalsReport = {
     CLS: 0,
-    FID: 0,
+    INP: 0,
     LCP: 0,
     FCP: 0,
     TTFB: 0,
@@ -60,8 +66,8 @@ export const generateWebVitalsReport = (): WebVitalsReport => {
         case 'CLS':
           report.CLS = m.value;
           break;
-        case 'FID':
-          report.FID = m.value;
+        case 'INP':
+          report.INP = m.value;
           break;
         case 'LCP':
           report.LCP = m.value;
