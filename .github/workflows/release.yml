@@ -21,8 +21,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
       - run: npm run build
-      - name: Lerna version
+      - name: Version packages
         run: npx lerna version --yes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
       - name: Push tags
         run: git push --follow-tags
       - name: Lerna publish
