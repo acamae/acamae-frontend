@@ -7,10 +7,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @acamae/frontend
 
-## 0.10.11 (2025-06-19)
-
-**Note:** Version bump only for package @acamae/frontend
-
 ## 0.10.10 (2025-06-19)
 
 **Note:** Version bump only for package @acamae/frontend
