@@ -5,8 +5,8 @@ try {
   const commitMsg = execSync('git log -1 --pretty=%B').toString().trim();
   console.log('Commit message:', commitMsg);
 
-  // Skip for Lerna version commits
-  if (commitMsg.includes('[skip ci]')) {
+  // Skip for Lerna version commits (detect 'chore(release):')
+  if (/^chore\(release\):/i.test(commitMsg)) {
     console.log('⏩ Pre-commit hook skipped for Lerna version commit.');
     process.exit(0);
   }

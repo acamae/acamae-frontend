@@ -196,7 +196,7 @@ npm run update:snapshots
 #### Husky + lint-staged
 
 - **Pre-commit**:
-  - Skips automatically on Lerna versioning commits (detects `[skip ci]` in the message).
+  - Skips automatically on Lerna versioning commits (detects commit messages that start with `chore(release):`).
   - Type checking with TypeScript (`tsc --noEmit`).
   - Runs unit tests only on staged files.
   - Linter and auto-formatting on staged files via lint-staged (ESLint and Prettier).
