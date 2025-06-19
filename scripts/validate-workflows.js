@@ -319,8 +319,6 @@ function checkVersioning(workflowFile, jobs) {
           foundVersioning = true;
           if (workflowFile !== 'release.yml') {
             console.error(`❌ Versioning/publishing command found in ${workflowFile}: ${runCmd}`);
-          } else {
-            console.log(`✅ Versioning command found in release.yml: ${runCmd}`);
           }
         }
       });
@@ -366,7 +364,9 @@ workflows.forEach(file => {
   }
 
   // Custom checks
-  checkVersioning(file, validator.content.jobs || {});
+  if (path.basename(file) !== 'release.yml') {
+    checkVersioning(file, validator.content.jobs || {});
+  }
   checkSonarCloud(file, validator.content.jobs || {});
 });
 
