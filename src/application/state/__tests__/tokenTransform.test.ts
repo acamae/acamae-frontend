@@ -19,7 +19,7 @@ describe('tokenTransform', () => {
     });
 
     it('should return null for undefined input', async () => {
-      expect(encryptToken(undefined)).toBeNull();
+      expect(encryptToken()).toBeNull();
     });
 
     it('should return null for empty string', async () => {
@@ -33,7 +33,7 @@ describe('tokenTransform', () => {
     });
 
     it('should return null for undefined input', async () => {
-      expect(decryptToken(undefined)).toBeNull();
+      expect(decryptToken()).toBeNull();
     });
 
     it('should return null for empty string', async () => {

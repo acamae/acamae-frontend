@@ -61,8 +61,8 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
 
   if (!tokenProp) {
     return (
-      <Alert variant="danger" role="status" aria-live="polite" data-testid="alert-error">
-        {t('reset.invalid_token')}
+      <Alert variant="danger" aria-live="polite" data-testid="alert-error">
+        <output>{t('reset.invalid_token')}</output>
       </Alert>
     );
   }
@@ -108,7 +108,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
         <Form.Control.Feedback type="invalid" data-testid="reset-password-form-password-error">
           {errors.password}
         </Form.Control.Feedback>
-        <PasswordStrengthMeter password={values.password || ''} t={t} />
+        <PasswordStrengthMeter password={values.password ?? ''} t={t} />
       </Form.Group>
       <div className="d-grid">
         <Button

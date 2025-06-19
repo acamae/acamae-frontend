@@ -19,7 +19,6 @@ interface AxiosResponse {
 }
 
 const reqOk: ((config: AxiosConfig) => AxiosConfig)[] = [];
-const reqErr: ((error: unknown) => unknown)[] = [];
 const resOk: ((response: AxiosResponse) => AxiosResponse)[] = [];
 const resErr: ((error: unknown) => Promise<never>)[] = [];
 
@@ -27,12 +26,9 @@ jest.mock('axios', () => {
   const create = jest.fn(() => ({
     interceptors: {
       request: {
-        use: jest.fn(
-          (ok: (config: AxiosConfig) => AxiosConfig, err: (error: unknown) => unknown) => {
-            reqOk.push(ok);
-            reqErr.push(err);
-          }
-        ),
+        use: jest.fn((ok: (config: AxiosConfig) => AxiosConfig) => {
+          reqOk.push(ok);
+        }),
       },
       response: {
         use: jest.fn(
@@ -81,7 +77,6 @@ beforeAll(() => {
 describe('axiosService unit tests', () => {
   beforeEach(() => {
     reqOk.length = 0;
-    reqErr.length = 0;
     resOk.length = 0;
     resErr.length = 0;
     jest.clearAllMocks();

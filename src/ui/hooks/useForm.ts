@@ -86,8 +86,6 @@ export const useForm = <T extends object>({
 
     try {
       return await onSubmit(values);
-    } catch (error) {
-      throw error;
     } finally {
       setIsSubmitting(false);
     }

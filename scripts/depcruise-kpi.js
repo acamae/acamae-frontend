@@ -5,19 +5,15 @@ const SRC = 'src';
 const depcruiseJson = execSync(`npx depcruise --output-type json ${SRC}`, { encoding: 'utf8' });
 const report = JSON.parse(depcruiseJson);
 
-// Número de ciclos
 const cycles =
   (report.summary && report.summary.cycleCount) || (report.cycles ? report.cycles.length : 0);
 
-// Profundidad máxima de dependencias
 const maxDepth = (report.summary && report.summary.maxDepth) || 0;
 
-// Módulos huérfanos
 const orphanModules = (report.orphanModules && report.orphanModules.length) || 0;
 const totalModules = (report.modules && report.modules.length) || 1;
 const orphanPercent = ((orphanModules / totalModules) * 100).toFixed(2);
 
-// Fan-in y fan-out
 let maxFanIn = 0,
   maxFanOut = 0;
 let maxFanInModules = [];
@@ -42,7 +38,7 @@ report.modules.forEach(mod => {
   }
 });
 
-// Violaciones de reglas de arquitectura (detalladas)
+// Architecture rule violations (detailed)
 let ruleViolations = [];
 if (report.modules) {
   report.modules.forEach(mod => {
@@ -65,10 +61,10 @@ if (report.modules) {
   });
 }
 
-// Nombres de módulos huérfanos
+// Orphan module names
 const orphanModuleNames = report.orphanModules || [];
 
-// Ciclos detectados
+// Detected cycles
 const cyclesList = (report.cycles || []).map(cycle => (cycle.cyclePath ? cycle.cyclePath : cycle));
 
 console.log('--- Dependency KPIs ---');

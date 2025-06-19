@@ -21,10 +21,14 @@ const LoginForm: React.FC = () => {
   const validate = useCallback(
     (values: LoginPayload) => {
       const errors: Partial<LoginPayload> = {};
-      if (!values.email || !validateEmail(values.email)) {
+      if (!values.email) {
+        errors.email = t('errors.email.required');
+      } else if (!validateEmail(values.email)) {
         errors.email = t('errors.email.invalid');
       }
-      if (!values.password || !validatePassword(values.password)) {
+      if (!values.password) {
+        errors.password = t('errors.password.required');
+      } else if (!validatePassword(values.password)) {
         errors.password = t('errors.password.invalid');
       }
       return errors;
@@ -97,7 +101,7 @@ const LoginForm: React.FC = () => {
           <Button
             variant="outline-secondary"
             onClick={() => setShowPassword(!showPassword)}
-            aria-label={t(showPassword ? 'login.toggle_password' : 'login.toggle_password')}
+            aria-label={t('login.toggle_password')}
             tabIndex={-1}
             data-testid="login-form-password-toggle">
             {showPassword ? '👁️' : '👁️‍🗨️'}

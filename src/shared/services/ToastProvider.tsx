@@ -14,7 +14,7 @@ type ToastContextType = {
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 let toastId = 0;
-const MAX_TOASTS = 3; // Máximo de toasts simultáneos
+const MAX_TOASTS = 3; // Maximum number of simultaneous toasts
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Array<ToastOptions & { id: number }>>([]);
@@ -31,7 +31,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           ...options,
           id: ++toastId,
           duration: options.duration ?? 5000,
-          autohide: options.autohide !== undefined ? options.autohide : true,
+          autohide: options.autohide ?? true,
         },
       ];
       // Limit the number of active toasts

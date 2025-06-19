@@ -18,13 +18,13 @@ import {
 import { AuthState } from '@domain/types/auth';
 import { useAuth } from '@ui/hooks/useAuth';
 
-// Mock de useAppDispatch
+// Mock useAppDispatch
 jest.mock('@application/state/hooks', () => ({
   useAppDispatch: jest.fn(),
   useAppSelector: jest.fn(),
 }));
 
-// Mock del reducer
+// Mock authSlice reducer
 jest.mock('@application/state/slices/authSlice', () => ({
   __esModule: true,
   default: (
@@ -57,127 +57,129 @@ jest.mock('@application/state/slices/authSlice', () => ({
   },
 }));
 
-// Mock de las acciones de Redux Toolkit
+// Mock Redux Toolkit actions
 jest.mock('@application/state/actions/auth.actions', () => ({
-  loginAction: createAsyncThunk('auth/login', async (payload: LoginPayload) => {
-    if (payload.email === 'test@example.com' && payload.password === 'password123') {
-      return {
-        success: true,
-        data: {
-          user: {
-            id: '1',
-            email: 'test@example.com',
-            role: 'user',
-          },
-          token: 'test-token',
-        },
-        message: 'Login successful',
-        status: 200,
-        code: 'SUCCESS',
-      };
-    }
+  loginAction: createAsyncThunk('auth/login', mockLoginThunk),
+  registerAction: createAsyncThunk('auth/register', mockRegisterThunk),
+  logoutAction: createAsyncThunk('auth/logout', mockLogoutThunk),
+  forgotPasswordAction: createAsyncThunk('auth/forgotPassword', mockForgotPasswordThunk),
+  resetPasswordAction: createAsyncThunk('auth/resetPassword', mockResetPasswordThunk),
+  resendVerificationAction: createAsyncThunk(
+    'auth/resendVerification',
+    mockResendVerificationThunk
+  ),
+}));
+
+async function mockLoginThunk(payload: LoginPayload) {
+  if (payload.email === 'test@example.com' && payload.password === 'password123') {
     return {
-      success: false,
-      message: 'Invalid credentials',
-      status: 401,
-      code: 'UNAUTHORIZED',
-    };
-  }),
-  registerAction: createAsyncThunk('auth/register', async (payload: RegisterPayload) => {
-    if (payload.email === 'test@example.com') {
-      return {
-        success: true,
-        data: {
-          user: {
-            id: '1',
-            email: 'test@example.com',
-            username: payload.username,
-            role: 'user',
-          },
-          token: 'test-token',
-        },
-        message: 'Registration successful',
-        status: 200,
-        code: 'SUCCESS',
-      };
-    }
+      success: true,
+      data: {
+        user: { id: '1', email: 'test@example.com', role: 'user' },
+        token: 'test-token',
+      },
+      message: 'Login successful',
+      status: 200,
+      code: 'SUCCESS',
+    } as const;
+  }
+  return {
+    success: false,
+    message: 'Invalid credentials',
+    status: 401,
+    code: 'UNAUTHORIZED',
+  } as const;
+}
+
+async function mockRegisterThunk(payload: RegisterPayload) {
+  if (payload.email === 'test@example.com') {
     return {
-      success: false,
-      message: 'Email already exists',
-      status: 409,
-      code: 'CONFLICT',
-    };
-  }),
-  logoutAction: createAsyncThunk('auth/logout', async () => {
+      success: true,
+      data: {
+        user: {
+          id: '1',
+          email: 'test@example.com',
+          username: payload.username,
+          role: 'user',
+        },
+        token: 'test-token',
+      },
+      message: 'Registration successful',
+      status: 200,
+      code: 'SUCCESS',
+    } as const;
+  }
+  return {
+    success: false,
+    message: 'Email already exists',
+    status: 409,
+    code: 'CONFLICT',
+  } as const;
+}
+
+async function mockForgotPasswordThunk(payload: ForgotPasswordPayload) {
+  if (payload.email === 'test@example.com') {
     return {
       success: true,
       data: null,
-      message: 'Logout successful',
+      message: 'Password reset email sent',
       status: 200,
       code: 'SUCCESS',
-    };
-  }),
-  forgotPasswordAction: createAsyncThunk(
-    'auth/forgotPassword',
-    async (payload: ForgotPasswordPayload) => {
-      if (payload.email === 'test@example.com') {
-        return {
-          success: true,
-          data: null,
-          message: 'Password reset email sent',
-          status: 200,
-          code: 'SUCCESS',
-        };
-      }
-      return {
-        success: false,
-        message: 'User not found',
-        status: 404,
-        code: 'NOT_FOUND',
-      };
-    }
-  ),
-  resetPasswordAction: createAsyncThunk(
-    'auth/resetPassword',
-    async (payload: ResetPasswordPayload) => {
-      if (payload.token === 'reset-token') {
-        return {
-          success: true,
-          data: null,
-          message: 'Password reset successful',
-          status: 200,
-          code: 'SUCCESS',
-        };
-      }
-      return {
-        success: false,
-        message: 'Invalid or expired token',
-        status: 400,
-        code: 'BAD_REQUEST',
-      };
-    }
-  ),
-  resendVerificationAction: createAsyncThunk(
-    'auth/resendVerification',
-    async (payload: ResendVerificationPayload) => {
-      if (payload.identifier === 'test@example.com') {
-        return {
-          success: true,
-          data: null,
-          message: 'Verification email sent',
-          status: 200,
-          code: 'SUCCESS',
-        };
-      }
-      return {
-        success: false,
-        message: 'User already verified',
-        status: 400,
-        code: 'BAD_REQUEST',
-      };
-    }
-  ),
-}));
+    } as const;
+  }
+  return {
+    success: false,
+    message: 'User not found',
+    status: 404,
+    code: 'NOT_FOUND',
+  } as const;
+}
+
+async function mockResetPasswordThunk(payload: ResetPasswordPayload) {
+  if (payload.token === 'reset-token') {
+    return {
+      success: true,
+      data: null,
+      message: 'Password reset successful',
+      status: 200,
+      code: 'SUCCESS',
+    } as const;
+  }
+  return {
+    success: false,
+    message: 'Invalid or expired token',
+    status: 400,
+    code: 'BAD_REQUEST',
+  } as const;
+}
+
+async function mockResendVerificationThunk(payload: ResendVerificationPayload) {
+  if (payload.identifier === 'test@example.com') {
+    return {
+      success: true,
+      data: null,
+      message: 'Verification email sent',
+      status: 200,
+      code: 'SUCCESS',
+    } as const;
+  }
+  return {
+    success: false,
+    message: 'User already verified',
+    status: 400,
+    code: 'BAD_REQUEST',
+  } as const;
+}
+
+async function mockLogoutThunk() {
+  return {
+    success: true,
+    data: null,
+    message: 'Logout successful',
+    status: 200,
+    code: 'SUCCESS',
+  } as const;
+}
 
 function getWrapper(store: ReturnType<typeof configureStore<{ auth: AuthState }>>) {
   return ({ children }: { children: React.ReactNode }) => (
@@ -229,7 +231,7 @@ describe('useAuth', () => {
         code: 'SUCCESS',
       };
 
-      // Mock de la acción de login
+      // Mock login action
       const loginAction = {
         type: 'auth/login/fulfilled',
         payload: {
@@ -238,23 +240,25 @@ describe('useAuth', () => {
         },
       };
 
-      mockDispatch.mockImplementationOnce(() => ({
+      const dispatchResult = {
         ...loginAction,
         unwrap: () => Promise.resolve(successResponse),
-      }));
+      };
+
+      mockDispatch.mockImplementationOnce(() => dispatchResult);
 
       const response = await result.current.login(loginPayload);
 
-      // Verificamos que dispatch fue llamado
+      // Verify dispatch was called
       expect(mockDispatch).toHaveBeenCalled();
 
-      // Verificamos que la respuesta es la esperada
+      // Verify response is the expected one
       expect(response).toEqual(successResponse.data);
 
-      // Procesamos la acción en el reducer
+      // Process action in reducer
       store.dispatch(loginAction);
 
-      // Verificamos que el estado se actualizó correctamente
+      // Verify state was updated correctly
       expect(store.getState().auth).toEqual({
         user: successResponse.data.user,
         token: successResponse.data.token,
@@ -275,11 +279,13 @@ describe('useAuth', () => {
         code: 'UNAUTHORIZED',
       };
 
-      mockDispatch.mockImplementationOnce(() => ({
+      const dispatchResult = {
         type: 'auth/login/rejected',
         payload: errorResponse,
         unwrap: () => Promise.resolve(errorResponse),
-      }));
+      };
+
+      mockDispatch.mockImplementationOnce(() => dispatchResult);
 
       await expect(result.current.login(loginPayload)).rejects.toThrow(ApiError);
       expect(mockDispatch).toHaveBeenCalled();
@@ -319,10 +325,12 @@ describe('useAuth', () => {
         },
       };
 
-      mockDispatch.mockImplementationOnce(() => ({
+      const dispatchResult = {
         ...registerAction,
         unwrap: () => Promise.resolve(successResponse),
-      }));
+      };
+
+      mockDispatch.mockImplementationOnce(() => dispatchResult);
 
       const response = await result.current.register(registerPayload);
 
@@ -355,11 +363,13 @@ describe('useAuth', () => {
         code: 'CONFLICT',
       };
 
-      mockDispatch.mockImplementationOnce(() => ({
+      const dispatchResult = {
         type: 'auth/register/rejected',
         payload: errorResponse,
         unwrap: () => Promise.resolve(errorResponse),
-      }));
+      };
+
+      mockDispatch.mockImplementationOnce(() => dispatchResult);
 
       await expect(result.current.register(registerPayload)).rejects.toThrow(ApiError);
       expect(mockDispatch).toHaveBeenCalled();
@@ -383,10 +393,12 @@ describe('useAuth', () => {
         payload: successResponse,
       };
 
-      mockDispatch.mockImplementationOnce(() => ({
+      const dispatchResult = {
         ...logoutAction,
         unwrap: () => Promise.resolve(successResponse),
-      }));
+      };
+
+      mockDispatch.mockImplementationOnce(() => dispatchResult);
 
       const response = await result.current.logout();
 
@@ -414,11 +426,13 @@ describe('useAuth', () => {
         code: 'INTERNAL_SERVER_ERROR',
       };
 
-      mockDispatch.mockImplementationOnce(() => ({
+      const dispatchResult = {
         type: 'auth/logout/rejected',
         payload: errorResponse,
         unwrap: () => Promise.resolve(errorResponse),
-      }));
+      };
+
+      mockDispatch.mockImplementationOnce(() => dispatchResult);
 
       await expect(result.current.logout()).rejects.toThrow(ApiError);
       expect(mockDispatch).toHaveBeenCalled();
@@ -443,10 +457,12 @@ describe('useAuth', () => {
         payload: successResponse,
       };
 
-      mockDispatch.mockImplementationOnce(() => ({
+      const dispatchResult = {
         ...forgotPasswordAction,
         unwrap: () => Promise.resolve(successResponse),
-      }));
+      };
+
+      mockDispatch.mockImplementationOnce(() => dispatchResult);
 
       const response = await result.current.forgotPassword(forgotPasswordPayload);
 
@@ -465,11 +481,13 @@ describe('useAuth', () => {
         code: 'NOT_FOUND',
       };
 
-      mockDispatch.mockImplementationOnce(() => ({
+      const dispatchResult = {
         type: 'auth/forgotPassword/rejected',
         payload: errorResponse,
         unwrap: () => Promise.resolve(errorResponse),
-      }));
+      };
+
+      mockDispatch.mockImplementationOnce(() => dispatchResult);
 
       await expect(result.current.forgotPassword(forgotPasswordPayload)).rejects.toThrow(ApiError);
       expect(mockDispatch).toHaveBeenCalled();
@@ -497,10 +515,12 @@ describe('useAuth', () => {
         payload: successResponse,
       };
 
-      mockDispatch.mockImplementationOnce(() => ({
+      const dispatchResult = {
         ...resetPasswordAction,
         unwrap: () => Promise.resolve(successResponse),
-      }));
+      };
+
+      mockDispatch.mockImplementationOnce(() => dispatchResult);
 
       const response = await result.current.resetPassword(resetPasswordPayload);
 
@@ -522,11 +542,13 @@ describe('useAuth', () => {
         code: 'BAD_REQUEST',
       };
 
-      mockDispatch.mockImplementationOnce(() => ({
+      const dispatchResult = {
         type: 'auth/resetPassword/rejected',
         payload: errorResponse,
         unwrap: () => Promise.resolve(errorResponse),
-      }));
+      };
+
+      mockDispatch.mockImplementationOnce(() => dispatchResult);
 
       await expect(result.current.resetPassword(resetPasswordPayload)).rejects.toThrow(ApiError);
       expect(mockDispatch).toHaveBeenCalled();
@@ -553,10 +575,12 @@ describe('useAuth', () => {
         payload: successResponse,
       };
 
-      mockDispatch.mockImplementationOnce(() => ({
+      const dispatchResult = {
         ...resendVerificationAction,
         unwrap: () => Promise.resolve(successResponse),
-      }));
+      };
+
+      mockDispatch.mockImplementationOnce(() => dispatchResult);
 
       const response = await result.current.resendVerification(resendVerificationPayload);
 
@@ -575,11 +599,13 @@ describe('useAuth', () => {
         code: 'BAD_REQUEST',
       };
 
-      mockDispatch.mockImplementationOnce(() => ({
+      const dispatchResult = {
         type: 'auth/resendVerification/rejected',
         payload: errorResponse,
         unwrap: () => Promise.resolve(errorResponse),
-      }));
+      };
+
+      mockDispatch.mockImplementationOnce(() => dispatchResult);
 
       await expect(result.current.resendVerification(resendVerificationPayload)).rejects.toThrow(
         ApiError

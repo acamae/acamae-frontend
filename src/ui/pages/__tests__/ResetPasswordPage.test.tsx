@@ -18,7 +18,7 @@ function renderResetPasswordPage({ token = 'mock-token' }: { token?: string } = 
       <Route path="/restablecer-clave" element={<ResetPasswordPage />} />
     </Routes>,
     {
-      route: `/restablecer-clave?${token ? `token=${token}` : ''}`,
+      route: token ? `/restablecer-clave?token=${token}` : '/restablecer-clave',
     }
   );
 }
