@@ -15,6 +15,12 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
+      - name: Verify branch
+        run: |
+          if [[ "${{ github.ref }}" != "refs/heads/release" ]]; then
+            echo "❌ This workflow should only run on the release branch"
+            exit 1
+          fi
       - name: Setup environment
         uses: ./.github/actions/setup-env
         with:

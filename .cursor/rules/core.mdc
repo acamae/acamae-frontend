@@ -7,27 +7,79 @@ alwaysApply: true
 
 ## Architectural Decisions {.section}
 
-### Branch & CI/CD Strategy {.subsection}
+### Git Flow & Branch Strategy {.subsection}
 {.decision-list}
-- **Decision**: Adopt strict main branch protection and scalable CI/CD flows for large teams
+- **Decision**: Implement Git Flow with release branch for versioning
 - **Status**: ACCEPTED
-- **Date**: 2025-06-18
-- **Context**: Need to ensure quality, traceability, and efficiency in large development teams
+- **Date**: 2024-03-20
+- **Context**: Need for clear versioning strategy and automated releases
 - **Consequences**:
-  - main is protected: only merge via Pull Request, never direct push
-  - Mandatory review and successful CI before merging to main
-  - CI (lint, test, validations) on every push to feature/*, fix/*, and main, and on every PR to main
-  - Versioning and publishing only on main after successful CI
-  - feature/* and fix/* are not strictly protected, but have basic CI
-  - Flow compatible with monorepo and multiple active branches
+  - feature/* and fix/* branches for development
+  - release branch for versioning and publishing
+  - main branch for stable code
+  - Clean git history with semantic versioning
+  - Automated version bumping with Lerna
 - **Validation Rules**:
-  - MUST protect main with branch protection rules (review, CI, up-to-date)
-  - MUST run CI on push to main, feature/*, fix/*, and on PRs to main
-  - MUST allow merging to main only via PR with CI and review
-  - MUST version/publish only on main
-  - MUST avoid versioning/publishing on feature/* and fix/*
-  - SHOULD allow fast work on feature/fix without unnecessary blockers
-  - SHOULD scale to large teams and multiple branches
+  - MUST use feature/* for new features
+  - MUST use fix/* for bug fixes
+  - MUST use release branch for versioning
+  - MUST merge main to release for versioning
+  - MUST merge release back to main with new version
+  - MUST NOT version/publish on feature/* or fix/* branches
+
+### Pre-commit Validation Strategy {.subsection}
+{.decision-list}
+- **Decision**: Implement pre-commit hooks for critical validations
+- **Status**: ACCEPTED
+- **Date**: 2024-03-20
+- **Context**: Need for early validation and consistent code quality
+- **Consequences**:
+  - Early detection of issues
+  - Consistent validation across team
+  - Faster feedback loop
+  - Reduced CI failures
+- **Validation Rules**:
+  - MUST validate workflows before commit
+  - MUST validate critical configurations
+  - MUST run lint on changed files
+  - MUST run tests on changed files
+  - MUST prevent commit if validations fail
+
+### CI/CD Pipeline Strategy {.subsection}
+{.decision-list}
+- **Decision**: Implement unified CI pipeline with sequential jobs
+- **Status**: ACCEPTED
+- **Date**: 2024-03-20
+- **Context**: Need for efficient and reliable CI/CD process
+- **Consequences**:
+  - Single job (ci-all) for all validations
+  - Sequential execution of steps
+  - Consistent environment setup
+  - Clear validation flow
+- **Validation Rules**:
+  - MUST run ci-all on PRs to main and release
+  - MUST use setup-env action for environment
+  - MUST run all validations in sequence
+  - MUST prevent merge if CI fails
+
+### Versioning & Publishing Strategy {.subsection}
+{.decision-list}
+- **Decision**: Version and publish only on release branch
+- **Status**: ACCEPTED
+- **Date**: 2024-03-20
+- **Context**: Need for controlled versioning and publishing process
+- **Consequences**:
+  - Version bump only on release branch
+  - Package publishing after versioning
+  - Clean release history
+  - Automated tag creation
+- **Validation Rules**:
+  - MUST run versioning workflow only on release branch
+  - MUST use Lerna for version management
+  - MUST create git tags for each release
+  - MUST publish packages after successful versioning
+  - MUST ensure git identity is properly configured
+  - MUST validate versioning commands only in release.yml
 
 ### Coverage Validation Strategy {.subsection}
 {.decision-list}
@@ -114,40 +166,6 @@ alwaysApply: true
   - MUST check for proper checkout before local actions
   - MUST verify required permissions
   - MUST ensure proper token handling
-
-### Branch Strategy {.subsection}
-{.decision-list}
-- **Decision**: Use feature/* and fix/* branches with pre-release versions
-- **Status**: ACCEPTED
-- **Date**: 2025-06-18
-- **Context**: Need for clear versioning and branch management strategy
-- **Consequences**:
-  - Clear version tracking
-  - Proper pre-release handling
-  - Automated version bumping
-  - Clean git history
-- **Validation Rules**:
-  - MUST use feature/* for new features
-  - MUST use fix/* for bug fixes
-  - MUST NOT update versions on main directly
-  - MUST use Lerna for version management
-
-### Versioning Only on Main {.subsection}
-{.decision-list}
-- **Decision**: Only generate new versions when workflow runs on main branch
-- **Status**: ACCEPTED
-- **Date**: 2025-06-18
-- **Context**: Prevent pre-releases and version bumps on feature/fix branches; ensure only stable, reviewed code increments version
-- **Consequences**:
-  - No versioning or publishing on feature/fix branches
-  - Version/tag only created on merge or push to main
-  - Clean release history
-  - Prevents accidental pre-releases
-- **Validation Rules**:
-  - MUST restrict versioning job to `main` branch in CI workflow
-  - MUST NOT generate versions/tags in feature/fix branches
-  - MUST ensure all keys in action.yml are compatible with GitHub Actions composite actions
-  - MUST check the latest official GitHub Actions documentation before adding or assuming new keys
 
 ## Core Persona & Approach {.section}
 
