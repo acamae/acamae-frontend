@@ -42,13 +42,13 @@ api.interceptors.request.use(
   },
 
   error => {
-    return Promise.reject(error);
+    return Promise.reject(error instanceof Error ? error : new Error(String(error)));
   }
 );
 
 api.interceptors.response.use(
   response => {
-    const url = response.config.url || '';
+    const url = response.config.url ?? '';
 
     if (JSON.parse(String(process.env.REACT_APP_ENABLE_ANALYTICS).toLowerCase())) {
       console.log('Analytics tracking enabled for API calls');
@@ -63,7 +63,7 @@ api.interceptors.response.use(
   },
 
   error => {
-    const url = error.config?.url || '';
+    const url = error.config?.url ?? '';
 
     // Optionally, we can perform specific actions based on the error status
     if (error.response) {
@@ -90,7 +90,7 @@ api.interceptors.response.use(
     }
 
     // We can choose to rethrow the error or handle it as needed
-    return Promise.reject(error);
+    return Promise.reject(error instanceof Error ? error : new Error(String(error)));
   }
 );
 

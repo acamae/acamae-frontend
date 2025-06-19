@@ -6,6 +6,6 @@ export const authPersistConfig = {
   key: 'auth',
   storage,
   transforms: [tokenTransform],
-  // Solo persistir estos campos
+  // Only persist these fields
   whitelist: ['user', 'token', 'isAuthenticated'],
 };

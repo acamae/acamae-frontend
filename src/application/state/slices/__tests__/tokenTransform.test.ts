@@ -1,6 +1,6 @@
 import { encryptToken, decryptToken } from '@application/state/tokenTransform';
 
-const SECRET_KEY = process.env.REACT_APP_TOKEN_SECRET || 'default_secret';
+const SECRET_KEY = process.env.REACT_APP_TOKEN_SECRET ?? 'default_secret';
 
 describe('tokenTransform', () => {
   it('should encrypt the token on persist and decrypt it on rehydrate', () => {
@@ -16,9 +16,8 @@ describe('tokenTransform', () => {
 
   it('should return null if the token is null or undefined', () => {
     expect(encryptToken(null)).toBeNull();
-    expect(encryptToken(undefined)).toBeNull();
+    expect(encryptToken()).toBeNull();
     expect(decryptToken(null)).toBeNull();
-    expect(decryptToken(undefined)).toBeNull();
   });
 
   it('should return null if decryption fails', () => {

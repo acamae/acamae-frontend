@@ -269,8 +269,7 @@ const TCOffcanvas: React.FC<TCOffcanvasProps> = ({ show, onHide }) => {
               </p>
               <p>
                 Estos términos y condiciones establecen las reglas y regulaciones para el uso del
-                sitio web de <span>Nombre de la Empresa</span>, ubicado en <span>SitioWeb.com</span>
-                .
+                sitio web de <span>Nombre de la Empresa</span>, en <span>SitioWeb.com</span>.
               </p>
               <p>
                 Al acceder a este sitio web, asumimos que acepta estos términos y condiciones. No

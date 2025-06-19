@@ -9,16 +9,16 @@ import es from '@infrastructure/i18n/locales/es-ES.json';
 import { makeTestStore } from '@shared/utils/reduxTestUtils';
 import PrivateRoute from '@ui/components/PrivateRoute';
 
-// Componente de prueba para renderizar dentro de PrivateRoute
+// Mock component for testing
 const MockProtectedComponent = () => <div data-testid="protected-content">Contenido Protegido</div>;
 
-// Componente para mostrar la ruta actual (para verificar redirecciones)
+// Component to display the current location (for checking redirects)
 const LocationDisplay = () => {
   const location = useLocation();
   return <div data-testid="location-display">{location.pathname}</div>;
 };
 
-// Estado base para auth, coincidiendo con initialState de authSlice
+// Base auth state, matching initialState of authSlice
 const baseAuthState: AuthState = {
   isAuthenticated: true,
   user: null,
@@ -27,7 +27,7 @@ const baseAuthState: AuthState = {
   loading: false,
 };
 
-// Configurar el mock store de Redux
+// Configure the mock Redux store
 describe('PrivateRoute', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -37,7 +37,7 @@ describe('PrivateRoute', () => {
     partialInitialAuthState: Partial<AuthState>,
     initialEntries = ['/protected']
   ) => {
-    // Crear un estado auth completo fusionando el base con el parcial del test
+    // Create a complete auth state by merging the base with the partial test state
     const fullInitialAuthState: AuthState = {
       ...baseAuthState,
       ...partialInitialAuthState,
@@ -70,7 +70,7 @@ describe('PrivateRoute', () => {
   };
 
   it('should show loading message when loading is true', () => {
-    renderWithRouterAndRedux({ loading: true, isAuthenticated: false }); // Aquí isAuthenticated es opcional, pero baseAuthState lo tiene
+    renderWithRouterAndRedux({ loading: true, isAuthenticated: false });
     expect(screen.getByTestId('session-checking')).toBeInTheDocument();
     expect(screen.getByText(es.session.checking)).toBeInTheDocument();
   });

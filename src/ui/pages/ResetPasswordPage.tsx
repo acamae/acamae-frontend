@@ -8,7 +8,7 @@ import ResetPasswordForm from '@ui/components/Forms/ResetPasswordForm';
 const ResetPasswordPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token') || '';
+  const token = searchParams.get('token') ?? '';
 
   return (
     <Container className="py-5">

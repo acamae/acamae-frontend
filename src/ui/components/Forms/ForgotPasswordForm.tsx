@@ -16,9 +16,9 @@ const ForgotPasswordForm: React.FC = () => {
   const validate = useCallback(
     (values: ForgotPasswordPayload) => {
       const errors: Partial<ForgotPasswordPayload> = {};
-      if (!values.email || !validateEmail(values.email)) {
+      if (!values.email) {
         errors.email = t('errors.email.required');
-      } else if (!values.email || !validateEmail(values.email)) {
+      } else if (!validateEmail(values.email)) {
         errors.email = t('errors.email.invalid');
       }
       return errors;
