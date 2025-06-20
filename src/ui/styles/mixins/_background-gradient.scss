@@ -1,8 +1,6 @@
 @mixin background-gradient($className, $from, $to, $direction: top) {
   .#{$className} {
     background: $from;
-  }
-  .#{$className} {
     background: -moz-linear-gradient($direction, $from, $to) !important;
     background: -webkit-linear-gradient($direction, $from, $to) !important;
     @if $direction == top {

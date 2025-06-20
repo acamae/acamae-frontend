@@ -1,6 +1,8 @@
 import { jest } from '@jest/globals';
 
+import { resetTimer } from '@application/state/slices/sessionTimerSlice';
 import { API_ROUTES } from '@shared/constants/apiRoutes';
+import { configureAxiosService } from '@shared/services/axiosService';
 
 interface StoreState {
   auth: {
@@ -18,32 +20,31 @@ interface AxiosResponse {
   };
 }
 
-const reqOk: ((config: AxiosConfig) => AxiosConfig)[] = [];
-const reqErr: ((error: unknown) => unknown)[] = [];
-const resOk: ((response: AxiosResponse) => AxiosResponse)[] = [];
-const resErr: ((error: unknown) => Promise<never>)[] = [];
+configureAxiosService({
+  getToken: () => storeMock.getState().auth.token,
+  onSessionRenewal: () => storeMock.dispatch(resetTimer()),
+});
 
 jest.mock('axios', () => {
+  // Internal arrays to capture the interceptors
+  const reqOk: Array<(c: unknown) => unknown> = [];
+  const reqErr: Array<(e: unknown) => unknown> = [];
+  const resOk: Array<(r: unknown) => unknown> = [];
+  const resErr: Array<(e: unknown) => Promise<never>> = [];
+
   const create = jest.fn(() => ({
     interceptors: {
       request: {
-        use: jest.fn(
-          (ok: (config: AxiosConfig) => AxiosConfig, err: (error: unknown) => unknown) => {
-            reqOk.push(ok);
-            reqErr.push(err);
-          }
-        ),
+        use: jest.fn((ok: (cfg: unknown) => unknown, err: (e: unknown) => unknown) => {
+          reqOk.push(ok);
+          reqErr.push(err);
+        }),
       },
       response: {
-        use: jest.fn(
-          (
-            ok: (response: AxiosResponse) => AxiosResponse,
-            err: (error: unknown) => Promise<never>
-          ) => {
-            resOk.push(ok);
-            resErr.push(err);
-          }
-        ),
+        use: jest.fn((ok: (res: unknown) => unknown, err: (e: unknown) => Promise<never>) => {
+          resOk.push(ok);
+          resErr.push(err);
+        }),
       },
     },
   }));
@@ -53,8 +54,23 @@ jest.mock('axios', () => {
     default: { create },
     create,
     AxiosHeaders: jest.fn(),
+    __mock: { reqOk, reqErr, resOk, resErr },
   };
 });
+
+type InterceptorFn = (...args: unknown[]) => unknown;
+
+const getAxiosMock = () =>
+  (
+    require('axios') as {
+      __mock: {
+        reqOk: InterceptorFn[];
+        reqErr: InterceptorFn[];
+        resOk: InterceptorFn[];
+        resErr: InterceptorFn[];
+      };
+    }
+  ).__mock;
 
 jest.mock('@infrastructure/storage/localStorageService', () => ({
   localStorageService: { remove: jest.fn() },
@@ -80,9 +96,9 @@ beforeAll(() => {
 
 describe('axiosService unit tests', () => {
   beforeEach(() => {
-    reqOk.length = 0;
-    resOk.length = 0;
-    resErr.length = 0;
+    getAxiosMock().reqOk.length = 0;
+    getAxiosMock().resOk.length = 0;
+    getAxiosMock().resErr.length = 0;
     jest.resetModules();
     jest.clearAllMocks();
     jest.spyOn(global.console, 'log').mockImplementation(() => {});
@@ -115,10 +131,11 @@ describe('axiosService unit tests', () => {
       storeMock.getState.mockReturnValueOnce({ auth: { token: 'abc123' } } as StoreState);
 
       require('@shared/services/axiosService');
+      const { reqOk } = getAxiosMock();
       expect(reqOk).toHaveLength(1);
 
       const cfg: AxiosConfig = { headers: {} };
-      const result = reqOk[0](cfg);
+      const result = (reqOk[0] as (c: AxiosConfig) => AxiosConfig)(cfg);
       expect(result.headers.Authorization).toBe('Bearer abc123');
     });
   });
@@ -127,8 +144,9 @@ describe('axiosService unit tests', () => {
     jest.isolateModules(() => {
       storeMock.getState.mockReturnValueOnce({ auth: { token: null } } as StoreState);
       require('@shared/services/axiosService');
+      const { reqOk } = getAxiosMock();
       const cfg: AxiosConfig = { headers: {} };
-      const result = reqOk[0](cfg);
+      const result = (reqOk[0] as (c: AxiosConfig) => AxiosConfig)(cfg);
       expect(result.headers.Authorization).toBeUndefined();
     });
   });
@@ -138,6 +156,7 @@ describe('axiosService unit tests', () => {
       const jsonSpy = jest.spyOn(JSON, 'parse').mockReturnValue(false as unknown);
 
       require('@shared/services/axiosService');
+      const { resOk } = getAxiosMock();
       expect(resOk).toHaveLength(1);
 
       const resetTimer = require('@application/state/slices/sessionTimerSlice').resetTimer;
@@ -160,7 +179,8 @@ describe('axiosService unit tests', () => {
         config: { url: '/otro' },
       };
 
-      resErr[0](error401).catch(() => {});
+      const { resErr } = getAxiosMock();
+      (resErr[0] as (e: unknown) => Promise<never>)(error401).catch(() => {});
 
       expect(localStorageService.remove).toHaveBeenCalledWith('REACT_APP_AUTH_TOKEN_KEY');
       expect(localStorageService.remove).toHaveBeenCalledWith('REACT_APP_REFRESH_TOKEN_KEY');
@@ -177,6 +197,7 @@ describe('axiosService unit tests', () => {
       require('@shared/services/axiosService');
 
       const response: AxiosResponse = { config: { url: '/some' } } as AxiosResponse;
+      const { resOk } = getAxiosMock();
       resOk[0](response);
 
       expect(logSpy).toHaveBeenCalledWith('Analytics tracking enabled for API calls');
@@ -197,6 +218,7 @@ describe('axiosService unit tests', () => {
         config: {},
       };
 
+      const { resErr } = getAxiosMock();
       await expect(resErr[0](errorObj)).rejects.toBeInstanceOf(Error);
     });
   });
@@ -207,6 +229,7 @@ describe('axiosService unit tests', () => {
 
       const errorObj: unknown = { message: 'boom', code: 'GEN', config: {} };
 
+      const { resErr } = getAxiosMock();
       await expect(resErr[0](errorObj)).rejects.toBeInstanceOf(Error);
     });
   });
@@ -215,8 +238,9 @@ describe('axiosService unit tests', () => {
     jest.isolateModules(() => {
       storeMock.getState.mockReturnValueOnce({ auth: { token: 'abc' } });
       require('@shared/services/axiosService');
+      const { reqOk } = getAxiosMock();
       const cfg: AxiosConfig = { headers: {} };
-      const modified = reqOk[0](cfg);
+      const modified = (reqOk[0] as (c: AxiosConfig) => AxiosConfig)(cfg);
       expect(modified.headers.Authorization).toBe('Bearer abc');
     });
   });
@@ -227,6 +251,7 @@ describe('axiosService unit tests', () => {
 
       const errorObj = 'boom';
       // Invoke captured request error handler and assert the rejection is an Error instance
+      const { reqErr } = getAxiosMock();
       await expect(reqErr[0](errorObj)).rejects.toBeInstanceOf(Error);
     });
   });
@@ -236,8 +261,9 @@ describe('axiosService unit tests', () => {
       storeMock.getState.mockReturnValueOnce({ auth: { token: 'dup' } });
       require('@shared/services/axiosService');
 
+      const { reqOk } = getAxiosMock();
       const cfg: AxiosConfig = { headers: { 'X-Custom': '1' } };
-      const modified = reqOk[0](cfg);
+      const modified = (reqOk[0] as (c: AxiosConfig) => AxiosConfig)(cfg);
       expect(modified.headers.Authorization).toBe('Bearer dup');
       expect(modified.headers['X-Custom']).toBe('1');
     });
@@ -255,7 +281,8 @@ describe('axiosService unit tests', () => {
         config: { url: API_ROUTES.AUTH.LOGIN },
       };
 
-      return resErr[0](error401).catch(() => {
+      const { resErr } = getAxiosMock();
+      return (resErr[0] as (e: unknown) => Promise<never>)(error401).catch(() => {
         expect(localStorageService.remove).toHaveBeenCalledTimes(2);
         expect(storeMock.dispatch).toHaveBeenCalledWith(resetTimer());
       });
@@ -271,6 +298,7 @@ describe('axiosService unit tests', () => {
       require('@shared/services/axiosService');
 
       const res: AxiosResponse = { config: { url: API_ROUTES.AUTH.ME } } as AxiosResponse;
+      const { resOk } = getAxiosMock();
       resOk[0](res);
       expect(storeMock.dispatch).toHaveBeenCalledWith(resetTimer());
 
@@ -284,8 +312,9 @@ describe('axiosService unit tests', () => {
       require('@shared/services/axiosService');
 
       // Pass config WITHOUT headers field to trigger the falsy branch of `config.headers || {}`
+      const { reqOk } = getAxiosMock();
       const cfg = {} as unknown as AxiosConfig;
-      const modified = reqOk[0](cfg);
+      const modified = (reqOk[0] as (c: AxiosConfig) => AxiosConfig)(cfg);
       expect(modified.headers.Authorization).toBe('Bearer new');
     });
   });
@@ -294,6 +323,7 @@ describe('axiosService unit tests', () => {
     await jest.isolateModulesAsync(async () => {
       require('@shared/services/axiosService');
       const errInstance = Object.assign(new Error('native'), { config: {} });
+      const { resErr } = getAxiosMock();
       await expect(resErr[0](errInstance)).rejects.toBe(errInstance);
     });
   });

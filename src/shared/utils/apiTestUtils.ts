@@ -12,7 +12,7 @@ export interface ApiResponseBody<TData = null> {
   errors?: { field: string; errorKey: string }[];
 }
 
-// Simula la estructura de error de Axios para los mocks
+// Simulates the error structure of Axios for mocks
 export interface MockAxiosError extends Error {
   isAxiosError: boolean;
   response: {
@@ -21,14 +21,14 @@ export interface MockAxiosError extends Error {
   };
 }
 
-// Esta interfaz se exporta para que los tests puedan tipar sus parámetros si lo desean
+// This interface is exported so that tests can type their parameters if they want
 export interface SimulateApiCallParams<TResponseData = unknown, TRequestData = unknown> {
   method: 'get' | 'post' | 'put' | 'delete';
   url: string;
   requestData?: TRequestData;
   httpStatusCode: number;
   apiResponseBody: ApiResponseBody<TResponseData>;
-  networkError?: Error; // Para simular errores donde no hay respuesta HTTP
+  networkError?: Error; // To simulate errors where there is no HTTP response
 }
 
 export const setupMockApiServiceCall = <TResponseData = unknown, TRequestData = unknown>(
@@ -121,9 +121,8 @@ export interface IPromiseMockParams {
   error?: string | null;
 }
 
-export interface IPromiseMock {
-  (params?: IPromiseMockParams): jest.Mock;
-}
+// Type alias instead of interface with only function signature (eslint consistent-type-definitions)
+export type IPromiseMock = (params?: IPromiseMockParams) => jest.Mock;
 
 export const promiseMock: IPromiseMock = ({ error = null }: IPromiseMockParams = {}) => {
   return jest.fn(() =>

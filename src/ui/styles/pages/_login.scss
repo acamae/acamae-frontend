@@ -16,32 +16,22 @@
   }
 
   .app-without-header {
-    & {
-      min-height: calc(100vh - $app-header-height);
-    }
+    min-height: calc(100vh - $app-header-height);
   }
 
   .app-without-footer {
-    & {
-      min-height: calc(100vh - $app-footer-height);
-    }
+    min-height: calc(100vh - $app-footer-height);
   }
 
   .app-content-full-height {
-    & {
-      min-height: 100vh;
-    }
+    min-height: 100vh;
   }
 
   .app-content-full-height.app-without-header {
-    & {
-      min-height: calc(100vh - $app-header-height);
-    }
+    min-height: calc(100vh - $app-header-height);
   }
 
   .app-content-full-height.app-without-footer {
-    & {
-      min-height: calc(100vh - $app-footer-height);
-    }
+    min-height: calc(100vh - $app-footer-height);
   }
 }
