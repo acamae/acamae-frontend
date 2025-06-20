@@ -1,7 +1,5 @@
 import axios, { AxiosHeaders } from 'axios';
 
-import { resetTimer } from '@application/state/slices/sessionTimerSlice';
-import { store } from '@application/state/store';
 import { localStorageService } from '@infrastructure/storage/localStorageService';
 import { API_ROUTES } from '@shared/constants/apiRoutes';
 
@@ -21,14 +19,74 @@ const api = axios.create({
   withCredentials: true, // Send cookies in cross-origin requests (CORS)
 });
 
+// Callbacks configurable to get the token and handle session renewal.
+type GetTokenFn = () => string | null | undefined;
+type SessionRenewalFn = () => void;
+
+const NOOP: SessionRenewalFn = () => {};
+
+let getTokenFn: GetTokenFn = () => null;
+let onSessionRenewalFn: SessionRenewalFn = NOOP;
+
+const getLazyStore = (): unknown => {
+  try {
+    const mod = require('@application/state/store');
+    return mod?.store ?? null;
+  } catch {
+    return null;
+  }
+};
+
+// Minimal types to avoid using any in assertions
+type StoreLike = {
+  dispatch?: (action: unknown) => void;
+  getState?: () => { auth?: { token?: string | null } };
+};
+
+type TimerSlice = {
+  resetTimer: () => unknown;
+};
+
+const dispatchResetTimerFallback = () => {
+  try {
+    const timerSlice = require('@application/state/slices/sessionTimerSlice') as TimerSlice;
+    const store = getLazyStore() as StoreLike;
+    store?.dispatch?.(timerSlice.resetTimer());
+  } catch {
+    /* ignore */
+  }
+};
+
+/**
+ * Allows injecting functions to avoid direct dependencies (breaks import cycles).
+ * Must be called once during app startup, for example after creating the store.
+ */
+export const configureAxiosService = (
+  options: {
+    getToken?: GetTokenFn;
+    onSessionRenewal?: SessionRenewalFn;
+  } = {}
+): void => {
+  if (options.getToken) getTokenFn = options.getToken;
+  if (options.onSessionRenewal) onSessionRenewalFn = options.onSessionRenewal;
+};
+
 api.interceptors.request.use(
   config => {
     // Get authentication token from local storage (localStorage)
-    const token = store.getState().auth.token;
+    let token = getTokenFn();
 
+    // Fallback for tests where configureAxiosService has not been called
+    if (!token) {
+      const store = getLazyStore() as StoreLike;
+      token = store?.getState?.()?.auth?.token ?? null;
+    }
+
+    // Ensure headers exists and add Authorization only once
+    const headers = (config.headers ??= {} as AxiosHeaders);
+
+    // Only add the header if there is a valid token
     if (token) {
-      // Ensure headers exists and add Authorization only once
-      const headers = (config.headers ??= {} as AxiosHeaders);
       headers.Authorization = `Bearer ${token}`;
     }
 
@@ -50,7 +108,11 @@ api.interceptors.response.use(
 
     // If the URL is in the list of endpoints that renew the session (token expiration)
     if (SESSION_RENEWAL_ENDPOINTS.some(endpoint => url.includes(endpoint))) {
-      store.dispatch(resetTimer());
+      if (onSessionRenewalFn !== NOOP) {
+        onSessionRenewalFn();
+      } else {
+        dispatchResetTimerFallback();
+      }
     }
 
     return response;
@@ -70,7 +132,11 @@ api.interceptors.response.use(
 
       // If the URL is in the list of endpoints that renew the session (token expiration)
       if (SESSION_RENEWAL_ENDPOINTS.some(endpoint => url.includes(endpoint))) {
-        store.dispatch(resetTimer());
+        if (onSessionRenewalFn !== NOOP) {
+          onSessionRenewalFn();
+        } else {
+          dispatchResetTimerFallback();
+        }
       }
     } else if (error.request) {
       console.error('No response received. Request:', error.message, error.code);

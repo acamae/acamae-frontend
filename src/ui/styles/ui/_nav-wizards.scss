@@ -68,8 +68,6 @@
           height: rem(2px);
           background: rgba(var(--#{$prefix}inverse-rgb), 0.3);
           transition: all 0.2s linear;
-        }
-        &:before {
           left: calc(-50% + 20px);
           right: calc(50% + 20px);
         }

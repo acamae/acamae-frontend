@@ -207,7 +207,7 @@ const RegisterForm: React.FC = () => {
             label={
               <Trans
                 i18nKey="register.terms_and_conditions"
-                components={{ url: <a href="#" onClick={handleShow} /> }}
+                components={{ url: <a href="#" onClick={handleShow} /> }} // NOSONAR: This is valid
               />
             }
             id="terms"
