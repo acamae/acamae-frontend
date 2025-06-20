@@ -96,6 +96,12 @@
 
 .ql-editor table {
   border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.ql-editor table td {
+  outline: none;
 }
 
 .ql-editor td {
@@ -481,15 +487,6 @@
   text-align: left;
 }
 
-.ql-editor table {
-  table-layout: fixed;
-  width: 100%;
-}
-
-.ql-editor table td {
-  outline: none;
-}
-
 .ql-editor .ql-code-block-container {
   font-family: monospace;
 }
@@ -633,7 +630,6 @@
   border: none;
   cursor: pointer;
   display: inline-block;
-  float: left;
   height: 24px;
   padding: 3px 5px;
   width: 28px;
@@ -769,20 +765,6 @@
   visibility: hidden;
 }
 
-.ql-snow .ql-tooltip {
-  position: absolute;
-  transform: translateY(10px);
-}
-
-.ql-snow .ql-tooltip a {
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.ql-snow .ql-tooltip.ql-flip {
-  transform: translateY(-10px);
-}
-
 .ql-snow .ql-formats {
   display: inline-block;
   vertical-align: middle;
@@ -888,17 +870,14 @@
   margin-bottom: 5px;
   margin-top: 5px;
   padding: 5px 10px;
+  background-color: #23241f;
+  color: #f8f8f2;
+  overflow: visible;
 }
 
 .ql-snow .ql-editor code {
   font-size: 85%;
   padding: 2px 4px;
-}
-
-.ql-snow .ql-editor .ql-code-block-container {
-  background-color: #23241f;
-  color: #f8f8f2;
-  overflow: visible;
 }
 
 .ql-snow .ql-editor img {
@@ -908,7 +887,6 @@
 .ql-snow .ql-picker {
   color: #444;
   display: inline-block;
-  float: left;
   font-size: 14px;
   font-weight: 500;
   height: 24px;
@@ -1211,6 +1189,8 @@
 }
 
 .ql-snow .ql-tooltip {
+    position: absolute;
+  transform: translateY(10px);
   background-color: #fff;
   border: 1px solid #ccc;
   box-shadow: 0 0 5px #ddd;
@@ -1235,6 +1215,16 @@
   width: 170px;
 }
 
+.ql-snow .ql-tooltip a {
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 26px;
+}
+
+.ql-snow .ql-tooltip.ql-flip {
+  transform: translateY(-10px);
+}
+
 .ql-snow .ql-tooltip a.ql-preview {
   display: inline-block;
   max-width: 200px;
@@ -1253,10 +1243,6 @@
 .ql-snow .ql-tooltip a.ql-remove:before {
   content: 'Remove';
   margin-left: 8px;
-}
-
-.ql-snow .ql-tooltip a {
-  line-height: 26px;
 }
 
 .ql-snow .ql-tooltip.ql-editing a.ql-preview,

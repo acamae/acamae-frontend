@@ -1,8 +1,8 @@
 import React from 'react';
 
-function Card(props: { className?: string; children: React.ReactNode }) {
+function Card(props: Readonly<{ className?: string; children: React.ReactNode }>) {
   return (
-    <div className={'card ' + (props.className ? props.className : '')} data-testid="card">
+    <div className={'card ' + (props.className ?? '')} data-testid="card">
       {props.children}
 
       <div className="card-arrow" data-testid="card-arrow">
@@ -15,51 +15,41 @@ function Card(props: { className?: string; children: React.ReactNode }) {
   );
 }
 
-function CardHeader(props: { className?: string; children: React.ReactNode }) {
+function CardHeader(props: Readonly<{ className?: string; children: React.ReactNode }>) {
   return (
-    <div
-      className={'card-header ' + (props.className ? props.className : '')}
-      data-testid="card-header">
+    <div className={'card-header ' + (props.className ?? '')} data-testid="card-header">
       {props.children}
     </div>
   );
 }
 
-function CardBody(props: { className?: string; children: React.ReactNode }) {
+function CardBody(props: Readonly<{ className?: string; children: React.ReactNode }>) {
   return (
-    <div
-      className={'card-body ' + (props.className ? props.className : '')}
-      data-testid="card-body">
+    <div className={'card-body ' + (props.className ?? '')} data-testid="card-body">
       {props.children}
     </div>
   );
 }
 
-function CardImgOverlay(props: { className?: string; children: React.ReactNode }) {
+function CardImgOverlay(props: Readonly<{ className?: string; children: React.ReactNode }>) {
   return (
-    <div
-      className={'card-img-overlay ' + (props.className ? props.className : '')}
-      data-testid="card-img-overlay">
+    <div className={'card-img-overlay ' + (props.className ?? '')} data-testid="card-img-overlay">
       {props.children}
     </div>
   );
 }
 
-function CardFooter(props: { className?: string; children: React.ReactNode }) {
+function CardFooter(props: Readonly<{ className?: string; children: React.ReactNode }>) {
   return (
-    <div
-      className={'card-footer ' + (props.className ? props.className : '')}
-      data-testid="card-footer">
+    <div className={'card-footer ' + (props.className ?? '')} data-testid="card-footer">
       {props.children}
     </div>
   );
 }
 
-function CardGroup(props: { className?: string; children: React.ReactNode }) {
+function CardGroup(props: Readonly<{ className?: string; children: React.ReactNode }>) {
   return (
-    <div
-      className={'card-group ' + (props.className ? props.className : '')}
-      data-testid="card-group">
+    <div className={'card-group ' + (props.className ?? '')} data-testid="card-group">
       {props.children}
     </div>
   );

@@ -911,7 +911,6 @@
   position: fixed;
   bottom: $spacer * 3;
   right: $spacer;
-  z-index: 1020;
   background: var(--#{$prefix}white);
   padding: $spacer * 0.5;
   width: rem(60px);

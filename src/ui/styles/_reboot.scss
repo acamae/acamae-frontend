@@ -27,7 +27,6 @@ html {
     background-repeat: no-repeat;
     background-position: center;
     background-attachment: initial;
-    height: 100%;
     transition: background 0.2s linear;
     background-size: cover;
   }
@@ -56,7 +55,6 @@ body {
     background-image: var(--#{$prefix}body-bg-image);
     background-size: var(--#{$prefix}body-bg-image-size);
     background-repeat: repeat;
-    background-attachment: initial;
     z-index: -5;
   }
   &:not(.app-init) * {

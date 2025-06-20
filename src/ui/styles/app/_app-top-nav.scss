@@ -133,8 +133,7 @@
       &.active {
         & > .menu-link {
           color: var(--#{$prefix}app-top-nav-menu-link-active-color);
-        }
-        & > .menu-link {
+
           & .menu-icon {
             color: $app-top-nav-menu-link-icon-active-color;
           }

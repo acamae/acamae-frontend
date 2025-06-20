@@ -21,13 +21,11 @@
         padding: 0;
       }
     }
-    & .mailbox-toolbar-link {
-      padding: $spacer * 0.5 $spacer;
-    }
     & .mailbox-toolbar-item {
       padding: $spacer * 0.5;
     }
     & .mailbox-toolbar-link {
+      padding: $spacer * 0.5 $spacer;
       color: rgba(var(--#{$prefix}inverse-rgb), 0.75);
       text-decoration: none;
       border-radius: $border-radius;
@@ -86,7 +84,6 @@
     align-items: center;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
 
     & .mailbox-empty-message-icon {
       & i {
