@@ -128,7 +128,6 @@
     "depcruise:svg": "dot -Tsvg dependency-graph.dot -o dependency-graph.svg",
     "depcruise:kpi": "node scripts/depcruise-kpi.js",
     "generate-ssl": "node ./scripts/generate-ssl.js",
-    "postinstall": "node ./scripts/generate-ssl.js",
     "release": "lerna publish --yes",
     "validate:workflows": "node scripts/validate-workflows.js",
     "validate:config": "node scripts/validate-critical-config.js",

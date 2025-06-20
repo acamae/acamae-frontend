@@ -45,9 +45,7 @@ export default [
     },
     rules: {
       'linebreak-style': 0,
-      'no-unused-vars': 'off',
       'react/react-in-jsx-scope': 'off',
-      'prettier/prettier': 'error',
       'react/prop-types': 'off',
       'prettier/prettier': [
         'error',
@@ -55,6 +53,27 @@ export default [
           endOfLine: 'auto',
         },
       ],
+
+      // Variables y declaraciones
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+      'no-var': 'error',
+      'prefer-const': 'error',
+
+      // Console y debugging
+      'no-console':
+        process.env.NODE_ENV === 'production' ? ['warn', { allow: ['warn', 'error'] }] : 'off',
+      'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+
+      // Imports y exports
+      'no-duplicate-imports': 'error',
       'import/order': [
         'error',
         {
@@ -67,14 +86,6 @@ export default [
       'import/no-named-as-default': 'warn',
       'import/no-named-as-default-member': 'warn',
       '@typescript-eslint/no-explicit-any': ['error', { ignoreRestArgs: true, fixToUnknown: true }],
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-          ignoreRestSiblings: true,
-        },
-      ],
     },
     settings: {
       react: { version: 'detect' },
