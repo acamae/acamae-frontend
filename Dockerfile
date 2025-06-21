@@ -1,7 +1,7 @@
 FROM node:22-alpine
 
 # Install necessary dependencies for compilation
-RUN apk add --no-cache python3 make g++ libc6-compat openssl curl
+RUN apk add --no-cache curl g++ libc6-compat make python3
 
 WORKDIR /app
 
@@ -20,6 +20,3 @@ COPY . .
 EXPOSE 3000
 
 USER node
-
-# Default to development
-CMD ["npm", "start"]
