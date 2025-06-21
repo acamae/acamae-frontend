@@ -2,12 +2,12 @@ services:
   frontend:
     build:
       context: ../
-    command: ['npm', 'run', 'start:dev']
+    command: ['npm', 'run', 'start:prod']
     container_name: acamae-frontend
     stdin_open: true
     tty: true
     env_file:
-      - ../.env.development
+      - ../.env.production
     expose:
       - '3000'
     volumes:
@@ -24,7 +24,7 @@ services:
 
 networks:
   acamae-network:
-    external: true
+    driver: bridge
 
 volumes:
   node_modules:

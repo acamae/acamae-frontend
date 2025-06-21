@@ -29,8 +29,8 @@ Designed for accessibility, internationalization, and maintainability.
   - `npm run lint` – Lint code
   - `npm run test` – Run unit tests
   - `npm run test:coverage` – Run tests with coverage
-  - `npm run docker-start` – Start with Docker (dev)
-  - `npm run docker-prod` – Start with Docker (prod)
+  - `npm run docker:up:dev` – Start with Docker (dev)
+  - `npm run docker:up:prod` – Start with Docker (prod)
 
 ---
 
@@ -133,7 +133,7 @@ npm run dev
 ### Running with Docker
 
 ```
-npm run docker-start
+npm run docker:up:dev
 ```
 
 ### Linting & Formatting
@@ -189,102 +189,88 @@ npm run update:snapshots
 
 #### GitHub Actions
 
-- **CI (`ci.yml`)**: Runs on all pushes and PRs to `main`, `feature/*`, and `fix/*`. Validates code with linter (auto-fix and strict), build, unit tests, coverage, and SonarCloud analysis.
-- **Release (`release.yml`)**: Runs only on `release` branch. Automates versioning, tagging, and publishing with Lerna using Conventional Commits. Only `release` branch is allowed for versioning/publishing.
-- **Lighthouse (`lighthouse.yml`)**: Runs after CI on `main`. Audits performance, accessibility, and best practices. Uploads Lighthouse reports as artifacts and creates issues on regression.
-
-#### Husky + lint-staged
-
-- **Pre-commit**:
-  - Skips automatically on Lerna versioning commits (detects commit messages that start with `chore(release):`).
-  - Type checking with TypeScript (`tsc --noEmit`).
-  - Runs unit tests only on staged files.
-  - Linter and auto-formatting on staged files via lint-staged (ESLint and Prettier).
-  - If any error remains after auto-fix, the commit is blocked.
-- **Commit-msg**: Validates that all commit messages follow Conventional Commits using commitlint.
-
-#### Other best practices
-
-- `.gitattributes` and `.prettierrc` enforce LF line endings to avoid cross-platform issues.
-- Workflows are separated for clarity and efficiency.
-- Main branch protection: only PRs to `main`, no direct pushes, all checks must pass.
+- **CI (`ci.yml`)**: Runs linting, build, tests, coverage, and SonarCloud on every push/PR to `main`, `feature/*`, or `fix/*`.
+- **Release (`release.yml`)**: Runs only on `release`. Automates versioning, tagging, and publishing with Lerna.
+- **Lighthouse (`lighthouse.yml`)**: After CI on `main`, performs Lighthouse audits and uploads reports as artifacts.
 
 ---
 
 ## Docker & Deployment
 
-- Dockerfile: Located in this package
-- Docker Compose: Used for local development and production
-- Nginx: Serves static files in production
-- CI/CD: GitHub Actions for linting, testing, and deployment
+🆕 **New local architecture (2025-06-21)**
 
-### Running in Production
+To prevent port collisions and simplify local development, **the backend's Nginx container is now the single TLS termination point**. The frontend container only runs `webpack-dev-server` and is exposed on the internal Docker network.
 
+### Step 1 — Create the external network (one-time)
+
+```bash
+npm run docker:create:net   # or:  docker network create --driver bridge acamae-network
 ```
-npm run docker-prod
+
+### Step 2 — Start the containers
+
+```bash
+# Frontend
+npm run docker:up:dev
+
+# Backend
+cd ../acamae-backend
+docker compose -f docker/docker-compose.yml up -d
 ```
 
----
+You can now access:
 
-## SonarCloud & Code Quality
+- `https://localhost` — React SPA with HMR
+- `https://localhost/api` — Backend API
 
-- **SonarCloud**: Static code analysis, code smells, coverage, and security.
-  - Configured via `sonar-project.properties`.
-  - Requires `SONAR_TOKEN` in the `development` environment.
-  - Automatically runs in CI after tests and coverage.
-- **Coverage**: Minimum 90% enforced. Reports generated with Jest and uploaded to SonarCloud.
-- **Lighthouse**: Performance and accessibility audits after each CI on `main`.
+### Step 3 — Shut everything down
 
----
+```bash
+npm run docker:down
+cd ../acamae-backend && docker compose down -v --remove-orphans
+```
 
-## Further Reading
+### Key notes
 
-- [SonarCloud Documentation](https://sonarcloud.io/documentation)
-- [Lerna Documentation](https://lerna.js.org/)
-- [Conventional Commits](https://www.conventionalcommits.org/)
-- [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci)
+- **No Nginx in frontend**: `docker/docker-compose.yml` of the frontend no longer contains an Nginx service nor publishes 80/443.
+- **Shared network**: both stacks declare `acamae-network` as `external: true`.
+- **Nginx config**: includes `resolver 127.0.0.11 valid=30s;` and proxies to `frontend:3000`.
+- **Port/service changes**: if you rename the service or change the internal port, update the `proxy_pass` rule accordingly.
+
+### Quick commands
+
+| Command                     | Description                                |
+| --------------------------- | ------------------------------------------ |
+| `npm run docker:create:net` | Create the `acamae-network` (run once)     |
+| `npm run docker:build:dev`  | Build the dev image of the frontend        |
+| `npm run docker:up:dev`     | Start the frontend container in dev mode   |
+| `npm run docker:up:prod`    | Start the production stack of the frontend |
+| `npm run docker:down`       | Stop the frontend and clean volumes        |
 
 ---
 
 ## Environment Variables
 
-| Variable                     | Description                          |
-| ---------------------------- | ------------------------------------ |
-| REACT_APP_LANG               | Default app language                 |
-| REACT_APP_AUTH_TOKEN_KEY     | Auth token key name in localStorage  |
-| REACT_APP_API_URL            | Backend API base URL                 |
-| REACT_APP_ENABLE_ANALYTICS   | Enable/disable analytics             |
-| REACT_APP_RECAPTCHA_SITE_KEY | Google reCAPTCHA public key          |
-| ...                          | See `.env.development` for full list |
-
-> Never include secrets or passwords in the frontend.
+- `SONAR_TOKEN`: Used for SonarCloud integration
 
 ---
 
 ## API Integration
 
-- All API endpoints are defined in `shared/constants/apiRoutes.ts`
-- API responses follow a uniform structure: `{ success, data, message, code, status }`
-- Always check the `success` field before processing data
+- Centralized API route management, Axios clients
 
 ---
 
 ## Contributing
 
-- Follow [Conventional Commits](https://www.conventionalcommits.org/)
-- Use `npm run commit` for standardized commit messages
-- See [Code Style & Conventions](#code-style--conventions) for details
+- Fork the repository
+- Create a new branch
+- Make your changes
+- Commit and push your changes
+- Create a pull request
 
 ---
 
 ## License
 
-[MIT](LICENSE)
-
-## 🛠️ Herramientas y Tecnologías
-
-- **Frontend**: React, TypeScript, TailwindCSS
-- **Testing**: Jest, React Testing Library
-- **CI/CD**: GitHub Actions
-- **Calidad de Código**: SonarCloud
-- **Gestión de Paquetes**: NPM, Lerna
+This project is licensed under the MIT License.

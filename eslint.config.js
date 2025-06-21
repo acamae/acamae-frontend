@@ -55,6 +55,7 @@ export default [
       ],
 
       // Variables y declaraciones
+      'no-unused-expressions': 'error',
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': [
         'error',
@@ -66,6 +67,8 @@ export default [
       ],
       'no-var': 'error',
       'prefer-const': 'error',
+      'prefer-arrow-callback': 'error',
+      'prefer-template': 'error',
 
       // Console y debugging
       'no-console':

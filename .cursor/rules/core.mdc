@@ -167,6 +167,24 @@ alwaysApply: true
   - MUST verify required permissions
   - MUST ensure proper token handling
 
+### Local Development Proxy Strategy {.subsection}
+{.decision-list}
+- **Decision**: Centralize HTTPS termination in backend Nginx and proxy React dev-server via internal Docker network
+- **Status**: ACCEPTED
+- **Date**: 2025-06-21
+- **Context**: Running `acamae-frontend` and `acamae-backend` simultaneously caused port collisions (80/443). The frontend only serves static React assets; therefore, a dedicated Nginx in the frontend stack is unnecessary.
+- **Consequences**:
+  - Removed Nginx container from `acamae-frontend` compose file
+  - Backend Nginx (`acamae-backend`) proxies `/` to `frontend:3000` and `/api` to `backend:4000`
+  - Both stacks must join the **external** Docker network `acamae-network`
+  - Developers access the entire platform at `https://localhost` without extra ports; CORS issues disappear (same origin)
+- **Validation Rules**:
+  - MUST create the external network once with `docker network create --driver bridge acamae-network` (or `npm run docker:create:net`)
+  - MUST declare `acamae-network` as `external: true` in every `docker-compose.yml`
+  - MUST expose (not publish) port 3000 in the frontend service
+  - MUST NOT publish 80/443 in the frontend compose; only backend Nginx publishes those ports
+  - MUST include `resolver 127.0.0.11 valid=30s;` in Nginx config or use `resolve` keyword to avoid startup failures
+
 ## Core Persona & Approach {.section}
 
 ### Autonomous Expert Role {.subsection}
