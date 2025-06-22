@@ -25,12 +25,27 @@ jest.mock('@application/state/actions/auth.actions', () => {
       'type' in action &&
       action.type === 'auth/logout/fulfilled',
   } as unknown;
-  return { logoutAction };
+
+  const loginAction = () => ({ type: 'auth/login/fulfilled' });
+  loginAction.fulfilled = {
+    match: (action: unknown) =>
+      typeof action === 'object' &&
+      action !== null &&
+      'type' in action &&
+      action.type === 'auth/login/fulfilled',
+  } as unknown;
+  return { logoutAction, loginAction };
 });
 
-const createTestStore = () =>
+// Stub auth reducer to control authentication state in each test
+const createAuthReducer = (isAuthenticated: boolean) => () => ({ isAuthenticated });
+
+const createTestStore = (isAuthenticated = true) =>
   configureStore({
-    reducer: { sessionTimer: sessionTimerReducer },
+    reducer: {
+      sessionTimer: sessionTimerReducer,
+      auth: createAuthReducer(isAuthenticated),
+    },
     middleware: getDefault => getDefault().concat(sessionTimerMiddleware),
   });
 
@@ -46,12 +61,24 @@ describe('sessionTimerMiddleware', () => {
     jest.useRealTimers();
   });
 
-  it('should dispatch resetTimer => setExpiresAt with future timestamp', () => {
-    const store = createTestStore();
+  it('should dispatch resetTimer => setExpiresAt with future timestamp when authenticated', () => {
+    const store = createTestStore(true);
     store.dispatch(resetTimer());
 
     const actions = store.getState().sessionTimer;
     expect(actions.expiresAt).toBeGreaterThan(0);
+  });
+
+  it('should ignore resetTimer when user is not authenticated', () => {
+    const store = createTestStore(false);
+    const { setExpiresAt } =
+      require('@infrastructure/storage/sessionExpiryService').sessionExpiryService;
+
+    store.dispatch(resetTimer());
+
+    // No efecto en almacenamiento ni programación de temporizador
+    expect(setExpiresAt).not.toHaveBeenCalled();
+    expect(store.getState().sessionTimer.showModal).toBe(false);
   });
 
   it('should program interval and show modal / logout when receiving setExpiresAt', () => {
@@ -112,5 +139,16 @@ describe('sessionTimerMiddleware', () => {
     // Verify that secondsLeft is 0 and no modal is shown
     expect(store.getState().sessionTimer.showModal).toBe(false);
     expect(store.getState().sessionTimer.expiresAt).toBe(0);
+  });
+
+  it('should start timer after successful login', () => {
+    const store = createTestStore(true);
+    const { setExpiresAt } =
+      require('@infrastructure/storage/sessionExpiryService').sessionExpiryService;
+
+    // Dispatch mocked login fulfilled action
+    store.dispatch({ type: 'auth/login/fulfilled' });
+
+    expect(setExpiresAt).toHaveBeenCalled();
   });
 });
