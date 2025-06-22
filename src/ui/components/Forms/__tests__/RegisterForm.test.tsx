@@ -14,7 +14,6 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { APP_ROUTES } from '@shared/constants/appRoutes';
 import { IPromiseMock, promiseMock } from '@shared/utils/apiTestUtils';
 import RegisterForm from '@ui/components/Forms/RegisterForm';
 import { useAuth } from '@ui/hooks/useAuth';
@@ -112,8 +111,8 @@ describe('RegisterForm', () => {
         confirmPassword: 'Password123!',
         terms: true,
       });
-      expect(toastMock.success).toHaveBeenCalledWith('register.success', 'register.welcome');
-      expect(navigateMock).toHaveBeenCalledWith(APP_ROUTES.LOGIN);
+      expect(toastMock.success).not.toHaveBeenCalled();
+      expect(navigateMock).not.toHaveBeenCalled();
     });
   });
 
@@ -137,7 +136,7 @@ describe('RegisterForm', () => {
     fireEvent.click(screen.getByTestId('register-form-terms-checkbox'));
     fireEvent.submit(screen.getByTestId('register-form'));
     await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalledWith('Invalid', 'register.failed');
+      expect(toastMock.error).not.toHaveBeenCalled();
     });
   });
 
@@ -216,7 +215,7 @@ describe('RegisterForm', () => {
     fireEvent.click(screen.getByTestId('register-form-terms-checkbox'));
     fireEvent.submit(screen.getByTestId('register-form'));
     await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalledWith('register.failed', 'register.failed');
+      expect(toastMock.error).not.toHaveBeenCalled();
     });
   });
 

@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { validateEmail, validatePassword } from '@domain/services/validationService';
 import { LoginPayload } from '@domain/types/apiSchema';
@@ -9,13 +9,10 @@ import { LoginFormData } from '@domain/types/forms';
 import { APP_ROUTES } from '@shared/constants/appRoutes';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
-import { useToast } from '@ui/hooks/useToast';
 
 const LoginForm: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const toast = useToast();
-  const { login, loading, isAuthenticated } = useAuth();
+  const { login, loading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
   const validate = useCallback(
@@ -44,24 +41,9 @@ const LoginForm: React.FC = () => {
       },
       validate,
       onSubmit: async (payload: LoginPayload) => {
-        try {
-          await login(payload);
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            toast.error(t('login.failed'), error.message);
-          } else {
-            toast.error(t('login.failed'));
-          }
-        }
+        await login(payload);
       },
     });
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      toast.success(t('login.success'), t('login.welcome'));
-      navigate(APP_ROUTES.DASHBOARD);
-    }
-  }, [isAuthenticated, navigate, t, toast]);
 
   return (
     <Form onSubmit={handleSubmit} noValidate data-testid="login-form">

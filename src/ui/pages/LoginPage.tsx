@@ -5,7 +5,7 @@ import LoginForm from '@ui/components/Forms/LoginForm';
 
 const LoginPage: React.FC = () => {
   return (
-    <div className="login">
+    <div className="login" data-testid="login-page">
       <div className="login-content">
         <h1 className="text-center" data-testid="login-page-title">
           {t('login.title')}

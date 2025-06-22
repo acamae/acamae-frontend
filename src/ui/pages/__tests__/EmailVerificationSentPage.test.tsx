@@ -16,6 +16,6 @@ describe('EmailVerificationSentPage', () => {
     const alert = screen.getByTestId('email-verification-sent-page');
     expect(within(alert).getByText(i18n.t('verification.sent.title'))).toBeInTheDocument();
     expect(within(alert).getByText(i18n.t('verification.sent.message'))).toBeInTheDocument();
-    expect(within(alert).getByTestId('link-back-home')).toBeInTheDocument();
+    expect(within(alert).getByTestId('email-verification-sent-back-home')).toBeInTheDocument();
   });
 });

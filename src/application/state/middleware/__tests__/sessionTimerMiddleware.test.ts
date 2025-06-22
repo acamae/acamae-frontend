@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import sessionTimerMiddleware from '@application/state/sessionTimerMiddleware';
+import sessionTimerMiddleware from '@application/state/middleware/sessionTimerMiddleware';
 import sessionTimerReducer, {
   resetTimer,
   setExpiresAt,

@@ -1,8 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore } from 'redux-persist';
 
+import { feedbackMiddleware } from '@application/state/middleware/feedbackMiddleware';
+import sessionTimerMiddleware from '@application/state/middleware/sessionTimerMiddleware';
 import rootReducer from '@application/state/rootReducer';
-import sessionTimerMiddleware from '@application/state/sessionTimerMiddleware';
 import { resetTimer } from '@application/state/slices/sessionTimerSlice';
 import { ForgotPasswordUseCase } from '@application/use-cases/auth/ForgotPasswordUseCase';
 import { LoginUseCase } from '@application/use-cases/auth/LoginUseCase';
@@ -30,7 +31,6 @@ export const store = configureStore({
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Ignore redux-persist actions
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
       },
       thunk: {
@@ -43,7 +43,9 @@ export const store = configureStore({
           resendVerificationUseCase,
         },
       },
-    }).concat(sessionTimerMiddleware),
+    })
+      .concat(sessionTimerMiddleware)
+      .concat(feedbackMiddleware),
 });
 
 export const persistor = persistStore(store);

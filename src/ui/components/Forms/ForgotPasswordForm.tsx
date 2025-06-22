@@ -7,11 +7,9 @@ import { ForgotPasswordPayload } from '@domain/types/apiSchema';
 import { ForgotPasswordFormData } from '@domain/types/forms';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
-import { useToast } from '@ui/hooks/useToast';
 
 const ForgotPasswordForm: React.FC = () => {
   const { t } = useTranslation();
-  const toast = useToast();
   const { forgotPassword, loading } = useAuth();
   const validate = useCallback(
     (values: ForgotPasswordPayload) => {
@@ -31,16 +29,7 @@ const ForgotPasswordForm: React.FC = () => {
       initialValues: { email: '' },
       validate,
       onSubmit: async (payload: ForgotPasswordPayload) => {
-        try {
-          await forgotPassword(payload);
-          toast.success(t('forgot.success'), t('forgot.check_email'));
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            toast.error(t('forgot.failed'), error.message);
-          } else {
-            toast.error(t('forgot.failed'));
-          }
-        }
+        await forgotPassword(payload);
       },
     });
 

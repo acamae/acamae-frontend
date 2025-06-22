@@ -35,7 +35,7 @@ const NotFoundPage: React.FC = () => {
             to={APP_ROUTES.HOME}
             className="text-decoration-none text-inverse text-opacity-50"
             data-testid="link-back-home">
-            {t('not_found.back_to_home')}
+            {t('global.back_to_home')}
           </Link>
           <span className="link-divider"></span>
           <Link
@@ -51,7 +51,7 @@ const NotFoundPage: React.FC = () => {
           size="lg"
           className="rounded-pill"
           data-testid="button-back">
-          <i className="fa fa-arrow-left me-1 ms-n1"></i> {t('not_found.go_back')}
+          <i className="fa fa-arrow-left me-1 ms-n1"></i> {t('global.go_back')}
         </Button>
       </div>
     </div>

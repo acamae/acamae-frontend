@@ -2,7 +2,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
 import { MemoryRouter, useNavigate } from 'react-router-dom';
 
-import { APP_ROUTES } from '@shared/constants/appRoutes';
 import { IPromiseMock, promiseMock } from '@shared/utils/apiTestUtils';
 import LoginForm from '@ui/components/Forms/LoginForm';
 import { useAuth } from '@ui/hooks/useAuth';
@@ -103,8 +102,8 @@ describe('LoginForm', () => {
         email: 'test@mail.com',
         password: 'Password123!',
       });
-      expect(toastMock.success).toHaveBeenCalledWith('login.success', 'login.welcome');
-      expect(navigateMock).toHaveBeenCalledWith(APP_ROUTES.DASHBOARD);
+      expect(toastMock.success).not.toHaveBeenCalled();
+      expect(navigateMock).not.toHaveBeenCalled();
     });
   });
 
@@ -140,7 +139,7 @@ describe('LoginForm', () => {
     fireEvent.submit(screen.getByTestId('login-form'));
 
     await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalledWith('login.failed', 'Invalid credentials');
+      expect(toastMock.error).not.toHaveBeenCalled();
     });
   });
 
@@ -158,18 +157,18 @@ describe('LoginForm', () => {
     fireEvent.submit(screen.getByTestId('login-form'));
 
     await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalledWith('login.failed', 'Error desde el estado');
+      expect(toastMock.error).not.toHaveBeenCalled();
     });
   });
 
-  it('should redirect to dashboard when login is successful', async () => {
+  it('should not trigger side effects on success (handled by middleware)', async () => {
     const loginMock = promiseMock();
     setupUseAuth({ login: loginMock, isAuthenticated: true });
     renderLoginForm();
 
     await waitFor(() => {
-      expect(toastMock.success).toHaveBeenCalledWith('login.success', 'login.welcome');
-      expect(navigateMock).toHaveBeenCalledWith(APP_ROUTES.DASHBOARD);
+      expect(toastMock.success).not.toHaveBeenCalled();
+      expect(navigateMock).not.toHaveBeenCalled();
     });
   });
 

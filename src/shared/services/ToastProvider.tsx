@@ -3,7 +3,7 @@ import { Toast, ToastContainer } from 'react-bootstrap';
 
 import { ToastOptions } from '@domain/types/toast';
 
-type ToastContextType = {
+export type ToastContextType = {
   show: (options: ToastOptions) => void;
   success: (message: string, title?: string, options?: Partial<ToastOptions>) => void;
   error: (message: string, title?: string, options?: Partial<ToastOptions>) => void;
@@ -24,9 +24,18 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   const show = useCallback((options: ToastOptions) => {
-    setToasts(toasts => {
+    setToasts(current => {
+      // Skip if an identical toast (same message & type) already exists
+      const alreadyQueued = current.some(
+        t => t.message === options.message && t.type === options.type
+      );
+
+      if (alreadyQueued) {
+        return current;
+      }
+
       const next = [
-        ...toasts,
+        ...current,
         {
           ...options,
           id: ++toastId,
@@ -34,7 +43,8 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           autohide: options.autohide ?? true,
         },
       ];
-      // Limit the number of active toasts
+
+      // Enforce max simultaneous toasts
       return next.length > MAX_TOASTS ? next.slice(next.length - MAX_TOASTS) : next;
     });
   }, []);

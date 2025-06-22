@@ -9,6 +9,7 @@ import { ToastProvider } from '@shared/services/ToastProvider';
 import { logWebVitalsReport } from '@shared/utils/webVitals';
 import App from '@ui/App';
 import '@infrastructure/i18n';
+import FeedbackInitializer from '@ui/components/FeedbackInitializer';
 
 const container = document.getElementById('root');
 
@@ -24,7 +25,9 @@ root.render(
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
           <ToastProvider>
-            <App />
+            <FeedbackInitializer>
+              <App />
+            </FeedbackInitializer>
           </ToastProvider>
         </BrowserRouter>
       </PersistGate>

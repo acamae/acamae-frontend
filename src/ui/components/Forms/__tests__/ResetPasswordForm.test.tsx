@@ -102,7 +102,7 @@ describe('ResetPasswordForm', () => {
         token: 'mock-token',
         password: 'Password123!',
       });
-      expect(toastMock.success).toHaveBeenCalledWith('reset.success');
+      expect(toastMock.success).not.toHaveBeenCalled();
     });
   });
 
@@ -149,7 +149,7 @@ describe('ResetPasswordForm', () => {
         token: 'mock-token',
         password: 'Password123!',
       });
-      expect(toastMock.error).toHaveBeenCalledWith('reset.failed', error);
+      expect(toastMock.error).not.toHaveBeenCalled();
     });
   });
 

@@ -16,6 +16,6 @@ describe('EmailVerificationExpired', () => {
     const alert = screen.getByTestId('email-verification-expired-page');
     expect(within(alert).getByText(i18n.t('verification.expired.title'))).toBeInTheDocument();
     expect(within(alert).getByText(i18n.t('verification.expired.message'))).toBeInTheDocument();
-    expect(within(alert).getByTestId('link-resend-verification')).toBeInTheDocument();
+    expect(within(alert).getByTestId('email-verification-expired-resend')).toBeInTheDocument();
   });
 });
