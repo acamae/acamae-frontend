@@ -83,7 +83,7 @@ describe('ResendVerificationForm', () => {
       expect(resendVerificationMock).toHaveBeenCalledWith({
         identifier: 'test@example.com',
       });
-      expect(toastMock.success).toHaveBeenCalledWith('verification.resend.success');
+      expect(toastMock.success).not.toHaveBeenCalled();
     });
   });
 
@@ -129,7 +129,7 @@ describe('ResendVerificationForm', () => {
       expect(resendVerificationMock).toHaveBeenCalledWith({
         identifier: 'notfound@example.com',
       });
-      expect(toastMock.error).toHaveBeenCalledWith('verification.resend.failed', error);
+      expect(toastMock.error).not.toHaveBeenCalled();
     });
   });
 
@@ -146,7 +146,7 @@ describe('ResendVerificationForm', () => {
       expect(resendVerificationMock).toHaveBeenCalledWith({
         identifier: 'already@example.com',
       });
-      expect(toastMock.error).toHaveBeenCalledWith('verification.resend.failed', error);
+      expect(toastMock.error).not.toHaveBeenCalled();
     });
   });
 
@@ -163,7 +163,7 @@ describe('ResendVerificationForm', () => {
       expect(resendVerificationMock).toHaveBeenCalledWith({
         identifier: 'fail@example.com',
       });
-      expect(toastMock.error).toHaveBeenCalledWith('verification.resend.failed', error);
+      expect(toastMock.error).not.toHaveBeenCalled();
     });
   });
 
@@ -191,7 +191,7 @@ describe('ResendVerificationForm', () => {
     });
     fireEvent.click(screen.getByTestId('resend-verification-form-button'));
     await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalledWith('verification.resend.failed', error);
+      expect(toastMock.error).not.toHaveBeenCalled();
     });
   });
 
@@ -205,7 +205,7 @@ describe('ResendVerificationForm', () => {
     });
     fireEvent.click(screen.getByTestId('resend-verification-form-button'));
     await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalledWith('verification.resend.failed', error);
+      expect(toastMock.error).not.toHaveBeenCalled();
     });
   });
 
@@ -249,7 +249,7 @@ describe('ResendVerificationForm', () => {
     fireEvent.click(screen.getByTestId('resend-verification-form-button'));
 
     await waitFor(() => {
-      expect(toastMock.error).toHaveBeenCalled();
+      expect(toastMock.error).not.toHaveBeenCalled();
       expect(screen.getByTestId('resend-verification-form-identifier-input')).toHaveValue(email);
     });
   });

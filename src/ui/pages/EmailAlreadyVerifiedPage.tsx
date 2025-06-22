@@ -1,27 +1,36 @@
 import React from 'react';
-import { Col, Row, Container, Alert } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+
+import { APP_ROUTES } from '@shared/constants/appRoutes';
 
 const EmailAlreadyVerified: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <Container className="py-5" data-testid="email-already-verified-page">
-      <Row className="justify-content-center">
-        <Col xs={12} md={8} lg={6} xl={5}>
-          <Alert variant="warning" dismissible>
-            <Alert.Heading>{t('verification.already.title')}</Alert.Heading>
-            <p className="mb-4" data-testid="email-already-verified-message">
-              {t('verification.already.message')}
-            </p>
-            <Link to="/" className="btn btn-outline-primary" data-testid="link-back-home">
-              {t('common.back_home')}
-            </Link>
-          </Alert>
-        </Col>
-      </Row>
-    </Container>
+    <div className="email-verification" data-testid="email-already-verified-page">
+      <div className="email-verification-content">
+        <div className="email-verification-icon text-center mb-4">
+          <i className="fa-solid fa-envelope"></i>
+        </div>
+        <h1 className="text-center" data-testid="email-already-verified-title">
+          {t('verification.already.title')}
+        </h1>
+        <div
+          className="text-inverse text-opacity-50 text-center mb-4"
+          data-testid="email-already-verified-message">
+          <p>{t('verification.already.message')}</p>
+        </div>
+        <div className="text-center mt-4">
+          <Link
+            to={APP_ROUTES.HOME}
+            className="btn btn-theme btn-md"
+            data-testid="email-already-verified-back-home">
+            {t('global.back_to_home')}
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 };
 

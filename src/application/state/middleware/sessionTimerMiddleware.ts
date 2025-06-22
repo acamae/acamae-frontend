@@ -1,6 +1,6 @@
 import type { Middleware, MiddlewareAPI } from '@reduxjs/toolkit';
 
-import { logoutAction } from '@application/state/actions/auth.actions';
+import { logoutAction, loginAction } from '@application/state/actions/auth.actions';
 import {
   setExpiresAt,
   hideModal,
@@ -21,12 +21,24 @@ const sessionTimerMiddleware: Middleware = (store: MiddlewareAPI) => next => act
   const result = next(action);
 
   if (resetTimer.match(action)) {
+    const state = store.getState() as { auth?: { isAuthenticated?: boolean } };
+    const isAuthenticated = state.auth?.isAuthenticated;
+    if (!isAuthenticated) {
+      return result;
+    }
+
     const expiresAt = Date.now() + SESSION_TIMEOUT_MINUTES * 60 * 1000;
     store.dispatch(setExpiresAt(expiresAt));
   }
 
   // When the session is renewed (e.g. stay connected)
   if (setExpiresAt.match(action)) {
+    const state = store.getState() as { auth?: { isAuthenticated?: boolean } };
+    const isAuthenticated = state.auth?.isAuthenticated;
+    if (!isAuthenticated) {
+      return result;
+    }
+
     sessionExpiryService.setExpiresAt(action.payload);
     if (timer) clearInterval(timer);
     timer = setInterval(() => {
@@ -53,6 +65,11 @@ const sessionTimerMiddleware: Middleware = (store: MiddlewareAPI) => next => act
   if (logoutAction.fulfilled.match(action)) {
     if (timer) clearInterval(timer);
     store.dispatch(removeExpiresAt());
+  }
+
+  // Start timer after successful login
+  if (loginAction.fulfilled.match(action)) {
+    store.dispatch(resetTimer());
   }
 
   return result;

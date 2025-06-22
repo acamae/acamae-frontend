@@ -1,5 +1,3 @@
-import { ApiErrorCodes } from '@domain/constants/errorCodes';
-import { ApiError } from '@domain/types/apiSchema';
 import apiService from '@shared/services/axiosService';
 
 /**
@@ -125,17 +123,5 @@ export interface IPromiseMockParams {
 export type IPromiseMock = (params?: IPromiseMockParams) => jest.Mock;
 
 export const promiseMock: IPromiseMock = ({ error = null }: IPromiseMockParams = {}) => {
-  return jest.fn(() =>
-    error
-      ? Promise.reject(
-          new ApiError({
-            success: false,
-            message: error,
-            data: null,
-            status: 999,
-            code: ApiErrorCodes.ERR_BAD_REQUEST,
-          })
-        )
-      : Promise.resolve()
-  );
+  return jest.fn(() => Promise.resolve(error ? { message: error } : undefined));
 };

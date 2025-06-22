@@ -1,6 +1,9 @@
 {
   "global": {
-    "accessing": "Accediendo..."
+    "accessing": "Accediendo...",
+    "back_to_home": "Volver al inicio",
+    "go_back": "Volver",
+    "processing": "Procesando..."
   },
   "home": {
     "title": "Bienvenido a Gestión eSports",
@@ -47,7 +50,6 @@
     "confirm_password": "Confirmar contraseña",
     "confirm_password_help": "Escribe la misma contraseña para verificar.",
     "button": "Registrarse",
-    "processing": "Registrando...",
     "message": "¿Aún no tienes cuenta?",
     "toggle_password": "Mostrar/ocultar contraseña",
     "terms_and_conditions": "Acepto los <url>términos y condiciones</url>",
@@ -58,7 +60,9 @@
       "good": "Buena",
       "strong": "Fuerte",
       "very_strong": "Muy fuerte"
-    }
+    },
+    "success": "Registro completado correctamente",
+    "welcome": "¡Ya puedes iniciar sesión!"
   },
   "sessionTimeout": {
     "title": "Sesión a punto de expirar",

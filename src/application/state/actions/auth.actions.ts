@@ -18,47 +18,110 @@ import { API_ROUTES } from '@shared/constants/apiRoutes';
 // Async thunks using use cases
 export const loginAction = createAsyncThunk(
   API_ROUTES.AUTH.LOGIN,
-  async (payload: LoginPayload, { extra }) => {
+  async (payload: LoginPayload, { extra, rejectWithValue }) => {
     const { loginUseCase } = extra as { loginUseCase: LoginUseCase };
-    return await loginUseCase.execute(payload);
+    try {
+      const result = await loginUseCase.execute(payload);
+
+      if (!result.success) {
+        return rejectWithValue(result);
+      }
+
+      return result;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   }
 );
 
 export const registerAction = createAsyncThunk(
   API_ROUTES.AUTH.REGISTER,
-  async (payload: RegisterPayload, { extra }) => {
+  async (payload: RegisterPayload, { extra, rejectWithValue }) => {
     const { registerUseCase } = extra as { registerUseCase: RegisterUseCase };
-    return await registerUseCase.execute(payload);
+    try {
+      const result = await registerUseCase.execute(payload);
+
+      if (!result.success) {
+        return rejectWithValue(result);
+      }
+
+      return result;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   }
 );
 
 export const forgotPasswordAction = createAsyncThunk(
   API_ROUTES.AUTH.FORGOT_PASSWORD,
-  async (payload: ForgotPasswordPayload, { extra }) => {
+  async (payload: ForgotPasswordPayload, { extra, rejectWithValue }) => {
     const { forgotPasswordUseCase } = extra as { forgotPasswordUseCase: ForgotPasswordUseCase };
-    return await forgotPasswordUseCase.execute(payload);
+    try {
+      const result = await forgotPasswordUseCase.execute(payload);
+
+      if (!result.success) {
+        return rejectWithValue(result);
+      }
+
+      return result;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   }
 );
 
 export const resetPasswordAction = createAsyncThunk(
   API_ROUTES.AUTH.RESET_PASSWORD,
-  async (payload: ResetPasswordPayload, { extra }) => {
+  async (payload: ResetPasswordPayload, { extra, rejectWithValue }) => {
     const { resetPasswordUseCase } = extra as { resetPasswordUseCase: ResetPasswordUseCase };
-    return await resetPasswordUseCase.execute(payload);
+    try {
+      const result = await resetPasswordUseCase.execute(payload);
+
+      if (!result.success) {
+        return rejectWithValue(result);
+      }
+
+      return result;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   }
 );
 
-export const logoutAction = createAsyncThunk(API_ROUTES.AUTH.LOGOUT, async (_, { extra }) => {
-  const { logoutUseCase } = extra as { logoutUseCase: LogoutUseCase };
-  return await logoutUseCase.execute();
-});
+export const logoutAction = createAsyncThunk(
+  API_ROUTES.AUTH.LOGOUT,
+  async (_, { extra, rejectWithValue }) => {
+    const { logoutUseCase } = extra as { logoutUseCase: LogoutUseCase };
+    try {
+      const result = await logoutUseCase.execute();
+
+      if (!result.success) {
+        return rejectWithValue(result);
+      }
+
+      return result;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
 export const resendVerificationAction = createAsyncThunk(
   API_ROUTES.AUTH.VERIFY_EMAIL_RESEND,
-  async (payload: ResendVerificationPayload, { extra }) => {
+  async (payload: ResendVerificationPayload, { extra, rejectWithValue }) => {
     const { resendVerificationUseCase } = extra as {
       resendVerificationUseCase: ResendVerificationUseCase;
     };
-    return await resendVerificationUseCase.execute(payload);
+    try {
+      const result = await resendVerificationUseCase.execute(payload);
+
+      if (!result.success) {
+        return rejectWithValue(result);
+      }
+
+      return result;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   }
 );
