@@ -7,12 +7,10 @@ import { ResendVerificationPayload } from '@domain/types/apiSchema';
 import { ResendVerificationFormData } from '@domain/types/forms';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
-import { useToast } from '@ui/hooks/useToast';
 
 const ResendVerificationForm: React.FC = () => {
   const { t } = useTranslation();
   const { resendVerification, loading } = useAuth();
-  const toast = useToast();
 
   const validate = useCallback(
     (values: ResendVerificationPayload) => {
@@ -32,16 +30,7 @@ const ResendVerificationForm: React.FC = () => {
       },
       validate,
       onSubmit: async (payload: ResendVerificationPayload) => {
-        try {
-          await resendVerification(payload);
-          toast.success(t('verification.resend.success'));
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            toast.error(t('verification.resend.failed'), error.message);
-          } else {
-            toast.error(t('verification.resend.failed'));
-          }
-        }
+        await resendVerification(payload);
       },
     });
 

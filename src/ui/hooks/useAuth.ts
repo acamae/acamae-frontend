@@ -13,7 +13,6 @@ import {
   RegisterPayload,
   ResetPasswordPayload,
   ResendVerificationPayload,
-  ApiError,
 } from '@domain/types/apiSchema';
 import type { RootState } from '@domain/types/redux';
 
@@ -24,51 +23,27 @@ export const useAuth = () => {
   );
 
   const login = async (loginPayload: LoginPayload) => {
-    const result = await dispatch(loginAction(loginPayload)).unwrap();
-    if (!result.success) {
-      throw new ApiError({ ...result });
-    }
-    return result.data;
+    return await dispatch(loginAction(loginPayload));
   };
 
   const register = async (registerPayload: RegisterPayload) => {
-    const result = await dispatch(registerAction(registerPayload)).unwrap();
-    if (!result.success) {
-      throw new ApiError({ ...result });
-    }
-    return result.data;
+    return await dispatch(registerAction(registerPayload));
   };
 
   const forgotPassword = async (forgotPasswordPayload: ForgotPasswordPayload) => {
-    const result = await dispatch(forgotPasswordAction(forgotPasswordPayload)).unwrap();
-    if (!result.success) {
-      throw new ApiError({ ...result });
-    }
-    return result.data;
+    return await dispatch(forgotPasswordAction(forgotPasswordPayload));
   };
 
   const resetPassword = async (resetPasswordPayload: ResetPasswordPayload) => {
-    const result = await dispatch(resetPasswordAction(resetPasswordPayload)).unwrap();
-    if (!result.success) {
-      throw new ApiError({ ...result });
-    }
-    return result.data;
+    return await dispatch(resetPasswordAction(resetPasswordPayload));
   };
 
   const logout = async () => {
-    const result = await dispatch(logoutAction()).unwrap();
-    if (!result.success) {
-      throw new ApiError({ ...result });
-    }
-    return result.data;
+    return await dispatch(logoutAction());
   };
 
   const resendVerification = async (payload: ResendVerificationPayload) => {
-    const result = await dispatch(resendVerificationAction(payload)).unwrap();
-    if (!result.success) {
-      throw new ApiError({ ...result });
-    }
-    return result.data;
+    return await dispatch(resendVerificationAction(payload));
   };
 
   return {

@@ -38,24 +38,11 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
       initialValues: { password: '', token: tokenProp },
       validate,
       onSubmit: async (payload: ResetPasswordPayload) => {
-        if (!payload.token) {
+        if (!payload.token || payload.token !== tokenProp) {
           toast.error(t('reset.invalid_token'));
-          return;
+          return; // do not submit the form
         }
-        if (payload.token !== tokenProp) {
-          toast.error(t('reset.invalid_token'));
-          return;
-        }
-        try {
-          await resetPassword(payload);
-          toast.success(t('reset.success'));
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            toast.error(t('reset.failed'), error.message);
-          } else {
-            toast.error(t('reset.failed'));
-          }
-        }
+        await resetPassword(payload);
       },
     });
 

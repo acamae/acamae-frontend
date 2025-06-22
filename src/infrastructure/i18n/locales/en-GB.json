@@ -1,6 +1,9 @@
 {
   "global": {
-    "accessing": "Accessing..."
+    "accessing": "Accessing...",
+    "back_to_home": "Back to home",
+    "go_back": "Go back",
+    "processing": "Processing..."
   },
   "home": {
     "title": "Welcome to eSports Management",
@@ -47,7 +50,6 @@
     "confirm_password": "Confirm password",
     "confirm_password_help": "Type the same password to verify.",
     "button": "Sign up",
-    "processing": "Signing up...",
     "message": "Don't have an account yet?",
     "toggle_password": "Show/hide password",
     "terms_and_conditions": "I accept the <url>terms and conditions</url>",
@@ -58,7 +60,9 @@
       "good": "Good",
       "strong": "Strong",
       "very_strong": "Very strong"
-    }
+    },
+    "success": "Registration successful",
+    "welcome": "You can now log in!"
   },
   "sessionTimeout": {
     "title": "Session about to expire",
@@ -151,9 +155,7 @@
   "not_found": {
     "title": "Page not found",
     "message": "The page you are looking for does not exist.",
-    "help_message": "Here are some helpful links instead:",
-    "back_to_home": "Back to home",
-    "go_back": "Go back"
+    "help_message": "Here are some helpful links instead:"
   },
   "dashboard": {
     "title": "User dashboard",

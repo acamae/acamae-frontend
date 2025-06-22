@@ -1,6 +1,5 @@
 import { AxiosError, AxiosResponse } from 'axios';
 
-import { ApiErrorCode } from '@domain/constants/apiCodes';
 import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { ApiSuccessCodes } from '@domain/constants/successCodes';
 import { USER_ROLES } from '@domain/constants/user';
@@ -37,44 +36,6 @@ function mapUserResponse(data: UserResponse): User {
   };
 }
 
-function mapApiAxiosResponseError<T>({
-  error,
-}: {
-  error: AxiosError<T>; // message, code, config, request, response
-}): ApiErrorResponse<T> {
-  return {
-    success: false,
-    data: null,
-    status: error.response?.status ?? 500,
-    message: error.message,
-    code: (error.code as ApiErrorCode) ?? ApiErrorCodes.ERR_BAD_RESPONSE,
-  };
-}
-
-export function mapApiAxiosRequestError<T>({
-  error,
-}: {
-  error: Partial<AxiosError<T>>;
-}): ApiErrorResponse<T> {
-  return {
-    success: false,
-    data: null,
-    status: error.status ?? 500,
-    message: error.message ?? 'A request error occurred',
-    code: (error.code as ApiErrorCode) ?? ApiErrorCodes.ERR_BAD_REQUEST,
-  };
-}
-
-function mapApiAxiosUnknownError<T>(): ApiErrorResponse<T> {
-  return {
-    success: false,
-    data: null,
-    status: 500,
-    message: ApiErrorCodes.UNKNOWN_ERROR,
-    code: ApiErrorCodes.UNKNOWN_ERROR,
-  } as ApiErrorResponse<T>;
-}
-
 function handleApiSuccess<T>({
   response,
 }: {
@@ -89,12 +50,18 @@ function handleApiSuccess<T>({
 }
 
 function handleApiError<T>(error: unknown): ApiErrorResponse<T> {
-  if (error instanceof AxiosError && error.response) {
-    return mapApiAxiosResponseError({ error });
-  } else if (error instanceof AxiosError && error.request) {
-    return mapApiAxiosRequestError({ error });
+  if (error instanceof AxiosError) {
+    return {
+      ...error.response?.data,
+    } as ApiErrorResponse<T>;
   }
-  return mapApiAxiosUnknownError();
+  return {
+    message: 'Unknown error',
+    code: ApiErrorCodes.UNKNOWN_ERROR,
+    success: false,
+    data: null,
+    status: 500,
+  } as ApiErrorResponse<T>;
 }
 
 export class AuthApiRepository implements IAuthRepository {

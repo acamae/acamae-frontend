@@ -82,7 +82,7 @@ describe('ForgotPasswordForm', () => {
     await waitFor(() => {
       expect(forgotPasswordMock).toHaveBeenCalledWith({ email: 'test@mail.com' });
       expect(screen.getByTestId('forgot-password-form-email-error')).toBeEmptyDOMElement();
-      expect(toastMock.success).toHaveBeenCalledWith('forgot.success', 'forgot.check_email');
+      expect(toastMock.success).not.toHaveBeenCalled();
       expect(toastMock.error).not.toHaveBeenCalled();
     });
   });
@@ -103,7 +103,7 @@ describe('ForgotPasswordForm', () => {
       expect(forgotPasswordMock).toHaveBeenCalledWith({ email: 'test@mail.com' });
       expect(screen.getByTestId('forgot-password-form-email-error')).toBeEmptyDOMElement();
       expect(toastMock.success).not.toHaveBeenCalled();
-      expect(toastMock.error).toHaveBeenCalledWith('forgot.failed', 'error.email.not_found');
+      expect(toastMock.error).not.toHaveBeenCalled();
     });
   });
 

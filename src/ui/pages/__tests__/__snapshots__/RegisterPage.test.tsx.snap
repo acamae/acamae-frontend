@@ -4,6 +4,7 @@ exports[`RegisterPage should render snapshot correctly 1`] = `
 <DocumentFragment>
   <div
     class="register"
+    data-testid="register-page"
   >
     <div
       class="register-content"

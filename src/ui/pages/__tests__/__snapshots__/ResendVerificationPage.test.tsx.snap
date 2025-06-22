@@ -3,36 +3,22 @@
 exports[`ResendVerificationPage should render snapshot correctly 1`] = `
 <DocumentFragment>
   <div
-    class="py-5 container"
+    class="resend-verification"
+    data-testid="resend-verification-page"
   >
     <div
-      class="justify-content-center row"
+      class="resend-verification-content"
     >
-      <div
-        class="col-xl-5 col-lg-6 col-md-8 col-12"
+      <h1
+        class="text-center"
+        data-testid="resend-verification-title"
       >
-        <div
-          class="card"
-        >
-          <div
-            class="text-center card-header"
-          >
-            <h2
-              data-testid="resend-verification-title"
-            >
-              Reenviar correo de verificación
-            </h2>
-          </div>
-          <div
-            class="card-body"
-          >
-            <div
-              data-testid="mock-resend-verification-form"
-            >
-              Mocked Resend Verification Form
-            </div>
-          </div>
-        </div>
+        Reenviar correo de verificación
+      </h1>
+      <div
+        data-testid="mock-resend-verification-form"
+      >
+        Mocked Resend Verification Form
       </div>
     </div>
   </div>

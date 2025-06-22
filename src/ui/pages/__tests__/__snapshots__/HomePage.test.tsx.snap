@@ -4,6 +4,7 @@ exports[`HomePage should render snapshot correctly 1`] = `
 <DocumentFragment>
   <div
     class="home"
+    data-testid="home-page"
   >
     <div
       class="home-content"

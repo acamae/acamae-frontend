@@ -70,20 +70,42 @@ describe('ToastProvider', () => {
     });
   });
 
-  it('should limit to a maximum of 3 simultaneous toasts', async () => {
+  it('should ignore duplicate toasts (same message and type)', async () => {
     renderWithProvider(<Demo />);
 
-    // Mostrar 4 toasts genéricos
     await act(async () => {
-      for (let i = 0; i < 4; i++) {
-        fireEvent.click(screen.getByText('generic'));
-      }
+      fireEvent.click(screen.getByText('generic'));
+      fireEvent.click(screen.getByText('generic'));
     });
 
-    // Esperar a que el estado se actualice y verificar que solo hay 3 toasts
     await waitFor(() => {
       const toasts = screen.getAllByTestId('toast-primary');
+      expect(toasts.length).toBe(1);
+    });
+  });
+
+  it('should limit to a maximum of 3 simultaneous toasts when distinct', async () => {
+    renderWithProvider(<Demo />);
+
+    // Mostrar 4 toasts distintos: success, error, warning, info
+    await act(async () => {
+      fireEvent.click(screen.getByText('success'));
+      fireEvent.click(screen.getByText('error'));
+      fireEvent.click(screen.getByText('warning'));
+      fireEvent.click(screen.getByText('info'));
+    });
+
+    await waitFor(() => {
+      // El contenedor solo debe tener 3 toasts visibles
+      const container = screen.getByTestId('toast-container');
+      const toasts = container.querySelectorAll('[data-testid^="toast-"]');
       expect(toasts.length).toBe(3);
+
+      // El primero mostrado (success) debió ser descartado por el límite
+      expect(screen.queryByTestId('toast-success')).not.toBeInTheDocument();
+      expect(screen.getByTestId('toast-danger')).toBeInTheDocument();
+      expect(screen.getByTestId('toast-warning')).toBeInTheDocument();
+      expect(screen.getByTestId('toast-info')).toBeInTheDocument();
     });
   });
 

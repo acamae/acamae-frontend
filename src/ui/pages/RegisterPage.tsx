@@ -7,7 +7,7 @@ const RegisterPage: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="register">
+    <div className="register" data-testid="register-page">
       <div className="register-content">
         <h1 className="text-center" data-testid="register-page-title">
           {t('register.title')}

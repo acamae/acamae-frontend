@@ -1,6 +1,6 @@
-import { ApiErrorCode, ApiSuccessCode } from '@domain/constants/apiCodes';
 import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { User } from '@domain/entities/User';
+import { ApiErrorCode, ApiSuccessCode } from '@domain/types/apiCodes';
 
 export class ApiError extends Error {
   data: unknown;
@@ -37,8 +37,8 @@ export interface ApiSuccessResponse<T> extends ApiResponse<T> {
 }
 
 export interface ApiErrorResponse<T> extends ApiResponse<T> {
-  data: null;
   success: false;
+  data: T | null;
   code: ApiErrorCode;
   message: string;
 }

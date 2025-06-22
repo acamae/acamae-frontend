@@ -1,30 +1,36 @@
 import React from 'react';
-import { Col, Row, Container, Alert } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+
+import { APP_ROUTES } from '@shared/constants/appRoutes';
 
 const EmailVerificationExpired: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <Container className="py-5" data-testid="email-verification-expired-page">
-      <Row className="justify-content-center">
-        <Col xs={12} md={8} lg={6} xl={5}>
-          <Alert variant="danger" dismissible>
-            <Alert.Heading>{t('verification.expired.title')}</Alert.Heading>
-            <p className="mb-4" data-testid="email-verification-expired-message">
-              {t('verification.expired.message')}
-            </p>
-            <Link
-              to="/resend-verification"
-              className="btn btn-primary"
-              data-testid="link-resend-verification">
-              {t('verification.expired.resend')}
-            </Link>
-          </Alert>
-        </Col>
-      </Row>
-    </Container>
+    <div className="email-verification" data-testid="email-verification-expired-page">
+      <div className="email-verification-content">
+        <div className="email-verification-icon text-center mb-4">
+          <i className="fa-solid fa-envelope"></i>
+        </div>
+        <h1 className="text-center" data-testid="email-verification-expired-title">
+          {t('verification.expired.title')}
+        </h1>
+        <div
+          className="text-inverse text-opacity-50 text-center mb-4"
+          data-testid="email-verification-expired-message">
+          <p>{t('verification.expired.message')}</p>
+        </div>
+        <div className="text-center mt-4">
+          <Link
+            to={APP_ROUTES.VERIFY_EMAIL_RESEND}
+            className="btn btn-theme btn-md"
+            data-testid="email-verification-expired-resend">
+            {t('verification.expired.resend')}
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 };
 

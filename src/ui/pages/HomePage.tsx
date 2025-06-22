@@ -5,7 +5,7 @@ const HomePage: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="home">
+    <div className="home" data-testid="home-page">
       <div className="home-content">
         <h1 className="text-center" data-testid="home-page-title">
           {t('home.title')}

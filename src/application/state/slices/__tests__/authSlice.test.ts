@@ -27,15 +27,15 @@ describe('authSlice reducer', () => {
   it.each([
     ['login', loginAction],
     ['register', registerAction],
+    ['forgotPassword', forgotPasswordAction],
+    ['resetPassword', resetPasswordAction],
+    ['logout', logoutAction],
   ])('should set loading to true when %s is pending', (_name, actionCreator: ActionCreator) => {
     const state = reducer(initialAuthState, { type: actionCreator.pending.type });
     expect(state.loading).toBe(true);
   });
 
-  it.each([
-    ['login', loginAction],
-    ['register', registerAction],
-  ])(
+  it.each([['login', loginAction]])(
     'should set isAuthenticated to true and user when %s is fulfilled',
     (_n, actionCreator: ActionCreator) => {
       const state = reducer(initialAuthState, {

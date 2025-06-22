@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Form, Button, InputGroup } from 'react-bootstrap';
 import { Trans, useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 
 import {
   validateEmail,
@@ -10,18 +9,14 @@ import {
 } from '@domain/services/validationService';
 import { RegisterPayload } from '@domain/types/apiSchema';
 import { RegisterFormData } from '@domain/types/forms';
-import { APP_ROUTES } from '@shared/constants/appRoutes';
 import PasswordStrengthMeter from '@ui/components/PasswordStrengthMeter';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
-import { useToast } from '@ui/hooks/useToast';
 
 import TCOffcanvas from '../Offcanvas/TCOffcanvas';
 
 const RegisterForm: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const toast = useToast();
   const { register, loading } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -77,23 +72,18 @@ const RegisterForm: React.FC = () => {
     },
     validate,
     onSubmit: async (data: RegisterPayload) => {
-      try {
-        await register(data);
-        toast.success(t('register.success'), t('register.welcome'));
-        navigate(APP_ROUTES.LOGIN);
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          toast.error(error.message, t('register.failed'));
-        } else {
-          toast.error(t('register.failed'));
-        }
-      }
+      await register(data);
     },
   });
 
   return (
     <>
-      <Form onSubmit={handleSubmit} noValidate data-testid="register-form">
+      <Form
+        onSubmit={e => {
+          void handleSubmit(e);
+        }}
+        noValidate
+        data-testid="register-form">
         <Form.Group className="mb-3" controlId="email">
           <Form.Label>{t('register.email')}</Form.Label>
           <Form.Control
@@ -236,7 +226,7 @@ const RegisterForm: React.FC = () => {
             type="submit"
             disabled={loading || isSubmitting}
             data-testid="register-form-button">
-            {loading || isSubmitting ? t('global.accessing') : t('register.button')}
+            {loading || isSubmitting ? t('global.processing') : t('register.button')}
           </Button>
         </div>
       </Form>

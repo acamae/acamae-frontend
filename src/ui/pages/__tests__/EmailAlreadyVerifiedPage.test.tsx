@@ -16,6 +16,6 @@ describe('EmailAlreadyVerified', () => {
     const alert = screen.getByTestId('email-already-verified-page');
     expect(within(alert).getByText(i18n.t('verification.already.title'))).toBeInTheDocument();
     expect(within(alert).getByText(i18n.t('verification.already.message'))).toBeInTheDocument();
-    expect(within(alert).getByTestId('link-back-home')).toBeInTheDocument();
+    expect(within(alert).getByTestId('email-already-verified-back-home')).toBeInTheDocument();
   });
 });

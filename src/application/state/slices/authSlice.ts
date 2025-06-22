@@ -36,10 +36,10 @@ const authSlice = createSlice({
   extraReducers: builder => {
     builder
       // Login
-      .addCase(loginAction.pending, state => {
+      .addCase(loginAction.pending, (state: AuthState) => {
         state.loading = true;
       })
-      .addCase(loginAction.fulfilled, (state, action) => {
+      .addCase(loginAction.fulfilled, (state: AuthState, action) => {
         state.loading = false;
         if (action.payload?.data) {
           state.user = action.payload.data;
@@ -49,57 +49,55 @@ const authSlice = createSlice({
           state.isAuthenticated = false;
         }
       })
-      .addCase(loginAction.rejected, state => {
+      .addCase(loginAction.rejected, (state: AuthState) => {
         state.loading = false;
       })
       // Register
-      .addCase(registerAction.pending, state => {
+      .addCase(registerAction.pending, (state: AuthState) => {
         state.loading = true;
       })
-      .addCase(registerAction.fulfilled, (state, action) => {
+      .addCase(registerAction.fulfilled, (state: AuthState, action) => {
         state.loading = false;
         if (action.payload?.data) {
           state.user = action.payload.data;
-          state.isAuthenticated = true;
         } else {
           state.user = null;
-          state.isAuthenticated = false;
         }
       })
-      .addCase(registerAction.rejected, state => {
+      .addCase(registerAction.rejected, (state: AuthState) => {
         state.loading = false;
       })
       // Logout
-      .addCase(logoutAction.pending, state => {
+      .addCase(logoutAction.pending, (state: AuthState) => {
         state.loading = true;
       })
-      .addCase(logoutAction.fulfilled, state => {
+      .addCase(logoutAction.fulfilled, (state: AuthState) => {
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;
         state.loading = false;
       })
-      .addCase(logoutAction.rejected, state => {
+      .addCase(logoutAction.rejected, (state: AuthState) => {
         state.loading = false;
       })
       // Forgot Password
-      .addCase(forgotPasswordAction.pending, state => {
+      .addCase(forgotPasswordAction.pending, (state: AuthState) => {
         state.loading = true;
       })
-      .addCase(forgotPasswordAction.fulfilled, state => {
+      .addCase(forgotPasswordAction.fulfilled, (state: AuthState) => {
         state.loading = false;
       })
-      .addCase(forgotPasswordAction.rejected, state => {
+      .addCase(forgotPasswordAction.rejected, (state: AuthState) => {
         state.loading = false;
       })
       // Reset Password
-      .addCase(resetPasswordAction.pending, state => {
+      .addCase(resetPasswordAction.pending, (state: AuthState) => {
         state.loading = true;
       })
-      .addCase(resetPasswordAction.fulfilled, state => {
+      .addCase(resetPasswordAction.fulfilled, (state: AuthState) => {
         state.loading = false;
       })
-      .addCase(resetPasswordAction.rejected, state => {
+      .addCase(resetPasswordAction.rejected, (state: AuthState) => {
         state.loading = false;
       });
   },
