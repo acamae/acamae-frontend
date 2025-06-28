@@ -32,6 +32,9 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+        isSerializable: (value: unknown) => {
+          return !(value instanceof Function) && typeof value !== 'symbol';
+        },
       },
       thunk: {
         extraArgument: {

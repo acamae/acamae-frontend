@@ -7,9 +7,12 @@ import MainLayout from '@ui/layouts/MainLayout';
 import PublicLayout from '@ui/layouts/PublicLayout';
 import DashboardPage from '@ui/pages/DashboardPage';
 import EmailAlreadyVerified from '@ui/pages/EmailAlreadyVerifiedPage';
+import EmailVerificationErrorPage from '@ui/pages/EmailVerificationErrorPage';
 import EmailVerificationExpired from '@ui/pages/EmailVerificationExpiredPage';
+import EmailVerificationPage from '@ui/pages/EmailVerificationPage';
 import EmailVerificationSentPage from '@ui/pages/EmailVerificationSentPage';
 import EmailVerificationSuccess from '@ui/pages/EmailVerificationSuccessPage';
+import EmailVerificationUsedPage from '@ui/pages/EmailVerificationUsedPage';
 import ForgotPasswordPage from '@ui/pages/ForgotPasswordPage';
 import HomePage from '@ui/pages/HomePage';
 import LoginPage from '@ui/pages/LoginPage';
@@ -35,10 +38,13 @@ const AppRoutes: React.FC = () => {
         <Route path={APP_ROUTES.REGISTER} element={<RegisterPage />} />
         <Route path={APP_ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
         <Route path={APP_ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
+        <Route path={APP_ROUTES.VERIFY_EMAIL} element={<EmailVerificationPage />} />
         <Route path={APP_ROUTES.VERIFY_EMAIL_SENT} element={<EmailVerificationSentPage />} />
         <Route path={APP_ROUTES.VERIFY_EMAIL_SUCCESS} element={<EmailVerificationSuccess />} />
         <Route path={APP_ROUTES.VERIFY_EMAIL_EXPIRED} element={<EmailVerificationExpired />} />
         <Route path={APP_ROUTES.VERIFY_EMAIL_ALREADY_VERIFIED} element={<EmailAlreadyVerified />} />
+        <Route path={APP_ROUTES.VERIFY_EMAIL_USED} element={<EmailVerificationUsedPage />} />
+        <Route path={APP_ROUTES.VERIFY_EMAIL_ERROR} element={<EmailVerificationErrorPage />} />
         <Route path={APP_ROUTES.VERIFY_EMAIL_RESEND} element={<ResendVerificationPage />} />
       </Route>
 

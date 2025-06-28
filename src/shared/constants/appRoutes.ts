@@ -10,6 +10,8 @@ export const APP_ROUTES = {
   VERIFY_EMAIL_EXPIRED: '/verify-email-expired',
   VERIFY_EMAIL_ALREADY_VERIFIED: '/verify-email-already-verified',
   VERIFY_EMAIL_RESEND: '/verify-email-resend',
+  VERIFY_EMAIL_USED: '/verify-email-used',
+  VERIFY_EMAIL_ERROR: '/verify-email-error',
   DASHBOARD: '/dashboard',
   PROFILE: '/profile',
   TEAMS: '/teams',

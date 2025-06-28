@@ -125,6 +125,15 @@
       "message": "The verification link has expired. Please request a new one.",
       "resend": "Resend verification"
     },
+    "used": {
+      "title": "Link already used",
+      "message": "This verification link has already been used.",
+      "login": "Go to login"
+    },
+    "error": {
+      "title": "Error verifying email",
+      "message": "Could not verify your email. Please try again later or contact support."
+    },
     "already": {
       "title": "Already verified",
       "message": "This email was already verified."

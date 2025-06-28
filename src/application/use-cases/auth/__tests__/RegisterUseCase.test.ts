@@ -1,8 +1,6 @@
 import { RegisterUseCase } from '@application/use-cases/auth/RegisterUseCase';
 import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { ApiSuccessCodes } from '@domain/constants/successCodes';
-import { USER_ROLES } from '@domain/constants/user';
-import { User } from '@domain/entities/User';
 import { IAuthRepository } from '@domain/repositories/AuthRepository';
 import { RegisterPayload } from '@domain/types/apiSchema';
 
@@ -36,21 +34,10 @@ describe('RegisterUseCase', () => {
       lastName: 'User',
     };
 
-    const mockUser: User = {
-      id: '1',
-      username: 'testuser',
-      email: 'test@example.com',
-      role: USER_ROLES.USER,
-      firstName: 'Test',
-      lastName: 'User',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
     mockAuthRepository.register.mockResolvedValue({
       success: true,
-      data: mockUser,
-      message: 'Registration successful',
+      data: null,
+      message: 'User registered successfully',
       status: 201,
       code: ApiSuccessCodes.SUCCESS,
     });
@@ -60,8 +47,8 @@ describe('RegisterUseCase', () => {
     expect(mockAuthRepository.register).toHaveBeenCalledWith(mockPayload);
     expect(result).toEqual({
       success: true,
-      data: mockUser,
-      message: 'Registration successful',
+      data: null,
+      message: 'User registered successfully',
       status: 201,
       code: ApiSuccessCodes.SUCCESS,
     });
