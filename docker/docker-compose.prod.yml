@@ -1,3 +1,5 @@
+name: acamae-frontend-prod
+
 services:
   frontend:
     build:
@@ -24,7 +26,7 @@ services:
 
 networks:
   acamae-network:
-    driver: bridge
+    external: true
 
 volumes:
   node_modules:

@@ -1,4 +1,6 @@
-import { encryptToken, decryptToken } from '@application/state/tokenTransform';
+import CryptoJS from 'crypto-js';
+
+import { encryptToken, decryptToken, tokenTransform } from '@application/state/tokenTransform';
 
 const SECRET_KEY = process.env.REACT_APP_TOKEN_SECRET ?? 'default_secret';
 
@@ -23,5 +25,39 @@ describe('tokenTransform', () => {
   it('should return null if decryption fails', () => {
     const invalidEncrypted = 'not-a-valid-encrypted-token';
     expect(decryptToken(invalidEncrypted)).toBeNull();
+  });
+
+  it('should return null if decrypted value is empty string', () => {
+    const mockWordArray = {
+      toString: () => '',
+      words: [],
+      sigBytes: 0,
+      concat: () => mockWordArray,
+      clamp: () => undefined,
+      clone: () => mockWordArray,
+    };
+
+    jest.spyOn(CryptoJS.AES, 'decrypt').mockImplementationOnce(() => mockWordArray);
+
+    expect(decryptToken('some-encrypted-value')).toBeNull();
+    jest.spyOn(CryptoJS.AES, 'decrypt').mockRestore();
+  });
+
+  it('should handle the transform correctly for redux-persist', () => {
+    // Verificar que el transform está definido
+    expect(tokenTransform).toBeDefined();
+
+    // Verificamos que las funciones de encriptación y desencriptación funcionan correctamente
+    // en un flujo completo de encriptación -> desencriptación
+    const token = 'test-token';
+    const encrypted = encryptToken(token);
+    const decrypted = decryptToken(encrypted);
+
+    expect(encrypted).not.toBe(token);
+    expect(decrypted).toBe(token);
+
+    // Verificar que el transform se creó con los parámetros correctos
+    // (indirectamente, ya que no podemos acceder a las propiedades internas)
+    expect(tokenTransform).not.toBeNull();
   });
 });

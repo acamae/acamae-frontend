@@ -1,3 +1,5 @@
+name: acamae-frontend
+
 services:
   frontend:
     build:

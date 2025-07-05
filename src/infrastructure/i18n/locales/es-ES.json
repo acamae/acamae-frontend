@@ -125,6 +125,15 @@
       "message": "El enlace de verificación ha expirado. Por favor, solicita uno nuevo.",
       "resend": "Reenviar verificación"
     },
+    "used": {
+      "title": "Enlace ya utilizado",
+      "message": "Este enlace de verificación ya fue usado previamente.",
+      "login": "Ir al login"
+    },
+    "error": {
+      "title": "Error al verificar correo",
+      "message": "No se pudo verificar tu correo. Por favor, intenta más tarde o contacta soporte."
+    },
     "already": {
       "title": "Ya verificado",
       "message": "Este correo ya estaba verificado."
