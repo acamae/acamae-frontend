@@ -3,7 +3,9 @@
     "accessing": "Accediendo...",
     "back_to_home": "Volver al inicio",
     "go_back": "Volver",
-    "processing": "Procesando..."
+    "processing": "Procesando...",
+    "required": "requerido",
+    "required_asterisk": "Los campos requeridos están marcados con un asterisco (<abbr>*</abbr>)"
   },
   "home": {
     "title": "Bienvenido a Gestión eSports",
@@ -55,11 +57,11 @@
     "terms_and_conditions": "Acepto los <url>términos y condiciones</url>",
     "terms_and_conditions_help": "Al crear una cuenta, aceptas nuestros términos y condiciones.",
     "strength": {
-      "weak": "Débil",
-      "fair": "Regular",
-      "good": "Buena",
-      "strong": "Fuerte",
-      "very_strong": "Muy fuerte"
+      "weak": "La contraseña es débil, intenta añadir más caracteres.",
+      "fair": "La contraseña es regular, intenta añadir más caracteres.",
+      "good": "La contraseña es buena",
+      "strong": "La contraseña es fuerte",
+      "very_strong": "La contraseña es muy fuerte"
     },
     "success": "Registro completado correctamente",
     "welcome": "¡Ya puedes iniciar sesión!"
@@ -115,6 +117,23 @@
     "resend_success": "Nuevo enlace enviado. Revisa tu bandeja de entrada."
   },
   "verification": {
+    "processing": {
+      "title": "Verificando tu cuenta...",
+      "message": "Por favor, espera mientras procesamos tu enlace de verificación."
+    },
+    "error": {
+      "title": "Error de verificación",
+      "invalid_token": "El enlace de verificación no es válido o ha expirado.",
+      "resend": "Reenviar verificación",
+      "home": "Volver al inicio",
+      "message": "No se pudo verificar tu correo. Por favor, intenta más tarde o contacta soporte."
+    },
+    "update_failed": {
+      "title": "Error al actualizar la cuenta",
+      "message": "Tu enlace de verificación es válido, pero hubo un error al actualizar tu cuenta. Por favor, inténtalo más tarde.",
+      "resend": "Reenviar verificación",
+      "home": "Volver al inicio"
+    },
     "success": {
       "title": "¡Tu cuenta ha sido verificada!",
       "message": "Ya puedes iniciar sesión en la plataforma.",
@@ -124,6 +143,11 @@
       "title": "Enlace de verificación expirado",
       "message": "El enlace de verificación ha expirado. Por favor, solicita uno nuevo.",
       "resend": "Reenviar verificación"
+    },
+    "used": {
+      "title": "Enlace ya utilizado",
+      "message": "Este enlace de verificación ya fue usado previamente.",
+      "login": "Ir al login"
     },
     "already": {
       "title": "Ya verificado",

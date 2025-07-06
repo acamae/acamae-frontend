@@ -18,7 +18,9 @@ exports[`ResendVerificationForm should render snapshot correctly 1`] = `
         verification.resend.label
       </label>
       <input
-        class="form-control"
+        aria-errormessage="resend-verification-form-identifier-error"
+        aria-required="true"
+        class="bg-white bg-opacity-5 form-control form-control-lg"
         data-testid="resend-verification-form-identifier-input"
         id="identifier"
         name="identifier"

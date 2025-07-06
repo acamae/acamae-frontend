@@ -2,6 +2,7 @@ import { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 import { USER_ROLES } from '@domain/constants/user';
 import { AuthApiRepository } from '@infrastructure/api/AuthApiRepository';
+import { tokenService } from '@infrastructure/storage/tokenService';
 import { API_ROUTES } from '@shared/constants/apiRoutes';
 
 interface MockAxios {
@@ -42,8 +43,8 @@ const userResponse = {
   email: 'a@b.com',
   username: 'alice',
   role: USER_ROLES.USER,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: '2023-01-01T00:00:00.000Z',
+  updatedAt: '2023-01-01T00:00:00.000Z',
 };
 
 beforeEach(() => {
@@ -52,7 +53,23 @@ beforeEach(() => {
 
 describe('AuthApiRepository', () => {
   it('should login and map the response correctly', async () => {
-    getMock().post.mockResolvedValue({ data: userResponse, status: 200 });
+    getMock().post.mockResolvedValue({
+      data: {
+        data: {
+          user: {
+            id: '1',
+            email: 'a@b.com',
+            username: 'alice',
+            role: 'user',
+            createdAt: '2023-01-01T00:00:00.000Z',
+            updatedAt: '2023-01-01T00:00:00.000Z',
+          },
+          accessToken: 'mockAccess',
+          refreshToken: 'mockRefresh',
+        },
+      },
+      status: 200,
+    });
 
     const result = await repo.login({ email: 'a@b.com', password: '123456' });
 
@@ -106,9 +123,13 @@ describe('AuthApiRepository', () => {
 
   it('should logout and return success', async () => {
     getMock().post.mockResolvedValue({ data: undefined, status: 200 });
+    jest.spyOn(tokenService, 'getRefreshToken').mockReturnValue('mockRefresh');
     const result = await repo.logout();
-    expect(getMock().post).toHaveBeenCalledWith(API_ROUTES.AUTH.LOGOUT);
+    expect(getMock().post).toHaveBeenCalledWith(API_ROUTES.AUTH.LOGOUT, {
+      refreshToken: 'mockRefresh',
+    });
     expect(result.success).toBe(true);
+    jest.restoreAllMocks();
   });
 
   it('should findAll and return array of users', async () => {
@@ -197,8 +218,8 @@ describe('AuthApiRepository', () => {
       email: 'a@b.com',
       username: 'updated',
       role: USER_ROLES.USER,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: '2023-01-01T00:00:00.000Z',
+      updatedAt: '2023-01-01T00:00:00.000Z',
     });
     expect(getMock().put).toHaveBeenCalledWith(
       expect.stringContaining('/users/1'),
@@ -227,8 +248,8 @@ describe('AuthApiRepository', () => {
       email: 'a@b.com',
       username: 'updated',
       role: USER_ROLES.USER,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: '2023-01-01T00:00:00.000Z',
+      updatedAt: '2023-01-01T00:00:00.000Z',
     });
     expect(result).toEqual({ message: 'Invalid data' });
   });

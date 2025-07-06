@@ -8,12 +8,12 @@ const ResendVerificationPage: React.FC = () => {
 
   return (
     <div className="resend-verification" data-testid="resend-verification-page">
-      <div className="resend-verification-content">
+      <main className="resend-verification-content">
         <h1 className="text-center" data-testid="resend-verification-title">
           {t('verification.resend.title')}
         </h1>
         <ResendVerificationForm />
-      </div>
+      </main>
     </div>
   );
 };

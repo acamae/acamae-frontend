@@ -18,7 +18,7 @@
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true,
     "typeRoots": ["./node_modules/@types", "./src/domain/types"],
-    "types": ["node", "jest", "cypress"],
+    "types": ["node", "jest"],
     "paths": {
       "@ui/*": ["src/ui/*"],
       "@domain/*": ["src/domain/*"],
@@ -29,13 +29,6 @@
       "@shared/*": ["src/shared/*"]
     }
   },
-  "include": [
-    "cypress/**/*.ts",
-    "src/**/*",
-    "*.config.js",
-    "*.setup.ts",
-    "scripts/**/*.js",
-    ".husky/**/*.js"
-  ],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*", "*.config.js", "*.setup.ts", "scripts/**/*.js", ".husky/**/*.js"],
+  "exclude": ["node_modules", "cypress"]
 }

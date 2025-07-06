@@ -3,7 +3,9 @@
     "accessing": "Accessing...",
     "back_to_home": "Back to home",
     "go_back": "Go back",
-    "processing": "Processing..."
+    "processing": "Processing...",
+    "required": "required",
+    "required_asterisk": "Required fields are marked with an asterisk (<abbr>*</abbr>)"
   },
   "home": {
     "title": "Welcome to eSports Management",
@@ -55,11 +57,11 @@
     "terms_and_conditions": "I accept the <url>terms and conditions</url>",
     "terms_and_conditions_help": "By creating an account, you agree to our terms and conditions.",
     "strength": {
-      "weak": "Weak",
-      "fair": "Fair",
-      "good": "Good",
-      "strong": "Strong",
-      "very_strong": "Very strong"
+      "weak": "The password is weak, try adding more characters.",
+      "fair": "The password is fair, try adding more characters.",
+      "good": "The password is good",
+      "strong": "The password is strong",
+      "very_strong": "The password is very strong"
     },
     "success": "Registration successful",
     "welcome": "You can now log in!"
@@ -115,6 +117,23 @@
     "resend_success": "New link sent. Check your inbox."
   },
   "verification": {
+    "processing": {
+      "title": "Verifying your account...",
+      "message": "Please wait while we process your verification link."
+    },
+    "error": {
+      "title": "Verification error",
+      "invalid_token": "The verification link is invalid or has expired.",
+      "resend": "Resend verification",
+      "home": "Back to home",
+      "message": "Could not verify your email. Please try again later or contact support."
+    },
+    "update_failed": {
+      "title": "Error updating account",
+      "message": "Your verification link is valid, but there was an error updating your account. Please try again later.",
+      "resend": "Resend verification",
+      "home": "Back to home"
+    },
     "success": {
       "title": "Your account has been verified!",
       "message": "You can now log in to the platform.",
@@ -124,6 +143,11 @@
       "title": "Verification link expired",
       "message": "The verification link has expired. Please request a new one.",
       "resend": "Resend verification"
+    },
+    "used": {
+      "title": "Link already used",
+      "message": "This verification link has already been used.",
+      "login": "Go to login"
     },
     "already": {
       "title": "Already verified",

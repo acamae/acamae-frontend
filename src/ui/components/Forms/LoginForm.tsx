@@ -57,6 +57,10 @@ const LoginForm: React.FC = () => {
           value={values.email}
           onChange={handleChange}
           isInvalid={touched.email && !!errors.email}
+          aria-invalid={touched.email && !!errors.email}
+          aria-required="true"
+          required
+          aria-errormessage="login-form-email-error"
           data-testid="login-form-email-input"
         />
         <Form.Text className="text-muted" data-testid="login-form-email-help">
@@ -69,7 +73,9 @@ const LoginForm: React.FC = () => {
 
       <Form.Group className="mb-3" controlId="password">
         <Form.Label data-testid="login-form-password-label">{t('login.password')}</Form.Label>
-        <InputGroup>
+        <InputGroup
+          hasValidation
+          className={touched.password && !!errors.password ? 'is-invalid' : ''}>
           <Form.Control
             size="lg"
             className="bg-white bg-opacity-5"
@@ -78,6 +84,10 @@ const LoginForm: React.FC = () => {
             value={values.password}
             onChange={handleChange}
             isInvalid={touched.password && !!errors.password}
+            aria-invalid={touched.password && !!errors.password}
+            aria-required="true"
+            required
+            aria-errormessage="login-form-password-error"
             data-testid="login-form-password-input"
           />
           <Button
@@ -88,13 +98,13 @@ const LoginForm: React.FC = () => {
             data-testid="login-form-password-toggle">
             {showPassword ? '👁️' : '👁️‍🗨️'}
           </Button>
-          <Form.Control.Feedback type="invalid" data-testid="login-form-password-error">
-            {errors.password}
-          </Form.Control.Feedback>
         </InputGroup>
         <Form.Text className="text-muted" data-testid="login-form-password-help">
           {t('login.password_help')}
         </Form.Text>
+        <Form.Control.Feedback type="invalid" data-testid="login-form-password-error">
+          {errors.password}
+        </Form.Control.Feedback>
       </Form.Group>
 
       <div className="d-grid">

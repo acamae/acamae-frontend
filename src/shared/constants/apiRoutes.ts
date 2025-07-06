@@ -34,7 +34,7 @@ export const API_ROUTES = {
 // Funciones auxiliares para construir rutas con parámetros para el frontend
 // Estas funciones devuelven la ruta parcial que se usará con la instancia de Axios.
 export const getAuthVerifyEmailUrl = (token: string): string =>
-  API_ROUTES.AUTH.VERIFY_EMAIL.replace(':token', token);
+  API_ROUTES.AUTH.VERIFY_EMAIL.replace(':token', encodeURIComponent(token));
 
 export const getAuthResetPasswordUrl = (token: string): string =>
   API_ROUTES.AUTH.RESET_PASSWORD.replace(':token', token);

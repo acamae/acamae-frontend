@@ -22,7 +22,13 @@ const PasswordStrengthMeter: React.FC<Props> = ({ password, t }) => {
 
   return (
     <div className="form-text">
-      <span data-testid="password-strength-label">{label}</span>
+      <span
+        data-testid="password-strength-label"
+        aria-live="polite"
+        aria-atomic="true"
+        role="alert">
+        {label}
+      </span>
       <div className="progress mt-1" aria-hidden="true">
         <div
           className={`progress-bar bg-${bootstrapColors[score]} progressBar progressBar-${score + 1}`}

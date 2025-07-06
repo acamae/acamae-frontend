@@ -38,8 +38,8 @@ describe('LoginUseCase', () => {
       username: 'testuser',
       email: 'test@example.com',
       role: USER_ROLES.USER,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: '2023-01-01T00:00:00.000Z',
+      updatedAt: '2023-01-01T00:00:00.000Z',
     };
 
     mockAuthRepository.login.mockResolvedValue({

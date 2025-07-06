@@ -9,7 +9,7 @@ const EmailVerificationSuccess: React.FC = () => {
 
   return (
     <div className="email-verification" data-testid="email-verification-success-page">
-      <div className="email-verification-content">
+      <main className="email-verification-content">
         <div className="email-verification-icon text-center mb-4">
           <i className="fa-solid fa-envelope"></i>
         </div>
@@ -29,7 +29,7 @@ const EmailVerificationSuccess: React.FC = () => {
             {t('verification.success.login')}
           </Link>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

@@ -7,6 +7,7 @@ import {
 } from '@application/state/actions/auth.actions';
 import reducer, { initialAuthState } from '@application/state/slices/authSlice';
 import { USER_ROLES } from '@domain/constants/user';
+import { tokenService } from '@infrastructure/storage/tokenService';
 
 interface ActionCreator {
   pending: { type: string };
@@ -20,8 +21,8 @@ describe('authSlice reducer', () => {
     email: 'a@b.com',
     username: 'alice',
     role: USER_ROLES.USER,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: '2023-01-01T00:00:00.000Z',
+    updatedAt: '2023-01-01T00:00:00.000Z',
   };
 
   it.each([
@@ -38,13 +39,15 @@ describe('authSlice reducer', () => {
   it.each([['login', loginAction]])(
     'should set isAuthenticated to true and user when %s is fulfilled',
     (_n, actionCreator: ActionCreator) => {
+      jest.spyOn(tokenService, 'getAccessToken').mockReturnValue('mocktoken');
       const state = reducer(initialAuthState, {
         type: actionCreator.fulfilled.type,
-        payload: { data: user },
+        payload: { data: user, success: true },
       });
       expect(state.loading).toBe(false);
       expect(state.isAuthenticated).toBe(true);
       expect(state.user?.email).toBe('a@b.com');
+      jest.restoreAllMocks();
     }
   );
 
@@ -145,6 +148,80 @@ describe('authSlice reducer', () => {
     });
     expect(state.loading).toBe(false);
     expect(state.isAuthenticated).toBe(false);
+    expect(state.user).toBeNull();
+  });
+
+  it('should set user, token, isAuthenticated correctly when login is fulfilled with success false', () => {
+    const state = reducer(initialAuthState, {
+      type: loginAction.fulfilled.type,
+      payload: { success: false, data: { id: 'x' } },
+    });
+    expect(state.user).toBeNull();
+    expect(state.token).toBeNull();
+    expect(state.isAuthenticated).toBe(false);
+  });
+
+  it('should set loading to false when login is rejected', () => {
+    const state = reducer(
+      { ...initialAuthState, loading: true },
+      { type: loginAction.rejected.type }
+    );
+    expect(state.loading).toBe(false);
+  });
+
+  it('should set loading to false when register is rejected', () => {
+    const state = reducer(
+      { ...initialAuthState, loading: true },
+      { type: registerAction.rejected.type }
+    );
+    expect(state.loading).toBe(false);
+  });
+
+  it('should set loading to false when logout is rejected', () => {
+    const state = reducer(
+      { ...initialAuthState, loading: true },
+      { type: logoutAction.rejected.type }
+    );
+    expect(state.loading).toBe(false);
+  });
+
+  it('should set loading to false when forgotPassword is rejected', () => {
+    const state = reducer(
+      { ...initialAuthState, loading: true },
+      { type: forgotPasswordAction.rejected.type }
+    );
+    expect(state.loading).toBe(false);
+  });
+
+  it('should set loading to false when resetPassword is rejected', () => {
+    const state = reducer(
+      { ...initialAuthState, loading: true },
+      { type: resetPasswordAction.rejected.type }
+    );
+    expect(state.loading).toBe(false);
+  });
+
+  it('should set user when register is fulfilled with data', () => {
+    const user = {
+      id: '2',
+      email: 'b@b.com',
+      username: 'bob',
+      role: USER_ROLES.USER,
+      createdAt: '',
+      updatedAt: '',
+    };
+    const state = reducer(initialAuthState, {
+      type: registerAction.fulfilled.type,
+      payload: { data: user },
+    });
+    expect(state.user).toEqual(user);
+  });
+
+  it('should set user to null when register is fulfilled with no data', () => {
+    const state = reducer(initialAuthState, {
+      type: registerAction.fulfilled.type,
+      payload: {},
+    });
     expect(state.user).toBeNull();
   });
 });

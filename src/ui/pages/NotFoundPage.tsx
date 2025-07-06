@@ -16,7 +16,7 @@ const NotFoundPage: React.FC = () => {
 
   return (
     <div className="error-page" data-testid="not-found-page">
-      <div className="error-page-content">
+      <main className="error-page-content">
         <Card className="mb-5 mx-auto">
           <CardBody>
             <Card>
@@ -53,7 +53,7 @@ const NotFoundPage: React.FC = () => {
           data-testid="button-back">
           <i className="fa fa-arrow-left me-1 ms-n1"></i> {t('global.go_back')}
         </Button>
-      </div>
+      </main>
     </div>
   );
 };

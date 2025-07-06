@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "cypress"]
+  },
+  "include": [
+    "../src/shared/constants/appRoutes.ts",
+    "../src/infrastructure/i18n/locales/*.json",
+    "./**/*.ts"
+  ],
+  "exclude": []
+}

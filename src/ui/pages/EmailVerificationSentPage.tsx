@@ -9,7 +9,7 @@ const EmailVerificationSentPage: React.FC = () => {
 
   return (
     <div className="email-verification" data-testid="email-verification-sent-page">
-      <div className="email-verification-content">
+      <main className="email-verification-content">
         <div className="email-verification-icon text-center mb-4">
           <i className="fa-solid fa-envelope fa-bounce"></i>
         </div>
@@ -29,7 +29,7 @@ const EmailVerificationSentPage: React.FC = () => {
             {t('global.back_to_home')}
           </Link>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

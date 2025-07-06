@@ -8,6 +8,7 @@ import {
   resetPasswordAction,
 } from '@application/state/actions/auth.actions';
 import { User } from '@domain/entities/User';
+import { tokenService } from '@infrastructure/storage/tokenService';
 
 interface AuthState {
   // Estado persistente
@@ -41,11 +42,13 @@ const authSlice = createSlice({
       })
       .addCase(loginAction.fulfilled, (state: AuthState, action) => {
         state.loading = false;
-        if (action.payload?.data) {
-          state.user = action.payload.data;
-          state.isAuthenticated = true;
+        if (action.payload?.success) {
+          state.token = tokenService.getAccessToken();
+          state.user = action.payload.data ?? null;
+          state.isAuthenticated = !!state.token;
         } else {
           state.user = null;
+          state.token = null;
           state.isAuthenticated = false;
         }
       })

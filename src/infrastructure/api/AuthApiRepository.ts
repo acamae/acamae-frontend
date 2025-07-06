@@ -15,13 +15,17 @@ import {
   RegisterPayload,
   ResetPasswordPayload,
   ResendVerificationPayload,
+  VerifyEmailPayload,
+  EmailVerificationResponse,
 } from '@domain/types/apiSchema';
+import { tokenService } from '@infrastructure/storage/tokenService';
 import {
   API_ROUTES,
   getUserByIdUrl,
   getUpdateUserByIdUrl,
   getDeleteUserByIdUrl,
   getAuthResetPasswordUrl,
+  getAuthVerifyEmailUrl,
 } from '@shared/constants/apiRoutes';
 import api from '@shared/services/axiosService';
 
@@ -31,8 +35,8 @@ function mapUserResponse(data: UserResponse): User {
     email: data.email,
     username: data.username,
     role: data.role === USER_ROLES.ADMIN ? USER_ROLES.ADMIN : USER_ROLES.USER,
-    createdAt: new Date(data.createdAt),
-    updatedAt: new Date(data.updatedAt),
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
   };
 }
 
@@ -70,10 +74,18 @@ export class AuthApiRepository implements IAuthRepository {
       const response = await api.post(API_ROUTES.AUTH.LOGIN, {
         ...payload,
       });
+
+      // Extraer tokens y usuario
+      const { accessToken, refreshToken, user } = response.data?.data ?? {};
+      if (accessToken && refreshToken) {
+        tokenService.setAccessToken(accessToken);
+        tokenService.setRefreshToken(refreshToken);
+      }
+
       return handleApiSuccess({
         response: {
           ...response,
-          data: { ...mapUserResponse(response.data) },
+          data: user ? { ...mapUserResponse(user) } : null,
         },
       });
     } catch (error: unknown) {
@@ -81,13 +93,13 @@ export class AuthApiRepository implements IAuthRepository {
     }
   }
 
-  async register(payload: RegisterPayload): ApiPromise<User> {
+  async register(payload: RegisterPayload): ApiPromise<void> {
     try {
       const response = await api.post(API_ROUTES.AUTH.REGISTER, payload);
       return handleApiSuccess({
         response: {
           ...response,
-          data: { ...mapUserResponse(response.data) },
+          data: null,
         },
       });
     } catch (error) {
@@ -117,7 +129,12 @@ export class AuthApiRepository implements IAuthRepository {
 
   async logout(): ApiPromise<void> {
     try {
-      const response = await api.post(API_ROUTES.AUTH.LOGOUT);
+      const response = await api.post(API_ROUTES.AUTH.LOGOUT, {
+        refreshToken: tokenService.getRefreshToken(),
+      });
+
+      // limpiar tokens locales
+      tokenService.clear();
       return handleApiSuccess({ response });
     } catch (error) {
       return handleApiError(error);
@@ -196,6 +213,15 @@ export class AuthApiRepository implements IAuthRepository {
   async resendVerification(payload: ResendVerificationPayload): ApiPromise<void> {
     try {
       const response = await api.post(API_ROUTES.AUTH.VERIFY_EMAIL_RESEND, payload);
+      return handleApiSuccess({ response });
+    } catch (error) {
+      return handleApiError(error);
+    }
+  }
+
+  async verifyEmail(payload: VerifyEmailPayload): ApiPromise<EmailVerificationResponse> {
+    try {
+      const response = await api.post(getAuthVerifyEmailUrl(payload.token));
       return handleApiSuccess({ response });
     } catch (error) {
       return handleApiError(error);
