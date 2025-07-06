@@ -1,5 +1,5 @@
 /*
-   01. Color system 
+   01. Color system
    02. Options toggle setting (rtl, shadow, caret, negative margin, color mode)
    03. Variable prefix setting
    04. Body setting
@@ -9,11 +9,11 @@
    08. Container padding
    09. Component border settings
    10. Component border-radius settings
-   11. Component box-shadow settings 
-   12. Component color settings 
-   13. Component caret settings 
-   14. Component transition settings 
-   15. Component ratio settings 
+   11. Component box-shadow settings
+   12. Component color settings
+   13. Component caret settings
+   14. Component transition settings
+   15. Component ratio settings
    16. Container padding settings
    17. App - Header settings
    18. App - Sidebar settings
@@ -859,7 +859,7 @@ $form-feedback-icon-invalid-color: $form-feedback-invalid-color !default;
 $form-feedback-icon-invalid: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='#{$form-feedback-icon-invalid-color}'><circle cx='6' cy='6' r='4.5'/><path stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/><circle cx='6' cy='8.2' r='.6' fill='#{$form-feedback-icon-invalid-color}' stroke='none'/></svg>") !default;
 $form-validation-states: (
   'valid': (
-    'color': var(--#{$prefix}success-text),
+    'color': var(--#{$prefix}success),
     'icon': $form-feedback-icon-valid,
     'tooltip-color': #fff,
     'tooltip-bg-color': var(--#{$prefix}success),
@@ -868,7 +868,7 @@ $form-validation-states: (
     'border-color': var(--#{$prefix}success),
   ),
   'invalid': (
-    'color': var(--#{$prefix}danger-text),
+    'color':  var(--#{$prefix}danger),
     'icon': $form-feedback-icon-invalid,
     'tooltip-color': #fff,
     'tooltip-bg-color': var(--#{$prefix}danger),

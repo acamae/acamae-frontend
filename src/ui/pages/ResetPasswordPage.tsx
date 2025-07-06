@@ -11,12 +11,12 @@ const ResetPasswordPage: React.FC = () => {
 
   return (
     <div className="reset-password" data-testid="reset-password-page">
-      <div className="reset-password-content">
+      <main className="reset-password-content">
         <h1 className="text-center" data-testid="reset-password-title">
           {t('reset.title')}
         </h1>
         <ResetPasswordForm tokenProp={token} />
-      </div>
+      </main>
     </div>
   );
 };

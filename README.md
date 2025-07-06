@@ -195,6 +195,35 @@ npm run update:snapshots
 
 ---
 
+## 🔒 Security Measures
+
+**GARANTÍA**: Es **IMPOSIBLE** ejecutar operaciones en base de datos de producción desde tests de Cypress.
+
+Se han implementado **8 capas de seguridad** que previenen completamente cualquier operación accidental:
+
+- ✅ **Verificación de entorno**: Solo funciona en `NODE_ENV=testing`
+- ✅ **Validación de BD**: Nombres deben contener "test"
+- ✅ **Lista negra BD**: 8 nombres de producción prohibidos
+- ✅ **Validación de usuario**: Usuarios deben contener "test"
+- ✅ **Lista negra usuario**: 9 usuarios de producción prohibidos
+- ✅ **Lista negra host**: 6 hosts de producción prohibidos
+- ✅ **Validación puerto**: Puertos remotos estándar bloqueados
+- ✅ **Verificación Cypress**: Validación en cypress.config.js
+
+### Scripts de Base de Datos Protegidos
+
+```bash
+# Todos los scripts incluyen validaciones de seguridad
+npm run test:e2e:setup      # Configurar BD de tests
+npm run test:e2e:cleanup    # Limpiar BD de tests
+npm run test:e2e:reset      # Reiniciar BD de tests
+npm run test:e2e:verify     # Verificar configuración segura
+```
+
+📖 **Documentación completa**: Ver [`README-seguridad.md`](./README-seguridad.md)
+
+---
+
 ## Docker & Deployment
 
 🆕 **New local architecture (2025-06-21)**

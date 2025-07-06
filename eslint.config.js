@@ -14,7 +14,7 @@ const __dirname = dirname(__filename);
 export default [
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
-    ignores: ['eslint.config.js'],
+    ignores: ['eslint.config.js', 'cypress/**/*'],
     languageOptions: {
       parser: tsparser,
       parserOptions: {
@@ -112,6 +112,88 @@ export default [
             ['@styles', resolve(__dirname, 'src/ui/styles')],
           ],
           extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+        },
+      },
+    },
+  },
+  {
+    files: ['cypress/**/*.ts', 'cypress/**/*.js'],
+    languageOptions: {
+      parser: tsparser,
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        project: resolve(__dirname, 'cypress/tsconfig.json'),
+        tsconfigRootDir: __dirname,
+      },
+      globals: {
+        cy: true,
+        Cypress: true,
+        describe: true,
+        it: true,
+        expect: true,
+        beforeEach: true,
+        afterEach: true,
+        before: true,
+        after: true,
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint,
+      import: importPlugin,
+      prettier: prettierPlugin,
+    },
+    rules: {
+      'linebreak-style': 0,
+      'prettier/prettier': [
+        'error',
+        {
+          endOfLine: 'auto',
+        },
+      ],
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+      'no-var': 'error',
+      'prefer-const': 'error',
+      'import/order': [
+        'error',
+        {
+          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc' },
+        },
+      ],
+      '@typescript-eslint/no-explicit-any': ['error', { ignoreRestArgs: true, fixToUnknown: true }],
+    },
+    settings: {
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          project: resolve(__dirname, 'cypress/tsconfig.json'),
+          extensions: ['.ts', '.js', '.json'],
+        },
+        node: {
+          extensions: ['.js', '.ts'],
+        },
+        alias: {
+          map: [
+            ['@domain', resolve(__dirname, 'src/domain')],
+            ['@shared', resolve(__dirname, 'src/shared')],
+            ['@ui', resolve(__dirname, 'src/ui')],
+            ['@application', resolve(__dirname, 'src/application')],
+            ['@infrastructure', resolve(__dirname, 'src/infrastructure')],
+            ['@i18n', resolve(__dirname, 'src/infrastructure/i18n')],
+            ['@styles', resolve(__dirname, 'src/ui/styles')],
+          ],
+          extensions: ['.ts', '.js', '.json'],
         },
       },
     },

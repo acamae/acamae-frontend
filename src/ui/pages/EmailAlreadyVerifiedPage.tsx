@@ -9,7 +9,7 @@ const EmailAlreadyVerified: React.FC = () => {
 
   return (
     <div className="email-verification" data-testid="email-already-verified-page">
-      <div className="email-verification-content">
+      <main className="email-verification-content">
         <div className="email-verification-icon text-center mb-4">
           <i className="fa-solid fa-envelope"></i>
         </div>
@@ -29,7 +29,7 @@ const EmailAlreadyVerified: React.FC = () => {
             {t('global.back_to_home')}
           </Link>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

@@ -78,6 +78,14 @@ const RegisterForm: React.FC = () => {
 
   return (
     <>
+      <p className="text-muted">
+        <Trans
+          i18nKey="global.required_asterisk"
+          components={{
+            abbr: <abbr className="text-danger" title={t('global.required')} />,
+          }}
+        />
+      </p>
       <Form
         onSubmit={e => {
           void handleSubmit(e);
@@ -85,59 +93,95 @@ const RegisterForm: React.FC = () => {
         noValidate
         data-testid="register-form">
         <Form.Group className="mb-3" controlId="email">
-          <Form.Label>{t('register.email')}</Form.Label>
+          <Form.Label>
+            {t('register.email')}{' '}
+            <abbr className="text-danger" title={t('global.required')}>
+              *
+            </abbr>
+          </Form.Label>
           <Form.Control
             type="email"
             name="email"
             value={values.email}
             onChange={handleChange}
             isInvalid={touched.email && !!errors.email}
+            aria-invalid={touched.email && !!errors.email}
             required
+            aria-required="true"
             autoComplete="email"
             aria-describedby="emailHelp"
+            aria-errormessage="register-form-email-error"
             data-testid="register-form-email-input"
           />
           <Form.Text id="emailHelp" className="text-muted">
             {t('register.email_help')}
           </Form.Text>
-          <Form.Control.Feedback type="invalid" data-testid="register-form-email-error">
+          <Form.Control.Feedback
+            type="invalid"
+            data-testid="register-form-email-error"
+            aria-live="polite"
+            aria-atomic="true"
+            role="alert">
             {errors.email}
           </Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="username">
-          <Form.Label>{t('register.username')}</Form.Label>
+          <Form.Label>
+            {t('register.username')}{' '}
+            <abbr className="text-danger" title={t('global.required')}>
+              *
+            </abbr>
+          </Form.Label>
           <Form.Control
             type="text"
             name="username"
             value={values.username}
             onChange={handleChange}
             isInvalid={touched.username && !!errors.username}
+            aria-invalid={touched.username && !!errors.username}
             required
+            aria-required="true"
             autoComplete="username"
             aria-describedby="usernameHelp"
+            aria-errormessage="register-form-username-error"
             data-testid="register-form-username-input"
           />
           <Form.Text id="usernameHelp" className="text-muted">
             {t('register.username_help')}
           </Form.Text>
-          <Form.Control.Feedback type="invalid" data-testid="register-form-username-error">
+          <Form.Control.Feedback
+            type="invalid"
+            data-testid="register-form-username-error"
+            aria-live="polite"
+            aria-atomic="true"
+            role="alert">
             {errors.username}
           </Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="password">
-          <Form.Label>{t('register.password')}</Form.Label>
-          <InputGroup hasValidation>
+          <Form.Label>
+            {t('register.password')}{' '}
+            <abbr className="text-danger" title={t('global.required')}>
+              *
+            </abbr>
+          </Form.Label>
+          <InputGroup
+            hasValidation
+            className={touched.password && !!errors.password ? 'is-invalid' : ''}>
             <Form.Control
               type={showPassword ? 'text' : 'password'}
               name="password"
               value={values.password}
               onChange={handleChange}
               isInvalid={touched.password && !!errors.password}
+              aria-invalid={touched.password && !!errors.password}
               required
+              aria-required="true"
               autoComplete="new-password"
               aria-describedby="passwordHelp"
+              aria-errormessage="register-form-password-error"
               data-testid="register-form-password-input"
             />
             <Button
@@ -148,28 +192,43 @@ const RegisterForm: React.FC = () => {
               type="button">
               {showPassword ? '🙈' : '👁️'}
             </Button>
-            <Form.Control.Feedback type="invalid" data-testid="register-form-password-error">
-              {errors.password}
-            </Form.Control.Feedback>
           </InputGroup>
           <Form.Text id="passwordHelp" className="text-muted">
             {t('register.password_help')}
           </Form.Text>
+          <Form.Control.Feedback
+            type="invalid"
+            data-testid="register-form-password-error"
+            aria-live="polite"
+            aria-atomic="true"
+            role="alert">
+            {errors.password}
+          </Form.Control.Feedback>
           <PasswordStrengthMeter password={values.password ?? ''} t={t} />
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="confirmPassword">
-          <Form.Label>{t('register.confirm_password')}</Form.Label>
-          <InputGroup hasValidation>
+          <Form.Label>
+            {t('register.confirm_password')}{' '}
+            <abbr className="text-danger" title={t('global.required')}>
+              *
+            </abbr>
+          </Form.Label>
+          <InputGroup
+            hasValidation
+            className={touched.confirmPassword && !!errors.confirmPassword ? 'is-invalid' : ''}>
             <Form.Control
               type={showConfirmPassword ? 'text' : 'password'}
               name="confirmPassword"
               value={values.confirmPassword}
               onChange={handleChange}
               isInvalid={touched.confirmPassword && !!errors.confirmPassword}
+              aria-invalid={touched.confirmPassword && !!errors.confirmPassword}
               required
+              aria-required="true"
               autoComplete="new-password"
               aria-describedby="confirmPasswordHelp"
+              aria-errormessage="register-form-confirm-password-error"
               data-testid="register-form-confirm-password-input"
             />
             <Button
@@ -180,40 +239,56 @@ const RegisterForm: React.FC = () => {
               type="button">
               {showConfirmPassword ? '🙈' : '👁️'}
             </Button>
-            <Form.Control.Feedback
-              type="invalid"
-              data-testid="register-form-confirm-password-error">
-              {errors.confirmPassword}
-            </Form.Control.Feedback>
           </InputGroup>
           <Form.Text id="confirmPasswordHelp" className="text-muted">
             {t('register.confirm_password_help')}
           </Form.Text>
+          <Form.Control.Feedback
+            type="invalid"
+            data-testid="register-form-confirm-password-error"
+            aria-live="polite"
+            aria-atomic="true"
+            role="alert">
+            {errors.confirmPassword}
+          </Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className="mb-3 has-validation" controlId="terms">
           <Form.Check
             type="checkbox"
             label={
-              <Trans
-                i18nKey="register.terms_and_conditions"
-                components={{ url: <a href="#" onClick={handleShow} /> }} // NOSONAR: This is valid
-              />
+              <>
+                <Trans
+                  i18nKey="register.terms_and_conditions"
+                  components={{ url: <a href="#" onClick={handleShow} /> }} // NOSONAR: This is valid
+                />{' '}
+                <abbr className="text-danger" title={t('global.required')}>
+                  *
+                </abbr>
+              </>
             }
             id="terms"
             name="terms"
             onChange={handleCheckboxChange}
             className={touched.terms && !!errors.terms ? 'is-invalid' : ''}
             isInvalid={touched.terms && !!errors.terms}
+            aria-invalid={touched.terms && !!errors.terms}
             required
+            aria-required="true"
             autoComplete="terms"
             aria-describedby="termsHelp"
+            aria-errormessage="register-form-terms-error"
             data-testid="register-form-terms-checkbox"
           />
           <Form.Text id="termsHelp" className="text-muted sr-only">
             {t('register.terms_and_conditions_help')}{' '}
           </Form.Text>
-          <Form.Control.Feedback type="invalid" data-testid="register-form-terms-error">
+          <Form.Control.Feedback
+            type="invalid"
+            data-testid="register-form-terms-error"
+            aria-live="polite"
+            aria-atomic="true"
+            role="alert">
             {errors.terms}
           </Form.Control.Feedback>
         </Form.Group>

@@ -65,13 +65,20 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
           data-testid="reset-password-form-token"
         />
         <Form.Label data-testid="label-reset-password">{t('reset.password')}</Form.Label>
-        <InputGroup hasValidation>
+        <InputGroup
+          hasValidation
+          className={touched.password && !!errors.password ? 'is-invalid' : ''}>
           <Form.Control
+            size="lg"
+            className="bg-white bg-opacity-5"
             type={showPassword ? 'text' : 'password'}
             name="password"
             value={values.password}
             onChange={handleChange}
             isInvalid={touched.password && !!errors.password}
+            aria-invalid={touched.password && !!errors.password}
+            aria-required="true"
+            aria-errormessage="reset-password-form-password-error"
             required
             autoComplete="new-password"
             aria-describedby="passwordHelp"

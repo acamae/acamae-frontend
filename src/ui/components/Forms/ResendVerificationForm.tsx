@@ -41,11 +41,16 @@ const ResendVerificationForm: React.FC = () => {
           {t('verification.resend.label')}
         </Form.Label>
         <Form.Control
+          size="lg"
+          className="bg-white bg-opacity-5"
           type="text"
           name="identifier"
           value={values.identifier}
           onChange={handleChange}
           isInvalid={touched.identifier && !!errors.identifier}
+          aria-invalid={touched.identifier && !!errors.identifier}
+          aria-required="true"
+          aria-errormessage="resend-verification-form-identifier-error"
           required
           autoFocus
           data-testid="resend-verification-form-identifier-input"

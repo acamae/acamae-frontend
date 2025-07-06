@@ -6,7 +6,7 @@ exports[`HomePage should render snapshot correctly 1`] = `
     class="home"
     data-testid="home-page"
   >
-    <div
+    <main
       class="home-content"
     >
       <h1
@@ -21,7 +21,7 @@ exports[`HomePage should render snapshot correctly 1`] = `
       >
         Gestiona tus equipos de eSports con seguridad y facilidad
       </div>
-    </div>
+    </main>
   </div>
 </DocumentFragment>
 `;

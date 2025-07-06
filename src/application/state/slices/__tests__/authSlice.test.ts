@@ -21,8 +21,8 @@ describe('authSlice reducer', () => {
     email: 'a@b.com',
     username: 'alice',
     role: USER_ROLES.USER,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: '2023-01-01T00:00:00.000Z',
+    updatedAt: '2023-01-01T00:00:00.000Z',
   };
 
   it.each([

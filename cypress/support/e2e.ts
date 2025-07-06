@@ -9,7 +9,11 @@
 // ***********************************************************
 
 // Importar comandos.js usando ES2015
+/// <reference types="cypress" />
 import './commands';
+
+// Importar utilidades de base de datos
+import './database';
 
 // Configuración adicional que sobrescribe la configuración en cypress.config.ts
 // puede ir aquí, como:

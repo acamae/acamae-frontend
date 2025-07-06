@@ -38,14 +38,19 @@ const ForgotPasswordForm: React.FC = () => {
       <Form.Group className="mb-3" controlId="email">
         <Form.Label>{t('forgot.email')}</Form.Label>
         <Form.Control
+          size="lg"
+          className="bg-white bg-opacity-5"
           type="email"
           name="email"
           value={values.email}
           onChange={handleChange}
           isInvalid={touched.email && !!errors.email}
+          aria-invalid={touched.email && !!errors.email}
+          aria-required="true"
           required
           autoComplete="email"
           aria-describedby="emailHelp"
+          aria-errormessage="forgot-password-form-email-error"
           data-testid="forgot-password-form-email-input"
         />
         <Form.Text
