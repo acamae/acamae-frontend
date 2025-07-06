@@ -78,21 +78,10 @@ export interface VerifyEmailPayload {
 }
 
 /**
- * Email verification status
- */
-export enum EmailVerificationStatus {
-  SUCCESS = 'success',
-  INVALID_TOKEN = 'invalid_token',
-  EXPIRED_TOKEN = 'expired_token',
-  ALREADY_VERIFIED = 'already_verified',
-  UPDATE_FAILED = 'update_failed',
-}
-
-/**
  * Email verification response
  */
 export interface EmailVerificationResponse {
-  status: EmailVerificationStatus;
+  status: string;
   message: string;
   resendRequired?: boolean;
 }

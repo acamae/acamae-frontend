@@ -2,11 +2,7 @@ import { VerifyEmailUseCase } from '@application/use-cases/auth/VerifyEmailUseCa
 import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { ApiSuccessCodes } from '@domain/constants/successCodes';
 import { IAuthRepository } from '@domain/repositories/AuthRepository';
-import {
-  VerifyEmailPayload,
-  EmailVerificationStatus,
-  EmailVerificationResponse,
-} from '@domain/types/apiSchema';
+import { VerifyEmailPayload, EmailVerificationResponse } from '@domain/types/apiSchema';
 
 describe('VerifyEmailUseCase', () => {
   let verifyEmailUseCase: VerifyEmailUseCase;
@@ -37,7 +33,7 @@ describe('VerifyEmailUseCase', () => {
     };
 
     const mockResponse: EmailVerificationResponse = {
-      status: EmailVerificationStatus.SUCCESS,
+      status: ApiSuccessCodes.SUCCESS,
       message: 'Email verified successfully',
       resendRequired: false,
     };
@@ -68,7 +64,7 @@ describe('VerifyEmailUseCase', () => {
     };
 
     const mockResponse: EmailVerificationResponse = {
-      status: EmailVerificationStatus.EXPIRED_TOKEN,
+      status: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
       message: 'Verification token has expired',
       resendRequired: true,
     };
@@ -99,7 +95,7 @@ describe('VerifyEmailUseCase', () => {
     };
 
     const mockResponse: EmailVerificationResponse = {
-      status: EmailVerificationStatus.INVALID_TOKEN,
+      status: ApiErrorCodes.AUTH_TOKEN_INVALID,
       message: 'Invalid verification token',
       resendRequired: true,
     };
@@ -130,7 +126,7 @@ describe('VerifyEmailUseCase', () => {
     };
 
     const mockResponse: EmailVerificationResponse = {
-      status: EmailVerificationStatus.ALREADY_VERIFIED,
+      status: ApiErrorCodes.AUTH_USER_ALREADY_VERIFIED,
       message: 'Email is already verified',
       resendRequired: false,
     };
@@ -161,7 +157,7 @@ describe('VerifyEmailUseCase', () => {
     };
 
     const mockResponse: EmailVerificationResponse = {
-      status: EmailVerificationStatus.UPDATE_FAILED,
+      status: ApiErrorCodes.AUTH_UPDATE_FAILED,
       message: 'Token is valid but user update failed',
       resendRequired: true,
     };

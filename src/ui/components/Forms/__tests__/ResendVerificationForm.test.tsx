@@ -134,7 +134,7 @@ describe('ResendVerificationForm', () => {
   });
 
   it('should show error message when user is already verified', async () => {
-    const error = 'ALREADY_VERIFIED';
+    const error = 'AUTH_USER_ALREADY_VERIFIED';
     const resendVerificationMock = promiseMock({ error });
     setupUseAuth({ resendVerification: resendVerificationMock });
     renderResendVerificationForm();

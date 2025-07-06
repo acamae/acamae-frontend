@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 
 import { ApiErrorCodes } from '@domain/constants/errorCodes';
-import { EmailVerificationStatus } from '@domain/types/apiSchema';
+import { ApiSuccessCodes } from '@domain/constants/successCodes';
 import i18n from '@infrastructure/i18n';
 import { APP_ROUTES } from '@shared/constants/appRoutes';
 import { createTestProviderFactory } from '@shared/utils/renderProvider';
@@ -67,7 +67,7 @@ describe('EmailVerificationPage', () => {
     mockExecute.mockResolvedValue({
       success: true,
       data: {
-        status: EmailVerificationStatus.SUCCESS,
+        status: ApiSuccessCodes.SUCCESS,
         message: 'Email verified successfully',
         resendRequired: false,
       },
@@ -84,7 +84,7 @@ describe('EmailVerificationPage', () => {
     mockExecute.mockResolvedValue({
       success: true,
       data: {
-        status: EmailVerificationStatus.EXPIRED_TOKEN,
+        status: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
         message: 'Token has expired',
         resendRequired: true,
       },
@@ -101,7 +101,7 @@ describe('EmailVerificationPage', () => {
     mockExecute.mockResolvedValue({
       success: true,
       data: {
-        status: EmailVerificationStatus.ALREADY_VERIFIED,
+        status: ApiErrorCodes.AUTH_USER_ALREADY_VERIFIED,
         message: 'Email already verified',
         resendRequired: false,
       },
@@ -118,7 +118,7 @@ describe('EmailVerificationPage', () => {
     mockExecute.mockResolvedValue({
       success: true,
       data: {
-        status: EmailVerificationStatus.INVALID_TOKEN,
+        status: ApiErrorCodes.AUTH_TOKEN_INVALID,
         message: 'Invalid token',
         resendRequired: true,
       },
@@ -135,7 +135,7 @@ describe('EmailVerificationPage', () => {
     mockExecute.mockResolvedValue({
       success: true,
       data: {
-        status: EmailVerificationStatus.UPDATE_FAILED,
+        status: ApiErrorCodes.AUTH_UPDATE_FAILED,
         message: 'Update failed',
         resendRequired: true,
       },
