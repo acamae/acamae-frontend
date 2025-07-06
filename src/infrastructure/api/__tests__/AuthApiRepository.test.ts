@@ -82,7 +82,7 @@ describe('AuthApiRepository', () => {
   });
 
   it('should login and return error payload when http 400', async () => {
-    const error = new AxiosError('Bad request') as MockAxiosError;
+    const error = new AxiosError('Bad Request') as MockAxiosError;
     error.response = {
       status: 400,
       data: { message: 'Bad' },
@@ -94,10 +94,20 @@ describe('AuthApiRepository', () => {
 
     const result = await repo.login({ email: 'a@b.com', password: '123456' });
 
-    expect(result).toEqual({ message: 'Bad' });
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      status: 400,
+      code: 'UNKNOWN_ERROR',
+      message: 'Bad',
+      timestamp: expect.any(String),
+      requestId: undefined,
+      meta: undefined,
+      error: undefined,
+    });
   });
 
-  it('should forgotPassword and return empty object on network error', async () => {
+  it('should forgotPassword and return structured error on network error', async () => {
     const netErr = new AxiosError('Network') as MockAxiosError;
     netErr.request = {};
     getMock().post.mockRejectedValue(netErr);
@@ -107,7 +117,24 @@ describe('AuthApiRepository', () => {
     expect(getMock().post).toHaveBeenCalledWith(API_ROUTES.AUTH.FORGOT_PASSWORD, {
       email: 'a@b.com',
     });
-    expect(result).toEqual({});
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      status: 0,
+      code: 'ERR_NETWORK',
+      message: 'Network',
+      timestamp: expect.any(String),
+      error: {
+        type: 'network',
+        details: [
+          {
+            field: 'network',
+            code: 'ERR_NETWORK',
+            message: 'Network',
+          },
+        ],
+      },
+    });
   });
 
   it('should register and return success', async () => {
@@ -164,15 +191,42 @@ describe('AuthApiRepository', () => {
     };
     getMock().get.mockRejectedValue(error);
     const result = await repo.getCurrentUser();
-    expect(result).toEqual({ message: 'Internal Server Error' });
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      status: 500,
+      code: 'UNKNOWN_ERROR',
+      message: 'Internal Server Error',
+      timestamp: expect.any(String),
+      requestId: undefined,
+      meta: undefined,
+      error: undefined,
+    });
   });
 
-  it('should return empty object on network error when no response', async () => {
+  it('should return structured error on network error when no response', async () => {
     const error = new AxiosError('Network Error') as MockAxiosError;
     error.request = {};
     getMock().get.mockRejectedValue(error);
     const result = await repo.getCurrentUser();
-    expect(result).toEqual({});
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      status: 0,
+      code: 'ERR_NETWORK',
+      message: 'Network Error',
+      timestamp: expect.any(String),
+      error: {
+        type: 'network',
+        details: [
+          {
+            field: 'network',
+            code: 'ERR_NETWORK',
+            message: 'Network Error',
+          },
+        ],
+      },
+    });
   });
 
   it('should handleApiError and handle unknown error', async () => {
@@ -207,7 +261,17 @@ describe('AuthApiRepository', () => {
     };
     getMock().get.mockRejectedValue(error);
     const result = await repo.findById('1');
-    expect(result).toEqual({ message: 'User not found' });
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      status: 404,
+      code: 'UNKNOWN_ERROR',
+      message: 'User not found',
+      timestamp: expect.any(String),
+      requestId: undefined,
+      meta: undefined,
+      error: undefined,
+    });
   });
 
   it('should save and return success', async () => {
@@ -251,7 +315,17 @@ describe('AuthApiRepository', () => {
       createdAt: '2023-01-01T00:00:00.000Z',
       updatedAt: '2023-01-01T00:00:00.000Z',
     });
-    expect(result).toEqual({ message: 'Invalid data' });
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      status: 400,
+      code: 'UNKNOWN_ERROR',
+      message: 'Invalid data',
+      timestamp: expect.any(String),
+      requestId: undefined,
+      meta: undefined,
+      error: undefined,
+    });
   });
 
   it('should delete and return success', async () => {
@@ -273,7 +347,17 @@ describe('AuthApiRepository', () => {
     };
     getMock().delete.mockRejectedValue(error);
     const result = await repo.delete('1');
-    expect(result).toEqual({ message: 'User not found' });
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      status: 404,
+      code: 'UNKNOWN_ERROR',
+      message: 'User not found',
+      timestamp: expect.any(String),
+      requestId: undefined,
+      meta: undefined,
+      error: undefined,
+    });
   });
 
   it('should resetPassword and return success', async () => {
@@ -300,7 +384,17 @@ describe('AuthApiRepository', () => {
       token: 'invalid-token',
       password: 'new-password',
     });
-    expect(result).toEqual({ message: 'Invalid or expired token' });
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      status: 400,
+      code: 'UNKNOWN_ERROR',
+      message: 'Invalid or expired token',
+      timestamp: expect.any(String),
+      requestId: undefined,
+      meta: undefined,
+      error: undefined,
+    });
   });
 
   it('should logout and propagate server error', async () => {
@@ -314,7 +408,17 @@ describe('AuthApiRepository', () => {
     };
     getMock().post.mockRejectedValue(error);
     const result = await repo.logout();
-    expect(result).toEqual({ message: 'Internal Server Error' });
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      status: 500,
+      code: 'UNKNOWN_ERROR',
+      message: 'Internal Server Error',
+      timestamp: expect.any(String),
+      requestId: undefined,
+      meta: undefined,
+      error: undefined,
+    });
   });
 
   it('should getCurrentUser and propagate backend unauthorized error', async () => {
@@ -328,14 +432,41 @@ describe('AuthApiRepository', () => {
     };
     getMock().get.mockRejectedValue(error);
     const result = await repo.getCurrentUser();
-    expect(result).toEqual({ message: 'Not authenticated' });
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      status: 401,
+      code: 'UNKNOWN_ERROR',
+      message: 'Not authenticated',
+      timestamp: expect.any(String),
+      requestId: undefined,
+      meta: undefined,
+      error: undefined,
+    });
   });
 
-  it('should findById and return empty object on network error', async () => {
+  it('should findById and return structured error on network error', async () => {
     const error = new AxiosError('Network Error') as MockAxiosError;
     error.request = {};
     getMock().get.mockRejectedValue(error);
     const result = await repo.findById('1');
-    expect(result).toEqual({});
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      status: 0,
+      code: 'ERR_NETWORK',
+      message: 'Network Error',
+      timestamp: expect.any(String),
+      error: {
+        type: 'network',
+        details: [
+          {
+            field: 'network',
+            code: 'ERR_NETWORK',
+            message: 'Network Error',
+          },
+        ],
+      },
+    });
   });
 });

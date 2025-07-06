@@ -34,8 +34,9 @@ describe('ApiError', () => {
     expect(error.success).toBe(true);
   });
 
-  it('should use default message when not provided', () => {
+  it('should use default message when empty string is provided', () => {
     const error = new ApiError({
+      message: '',
       data: null,
       status: 400,
       code: ApiErrorCodes.UNKNOWN_ERROR,
@@ -49,9 +50,9 @@ describe('ApiError', () => {
     expect(error.success).toBe(false);
   });
 
-  it('should use default message when message is undefined', () => {
+  it('should use default message when message is whitespace only', () => {
     const error = new ApiError({
-      message: undefined,
+      message: '   ',
       data: null,
       status: 400,
       code: ApiErrorCodes.UNKNOWN_ERROR,
