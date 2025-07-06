@@ -6,7 +6,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="home" data-testid="home-page">
-      <div className="home-content">
+      <main className="home-content">
         <h1 className="text-center" data-testid="home-page-title">
           {t('home.title')}
         </h1>
@@ -15,7 +15,7 @@ const HomePage: React.FC = () => {
           data-testid="home-page-description">
           {t('home.description')}
         </div>
-      </div>
+      </main>
     </div>
   );
 };

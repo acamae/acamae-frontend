@@ -43,8 +43,8 @@ const userResponse = {
   email: 'a@b.com',
   username: 'alice',
   role: USER_ROLES.USER,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: '2023-01-01T00:00:00.000Z',
+  updatedAt: '2023-01-01T00:00:00.000Z',
 };
 
 beforeEach(() => {
@@ -218,8 +218,8 @@ describe('AuthApiRepository', () => {
       email: 'a@b.com',
       username: 'updated',
       role: USER_ROLES.USER,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: '2023-01-01T00:00:00.000Z',
+      updatedAt: '2023-01-01T00:00:00.000Z',
     });
     expect(getMock().put).toHaveBeenCalledWith(
       expect.stringContaining('/users/1'),
@@ -248,8 +248,8 @@ describe('AuthApiRepository', () => {
       email: 'a@b.com',
       username: 'updated',
       role: USER_ROLES.USER,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: '2023-01-01T00:00:00.000Z',
+      updatedAt: '2023-01-01T00:00:00.000Z',
     });
     expect(result).toEqual({ message: 'Invalid data' });
   });

@@ -1,7 +1,7 @@
 /*
    Dark color mode variables
-	
-   01. Color system 
+
+   01. Color system
    02. Body setting
    03. Font & headings settings
    04. Border settings
@@ -35,7 +35,7 @@ $aqua-dark: #0cfff5 !default;
 $blue-dark: #4e9cff !default;
 $indigo-dark: #bba4ff !default;
 $purple-dark: #de8cff !default;
-$red-dark: #ff6060 !default;
+$red-dark: #fe4b4b !default;
 $teal-dark: #3cd2a5 !default;
 $green-dark: #1ecc33 !default;
 $lime-dark: #81f32d !default;
@@ -122,8 +122,8 @@ $body-letter-spacing-dark: rem(0.75px) !default;
 $body-bg-dark: #1d2835 !default;
 $body-bg-gradient-dark: linear-gradient(
   180deg,
-  rgba(50, 70, 80, 0.9) 0%,
-  rgba(13, 16, 27, 1) 100%
+  rgb(17 25 29 / 90%) 0%,
+  rgb(13, 16, 27) 100%
 ) !default;
 $body-bg-cover-dark: url('images/cover-dark.jpg') !default;
 $body-bg-image-dark: url('images/pattern-dark.png') !default;

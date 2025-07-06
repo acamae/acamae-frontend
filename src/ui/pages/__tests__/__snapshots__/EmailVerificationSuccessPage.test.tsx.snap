@@ -6,7 +6,7 @@ exports[`EmailVerificationSuccess should render snapshot correctly 1`] = `
     class="email-verification"
     data-testid="email-verification-success-page"
   >
-    <div
+    <main
       class="email-verification-content"
     >
       <div
@@ -44,7 +44,7 @@ exports[`EmailVerificationSuccess should render snapshot correctly 1`] = `
           Ir al login
         </a>
       </div>
-    </div>
+    </main>
   </div>
 </DocumentFragment>
 `;

@@ -6,7 +6,7 @@ import LoginForm from '@ui/components/Forms/LoginForm';
 const LoginPage: React.FC = () => {
   return (
     <div className="login" data-testid="login-page">
-      <div className="login-content">
+      <main className="login-content">
         <h1 className="text-center" data-testid="login-page-title">
           {t('login.title')}
         </h1>
@@ -16,7 +16,7 @@ const LoginPage: React.FC = () => {
           {t('login.protection_message')}
         </div>
         <LoginForm />
-      </div>
+      </main>
     </div>
   );
 };

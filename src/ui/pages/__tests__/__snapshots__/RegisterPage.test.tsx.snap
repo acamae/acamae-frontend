@@ -6,7 +6,7 @@ exports[`RegisterPage should render snapshot correctly 1`] = `
     class="register"
     data-testid="register-page"
   >
-    <div
+    <main
       class="register-content"
     >
       <h1
@@ -20,7 +20,7 @@ exports[`RegisterPage should render snapshot correctly 1`] = `
       >
         Mocked Register Form
       </div>
-    </div>
+    </main>
   </div>
 </DocumentFragment>
 `;

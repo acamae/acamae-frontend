@@ -7,6 +7,9 @@ WORKDIR /app
 
 # Copy package files first
 COPY package*.json ./
+COPY ./src /app/src
+COPY .env.${NODE_ENV:-development} /app/.env.${NODE_ENV:-development}
+
 
 # Install dependencies without running postinstall scripts
 RUN npm install --include=optional --ignore-scripts \

@@ -15,6 +15,8 @@ import {
   RegisterPayload,
   ResetPasswordPayload,
   ResendVerificationPayload,
+  VerifyEmailPayload,
+  EmailVerificationResponse,
 } from '@domain/types/apiSchema';
 import { tokenService } from '@infrastructure/storage/tokenService';
 import {
@@ -217,13 +219,9 @@ export class AuthApiRepository implements IAuthRepository {
     }
   }
 
-  /**
-   * Verifica el correo electrónico enviando el token al backend.
-   * @param token Token de verificación
-   */
-  async verifyEmail(token: string): ApiPromise<void> {
+  async verifyEmail(payload: VerifyEmailPayload): ApiPromise<EmailVerificationResponse> {
     try {
-      const response = await api.get(getAuthVerifyEmailUrl(token));
+      const response = await api.post(getAuthVerifyEmailUrl(payload.token));
       return handleApiSuccess({ response });
     } catch (error) {
       return handleApiError(error);

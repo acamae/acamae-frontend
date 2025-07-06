@@ -57,7 +57,7 @@ export const useEmailVerification = (): UseEmailVerificationResult => {
     }, 10000); // 10s timeout
 
     useCase
-      .execute(token)
+      .execute({ token })
       .then(response => {
         clearTimeout(timeoutId);
         if (response.success) {

@@ -8,12 +8,12 @@ const RegisterPage: React.FC = () => {
 
   return (
     <div className="register" data-testid="register-page">
-      <div className="register-content">
+      <main className="register-content">
         <h1 className="text-center" data-testid="register-page-title">
           {t('register.title')}
         </h1>
         <RegisterForm />
-      </div>
+      </main>
     </div>
   );
 };

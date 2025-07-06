@@ -7,6 +7,8 @@ import {
   RegisterPayload,
   ResetPasswordPayload,
   ResendVerificationPayload,
+  VerifyEmailPayload,
+  EmailVerificationResponse,
 } from '@domain/types/apiSchema';
 
 /**
@@ -21,9 +23,5 @@ export interface IAuthRepository extends Repository<User> {
   logout(): ApiPromise<void>;
   getCurrentUser(): ApiPromise<User>;
   resendVerification(payload: ResendVerificationPayload): ApiPromise<void>;
-  /**
-   * Verifica el correo electrónico a partir del token recibido en la URL.
-   * @param token Token de verificación enviado al email del usuario
-   */
-  verifyEmail(token: string): ApiPromise<void>;
+  verifyEmail(payload: VerifyEmailPayload): ApiPromise<EmailVerificationResponse>;
 }

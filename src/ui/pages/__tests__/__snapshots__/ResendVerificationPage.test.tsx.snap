@@ -6,7 +6,7 @@ exports[`ResendVerificationPage should render snapshot correctly 1`] = `
     class="resend-verification"
     data-testid="resend-verification-page"
   >
-    <div
+    <main
       class="resend-verification-content"
     >
       <h1
@@ -20,7 +20,7 @@ exports[`ResendVerificationPage should render snapshot correctly 1`] = `
       >
         Mocked Resend Verification Form
       </div>
-    </div>
+    </main>
   </div>
 </DocumentFragment>
 `;

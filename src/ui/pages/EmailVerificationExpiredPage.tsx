@@ -9,7 +9,7 @@ const EmailVerificationExpired: React.FC = () => {
 
   return (
     <div className="email-verification" data-testid="email-verification-expired-page">
-      <div className="email-verification-content">
+      <main className="email-verification-content">
         <div className="email-verification-icon text-center mb-4">
           <i className="fa-solid fa-envelope"></i>
         </div>
@@ -29,7 +29,7 @@ const EmailVerificationExpired: React.FC = () => {
             {t('verification.expired.resend')}
           </Link>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
