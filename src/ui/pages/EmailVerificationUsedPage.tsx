@@ -11,7 +11,7 @@ const EmailVerificationUsedPage: React.FC = () => {
     <div className="email-verification" data-testid="email-verification-used-page">
       <div className="email-verification-content">
         <div className="email-verification-icon text-center mb-4">
-          <i className="fa-solid fa-envelope-circle-check"></i>
+          <i className="fa-solid fa-check-circle"></i>
         </div>
         <h1 className="text-center" data-testid="email-verification-used-title">
           {t('verification.used.title')}
@@ -24,9 +24,15 @@ const EmailVerificationUsedPage: React.FC = () => {
         <div className="text-center mt-4">
           <Link
             to={APP_ROUTES.LOGIN}
-            className="btn btn-theme btn-md"
+            className="btn btn-theme btn-md me-2"
             data-testid="email-verification-used-login">
             {t('verification.used.login')}
+          </Link>
+          <Link
+            to={APP_ROUTES.HOME}
+            className="btn btn-outline-theme btn-md"
+            data-testid="email-verification-used-home">
+            {t('global.back_to_home')}
           </Link>
         </div>
       </div>

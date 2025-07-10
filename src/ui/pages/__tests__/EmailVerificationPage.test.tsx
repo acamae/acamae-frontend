@@ -66,11 +66,9 @@ describe('EmailVerificationPage', () => {
   it('should redirect to success page on successful verification', async () => {
     mockExecute.mockResolvedValue({
       success: true,
-      data: {
-        status: ApiSuccessCodes.SUCCESS,
-        message: 'Email verified successfully',
-        resendRequired: false,
-      },
+      data: null,
+      message: 'Email verified successfully',
+      code: ApiSuccessCodes.SUCCESS,
     });
 
     renderEmailVerificationPage();
@@ -82,12 +80,10 @@ describe('EmailVerificationPage', () => {
 
   it('should redirect to expired page on expired token', async () => {
     mockExecute.mockResolvedValue({
-      success: true,
-      data: {
-        status: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
-        message: 'Token has expired',
-        resendRequired: true,
-      },
+      success: false,
+      data: null,
+      message: 'Token has expired',
+      code: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
     });
 
     renderEmailVerificationPage();
@@ -99,12 +95,10 @@ describe('EmailVerificationPage', () => {
 
   it('should redirect to already verified page on already verified status', async () => {
     mockExecute.mockResolvedValue({
-      success: true,
-      data: {
-        status: ApiErrorCodes.AUTH_USER_ALREADY_VERIFIED,
-        message: 'Email already verified',
-        resendRequired: false,
-      },
+      success: false,
+      data: null,
+      message: 'Email already verified',
+      code: ApiErrorCodes.AUTH_USER_ALREADY_VERIFIED,
     });
 
     renderEmailVerificationPage();
@@ -116,12 +110,10 @@ describe('EmailVerificationPage', () => {
 
   it('should redirect to error page for invalid token', async () => {
     mockExecute.mockResolvedValue({
-      success: true,
-      data: {
-        status: ApiErrorCodes.AUTH_TOKEN_INVALID,
-        message: 'Invalid token',
-        resendRequired: true,
-      },
+      success: false,
+      data: null,
+      message: 'Invalid token',
+      code: ApiErrorCodes.AUTH_TOKEN_INVALID,
     });
 
     renderEmailVerificationPage();
@@ -133,12 +125,10 @@ describe('EmailVerificationPage', () => {
 
   it('should redirect to error page for update failed status', async () => {
     mockExecute.mockResolvedValue({
-      success: true,
-      data: {
-        status: ApiErrorCodes.AUTH_UPDATE_FAILED,
-        message: 'Update failed',
-        resendRequired: true,
-      },
+      success: false,
+      data: null,
+      message: 'Update failed',
+      code: ApiErrorCodes.AUTH_UPDATE_FAILED,
     });
 
     renderEmailVerificationPage();

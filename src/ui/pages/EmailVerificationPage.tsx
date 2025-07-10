@@ -38,8 +38,9 @@ const EmailVerificationPage: React.FC = () => {
 
         const response = await verifyEmailUseCase.execute({ token });
 
-        if (response.success && response.data) {
-          setVerificationStatus(response.data.status);
+        if (response.success) {
+          // Verificación exitosa - el backend devolvió una respuesta exitosa
+          setVerificationStatus(ApiSuccessCodes.SUCCESS);
         } else {
           // API error, check error code to determine the appropriate status
           switch (response.code) {
