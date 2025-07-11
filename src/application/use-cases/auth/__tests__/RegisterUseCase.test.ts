@@ -68,7 +68,7 @@ describe('RegisterUseCase', () => {
       data: null,
       message: 'Email already exists',
       status: 400,
-      code: ApiErrorCodes.VALIDATION_FAILED,
+      code: ApiErrorCodes.VALIDATION_ERROR,
     });
 
     const result = await registerUseCase.execute(mockPayload);
@@ -79,7 +79,7 @@ describe('RegisterUseCase', () => {
       data: null,
       message: 'Email already exists',
       status: 400,
-      code: ApiErrorCodes.VALIDATION_FAILED,
+      code: ApiErrorCodes.VALIDATION_ERROR,
     });
   });
 });

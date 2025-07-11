@@ -318,13 +318,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
               examples:
-                validation_failed:
+                VALIDATION_ERROR:
                   summary: Validación fallida
                   value:
                     success: false
                     data: null
                     status: 422
-                    code: "VALIDATION_FAILED"
+                    code: "VALIDATION_ERROR"
                     message: "Los datos enviados no son válidos"
                     timestamp: "2024-01-15T10:30:00.000Z"
                     requestId: "550e8400-e29b-41d4-a716-446655440000"
@@ -978,7 +978,7 @@ components:
 # AUTH_NO_ACTIVE_SESSION, AUTH_TOKEN_EXPIRED, AUTH_TOKEN_INVALID
 # AUTH_TOKEN_ALREADY_USED, AUTH_TOKEN_REVOKED, AUTH_TOKEN_MALICIOUS
 # AUTH_TOKEN_OTHER_FLOW, AUTH_FORBIDDEN, AUTH_UPDATE_FAILED
-# VALIDATION_FAILED, RESOURCE_NOT_FOUND
+# VALIDATION_ERROR, RESOURCE_NOT_FOUND
 # ERR_NETWORK, ERR_CANCELED, ECONNABORTED, ETIMEDOUT, UNKNOWN_ERROR
 # AUTH_RATE_LIMIT, SERVICE_UNAVAILABLE
 # AUTH_USER_NOT_FOUND, AUTH_USER_BLOCKED

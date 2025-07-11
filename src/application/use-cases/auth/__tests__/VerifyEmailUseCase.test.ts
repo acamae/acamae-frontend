@@ -136,7 +136,7 @@ describe('VerifyEmailUseCase', () => {
       data: mockResponse,
       message: 'Email is already verified',
       status: 409,
-      code: ApiErrorCodes.VALIDATION_FAILED,
+      code: ApiErrorCodes.VALIDATION_ERROR,
     });
 
     const result = await verifyEmailUseCase.execute(mockPayload);
@@ -147,7 +147,7 @@ describe('VerifyEmailUseCase', () => {
       data: mockResponse,
       message: 'Email is already verified',
       status: 409,
-      code: ApiErrorCodes.VALIDATION_FAILED,
+      code: ApiErrorCodes.VALIDATION_ERROR,
     });
   });
 
