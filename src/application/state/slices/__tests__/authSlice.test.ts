@@ -224,4 +224,59 @@ describe('authSlice reducer', () => {
     });
     expect(state.user).toBeNull();
   });
+
+  it('should handle login fulfilled with null payload', () => {
+    const state = reducer(initialAuthState, {
+      type: loginAction.fulfilled.type,
+      payload: null,
+    });
+    expect(state.loading).toBe(false);
+    expect(state.user).toBeNull();
+    expect(state.token).toBeNull();
+    expect(state.isAuthenticated).toBe(false);
+  });
+
+  it('should handle login fulfilled with undefined success', () => {
+    const state = reducer(initialAuthState, {
+      type: loginAction.fulfilled.type,
+      payload: { data: user },
+    });
+    expect(state.loading).toBe(false);
+    expect(state.user).toBeNull();
+    expect(state.token).toBeNull();
+    expect(state.isAuthenticated).toBe(false);
+  });
+
+  it('should handle login fulfilled with null success', () => {
+    const state = reducer(initialAuthState, {
+      type: loginAction.fulfilled.type,
+      payload: { data: user, success: null },
+    });
+    expect(state.loading).toBe(false);
+    expect(state.user).toBeNull();
+    expect(state.token).toBeNull();
+    expect(state.isAuthenticated).toBe(false);
+  });
+
+  it('should handle login fulfilled with empty string success', () => {
+    const state = reducer(initialAuthState, {
+      type: loginAction.fulfilled.type,
+      payload: { data: user, success: '' },
+    });
+    expect(state.loading).toBe(false);
+    expect(state.user).toBeNull();
+    expect(state.token).toBeNull();
+    expect(state.isAuthenticated).toBe(false);
+  });
+
+  it('should handle login fulfilled with zero success', () => {
+    const state = reducer(initialAuthState, {
+      type: loginAction.fulfilled.type,
+      payload: { data: user, success: 0 },
+    });
+    expect(state.loading).toBe(false);
+    expect(state.user).toBeNull();
+    expect(state.token).toBeNull();
+    expect(state.isAuthenticated).toBe(false);
+  });
 });

@@ -1,33 +1,33 @@
 import { screen } from '@testing-library/react';
 
 import { createTestProviderFactory } from '@shared/utils/renderProvider';
-import ResendVerificationPage from '@ui/pages/ResendVerificationPage';
+import EmailVerificationResendPage from '@ui/pages/EmailVerificationResendPage';
 
 jest.mock('@ui/components/Forms/ResendVerificationForm', () => {
   const MockResendVerificationForm = () => (
-    <div data-testid="mock-resend-verification-form">Mocked Resend Verification Form</div>
+    <div data-testid="mock-email-verification-resend-form">Mocked Resend Verification Form</div>
   );
   return MockResendVerificationForm;
 });
 
-function renderResendVerificationPage() {
+function renderEmailVerificationResendPage() {
   const renderWithProviders = createTestProviderFactory();
-  return renderWithProviders(<ResendVerificationPage />);
+  return renderWithProviders(<EmailVerificationResendPage />);
 }
 
-describe('ResendVerificationPage', () => {
+describe('EmailVerificationResendPage', () => {
   it('should render the title', () => {
-    renderResendVerificationPage();
-    expect(screen.getByTestId('resend-verification-title')).toBeInTheDocument();
+    renderEmailVerificationResendPage();
+    expect(screen.getByTestId('email-verification-resend-title')).toBeInTheDocument();
   });
 
   it('should render the form correctly', () => {
-    renderResendVerificationPage();
-    expect(screen.getByTestId('mock-resend-verification-form')).toBeInTheDocument();
+    renderEmailVerificationResendPage();
+    expect(screen.getByTestId('mock-email-verification-resend-form')).toBeInTheDocument();
   });
 
   it('should render snapshot correctly', () => {
-    const { asFragment } = renderResendVerificationPage();
+    const { asFragment } = renderEmailVerificationResendPage();
     expect(asFragment()).toMatchSnapshot();
   });
 });

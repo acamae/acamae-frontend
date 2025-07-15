@@ -7,6 +7,7 @@ import {
   resendVerificationAction,
 } from '@application/state/actions/auth.actions';
 import { useAppDispatch, useAppSelector } from '@application/state/hooks';
+import { UserRole } from '@domain/constants/user';
 import {
   ForgotPasswordPayload,
   LoginPayload,
@@ -46,6 +47,18 @@ export const useAuth = () => {
     return await dispatch(resendVerificationAction(payload));
   };
 
+  /**
+   * Check if the current user has one of the specified roles
+   * @param roles - Array of roles to check against
+   * @returns boolean indicating if user has one of the roles
+   */
+  const hasRole = (roles: UserRole | UserRole[]): boolean => {
+    if (!user?.role) return false;
+
+    const rolesToCheck = Array.isArray(roles) ? roles : [roles];
+    return rolesToCheck.includes(user.role);
+  };
+
   return {
     user,
     token,
@@ -57,5 +70,6 @@ export const useAuth = () => {
     forgotPassword,
     resetPassword,
     resendVerification,
+    hasRole,
   };
 };

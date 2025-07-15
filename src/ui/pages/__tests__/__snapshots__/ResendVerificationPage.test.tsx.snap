@@ -1,22 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ResendVerificationPage should render snapshot correctly 1`] = `
+exports[`EmailVerificationResendPage should render snapshot correctly 1`] = `
 <DocumentFragment>
   <div
-    class="resend-verification"
-    data-testid="resend-verification-page"
+    class="email-verification-resend"
+    data-testid="email-verification-resend-page"
   >
     <main
-      class="resend-verification-content"
+      class="email-verification-resend-content"
     >
+      <div
+        class="email-verification-resend-icon text-center mb-4"
+      >
+        <i
+          class="fa-solid fa-paper-plane"
+        />
+      </div>
       <h1
         class="text-center"
-        data-testid="resend-verification-title"
+        data-testid="email-verification-resend-title"
       >
         Reenviar correo de verificación
       </h1>
       <div
-        data-testid="mock-resend-verification-form"
+        data-testid="mock-email-verification-resend-form"
       >
         Mocked Resend Verification Form
       </div>

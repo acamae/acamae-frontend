@@ -10,12 +10,13 @@ function renderEmailAlreadyVerifiedPage() {
 }
 
 describe('EmailAlreadyVerified', () => {
-  it('should render the title and the message', () => {
+  it('should render the title, message and action buttons', () => {
     renderEmailAlreadyVerifiedPage();
 
     const alert = screen.getByTestId('email-already-verified-page');
     expect(within(alert).getByText(i18n.t('verification.already.title'))).toBeInTheDocument();
     expect(within(alert).getByText(i18n.t('verification.already.message'))).toBeInTheDocument();
+    expect(within(alert).getByTestId('email-already-verified-login')).toBeInTheDocument();
     expect(within(alert).getByTestId('email-already-verified-back-home')).toBeInTheDocument();
   });
 });

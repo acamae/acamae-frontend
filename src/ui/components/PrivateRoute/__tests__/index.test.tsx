@@ -3,6 +3,7 @@ import { I18nextProvider } from 'react-i18next';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom';
 
+import { USER_ROLES } from '@domain/constants/user';
 import { AuthState } from '@domain/types/auth';
 import i18n from '@infrastructure/i18n';
 import es from '@infrastructure/i18n/locales/es-ES.json';
@@ -35,7 +36,8 @@ describe('PrivateRoute', () => {
 
   const renderWithRouterAndRedux = (
     partialInitialAuthState: Partial<AuthState>,
-    initialEntries = ['/protected']
+    initialEntries = ['/protected'],
+    roles?: (typeof USER_ROLES)[keyof typeof USER_ROLES][]
   ) => {
     // Create a complete auth state by merging the base with the partial test state
     const fullInitialAuthState: AuthState = {
@@ -54,10 +56,11 @@ describe('PrivateRoute', () => {
           <MemoryRouter initialEntries={initialEntries}>
             <Routes>
               <Route path="/login" element={<LocationDisplay />} />
+              <Route path="/dashboard" element={<div data-testid="dashboard">Dashboard</div>} />
               <Route
                 path="/protected"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute roles={roles}>
                     <MockProtectedComponent />
                   </PrivateRoute>
                 }
@@ -87,5 +90,85 @@ describe('PrivateRoute', () => {
     renderWithRouterAndRedux({ isAuthenticated: false });
     expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
     expect(screen.getByTestId('location-display')).toHaveTextContent('/login');
+  });
+
+  describe('Role-based access control', () => {
+    it('should render children when user has required role', () => {
+      renderWithRouterAndRedux(
+        {
+          isAuthenticated: true,
+          user: { id: '1', username: 'admin', email: 'admin@example.com', role: 'admin' },
+        },
+        ['/protected'],
+        [USER_ROLES.ADMIN]
+      );
+      expect(screen.getByTestId('protected-content')).toBeInTheDocument();
+    });
+
+    it('should render children when user has one of the required roles', () => {
+      renderWithRouterAndRedux(
+        {
+          isAuthenticated: true,
+          user: { id: '1', username: 'manager', email: 'manager@example.com', role: 'manager' },
+        },
+        ['/protected'],
+        [USER_ROLES.ADMIN, USER_ROLES.MANAGER]
+      );
+      expect(screen.getByTestId('protected-content')).toBeInTheDocument();
+    });
+
+    it('should redirect to dashboard when user does not have required role', () => {
+      renderWithRouterAndRedux(
+        {
+          isAuthenticated: true,
+          user: { id: '1', username: 'user', email: 'user@example.com', role: 'user' },
+        },
+        ['/protected'],
+        [USER_ROLES.ADMIN]
+      );
+      expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
+      expect(screen.getByTestId('dashboard')).toBeInTheDocument();
+    });
+
+    it('should redirect to dashboard when user does not have required role (user trying to access admin)', () => {
+      renderWithRouterAndRedux(
+        {
+          isAuthenticated: true,
+          user: {
+            id: '1',
+            username: 'user',
+            email: 'user@example.com',
+            role: 'user',
+          },
+        },
+        ['/protected'],
+        [USER_ROLES.ADMIN]
+      );
+      expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
+      expect(screen.getByTestId('dashboard')).toBeInTheDocument();
+    });
+
+    it('should render children when no roles are specified', () => {
+      renderWithRouterAndRedux(
+        {
+          isAuthenticated: true,
+          user: { id: '1', username: 'user', email: 'user@example.com', role: 'user' },
+        },
+        ['/protected']
+      );
+      expect(screen.getByTestId('protected-content')).toBeInTheDocument();
+    });
+
+    it('should render children when empty roles array is specified', () => {
+      renderWithRouterAndRedux(
+        {
+          isAuthenticated: true,
+          user: { id: '1', username: 'user', email: 'user@example.com', role: 'user' },
+        },
+        ['/protected'],
+        []
+      );
+      expect(screen.getByTestId('protected-content')).toBeInTheDocument();
+    });
   });
 });

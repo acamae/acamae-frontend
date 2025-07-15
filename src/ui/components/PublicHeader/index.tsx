@@ -5,9 +5,11 @@ import { Link } from 'react-router-dom';
 
 import { APP_ROUTES } from '@shared/constants/appRoutes';
 import LanguageSelector from '@ui/components/LanguageSelector';
+import { useAuth } from '@ui/hooks/useAuth';
 
 const PublicHeader: React.FC = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   return (
     <div id="header" className="app-header" data-testid="public-header">
@@ -32,31 +34,46 @@ const PublicHeader: React.FC = () => {
         </Link>
       </div>
       <div className="menu">
-        <div className="menu-item">
-          <div className="menu-link">
-            <Link
-              to={APP_ROUTES.LOGIN}
-              className="btn btn-outline-theme btn-md text-nowrap"
-              data-testid="link-login-nav">
-              {t('nav.login')}
-            </Link>
+        {user ? (
+          <div className="menu-item">
+            <div className="menu-link">
+              <Link
+                to={APP_ROUTES.DASHBOARD}
+                className="btn btn-outline-theme btn-md text-nowrap"
+                data-testid="link-dashboard-nav">
+                {t('nav.dashboard')}
+              </Link>
+            </div>
           </div>
-        </div>
-        <div className="menu-item">
-          <div className="menu-link">
-            <Link
-              to={APP_ROUTES.REGISTER}
-              className="btn btn-theme btn-md"
-              data-testid="link-register">
-              {t('nav.register')}
-            </Link>
-          </div>
-        </div>
-        <div className="menu-item dropdown dropdown-mobile-full">
-          <div className="menu-link">
-            <LanguageSelector />
-          </div>
-        </div>
+        ) : (
+          <>
+            <div className="menu-item">
+              <div className="menu-link">
+                <Link
+                  to={APP_ROUTES.LOGIN}
+                  className="btn btn-outline-theme btn-md text-nowrap"
+                  data-testid="link-login-nav">
+                  {t('nav.login')}
+                </Link>
+              </div>
+            </div>
+            <div className="menu-item">
+              <div className="menu-link">
+                <Link
+                  to={APP_ROUTES.REGISTER}
+                  className="btn btn-theme btn-md"
+                  data-testid="link-register">
+                  {t('nav.register')}
+                </Link>
+              </div>
+            </div>
+            <div className="menu-item dropdown dropdown-mobile-full">
+              <div className="menu-link">
+                <LanguageSelector />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

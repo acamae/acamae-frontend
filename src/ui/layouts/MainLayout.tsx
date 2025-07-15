@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom';
 
 import { LayoutOptions } from '@domain/types/layoutOptions';
 import { DEFAULT_LAYOUT_OPTIONS } from '@shared/constants/layoutOptions';
+import FeedbackInitializer from '@ui/components/FeedbackInitializer';
 import PrivateFooter from '@ui/components/PrivateFooter';
 import PrivateHeader from '@ui/components/PrivateHeader';
 import SessionTimeoutModal from '@ui/components/SessionTimeoutModal/SessionTimeoutModal';
@@ -20,7 +21,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ options = {} }) => {
   };
 
   return (
-    <>
+    <FeedbackInitializer>
       <SessionTimerInitializer />
       <div
         className={`app ${LAYOUT_OPTIONS.appBoxedLayout ? 'app-boxed-layout ' : ''}${
@@ -44,7 +45,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ options = {} }) => {
         {LAYOUT_OPTIONS.appFooter && <PrivateFooter />}
       </div>
       <SessionTimeoutModal />
-    </>
+    </FeedbackInitializer>
   );
 };
 

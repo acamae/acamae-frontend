@@ -1,4 +1,5 @@
-export const APP_ROUTES = {
+// Rutas públicas (sin prefijo)
+export const PUBLIC_ROUTES = {
   HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',
@@ -12,7 +13,30 @@ export const APP_ROUTES = {
   VERIFY_EMAIL_RESEND: '/verify-email-resend',
   VERIFY_EMAIL_USED: '/verify-email-used',
   VERIFY_EMAIL_ERROR: '/verify-email-error',
-  DASHBOARD: '/dashboard',
-  PROFILE: '/profile',
-  TEAMS: '/teams',
+} as const;
+
+// Rutas privadas (con prefijo /app)
+export const PRIVATE_ROUTES = {
+  DASHBOARD: '/app/dashboard',
+  PROFILE: '/app/profile',
+  TEAMS: '/app/teams',
+  TOURNAMENTS: '/app/tournaments',
+  USERS: '/app/users',
+} as const;
+
+// Función helper para obtener rutas relativas de todas las rutas privadas (dinámica)
+export const getPrivateRoutesRelative = () => {
+  const appPrefix = '/app/';
+  return Object.fromEntries(
+    Object.entries(PRIVATE_ROUTES).map(([key, value]) => [
+      key,
+      value.startsWith(appPrefix) ? value.substring(appPrefix.length) : value,
+    ])
+  ) as typeof PRIVATE_ROUTES;
 };
+
+// Mantener compatibilidad hacia atrás con APP_ROUTES
+export const APP_ROUTES = {
+  ...PUBLIC_ROUTES,
+  ...PRIVATE_ROUTES,
+} as const;

@@ -1,10 +1,16 @@
 import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ThrottleConfig } from '@shared/constants/security';
+import { useThrottledSubmit } from '@ui/hooks/useThrottledSubmit';
+
 export type UseFormConfig<T> = {
   initialValues: T;
   onSubmit: (values: T) => Promise<void>;
   validate?: (values: T) => Partial<Record<keyof T, string>>;
+  enableThrottling?: boolean;
+  formName?: string;
+  throttleConfig?: Partial<ThrottleConfig>;
 };
 
 export type UseFormReturn<T> = {
@@ -13,20 +19,43 @@ export type UseFormReturn<T> = {
   touched: Partial<Record<keyof T, boolean>>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleCheckboxChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleSubmit: (config: UseFormConfig<T>) => (e: React.FormEvent) => void;
+  handleSubmit: (e: React.FormEvent) => void;
   isSubmitting?: boolean;
+  // Throttling properties
+  isThrottled?: boolean;
+  canSubmit?: boolean;
+  timeUntilNextSubmission?: number;
+  remainingAttempts?: number;
+  resetThrottle?: () => void;
 };
 
 export const useForm = <T extends object>({
   initialValues,
   onSubmit,
   validate,
+  enableThrottling = false,
+  formName = 'default-form',
+  throttleConfig,
 }: UseFormConfig<T>) => {
   const [values, setValues] = useState<T>(initialValues);
   const [errors, setErrors] = useState<Partial<Record<keyof T, string | React.ReactNode>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [touched, setTouched] = useState<Record<keyof T, boolean>>({} as Record<keyof T, boolean>);
   const { i18n } = useTranslation();
+
+  const shouldUseThrottling = enableThrottling && formName;
+
+  // Throttling functionality - always call the hook
+  const throttledSubmit = useThrottledSubmit({
+    formName: shouldUseThrottling ? formName : 'disabled',
+    throttleConfig: shouldUseThrottling ? throttleConfig : undefined,
+    onSubmit: async () => {
+      if (shouldUseThrottling) {
+        await onSubmit(values);
+      }
+    },
+    showToastOnThrottle: !!shouldUseThrottling,
+  });
 
   // Run validation only when the language changes and only for touched fields
   useEffect(() => {
@@ -85,7 +114,11 @@ export const useForm = <T extends object>({
     setIsSubmitting(true);
 
     try {
-      await onSubmit(values);
+      if (shouldUseThrottling && throttledSubmit) {
+        await throttledSubmit.handleThrottledSubmit();
+      } else {
+        await onSubmit(values);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -106,5 +139,14 @@ export const useForm = <T extends object>({
     handleCheckboxChange,
     handleSubmit,
     resetForm,
+    // Throttling properties (always available with defaults)
+    isThrottled: shouldUseThrottling && throttledSubmit ? throttledSubmit.isThrottled : false,
+    canSubmit: shouldUseThrottling && throttledSubmit ? throttledSubmit.canSubmit : true,
+    timeUntilNextSubmission:
+      shouldUseThrottling && throttledSubmit ? throttledSubmit.timeUntilNextSubmission : 0,
+    remainingAttempts:
+      shouldUseThrottling && throttledSubmit ? throttledSubmit.remainingAttempts : 0,
+    resetThrottle:
+      shouldUseThrottling && throttledSubmit ? throttledSubmit.resetThrottle : () => {},
   };
 };

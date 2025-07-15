@@ -1,5 +1,7 @@
+import { configureStore } from '@reduxjs/toolkit';
 import { render, screen } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
+import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
 
 import i18n from '@infrastructure/i18n';
@@ -12,13 +14,24 @@ jest.mock('@ui/components/LanguageSelector', () => {
   return MockLanguageSelector;
 });
 
+// Mock store for tests
+const createTestStore = () =>
+  configureStore({
+    reducer: {
+      auth: () => ({ isAuthenticated: false, user: null, token: null, loading: false }),
+    },
+  });
+
 function renderPublicHeader() {
+  const store = createTestStore();
   return render(
-    <I18nextProvider i18n={i18n}>
-      <MemoryRouter>
-        <PublicHeader />
-      </MemoryRouter>
-    </I18nextProvider>
+    <Provider store={store}>
+      <I18nextProvider i18n={i18n}>
+        <MemoryRouter>
+          <PublicHeader />
+        </MemoryRouter>
+      </I18nextProvider>
+    </Provider>
   );
 }
 

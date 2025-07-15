@@ -5,7 +5,8 @@
     "go_back": "Go back",
     "processing": "Processing...",
     "required": "required",
-    "required_asterisk": "Required fields are marked with an asterisk (<abbr>*</abbr>)"
+    "required_asterisk": "Required fields are marked with an asterisk (<abbr>*</abbr>)",
+    "loading": "Loading..."
   },
   "home": {
     "title": "Welcome to eSports Management",
@@ -29,6 +30,9 @@
     "sign_up": "Sign up",
     "success": "Login successful",
     "welcome": "Welcome back!"
+  },
+  "logout": {
+    "success": "Logout successful"
   },
   "forgot": {
     "title": "Recover Password",
@@ -105,6 +109,14 @@
     },
     "unknown": "An unexpected error occurred."
   },
+  "security": {
+    "throttle": {
+      "wait": "Please wait {{seconds}} seconds before trying again.",
+      "blocked": "Too many attempts. Try again in {{minutes}} minutes.",
+      "rate_limit_exceeded": "Rate limit exceeded. Please try again later.",
+      "attempts_remaining": "You have {{count}} attempts remaining before being temporarily blocked."
+    }
+  },
   "session": {
     "checking": "Checking session..."
   },
@@ -122,11 +134,20 @@
       "message": "Please wait while we process your verification link."
     },
     "error": {
-      "title": "Verification error",
+      "title": "Invalid verification link",
       "invalid_token": "The verification link is invalid or has expired.",
       "resend": "Resend verification",
       "home": "Back to home",
-      "message": "Could not verify your email. Please try again later or contact support."
+      "message": "The verification link you used is not valid. This could be because:",
+      "reasons": {
+        "invalid": "• The link is malformed or corrupted",
+        "expired": "• The link has expired (they are valid for 10 minutes)",
+        "already_used": "• The link was already used previously",
+        "wrong_user": "• The link doesn't correspond to your account"
+      },
+      "solutions": "To fix this:",
+      "solution_resend": "• Request a new verification link",
+      "solution_contact": "• If the problem persists, contact support"
     },
     "update_failed": {
       "title": "Error updating account",
@@ -141,17 +162,17 @@
     },
     "expired": {
       "title": "Verification link expired",
-      "message": "The verification link has expired. Please request a new one.",
+      "message": "The verification link has expired. Verification links are valid for 10 minutes for security.",
       "resend": "Resend verification"
     },
     "used": {
       "title": "Link already used",
-      "message": "This verification link has already been used.",
+      "message": "This verification link has already been used. Your account is already verified.",
       "login": "Go to login"
     },
     "already": {
       "title": "Already verified",
-      "message": "This email was already verified."
+      "message": "This email was already verified. You can log in normally."
     },
     "sent": {
       "title": "Verification email sent",
@@ -159,7 +180,7 @@
     },
     "resend": {
       "title": "Resend verification email",
-      "label": "Email or username",
+      "label": "Email",
       "button": "Resend verification",
       "loading": "Sending...",
       "success": "Verification email sent. Please check your inbox."

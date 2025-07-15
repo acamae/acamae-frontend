@@ -11,7 +11,7 @@ const EmailVerificationExpired: React.FC = () => {
     <div className="email-verification" data-testid="email-verification-expired-page">
       <main className="email-verification-content">
         <div className="email-verification-icon text-center mb-4">
-          <i className="fa-solid fa-envelope"></i>
+          <i className="fa-solid fa-clock"></i>
         </div>
         <h1 className="text-center" data-testid="email-verification-expired-title">
           {t('verification.expired.title')}

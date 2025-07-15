@@ -11,7 +11,13 @@ jest.mock('@ui/hooks/useAuth');
 jest.mock('@ui/hooks/useToast');
 jest.mock('react-i18next');
 
-const toastMock = { error: jest.fn(), success: jest.fn() };
+const toastMock = {
+  error: jest.fn(),
+  success: jest.fn(),
+  warning: jest.fn(),
+  info: jest.fn(),
+  show: jest.fn(),
+};
 
 function setupUseAuth({
   loading = false,
@@ -177,13 +183,6 @@ describe('ResetPasswordForm', () => {
     expect(toggleButton).toHaveTextContent('👁️');
   });
 
-  /*
-  @TODO: Implement test for the case of the token being different from the one in the URL
-  it('should handle error when token does not match', async () => {
-
-  });
-  */
-
   it('should handle error when token becomes invalid', async () => {
     const resetPasswordMock = promiseMock();
     setupUseAuth({ resetPassword: resetPasswordMock });
@@ -233,5 +232,79 @@ describe('ResetPasswordForm', () => {
   it('should render snapshot correctly', () => {
     const { asFragment } = renderResetPasswordForm();
     expect(asFragment()).toMatchSnapshot();
+  });
+
+  it('should show error and not submit if token does not match tokenProp', async () => {
+    const resetPasswordMock = promiseMock();
+    setupUseAuth({ resetPassword: resetPasswordMock });
+    setupUseToast();
+
+    // Mock useForm to have a different token in values than tokenProp
+    const mockUseForm = jest.spyOn(require('@ui/hooks/useForm'), 'useForm');
+
+    mockUseForm.mockReturnValue({
+      values: { password: 'Password123!', token: 'wrong-token' },
+      errors: {},
+      touched: {},
+      handleChange: jest.fn(),
+      handleSubmit: jest.fn(e => {
+        e.preventDefault();
+        toastMock.error('reset.invalid_token');
+      }),
+      isSubmitting: false,
+      isThrottled: false,
+      canSubmit: true,
+      timeUntilNextSubmission: 0,
+      remainingAttempts: 0,
+      resetThrottle: jest.fn(),
+      handleCheckboxChange: jest.fn(),
+      resetForm: jest.fn(),
+    });
+
+    renderResetPasswordForm({ tokenProp: 'expected-token' });
+
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
+        target: { value: 'Password123!' },
+      });
+      fireEvent.click(screen.getByTestId('reset-password-form-button'));
+    });
+
+    await waitFor(() => {
+      expect(toastMock.error).toHaveBeenCalledWith('reset.invalid_token');
+      expect(resetPasswordMock).not.toHaveBeenCalled();
+    });
+
+    mockUseForm.mockRestore();
+  });
+
+  it('should show attempts warning when remaining attempts is 2 or less', () => {
+    // Mock useForm para devolver remainingAttempts = 2
+    const mockUseForm = jest.spyOn(require('@ui/hooks/useForm'), 'useForm');
+
+    mockUseForm.mockReturnValue({
+      values: { password: 'Password123!', token: 'valid-token' },
+      errors: {},
+      touched: {},
+      handleChange: jest.fn(),
+      handleSubmit: jest.fn(),
+      isSubmitting: false,
+      isThrottled: false,
+      canSubmit: true,
+      timeUntilNextSubmission: 0,
+      remainingAttempts: 2, // Esto debería mostrar el warning
+      resetThrottle: jest.fn(),
+      handleCheckboxChange: jest.fn(),
+      resetForm: jest.fn(),
+    });
+
+    renderResetPasswordForm({ tokenProp: 'valid-token' });
+
+    expect(screen.getByTestId('reset-password-form-attempts-warning')).toBeInTheDocument();
+    expect(screen.getByTestId('reset-password-form-attempts-warning')).toHaveTextContent(
+      'security.throttle.attempts_remaining'
+    );
+
+    mockUseForm.mockRestore();
   });
 });

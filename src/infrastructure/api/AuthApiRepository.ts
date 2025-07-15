@@ -7,27 +7,28 @@ import { User } from '@domain/entities/User';
 import { IAuthRepository } from '@domain/repositories/AuthRepository';
 import { UserResponse } from '@domain/types/api';
 import {
-  ApiPromise,
   ApiErrorResponse,
+  ApiPromise,
   ApiSuccessResponse,
+  EmailVerificationResponse,
   ForgotPasswordPayload,
   LoginPayload,
   RegisterPayload,
-  ResetPasswordPayload,
   ResendVerificationPayload,
+  ResetPasswordPayload,
   VerifyEmailPayload,
-  EmailVerificationResponse,
 } from '@domain/types/apiSchema';
 import { tokenService } from '@infrastructure/storage/tokenService';
 import {
   API_ROUTES,
-  getUserByIdUrl,
-  getUpdateUserByIdUrl,
-  getDeleteUserByIdUrl,
   getAuthResetPasswordUrl,
   getAuthVerifyEmailUrl,
+  getDeleteUserByIdUrl,
+  getUpdateUserByIdUrl,
+  getUserByIdUrl,
 } from '@shared/constants/apiRoutes';
 import api from '@shared/services/axiosService';
+import { generateSecureId } from '@shared/utils/generateSecureId';
 
 function mapUserResponse(data: UserResponse): User {
   return {
@@ -45,27 +46,124 @@ function handleApiSuccess<T>({
 }: {
   response: AxiosResponse<T>; // data, status, statusText, headers, config, request?
 }): ApiSuccessResponse<T> {
+  const requestId = response.headers?.['x-request-id'] || `req_${Date.now()}_${generateSecureId()}`;
+
   return {
     data: response.data ?? null,
     status: response.status,
-    success: true,
+    success: true as const,
     code: ApiSuccessCodes.SUCCESS,
+    message: response.statusText || 'Operation successful',
+    timestamp: new Date().toISOString(),
+    requestId,
   };
 }
 
 function handleApiError<T>(error: unknown): ApiErrorResponse<T> {
   if (error instanceof AxiosError) {
+    // Si hay respuesta del servidor, usar esos datos
+    if (error.response?.data && typeof error.response.data === 'object') {
+      const serverData = error.response.data as Record<string, unknown>;
+      return {
+        success: false,
+        data: serverData.data || null,
+        status: error.response.status,
+        code: serverData.code || ApiErrorCodes.UNKNOWN_ERROR,
+        message: serverData.message || error.message || 'Server error',
+        timestamp: serverData.timestamp || new Date().toISOString(),
+        requestId: serverData.requestId,
+        meta: serverData.meta,
+        error: serverData.error,
+      } as ApiErrorResponse<T>;
+    }
+
+    // Si no hay respuesta del servidor, manejar errores de red/cliente
+    const networkErrorCode = (error.code as string) || ApiErrorCodes.ERR_NETWORK;
+    const errorType = getErrorType(error);
+
     return {
-      ...error.response?.data,
+      message: getErrorMessage(error),
+      code: networkErrorCode,
+      success: false,
+      data: null,
+      status: error.response?.status || 0,
+      timestamp: new Date().toISOString(),
+      error: {
+        type: errorType,
+        details: [
+          {
+            field: 'network',
+            code: networkErrorCode,
+            message: error.message,
+          },
+        ],
+      },
     } as ApiErrorResponse<T>;
   }
+
+  // Error no identificado
   return {
-    message: 'Unknown error',
+    message: 'Unknown error occurred',
     code: ApiErrorCodes.UNKNOWN_ERROR,
     success: false,
     data: null,
     status: 500,
+    timestamp: new Date().toISOString(),
+    error: {
+      type: 'server',
+      details: [
+        {
+          field: 'unknown',
+          code: ApiErrorCodes.UNKNOWN_ERROR,
+          message: error instanceof Error ? error.message : String(error),
+        },
+      ],
+    },
   } as ApiErrorResponse<T>;
+}
+
+/**
+ * Determina el tipo de error basado en el AxiosError
+ */
+function getErrorType(
+  error: AxiosError
+): 'validation' | 'network' | 'server' | 'authentication' | 'authorization' | 'business' {
+  if (!error.response) {
+    return 'network';
+  }
+
+  const status = error.response.status;
+  if (status === 401) return 'authentication';
+  if (status === 403) return 'authorization';
+  if (status === 422) return 'validation';
+  if (status >= 400 && status < 500) return 'business';
+  return 'server';
+}
+
+/**
+ * Genera un mensaje de error amigable basado en el AxiosError
+ */
+function getErrorMessage(error: AxiosError): string {
+  if (error.response?.data && typeof error.response.data === 'object') {
+    const responseData = error.response.data as Record<string, unknown>;
+    if (responseData.message && typeof responseData.message === 'string') {
+      return responseData.message;
+    }
+  }
+
+  const code = error.code;
+  switch (code) {
+    case 'ECONNABORTED':
+      return 'La conexión se ha cancelado';
+    case 'ETIMEDOUT':
+      return 'La solicitud ha excedido el tiempo límite';
+    case 'ERR_NETWORK':
+      return 'Error de red. Verifica tu conexión';
+    case 'ERR_CANCELED':
+      return 'La solicitud fue cancelada';
+    default:
+      return error.message || 'Error de conexión';
+  }
 }
 
 export class AuthApiRepository implements IAuthRepository {

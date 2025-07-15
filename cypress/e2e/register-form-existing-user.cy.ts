@@ -4,6 +4,11 @@ import { APP_ROUTES } from '@shared/constants/appRoutes';
 
 describe('Register Form - Existing User/Email Cases', () => {
   beforeEach(() => {
+    // Clear any existing throttle states before each test
+    cy.window().then(win => {
+      win.localStorage.removeItem('acamae-throttle-states');
+    });
+
     // Visit the register page
     cy.visit(APP_ROUTES.REGISTER);
 
@@ -132,6 +137,8 @@ describe('Register Form - Existing User/Email Cases', () => {
       }).as('registerSuccess');
 
       // Submit corrected form
+      // Wait for button to be enabled after throttling with longer timeout
+      cy.get('[data-testid="register-form-button"]', { timeout: 10000 }).should('not.be.disabled');
       cy.get('[data-testid="register-form-button"]').click();
       cy.wait('@registerSuccess');
 
@@ -259,6 +266,8 @@ describe('Register Form - Existing User/Email Cases', () => {
       }).as('registerSuccess');
 
       // Submit corrected form
+      // Wait for button to be enabled after throttling with longer timeout
+      cy.get('[data-testid="register-form-button"]', { timeout: 10000 }).should('not.be.disabled');
       cy.get('[data-testid="register-form-button"]').click();
       cy.wait('@registerSuccess');
 
@@ -347,6 +356,8 @@ describe('Register Form - Existing User/Email Cases', () => {
       }).as('registerSuccess');
 
       // Try submitting form again
+      // Wait for button to be enabled after throttling with longer timeout
+      cy.get('[data-testid="register-form-button"]', { timeout: 10000 }).should('not.be.disabled');
       cy.get('[data-testid="register-form-button"]').click();
       cy.wait('@registerSuccess');
 
@@ -374,7 +385,8 @@ describe('Register Form - Existing User/Email Cases', () => {
       cy.wait('@registerNetworkError');
 
       // Verify that the button is re-enabled (doesn't stay in loading state)
-      cy.get('[data-testid="register-form-button"]').should('not.be.disabled');
+      // Wait for button to be enabled after throttling with longer timeout
+      cy.get('[data-testid="register-form-button"]', { timeout: 10000 }).should('not.be.disabled');
 
       // Verify that it stays on the register page
       cy.url().should('include', APP_ROUTES.REGISTER);

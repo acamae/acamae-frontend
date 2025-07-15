@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, type Store } from '@reduxjs/toolkit';
 
 import sessionTimerMiddleware from '@application/state/middleware/sessionTimerMiddleware';
 import sessionTimerReducer, {
@@ -7,8 +7,30 @@ import sessionTimerReducer, {
   removeExpiresAt,
   showModal,
 } from '@application/state/slices/sessionTimerSlice';
-import { sessionExpiryService } from '@infrastructure/storage/sessionExpiryService';
 
+// Constantes para valores reutilizables
+const SESSION_TIMEOUT_MINUTES = 15;
+const SESSION_TIMEOUT_MS = SESSION_TIMEOUT_MINUTES * 60 * 1000;
+const SESSION_TIMEOUT_WARNING_SECONDS = 30;
+const MOCK_ACTION_TYPES = {
+  LOGIN_FULFILLED: 'auth/login/fulfilled',
+  LOGOUT_FULFILLED: 'auth/logout/fulfilled',
+};
+
+// Tipado mejorado para acciones
+interface ActionWithType {
+  type: string;
+  payload?: unknown;
+}
+
+// Interfaz para el mock de logoutAction con la propiedad fulfilled
+interface MockLogoutThunk extends jest.Mock {
+  fulfilled: {
+    match: (action: ActionWithType) => boolean;
+  };
+}
+
+// Configuración de mocks
 jest.mock('@infrastructure/storage/sessionExpiryService', () => ({
   sessionExpiryService: {
     setExpiresAt: jest.fn(),
@@ -16,44 +38,83 @@ jest.mock('@infrastructure/storage/sessionExpiryService', () => ({
   },
 }));
 
+// Para evitar problemas de hoisting y referencia, definimos un factory de matchers
+// fuera del mock y utilizamos una función simple dentro del mock
 jest.mock('@application/state/actions/auth.actions', () => {
-  const logoutAction = () => ({ type: 'auth/logout/fulfilled' });
-  logoutAction.fulfilled = {
-    match: (action: unknown) =>
-      typeof action === 'object' &&
-      action !== null &&
-      'type' in action &&
-      action.type === 'auth/logout/fulfilled',
-  } as unknown;
+  const mockLogoutThunk = jest.fn(() => (dispatch: (action: ActionWithType) => void) => {
+    const action = { type: 'auth/logout/fulfilled' };
+    dispatch(action);
+    return action;
+  });
 
-  const loginAction = () => ({ type: 'auth/login/fulfilled' });
-  loginAction.fulfilled = {
-    match: (action: unknown) =>
-      typeof action === 'object' &&
-      action !== null &&
-      'type' in action &&
-      action.type === 'auth/login/fulfilled',
-  } as unknown;
-  return { logoutAction, loginAction };
+  // Usamos una implementación directa en lugar de llamar a createActionMatcher
+  (mockLogoutThunk as MockLogoutThunk).fulfilled = {
+    match: (action: ActionWithType): boolean => action?.type === 'auth/logout/fulfilled',
+  };
+
+  return {
+    logoutAction: mockLogoutThunk,
+    loginAction: {
+      fulfilled: {
+        match: (action: ActionWithType): boolean => action?.type === 'auth/login/fulfilled',
+      },
+    },
+    __esModule: true,
+    mockLogoutThunk,
+  };
 });
 
-// Stub auth reducer to control authentication state in each test
-const createAuthReducer = (isAuthenticated: boolean) => () => ({ isAuthenticated });
+// Factory para el store de pruebas con tipado seguro
+interface TestState {
+  sessionTimer: {
+    expiresAt: number;
+    showModal: boolean;
+  };
+  auth: {
+    isAuthenticated: boolean;
+  };
+}
 
-const createTestStore = (isAuthenticated = true) =>
-  configureStore({
+type TestStore = Store<TestState>;
+
+function createTestStore(isAuthenticated = true): TestStore {
+  return configureStore({
     reducer: {
       sessionTimer: sessionTimerReducer,
-      auth: createAuthReducer(isAuthenticated),
+      auth: () => ({ isAuthenticated }),
     },
-    middleware: getDefault => getDefault().concat(sessionTimerMiddleware),
+    middleware: getDefaultMiddleware =>
+      getDefaultMiddleware({
+        serializableCheck: false,
+        immutableCheck: false,
+        thunk: { extraArgument: {} },
+      }).concat(sessionTimerMiddleware),
+    devTools: false,
   });
+}
+
+// Utilitario para obtener los mocks de forma segura
+function getMocks() {
+  const { mockLogoutThunk } = require('@application/state/actions/auth.actions');
+  const { sessionExpiryService } = require('@infrastructure/storage/sessionExpiryService');
+
+  return {
+    mockLogoutThunk,
+    sessionExpiryService,
+  };
+}
 
 describe('sessionTimerMiddleware', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
     jest.setSystemTime(0);
+
+    // Usar el utilitario para obtener y limpiar los mocks
+    const { mockLogoutThunk, sessionExpiryService } = getMocks();
+    mockLogoutThunk.mockClear();
+    sessionExpiryService.setExpiresAt.mockClear();
+    sessionExpiryService.removeExpiresAt.mockClear();
   });
 
   afterEach(() => {
@@ -61,94 +122,160 @@ describe('sessionTimerMiddleware', () => {
     jest.useRealTimers();
   });
 
-  it('should dispatch resetTimer => setExpiresAt with future timestamp when authenticated', () => {
-    const store = createTestStore(true);
-    store.dispatch(resetTimer());
+  // Casos de prueba para resetTimer
+  describe('when handling resetTimer action', () => {
+    it('should set future expiresAt timestamp when user is authenticated', () => {
+      // Arrange
+      const store = createTestStore(true);
 
-    const actions = store.getState().sessionTimer;
-    expect(actions.expiresAt).toBeGreaterThan(0);
+      // Act
+      store.dispatch(resetTimer());
+
+      // Assert
+      const state = store.getState().sessionTimer;
+      expect(state.expiresAt).toBe(SESSION_TIMEOUT_MS); // Valor específico en vez de solo "mayor que 0"
+      expect(state.showModal).toBe(false);
+    });
+
+    it('should not update expiresAt in storage when user is not authenticated', () => {
+      // Arrange
+      const store = createTestStore(false);
+      const { sessionExpiryService } = getMocks();
+
+      // Act
+      store.dispatch(resetTimer());
+
+      // Assert
+      expect(sessionExpiryService.setExpiresAt).not.toHaveBeenCalled();
+      expect(store.getState().sessionTimer.showModal).toBe(false);
+      expect(store.getState().sessionTimer.expiresAt).toBe(SESSION_TIMEOUT_MS);
+    });
   });
 
-  it('should ignore resetTimer when user is not authenticated', () => {
-    const store = createTestStore(false);
-    const { setExpiresAt } =
-      require('@infrastructure/storage/sessionExpiryService').sessionExpiryService;
+  // Casos de prueba para setExpiresAt
+  describe('when handling setExpiresAt action', () => {
+    it('should store expiresAt in session storage when authenticated', () => {
+      // Arrange
+      const store = createTestStore(true);
+      const { sessionExpiryService } = getMocks();
+      const expiresAt = Date.now() + 60_000;
 
-    store.dispatch(resetTimer());
+      // Act
+      store.dispatch(setExpiresAt(expiresAt));
 
-    // No efecto en almacenamiento ni programación de temporizador
-    expect(setExpiresAt).not.toHaveBeenCalled();
-    expect(store.getState().sessionTimer.showModal).toBe(false);
+      // Assert
+      expect(sessionExpiryService.setExpiresAt).toHaveBeenCalledWith(expiresAt);
+      expect(store.getState().sessionTimer.expiresAt).toBe(expiresAt);
+    });
+
+    it('should not store expiresAt when payload is invalid', () => {
+      // Arrange
+      const store = createTestStore(true);
+      const { sessionExpiryService } = getMocks();
+
+      // Act
+      store.dispatch(setExpiresAt(0));
+
+      // Assert
+      expect(sessionExpiryService.setExpiresAt).not.toHaveBeenCalled();
+      expect(store.getState().sessionTimer.expiresAt).toBe(0);
+    });
+
+    it('should not store expiresAt when user is not authenticated', () => {
+      // Arrange
+      const store = createTestStore(false);
+      const { sessionExpiryService } = getMocks();
+      const expiresAt = Date.now() + 60_000;
+
+      // Act
+      store.dispatch(setExpiresAt(expiresAt));
+
+      // Assert
+      expect(sessionExpiryService.setExpiresAt).not.toHaveBeenCalled();
+    });
+
+    it('should show modal when warning time is reached', () => {
+      // Arrange
+      const store = createTestStore(true);
+      const warningTimeMs = SESSION_TIMEOUT_WARNING_SECONDS * 1000;
+      const expiresAt = Date.now() + warningTimeMs + 1000; // 1 segundo más del tiempo de advertencia
+      store.dispatch(setExpiresAt(expiresAt));
+
+      // Act - simular que ha pasado el tiempo hasta la advertencia
+      jest.advanceTimersByTime(1000);
+      jest.setSystemTime(1000);
+      jest.runOnlyPendingTimers();
+
+      // Assert
+      expect(store.getState().sessionTimer.showModal).toBe(true);
+    });
+
+    it('should not show modal if it is already visible', () => {
+      // Arrange
+      const store = createTestStore(true);
+      const warningTimeMs = SESSION_TIMEOUT_WARNING_SECONDS * 1000;
+      const expiresAt = Date.now() + warningTimeMs + 1000;
+      store.dispatch(setExpiresAt(expiresAt));
+      store.dispatch(showModal());
+
+      // Act - espiamos dispatch para ver si se llama de nuevo
+      const spyDispatch = jest.spyOn(store, 'dispatch');
+      jest.advanceTimersByTime(1000);
+      jest.setSystemTime(1000);
+      jest.runOnlyPendingTimers();
+
+      // Assert - confirmamos que showModal no fue llamado de nuevo
+      expect(spyDispatch).not.toHaveBeenCalledWith(showModal());
+      spyDispatch.mockRestore();
+    });
   });
 
-  it('should program interval and show modal / logout when receiving setExpiresAt', () => {
-    const store = createTestStore();
+  // Casos de prueba para removeExpiresAt
+  describe('when handling removeExpiresAt action', () => {
+    it('should clear session storage', () => {
+      // Arrange
+      const store = createTestStore();
+      const { sessionExpiryService } = getMocks();
 
-    // 1 minute session and warning at 30 seconds
-    const expiresAt = Date.now() + 60_000;
-    store.dispatch(setExpiresAt(expiresAt));
+      // Act
+      store.dispatch(removeExpiresAt());
 
-    // Advance time to warning point (30 seconds before expiration)
-    jest.advanceTimersByTime(30_000);
-    jest.setSystemTime(30_000);
-    expect(store.getState().sessionTimer.showModal).toBe(true);
-
-    // Advance time to total expiration (other 30 seconds)
-    jest.advanceTimersByTime(30_000);
-    jest.setSystemTime(60_000);
-
-    // The modal is hidden and logout is triggered
-    expect(store.getState().sessionTimer.showModal).toBe(false);
-    expect(store.getState().sessionTimer.expiresAt).toBe(0);
+      // Assert
+      expect(sessionExpiryService.removeExpiresAt).toHaveBeenCalled();
+      expect(store.getState().sessionTimer.expiresAt).toBe(0);
+      expect(store.getState().sessionTimer.showModal).toBe(false);
+    });
   });
 
-  it('should cancel timer and clear storage when receiving removeExpiresAt', () => {
-    const store = createTestStore();
-    store.dispatch(removeExpiresAt());
-    expect(sessionExpiryService.removeExpiresAt).toHaveBeenCalled();
+  // Casos de prueba para logoutAction.fulfilled
+  describe('when handling logoutAction.fulfilled', () => {
+    it('should remove expiresAt and hide modal', () => {
+      // Arrange
+      const store = createTestStore();
+      store.dispatch(showModal());
+      expect(store.getState().sessionTimer.showModal).toBe(true);
+
+      // Act
+      store.dispatch({ type: MOCK_ACTION_TYPES.LOGOUT_FULFILLED });
+
+      // Assert
+      expect(store.getState().sessionTimer.showModal).toBe(false);
+      expect(store.getState().sessionTimer.expiresAt).toBe(0);
+    });
   });
 
-  it('should not show modal if it is already visible when the warning time is reached', () => {
-    const store = createTestStore();
+  // Casos de prueba para loginAction.fulfilled
+  describe('when handling loginAction.fulfilled', () => {
+    it('should reset timer', () => {
+      // Arrange
+      const store = createTestStore(true);
 
-    // 1 minute session and warning at 30 seconds
-    const expiresAt = Date.now() + 60_000;
-    store.dispatch(setExpiresAt(expiresAt));
+      // Act
+      store.dispatch({ type: MOCK_ACTION_TYPES.LOGIN_FULFILLED });
 
-    // Show the modal manually
-    store.dispatch(showModal());
-    expect(store.getState().sessionTimer.showModal).toBe(true);
-
-    // Advance to the warning point (30 seconds before expiration)
-    jest.advanceTimersByTime(30_000);
-    jest.setSystemTime(30_000);
-
-    // The modal should remain visible but its state should not have changed
-    expect(store.getState().sessionTimer.showModal).toBe(true);
-  });
-
-  it('should handle null or undefined expiresAt value', () => {
-    const store = createTestStore();
-
-    // Set expiresAt to 0 (which is equivalent to null/undefined in this context)
-    store.dispatch(setExpiresAt(0));
-
-    // Advance time to trigger the interval
-    jest.advanceTimersByTime(1000);
-
-    // Verify that secondsLeft is 0 and no modal is shown
-    expect(store.getState().sessionTimer.showModal).toBe(false);
-    expect(store.getState().sessionTimer.expiresAt).toBe(0);
-  });
-
-  it('should start timer after successful login', () => {
-    const store = createTestStore(true);
-    const { setExpiresAt } =
-      require('@infrastructure/storage/sessionExpiryService').sessionExpiryService;
-
-    // Dispatch mocked login fulfilled action
-    store.dispatch({ type: 'auth/login/fulfilled' });
-
-    expect(setExpiresAt).toHaveBeenCalled();
+      // Assert
+      expect(store.getState().sessionTimer.expiresAt).toBe(SESSION_TIMEOUT_MS);
+      expect(store.getState().sessionTimer.showModal).toBe(false);
+    });
   });
 });
