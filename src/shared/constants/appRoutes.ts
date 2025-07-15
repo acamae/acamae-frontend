@@ -12,7 +12,9 @@ export const APP_ROUTES = {
   VERIFY_EMAIL_RESEND: '/verify-email-resend',
   VERIFY_EMAIL_USED: '/verify-email-used',
   VERIFY_EMAIL_ERROR: '/verify-email-error',
-  DASHBOARD: '/dashboard',
-  PROFILE: '/profile',
-  TEAMS: '/teams',
+  DASHBOARD: '/app/dashboard',
+  PROFILE: '/app/profile',
+  TEAMS: '/app/teams',
+  TOURNAMENTS: '/app/tournaments',
+  USERS: '/app/users',
 };

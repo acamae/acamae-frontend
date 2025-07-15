@@ -44,6 +44,8 @@ describe('VerifyEmailUseCase', () => {
       message: 'Email verified successfully',
       status: 200,
       code: ApiSuccessCodes.SUCCESS,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_verify_123',
     });
 
     const result = await verifyEmailUseCase.execute(mockPayload);
@@ -55,6 +57,8 @@ describe('VerifyEmailUseCase', () => {
       message: 'Email verified successfully',
       status: 200,
       code: ApiSuccessCodes.SUCCESS,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
   });
 
@@ -75,6 +79,8 @@ describe('VerifyEmailUseCase', () => {
       message: 'Verification token has expired',
       status: 410,
       code: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_verify_456',
     });
 
     const result = await verifyEmailUseCase.execute(mockPayload);
@@ -86,6 +92,8 @@ describe('VerifyEmailUseCase', () => {
       message: 'Verification token has expired',
       status: 410,
       code: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
   });
 
@@ -106,6 +114,8 @@ describe('VerifyEmailUseCase', () => {
       message: 'Invalid verification token',
       status: 400,
       code: ApiErrorCodes.AUTH_TOKEN_INVALID,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_verify_789',
     });
 
     const result = await verifyEmailUseCase.execute(mockPayload);
@@ -117,6 +127,8 @@ describe('VerifyEmailUseCase', () => {
       message: 'Invalid verification token',
       status: 400,
       code: ApiErrorCodes.AUTH_TOKEN_INVALID,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
   });
 
@@ -137,6 +149,8 @@ describe('VerifyEmailUseCase', () => {
       message: 'Email is already verified',
       status: 409,
       code: ApiErrorCodes.VALIDATION_ERROR,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_verify_abc',
     });
 
     const result = await verifyEmailUseCase.execute(mockPayload);
@@ -148,6 +162,8 @@ describe('VerifyEmailUseCase', () => {
       message: 'Email is already verified',
       status: 409,
       code: ApiErrorCodes.VALIDATION_ERROR,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
   });
 
@@ -168,6 +184,8 @@ describe('VerifyEmailUseCase', () => {
       message: 'Token is valid but user update failed',
       status: 500,
       code: ApiErrorCodes.ERR_NETWORK,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_verify_def',
     });
 
     const result = await verifyEmailUseCase.execute(mockPayload);
@@ -179,6 +197,8 @@ describe('VerifyEmailUseCase', () => {
       message: 'Token is valid but user update failed',
       status: 500,
       code: ApiErrorCodes.ERR_NETWORK,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
   });
 });

@@ -1,4 +1,7 @@
-.register {
+.login,
+.register,
+.email-verification,
+.email-verification-resend {
   min-height: calc(100vh - $app-header-height - $app-footer-height);
   padding: $spacer * 3 $spacer;
   display: flex;
@@ -8,11 +11,19 @@
     padding: $spacer;
   }
 
-  & .register-content {
+  & .login-content,
+  & .register-content,
+  & .email-verification-content,
+  & .email-verification-resend-content {
     flex: 1;
     max-width: rem(360px);
     margin: 0 auto;
     position: relative;
+  }
+
+  & .email-verification-icon,
+  & .email-verification-resend-icon {
+    font-size: rem(64px);
   }
 
   .app-without-header {

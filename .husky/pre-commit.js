@@ -25,14 +25,17 @@ try {
   // Run tests if there are staged files
   if (stagedFiles) {
     console.log('🧪 Running tests...');
-    execSync(`npx jest --bail --findRelatedTests --passWithNoTests ${stagedFiles}`, {
-      stdio: 'inherit',
-    });
+    execSync(
+      `npx jest --bail --clearCache --silent --findRelatedTests --passWithNoTests ${stagedFiles}`,
+      {
+        stdio: 'inherit',
+      }
+    );
   }
 
   // Run linter
   console.log('🧪 Running linter...');
-  execSync('npx lint-staged', { stdio: 'inherit' });
+  execSync('npx lint-staged --quiet', { stdio: 'inherit' });
 } catch (error) {
   console.error('❌ Pre-commit hook failed:', error.message);
   process.exit(1);

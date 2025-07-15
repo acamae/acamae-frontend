@@ -17,59 +17,80 @@ const SESSION_TIMEOUT_WARNING_SECONDS =
 
 let timer: NodeJS.Timeout | null = null;
 
+// Funciones auxiliares para reducir complejidad
+function isUserAuthenticated(store: MiddlewareAPI): boolean {
+  const state = store.getState() as { auth?: { isAuthenticated?: boolean } };
+  return Boolean(state.auth?.isAuthenticated);
+}
+
+function clearTimer(): void {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
+}
+
+function handleSessionInterval(store: MiddlewareAPI): void {
+  const { expiresAt, showModal: isModalShown } = store.getState().sessionTimer;
+  const secondsLeft = expiresAt ? Math.max(0, Math.floor((expiresAt - Date.now()) / 1000)) : 0;
+
+  if (secondsLeft === SESSION_TIMEOUT_WARNING_SECONDS && !isModalShown) {
+    store.dispatch(showModal());
+  }
+
+  if (secondsLeft <= 0) {
+    clearTimer();
+    store.dispatch(hideModal());
+    (store.dispatch as AppDispatch)(logoutAction());
+  }
+}
+
+function handleResetTimer(store: MiddlewareAPI): void {
+  if (!isUserAuthenticated(store)) {
+    return;
+  }
+
+  const expiresAt = Date.now() + SESSION_TIMEOUT_MINUTES * 60 * 1000;
+  store.dispatch(setExpiresAt(expiresAt));
+}
+
+function handleSetExpiresAt(store: MiddlewareAPI, payload: number): void {
+  if (!isUserAuthenticated(store) || !payload) {
+    return;
+  }
+
+  sessionExpiryService.setExpiresAt(payload);
+  clearTimer();
+  timer = setInterval(() => handleSessionInterval(store), 1000);
+}
+
+function handleRemoveExpiresAt(): void {
+  clearTimer();
+  sessionExpiryService.removeExpiresAt();
+}
+
+function handleLogoutFulfilled(store: MiddlewareAPI): void {
+  clearTimer();
+  store.dispatch(removeExpiresAt());
+}
+
+function handleLoginFulfilled(store: MiddlewareAPI): void {
+  store.dispatch(resetTimer());
+}
+
 const sessionTimerMiddleware: Middleware = (store: MiddlewareAPI) => next => action => {
   const result = next(action);
 
   if (resetTimer.match(action)) {
-    const state = store.getState() as { auth?: { isAuthenticated?: boolean } };
-    const isAuthenticated = state.auth?.isAuthenticated;
-    if (!isAuthenticated) {
-      return result;
-    }
-
-    const expiresAt = Date.now() + SESSION_TIMEOUT_MINUTES * 60 * 1000;
-    store.dispatch(setExpiresAt(expiresAt));
-  }
-
-  // When the session is renewed (e.g. stay connected)
-  if (setExpiresAt.match(action)) {
-    const state = store.getState() as { auth?: { isAuthenticated?: boolean } };
-    const isAuthenticated = state.auth?.isAuthenticated;
-    if (!isAuthenticated) {
-      return result;
-    }
-
-    sessionExpiryService.setExpiresAt(action.payload);
-    if (timer) clearInterval(timer);
-    timer = setInterval(() => {
-      const { expiresAt, showModal: isModalShown } = store.getState().sessionTimer;
-      const secondsLeft = expiresAt ? Math.max(0, Math.floor((expiresAt - Date.now()) / 1000)) : 0;
-
-      if (secondsLeft === SESSION_TIMEOUT_WARNING_SECONDS && !isModalShown) {
-        store.dispatch(showModal());
-      }
-
-      if (secondsLeft <= 0) {
-        clearInterval(timer!);
-        store.dispatch(hideModal());
-        (store.dispatch as AppDispatch)(logoutAction());
-      }
-    }, 1000);
-  }
-
-  if (removeExpiresAt.match(action)) {
-    if (timer) clearInterval(timer);
-    sessionExpiryService.removeExpiresAt();
-  }
-
-  if (logoutAction.fulfilled.match(action)) {
-    if (timer) clearInterval(timer);
-    store.dispatch(removeExpiresAt());
-  }
-
-  // Start timer after successful login
-  if (loginAction.fulfilled.match(action)) {
-    store.dispatch(resetTimer());
+    handleResetTimer(store);
+  } else if (setExpiresAt.match(action)) {
+    handleSetExpiresAt(store, action.payload);
+  } else if (removeExpiresAt.match(action)) {
+    handleRemoveExpiresAt();
+  } else if (logoutAction.fulfilled.match(action)) {
+    handleLogoutFulfilled(store);
+  } else if (loginAction.fulfilled.match(action)) {
+    handleLoginFulfilled(store);
   }
 
   return result;

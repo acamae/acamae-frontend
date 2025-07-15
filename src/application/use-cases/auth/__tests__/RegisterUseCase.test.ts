@@ -40,6 +40,8 @@ describe('RegisterUseCase', () => {
       message: 'User registered successfully',
       status: 201,
       code: ApiSuccessCodes.SUCCESS,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_register_123',
     });
 
     const result = await registerUseCase.execute(mockPayload);
@@ -51,6 +53,8 @@ describe('RegisterUseCase', () => {
       message: 'User registered successfully',
       status: 201,
       code: ApiSuccessCodes.SUCCESS,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
   });
 
@@ -69,6 +73,8 @@ describe('RegisterUseCase', () => {
       message: 'Email already exists',
       status: 400,
       code: ApiErrorCodes.VALIDATION_ERROR,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_register_456',
     });
 
     const result = await registerUseCase.execute(mockPayload);
@@ -80,6 +86,109 @@ describe('RegisterUseCase', () => {
       message: 'Email already exists',
       status: 400,
       code: ApiErrorCodes.VALIDATION_ERROR,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
+  });
+
+  it('should handle DATABASE_ERROR during registration', async () => {
+    const mockPayload: RegisterPayload = {
+      username: 'testuser',
+      email: 'test@example.com',
+      password: 'password123',
+      firstName: 'Test',
+      lastName: 'User',
+    };
+
+    mockAuthRepository.register.mockResolvedValue({
+      success: false,
+      data: null,
+      message: 'Database error occurred during registration',
+      status: 500,
+      code: ApiErrorCodes.DATABASE_ERROR,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_register_789',
+    });
+
+    const result = await registerUseCase.execute(mockPayload);
+
+    expect(mockAuthRepository.register).toHaveBeenCalledWith(mockPayload);
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      message: 'Database error occurred during registration',
+      status: 500,
+      code: ApiErrorCodes.DATABASE_ERROR,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
+    });
+  });
+
+  it('should handle EMAIL_NOT_VERIFIED error during registration', async () => {
+    const mockPayload: RegisterPayload = {
+      username: 'testuser',
+      email: 'test@example.com',
+      password: 'password123',
+      firstName: 'Test',
+      lastName: 'User',
+    };
+
+    mockAuthRepository.register.mockResolvedValue({
+      success: false,
+      data: null,
+      message: 'Email verification required',
+      status: 403,
+      code: ApiErrorCodes.EMAIL_NOT_VERIFIED,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_register_abc',
+    });
+
+    const result = await registerUseCase.execute(mockPayload);
+
+    expect(mockAuthRepository.register).toHaveBeenCalledWith(mockPayload);
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      message: 'Email verification required',
+      status: 403,
+      code: ApiErrorCodes.EMAIL_NOT_VERIFIED,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
+    });
+  });
+
+  it('should handle multiple error codes in registration', async () => {
+    const mockPayload: RegisterPayload = {
+      username: 'testuser',
+      email: 'test@example.com',
+      password: 'password123',
+      firstName: 'Test',
+      lastName: 'User',
+    };
+
+    const errorCodes = [
+      ApiErrorCodes.DATABASE_ERROR,
+      ApiErrorCodes.EMAIL_NOT_VERIFIED,
+      ApiErrorCodes.INVALID_REFRESH_TOKEN,
+    ];
+
+    for (const code of errorCodes) {
+      mockAuthRepository.register.mockResolvedValue({
+        success: false,
+        data: null,
+        message: `Registration error: ${code}`,
+        status: 500,
+        code,
+        timestamp: new Date().toISOString(),
+        requestId: `req_register_${code}`,
+      });
+
+      const result = await registerUseCase.execute(mockPayload);
+
+      expect(mockAuthRepository.register).toHaveBeenCalledWith(mockPayload);
+      expect(result.code).toBe(code);
+      expect(result.timestamp).toBeDefined();
+      expect(result.requestId).toBeDefined();
+    }
   });
 });

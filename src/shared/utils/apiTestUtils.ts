@@ -6,12 +6,25 @@ import apiService from '@shared/services/axiosService';
 export interface ApiResponseBody<TData = null> {
   success: boolean;
   data?: TData;
-  message?: string;
-  errors?: { field: string; errorKey: string }[];
+  status: number;
+  code: string;
+  message: string;
+  timestamp: string;
+  requestId: string;
+  meta?: Record<string, unknown>;
+  error?: {
+    type?: 'validation' | 'network' | 'server' | 'authentication' | 'authorization' | 'business';
+    details?: Array<{
+      field: string;
+      code: string;
+      message: string;
+    }>;
+    stack?: string;
+  };
 }
 
 // Simulates the error structure of Axios for mocks
-export interface MockAxiosError extends Error {
+export interface CreateAxiosMockError extends Error {
   isAxiosError: boolean;
   response: {
     data: unknown;
@@ -94,7 +107,7 @@ export const setupMockApiServiceCall = <TResponseData = unknown, TRequestData = 
         status: httpStatusCode,
       });
     } else if (httpStatusCode >= 300 && httpStatusCode < 600) {
-      const error: MockAxiosError = Object.assign(
+      const error: CreateAxiosMockError = Object.assign(
         new Error(`Request failed with status code ${httpStatusCode}`),
         {
           isAxiosError: true,

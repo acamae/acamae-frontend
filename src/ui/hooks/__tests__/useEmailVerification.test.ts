@@ -62,6 +62,9 @@ describe('useEmailVerification', () => {
       errorCodes.ApiErrorCodes.AUTH_USER_ALREADY_VERIFIED,
       errorCodes.ApiErrorCodes.AUTH_USER_NOT_FOUND,
       errorCodes.ApiErrorCodes.AUTH_USER_BLOCKED,
+      errorCodes.ApiErrorCodes.INVALID_REFRESH_TOKEN,
+      errorCodes.ApiErrorCodes.EMAIL_NOT_VERIFIED,
+      errorCodes.ApiErrorCodes.DATABASE_ERROR,
       'OTRO',
     ];
     for (const code of codes) {
@@ -82,10 +85,11 @@ describe('useEmailVerification', () => {
 
   it('debe manejar timeout', async () => {
     jest.useFakeTimers();
+    const mockVerifyEmail = jest.fn(() => new Promise(() => {}));
     verifyEmailMock.mockImplementation(
       () =>
         ({
-          verifyEmail: jest.fn(() => new Promise(() => {})),
+          verifyEmail: mockVerifyEmail,
         }) as unknown
     );
     const { result } = renderHook(() => useEmailVerification());
@@ -100,10 +104,11 @@ describe('useEmailVerification', () => {
 
   it('no cambia estado si el error es por abort (signal.aborted)', async () => {
     // Simula verifyEmail que rechaza y el abortController está aborted
+    const mockVerifyEmail = jest.fn(() => Promise.reject(new Error('IGNORED')));
     verifyEmailMock.mockImplementation(
       () =>
         ({
-          verifyEmail: jest.fn(() => Promise.reject({ code: 'IGNORED' })),
+          verifyEmail: mockVerifyEmail,
         }) as unknown
     );
     const { result } = renderHook(() => useEmailVerification());
@@ -136,10 +141,11 @@ describe('useEmailVerification', () => {
   });
 
   it('debe asignar UNKNOWN_ERROR si el error no tiene code', async () => {
+    const mockVerifyEmail = jest.fn();
     verifyEmailMock = jest.spyOn(api, 'AuthApiRepository').mockImplementation(
       () =>
         ({
-          verifyEmail: jest.fn(),
+          verifyEmail: mockVerifyEmail,
         }) as unknown as jest.Mocked<AuthApiRepository>
     );
     const { result } = renderHook(() => useEmailVerification());
@@ -178,10 +184,11 @@ describe('useEmailVerification', () => {
     };
     const origAbortController = window.AbortController;
     (window as any).AbortController = abortControllerMock; // eslint-disable-line @typescript-eslint/no-explicit-any
+    const mockVerifyEmail = jest.fn(() => Promise.resolve({ success: true }));
     verifyEmailMock.mockImplementation(
       () =>
         ({
-          verifyEmail: jest.fn(() => Promise.resolve({ success: true })),
+          verifyEmail: mockVerifyEmail,
         }) as unknown
     );
     const { result } = renderHook(() => useEmailVerification());
@@ -191,5 +198,89 @@ describe('useEmailVerification', () => {
     });
     expect(abortCalled).toBe(true);
     (window as any).AbortController = origAbortController; // eslint-disable-line @typescript-eslint/no-explicit-any
+  });
+
+  it('debe manejar INVALID_REFRESH_TOKEN correctamente', async () => {
+    const mockVerifyEmail = jest.fn().mockResolvedValue({
+      success: false,
+      code: errorCodes.ApiErrorCodes.INVALID_REFRESH_TOKEN,
+    });
+    verifyEmailMock.mockImplementation(
+      () =>
+        ({
+          verifyEmail: mockVerifyEmail,
+        }) as unknown
+    );
+    const { result } = renderHook(() => useEmailVerification());
+    await act(async () => {
+      result.current.verify('token');
+    });
+    expect(result.current.status).toBe('ERROR');
+    expect(result.current.errorCode).toBe(errorCodes.ApiErrorCodes.INVALID_REFRESH_TOKEN);
+  });
+
+  it('debe manejar EMAIL_NOT_VERIFIED correctamente', async () => {
+    const mockVerifyEmail = jest.fn().mockResolvedValue({
+      success: false,
+      code: errorCodes.ApiErrorCodes.EMAIL_NOT_VERIFIED,
+    });
+    verifyEmailMock.mockImplementation(
+      () =>
+        ({
+          verifyEmail: mockVerifyEmail,
+        }) as unknown
+    );
+    const { result } = renderHook(() => useEmailVerification());
+    await act(async () => {
+      result.current.verify('token');
+    });
+    expect(result.current.status).toBe('ERROR');
+    expect(result.current.errorCode).toBe(errorCodes.ApiErrorCodes.EMAIL_NOT_VERIFIED);
+  });
+
+  it('debe manejar DATABASE_ERROR correctamente', async () => {
+    const mockVerifyEmail = jest.fn().mockResolvedValue({
+      success: false,
+      code: errorCodes.ApiErrorCodes.DATABASE_ERROR,
+    });
+    verifyEmailMock.mockImplementation(
+      () =>
+        ({
+          verifyEmail: mockVerifyEmail,
+        }) as unknown
+    );
+    const { result } = renderHook(() => useEmailVerification());
+    await act(async () => {
+      result.current.verify('token');
+    });
+    expect(result.current.status).toBe('ERROR');
+    expect(result.current.errorCode).toBe(errorCodes.ApiErrorCodes.DATABASE_ERROR);
+  });
+
+  it('debe manejar múltiples códigos de error en secuencia', async () => {
+    const errorCodesToTest = [
+      errorCodes.ApiErrorCodes.INVALID_REFRESH_TOKEN,
+      errorCodes.ApiErrorCodes.EMAIL_NOT_VERIFIED,
+      errorCodes.ApiErrorCodes.DATABASE_ERROR,
+    ];
+
+    for (const code of errorCodesToTest) {
+      const mockVerifyEmail = jest.fn().mockResolvedValue({
+        success: false,
+        code,
+      });
+      verifyEmailMock.mockImplementation(
+        () =>
+          ({
+            verifyEmail: mockVerifyEmail,
+          }) as unknown
+      );
+      const { result } = renderHook(() => useEmailVerification());
+      await act(async () => {
+        result.current.verify('token');
+      });
+      expect(result.current.status).toBe('ERROR');
+      expect(result.current.errorCode).toBe(code);
+    }
   });
 });

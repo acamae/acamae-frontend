@@ -224,8 +224,8 @@ describe('Register Form - Successful Registration', () => {
       // Verify redirection
       cy.url().should('include', APP_ROUTES.VERIFY_EMAIL_SENT);
 
-      // Verify that the language remains in English
-      cy.get('[data-testid="language-picker-select"]').should('have.value', 'en-GB');
+      // Note: The language picker is not present on the success page
+      // The language preference is maintained through the application state
 
       // Verify that the success message is displayed in English
       cy.get('body').should('contain.text', enGB.register.success);

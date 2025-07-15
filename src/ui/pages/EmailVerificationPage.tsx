@@ -37,7 +37,7 @@ const EmailVerificationPage: React.FC = () => {
         const verifyEmailUseCase = new VerifyEmailUseCase(authRepository);
 
         const response = await verifyEmailUseCase.execute({ token });
-
+        console.log('verifyEmail response', response);
         if (response.success) {
           // Verificación exitosa - el backend devolvió una respuesta exitosa
           setVerificationStatus(ApiSuccessCodes.SUCCESS);
@@ -68,6 +68,7 @@ const EmailVerificationPage: React.FC = () => {
   }, [searchParams, navigate, t]);
 
   useEffect(() => {
+    console.log('verificationStatus', verificationStatus);
     // Redirect to specific pages based on verification status
     if (!loading && verificationStatus) {
       switch (verificationStatus) {
@@ -108,8 +109,7 @@ const EmailVerificationPage: React.FC = () => {
     );
   }
 
-  // All verification results redirect to specific pages
-  // This should not be reached normally
+  // The rest of the cases never render because the component redirects.
   return null;
 };
 

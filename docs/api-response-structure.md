@@ -39,7 +39,7 @@ interface ApiSuccessResponse<T> {
   data: T | null; // Los datos solicitados o null
   status: number; // Código HTTP (200, 201, etc.)
   code: 'SUCCESS'; // SIEMPRE "SUCCESS" para casos exitosos
-  message: string; // Mensaje descriptivo en ESPAÑOL
+  message: string; // Mensaje descriptivo en INGLÉS
   timestamp: string; // ISO 8601 timestamp (OBLIGATORIO)
   requestId: string; // UUID único por request (OBLIGATORIO)
   meta?: Record<string, any>; // OPCIONAL: paginación, totales, etc.
@@ -54,7 +54,7 @@ interface ApiErrorResponse {
   data: null; // SIEMPRE null en errores
   status: number; // Código HTTP (400, 401, 500, etc.)
   code: string; // Código semántico (ver lista abajo)
-  message: string; // Mensaje de error en ESPAÑOL
+  message: string; // Mensaje de error en INGLÉS
   timestamp: string; // ISO 8601 timestamp (OBLIGATORIO)
   requestId: string; // UUID único por request (OBLIGATORIO)
   meta?: Record<string, any>; // OPCIONAL
@@ -65,7 +65,7 @@ interface ApiErrorResponse {
       // Array de errores específicos
       field: string; // Campo que causó el error
       code: string; // Código específico del campo
-      message: string; // Mensaje específico en ESPAÑOL
+      message: string; // Mensaje específico en INGLÉS
     }>;
     stack?: string; // SOLO en desarrollo (NODE_ENV !== 'production')
   };
@@ -106,7 +106,7 @@ interface ApiErrorResponse {
   },
   "status": 200,
   "code": "SUCCESS",
-  "message": "Login exitoso",
+  "message": "Login successful",
   "timestamp": "2024-01-15T10:30:00.000Z",
   "requestId": "req_abc123"
 }
@@ -123,7 +123,7 @@ interface ApiErrorResponse {
   ],
   "status": 200,
   "code": "SUCCESS",
-  "message": "Usuarios obtenidos exitosamente",
+  "message": "Users retrieved successfully",
   "timestamp": "2024-01-15T10:30:00.000Z",
   "requestId": "req_abc123",
   "meta": {
@@ -147,7 +147,7 @@ interface ApiErrorResponse {
   "data": null,
   "status": 422,
   "code": "VALIDATION_ERROR",
-  "message": "Los datos enviados no son válidos",
+  "message": "The submitted data is not valid",
   "timestamp": "2024-01-15T10:30:00.000Z",
   "requestId": "req_abc123",
   "error": {
@@ -156,12 +156,12 @@ interface ApiErrorResponse {
       {
         "field": "email",
         "code": "INVALID_FORMAT",
-        "message": "El formato del email no es válido"
+        "message": "The email format is not valid"
       },
       {
         "field": "password",
         "code": "TOO_SHORT",
-        "message": "La contraseña debe tener al menos 8 caracteres"
+        "message": "Password must be at least 8 characters"
       }
     ]
   }
@@ -176,7 +176,7 @@ interface ApiErrorResponse {
   "data": null,
   "status": 0,
   "code": "ERR_NETWORK",
-  "message": "Error de red. Verifica tu conexión",
+  "message": "Network error. Check your connection",
   "timestamp": "2024-01-15T10:30:00.000Z",
   "requestId": "req_generated_client_side",
   "error": {
@@ -210,7 +210,7 @@ app.use((req, res, next) => {
 
 // Middleware para respuestas consistentes
 const responseHandler = {
-  success: (res, data = null, message = 'Operación exitosa', meta = null) => {
+  success: (res, data = null, message = 'Operation successful', meta = null) => {
     return res.status(200).json({
       success: true,
       data,
@@ -321,6 +321,13 @@ const API_ERROR_CODES = {
   // User related
   AUTH_USER_NOT_FOUND: 'AUTH_USER_NOT_FOUND',
   AUTH_USER_BLOCKED: 'AUTH_USER_BLOCKED',
+
+  // Token & Session Management
+  INVALID_REFRESH_TOKEN: 'INVALID_REFRESH_TOKEN',
+  EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
+
+  // Database & Server
+  DATABASE_ERROR: 'DATABASE_ERROR',
 };
 ```
 
@@ -358,34 +365,29 @@ app.use((error, req, res, next) => {
 
   // Errores de validación de Express Validator
   if (error.type === 'validation') {
-    return res.apiError(
-      422,
-      API_ERROR_CODES.VALIDATION_ERROR,
-      'Los datos enviados no son válidos',
-      {
-        type: 'validation',
-        details: error.details,
-        ...(process.env.NODE_ENV !== 'production' && { stack: error.stack }),
-      }
-    );
+    return res.apiError(422, API_ERROR_CODES.VALIDATION_ERROR, 'The submitted data is not valid', {
+      type: 'validation',
+      details: error.details,
+      ...(process.env.NODE_ENV !== 'production' && { stack: error.stack }),
+    });
   }
 
   // Errores de autenticación JWT
   if (error.name === 'JsonWebTokenError') {
-    return res.apiError(401, API_ERROR_CODES.AUTH_TOKEN_INVALID, 'Token de acceso inválido');
+    return res.apiError(401, API_ERROR_CODES.AUTH_TOKEN_INVALID, 'Invalid access token');
   }
 
   if (error.name === 'TokenExpiredError') {
-    return res.apiError(401, API_ERROR_CODES.AUTH_TOKEN_EXPIRED, 'Token de acceso expirado');
+    return res.apiError(401, API_ERROR_CODES.AUTH_TOKEN_EXPIRED, 'Expired access token');
   }
 
   // Error de base de datos
   if (error.code === 'ER_DUP_ENTRY') {
-    return res.apiError(409, API_ERROR_CODES.AUTH_USER_ALREADY_EXISTS, 'El recurso ya existe');
+    return res.apiError(409, API_ERROR_CODES.AUTH_USER_ALREADY_EXISTS, 'Resource already exists');
   }
 
   // Error genérico
-  return res.apiError(500, API_ERROR_CODES.UNKNOWN_ERROR, 'Error interno del servidor', {
+  return res.apiError(500, API_ERROR_CODES.UNKNOWN_ERROR, 'Internal server error', {
     type: 'server',
     ...(process.env.NODE_ENV !== 'production' && {
       details: [{ field: 'server', code: 'INTERNAL_ERROR', message: error.message }],
@@ -399,7 +401,7 @@ app.use('*', (req, res) => {
   return res.apiError(
     404,
     API_ERROR_CODES.RESOURCE_NOT_FOUND,
-    `La ruta ${req.originalUrl} no existe`
+    `Route ${req.originalUrl} does not exist`
   );
 });
 ```
@@ -415,14 +417,14 @@ El servidor responde pero con error:
 return res.apiError(
   401,
   API_ERROR_CODES.AUTH_INVALID_CREDENTIALS,
-  'Las credenciales proporcionadas son incorrectas',
+  'The provided credentials are incorrect',
   {
     type: 'authentication',
     details: [
       {
         field: 'credentials',
         code: 'INVALID',
-        message: 'Email o contraseña incorrectos',
+        message: 'Incorrect email or password',
       },
     ],
   }
@@ -485,23 +487,23 @@ app.post('/auth/login', async (req, res) => {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
       },
-      'Login exitoso'
+      'Login successful'
     );
   } catch (error) {
     if (error.code === 'INVALID_CREDENTIALS') {
       return res.apiError(
         401,
         API_ERROR_CODES.AUTH_INVALID_CREDENTIALS,
-        'Las credenciales proporcionadas son incorrectas'
+        'The provided credentials are incorrect'
       );
     }
 
-    return res.apiError(500, API_ERROR_CODES.UNKNOWN_ERROR, 'Error interno del servidor');
+    return res.apiError(500, API_ERROR_CODES.UNKNOWN_ERROR, 'Internal server error');
   }
 });
 ```
 
-### **POST /auth/register - Error de Validación**
+### **POST /auth/register - Validation Error**
 
 ```javascript
 app.post('/auth/register', async (req, res) => {
@@ -512,7 +514,7 @@ app.post('/auth/register', async (req, res) => {
       return res.apiError(
         422,
         API_ERROR_CODES.VALIDATION_ERROR,
-        'Los datos enviados no son válidos',
+        'The submitted data is not valid',
         {
           type: 'validation',
           details: validationErrors.map(err => ({
@@ -529,14 +531,14 @@ app.post('/auth/register', async (req, res) => {
 
     return res.apiSuccess(
       null,
-      'Usuario registrado exitosamente. Revisa tu correo para verificar tu cuenta.'
+      'User registered successfully. Check your email to verify your account.'
     );
   } catch (error) {
     if (error.code === 'USER_EXISTS') {
       return res.apiError(
         409,
         API_ERROR_CODES.AUTH_USER_ALREADY_EXISTS,
-        'El email ya está registrado'
+        'Email is already registered'
       );
     }
 

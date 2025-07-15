@@ -33,17 +33,41 @@ const LoginForm: React.FC = () => {
     [t]
   );
 
-  const { values, errors, touched, handleChange, handleSubmit, isSubmitting } =
-    useForm<LoginFormData>({
-      initialValues: {
-        email: '',
-        password: '',
-      },
-      validate,
-      onSubmit: async (payload: LoginPayload) => {
-        await login(payload);
-      },
-    });
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleSubmit,
+    isSubmitting,
+    isThrottled,
+    canSubmit,
+    timeUntilNextSubmission,
+    remainingAttempts,
+  } = useForm<LoginFormData>({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validate,
+    onSubmit: async (payload: LoginPayload) => {
+      await login(payload);
+    },
+    enableThrottling: true,
+    formName: 'login-form',
+  });
+
+  const getButtonText = () => {
+    if (isSubmitting || loading) {
+      return t('global.accessing');
+    }
+    if (isThrottled && timeUntilNextSubmission && timeUntilNextSubmission > 0) {
+      return `${t('login.button')} (${Math.ceil(timeUntilNextSubmission / 1000)}s)`;
+    }
+    return t('login.button');
+  };
+
+  const showAttemptsWarning = remainingAttempts > 0 && remainingAttempts <= 2;
 
   return (
     <Form onSubmit={handleSubmit} noValidate data-testid="login-form">
@@ -66,7 +90,12 @@ const LoginForm: React.FC = () => {
         <Form.Text className="text-muted" data-testid="login-form-email-help">
           {t('login.email_help')}
         </Form.Text>
-        <Form.Control.Feedback type="invalid" data-testid="login-form-email-error">
+        <Form.Control.Feedback
+          type="invalid"
+          aria-live="polite"
+          aria-atomic="true"
+          role="alert"
+          data-testid="login-form-email-error">
           {errors.email}
         </Form.Control.Feedback>
       </Form.Group>
@@ -102,21 +131,38 @@ const LoginForm: React.FC = () => {
         <Form.Text className="text-muted" data-testid="login-form-password-help">
           {t('login.password_help')}
         </Form.Text>
-        <Form.Control.Feedback type="invalid" data-testid="login-form-password-error">
+        <Form.Control.Feedback
+          type="invalid"
+          aria-live="polite"
+          aria-atomic="true"
+          role="alert"
+          data-testid="login-form-password-error">
           {errors.password}
         </Form.Control.Feedback>
       </Form.Group>
 
+      {showAttemptsWarning && (
+        <div
+          className="alert alert-warning mb-3"
+          role="alert"
+          data-testid="login-form-attempts-warning">
+          <small>
+            <i className="fas fa-exclamation-triangle me-2"></i>
+            {t('security.throttle.attempts_remaining', { count: remainingAttempts })}
+          </small>
+        </div>
+      )}
+
       <div className="d-grid">
         <Button
-          variant="outline-theme"
           size="lg"
+          variant="outline-theme"
           className="d-block w-100 fw-500 mb-3"
           type="submit"
-          disabled={isSubmitting || loading}
-          aria-busy={isSubmitting || loading}
+          disabled={isSubmitting || loading || isThrottled || !canSubmit}
+          aria-busy={isSubmitting || loading || isThrottled || !canSubmit}
           data-testid="login-form-button">
-          {isSubmitting || loading ? t('global.accessing') : t('login.button')}
+          {getButtonText()}
         </Button>
       </div>
       <div className="text-center text-inverse text-opacity-50">

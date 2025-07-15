@@ -37,6 +37,8 @@ describe('ResetPasswordUseCase', () => {
       message: 'Password reset successful',
       status: 200,
       code: ApiSuccessCodes.SUCCESS,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_reset_123',
     });
 
     const result = await resetPasswordUseCase.execute(mockPayload);
@@ -48,6 +50,8 @@ describe('ResetPasswordUseCase', () => {
       message: 'Password reset successful',
       status: 200,
       code: ApiSuccessCodes.SUCCESS,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
   });
 
@@ -63,6 +67,8 @@ describe('ResetPasswordUseCase', () => {
       message: 'Invalid or expired reset token',
       status: 400,
       code: ApiErrorCodes.AUTH_TOKEN_INVALID,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_reset_456',
     });
 
     const result = await resetPasswordUseCase.execute(mockPayload);
@@ -74,6 +80,8 @@ describe('ResetPasswordUseCase', () => {
       message: 'Invalid or expired reset token',
       status: 400,
       code: ApiErrorCodes.AUTH_TOKEN_INVALID,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
   });
 
@@ -89,6 +97,8 @@ describe('ResetPasswordUseCase', () => {
       message: 'Reset token has expired',
       status: 410,
       code: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_reset_789',
     });
 
     const result = await resetPasswordUseCase.execute(mockPayload);
@@ -100,6 +110,8 @@ describe('ResetPasswordUseCase', () => {
       message: 'Reset token has expired',
       status: 410,
       code: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
   });
 });

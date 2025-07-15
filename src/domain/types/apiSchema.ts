@@ -9,7 +9,7 @@ export class ApiError extends Error {
   success: boolean;
 
   constructor({ message, data, status, code, success = false }: ApiResponse<unknown>) {
-    super(message && message.trim() ? message : ApiErrorCodes.UNKNOWN_ERROR);
+    super(message?.trim() ? message : ApiErrorCodes.UNKNOWN_ERROR);
     this.data = data;
     this.status = status;
     this.code = code;
@@ -33,10 +33,10 @@ export interface ApiResponse<T> {
   code: ApiErrorCode | ApiSuccessCode;
   /** Mensaje descriptivo (siempre presente) */
   message: string;
-  /** Timestamp de la respuesta (ISO 8601) */
-  timestamp?: string;
-  /** ID único de la request para trazabilidad */
-  requestId?: string;
+  /** Timestamp de la respuesta (ISO 8601) - OBLIGATORIO */
+  timestamp: string;
+  /** ID único de la request para trazabilidad - OBLIGATORIO */
+  requestId: string;
   /** Metadatos adicionales (paginación, validaciones, etc.) */
   meta?: Record<string, unknown>;
 }
@@ -49,6 +49,8 @@ export interface ApiSuccessResponse<T> extends ApiResponse<T> {
   data: T | null;
   code: ApiSuccessCode;
   message: string;
+  timestamp: string;
+  requestId: string;
 }
 
 /**
@@ -59,6 +61,8 @@ export interface ApiErrorResponse<T> extends ApiResponse<T> {
   data: T | null;
   code: ApiErrorCode;
   message: string;
+  timestamp: string;
+  requestId: string;
   /** Detalles específicos del error */
   error?: {
     /** Tipo de error (validation, network, server, etc.) */

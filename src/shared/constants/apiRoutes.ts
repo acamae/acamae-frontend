@@ -13,6 +13,7 @@ export const API_ROUTES = {
     VERIFY_EMAIL_SUCCESS: '/auth/verify-email-success',
     VERIFY_EMAIL_EXPIRED: '/auth/verify-email-expired',
     VERIFY_EMAIL_ALREADY_VERIFIED: '/auth/verify-email-already-verified',
+    VERIFY_EMAIL_ERROR: '/auth/verify-email-error',
   },
   USERS: {
     GET_ALL: '/users',

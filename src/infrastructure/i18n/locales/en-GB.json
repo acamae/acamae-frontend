@@ -5,7 +5,8 @@
     "go_back": "Go back",
     "processing": "Processing...",
     "required": "required",
-    "required_asterisk": "Required fields are marked with an asterisk (<abbr>*</abbr>)"
+    "required_asterisk": "Required fields are marked with an asterisk (<abbr>*</abbr>)",
+    "loading": "Loading..."
   },
   "home": {
     "title": "Welcome to eSports Management",
@@ -29,6 +30,9 @@
     "sign_up": "Sign up",
     "success": "Login successful",
     "welcome": "Welcome back!"
+  },
+  "logout": {
+    "success": "Logout successful"
   },
   "forgot": {
     "title": "Recover Password",
@@ -105,6 +109,14 @@
     },
     "unknown": "An unexpected error occurred."
   },
+  "security": {
+    "throttle": {
+      "wait": "Please wait {{seconds}} seconds before trying again.",
+      "blocked": "Too many attempts. Try again in {{minutes}} minutes.",
+      "rate_limit_exceeded": "Rate limit exceeded. Please try again later.",
+      "attempts_remaining": "You have {{count}} attempts remaining before being temporarily blocked."
+    }
+  },
   "session": {
     "checking": "Checking session..."
   },
@@ -168,7 +180,7 @@
     },
     "resend": {
       "title": "Resend verification email",
-      "label": "Email or username",
+      "label": "Email",
       "button": "Resend verification",
       "loading": "Sending...",
       "success": "Verification email sent. Please check your inbox."

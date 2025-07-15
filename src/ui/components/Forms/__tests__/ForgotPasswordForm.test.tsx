@@ -4,14 +4,22 @@ import { useTranslation } from 'react-i18next';
 import { IPromiseMock, promiseMock } from '@shared/utils/apiTestUtils';
 import ForgotPasswordForm from '@ui/components/Forms/ForgotPasswordForm';
 import { useAuth } from '@ui/hooks/useAuth';
+import * as useFormModule from '@ui/hooks/useForm';
 import { useToast } from '@ui/hooks/useToast';
 
 // Mock de las dependencias
 jest.mock('@ui/hooks/useAuth');
 jest.mock('@ui/hooks/useToast');
 jest.mock('react-i18next');
+// Los mocks del throttling ahora están configurados globalmente en jest.setup.ts
 
-const toastMock = { error: jest.fn(), success: jest.fn() };
+const toastMock = {
+  error: jest.fn(),
+  success: jest.fn(),
+  warning: jest.fn(),
+  info: jest.fn(),
+  show: jest.fn(),
+};
 
 function setupUseAuth({
   loading = false,
@@ -101,6 +109,10 @@ describe('ForgotPasswordForm', () => {
 
     await waitFor(() => {
       expect(forgotPasswordMock).toHaveBeenCalledWith({ email: 'test@mail.com' });
+    });
+
+    // Verificar que el error se muestra correctamente
+    await waitFor(() => {
       expect(screen.getByTestId('forgot-password-form-email-error')).toBeEmptyDOMElement();
       expect(toastMock.success).not.toHaveBeenCalled();
       expect(toastMock.error).not.toHaveBeenCalled();
@@ -129,6 +141,27 @@ describe('ForgotPasswordForm', () => {
         expect(toastMock.success).not.toHaveBeenCalled();
       });
     });
+
+    it('should validate that the email is invalid', async () => {
+      const forgotPasswordMock = promiseMock();
+      setupUseAuth({ forgotPassword: forgotPasswordMock });
+      setupUseTranslation({ t: str => str });
+      renderForgotPasswordForm();
+
+      await act(async () => {
+        fireEvent.change(screen.getByTestId('forgot-password-form-email-input'), {
+          target: { value: 'invalid-email' },
+        });
+        fireEvent.submit(screen.getByTestId('forgot-password-form'));
+      });
+
+      await waitFor(() => {
+        expect(forgotPasswordMock).not.toHaveBeenCalled();
+        expect(screen.getByTestId('forgot-password-form-email-error')).toHaveTextContent(
+          'errors.email.invalid'
+        );
+      });
+    });
   });
 
   it('should show loading state during submission', async () => {
@@ -145,5 +178,25 @@ describe('ForgotPasswordForm', () => {
     const submitButton = screen.getByTestId('forgot-password-form-button');
     expect(submitButton).toBeDisabled();
     expect(submitButton).toHaveAttribute('aria-busy', 'true');
+  });
+
+  it('should show attempts warning when remainingAttempts is 2', () => {
+    jest.spyOn(useFormModule, 'useForm').mockReturnValue({
+      values: { email: '' },
+      errors: {},
+      touched: {},
+      isSubmitting: false,
+      handleChange: jest.fn(),
+      handleSubmit: jest.fn(),
+      isThrottled: false,
+      canSubmit: true,
+      timeUntilNextSubmission: 0,
+      remainingAttempts: 2,
+      resetThrottle: jest.fn(),
+      handleCheckboxChange: jest.fn(),
+      resetForm: jest.fn(),
+    } as ReturnType<typeof useFormModule.useForm>);
+    renderForgotPasswordForm();
+    expect(screen.getByTestId('forgot-password-form-attempts-warning')).toBeInTheDocument();
   });
 });

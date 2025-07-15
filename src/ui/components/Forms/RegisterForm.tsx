@@ -62,6 +62,10 @@ const RegisterForm: React.FC = () => {
     handleSubmit,
     isSubmitting,
     handleCheckboxChange,
+    isThrottled,
+    canSubmit,
+    timeUntilNextSubmission,
+    remainingAttempts,
   } = useForm<RegisterFormData>({
     initialValues: {
       email: '',
@@ -74,7 +78,22 @@ const RegisterForm: React.FC = () => {
     onSubmit: async (data: RegisterPayload) => {
       await register(data);
     },
+    enableThrottling: true,
+    formName: 'register-form',
   });
+
+  const getButtonText = () => {
+    if (loading || isSubmitting) {
+      return t('global.processing');
+    }
+    if (isThrottled && timeUntilNextSubmission && timeUntilNextSubmission > 0) {
+      return `${t('register.button')} (${Math.ceil(timeUntilNextSubmission / 1000)}s)`;
+    }
+    return t('register.button');
+  };
+
+  const showAttemptsWarning =
+    remainingAttempts !== undefined && remainingAttempts > 0 && remainingAttempts <= 2;
 
   return (
     <>
@@ -293,15 +312,28 @@ const RegisterForm: React.FC = () => {
           </Form.Control.Feedback>
         </Form.Group>
 
+        {showAttemptsWarning && (
+          <div
+            className="alert alert-warning mb-3"
+            role="alert"
+            data-testid="register-form-attempts-warning">
+            <small>
+              <i className="fas fa-exclamation-triangle me-2"></i>
+              {t('security.throttle.attempts_remaining', { count: remainingAttempts })}
+            </small>
+          </div>
+        )}
+
         <div className="d-grid">
           <Button
             size="lg"
             variant="outline-theme"
             className="d-block w-100 fw-500 mb-3"
             type="submit"
-            disabled={loading || isSubmitting}
+            disabled={loading || isSubmitting || isThrottled || !canSubmit}
+            aria-busy={loading || isSubmitting}
             data-testid="register-form-button">
-            {loading || isSubmitting ? t('global.processing') : t('register.button')}
+            {getButtonText()}
           </Button>
         </div>
       </Form>

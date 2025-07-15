@@ -1,7 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import { store, persistor } from '@application/state/store';
@@ -9,7 +8,6 @@ import { ToastProvider } from '@shared/services/ToastProvider';
 import { logWebVitalsReport } from '@shared/utils/webVitals';
 import App from '@ui/App';
 import '@infrastructure/i18n';
-import FeedbackInitializer from '@ui/components/FeedbackInitializer';
 
 const container = document.getElementById('root');
 
@@ -23,13 +21,9 @@ root.render(
   <React.StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <BrowserRouter>
-          <ToastProvider>
-            <FeedbackInitializer>
-              <App />
-            </FeedbackInitializer>
-          </ToastProvider>
-        </BrowserRouter>
+        <ToastProvider>
+          <App />
+        </ToastProvider>
       </PersistGate>
     </Provider>
   </React.StrictMode>

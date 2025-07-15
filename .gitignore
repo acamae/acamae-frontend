@@ -44,3 +44,5 @@ docker/ssl/*.key
 docker/ssl/*.pem
 .npmrc
 /dependency-graph*.*
+
+/generated/prisma

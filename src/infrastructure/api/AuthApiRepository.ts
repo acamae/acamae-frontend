@@ -28,6 +28,7 @@ import {
   getUserByIdUrl,
 } from '@shared/constants/apiRoutes';
 import api from '@shared/services/axiosService';
+import { generateSecureId } from '@shared/utils/generateSecureId';
 
 function mapUserResponse(data: UserResponse): User {
   return {
@@ -45,12 +46,16 @@ function handleApiSuccess<T>({
 }: {
   response: AxiosResponse<T>; // data, status, statusText, headers, config, request?
 }): ApiSuccessResponse<T> {
+  const requestId = response.headers?.['x-request-id'] || `req_${Date.now()}_${generateSecureId()}`;
+
   return {
     data: response.data ?? null,
     status: response.status,
-    success: true,
+    success: true as const,
     code: ApiSuccessCodes.SUCCESS,
     message: response.statusText || 'Operation successful',
+    timestamp: new Date().toISOString(),
+    requestId,
   };
 }
 

@@ -31,6 +31,8 @@ describe('LogoutUseCase', () => {
       message: 'Logout successful',
       status: 200,
       code: ApiSuccessCodes.SUCCESS,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_logout_123',
     });
 
     const result = await logoutUseCase.execute();
@@ -42,6 +44,8 @@ describe('LogoutUseCase', () => {
       message: 'Logout successful',
       status: 200,
       code: ApiSuccessCodes.SUCCESS,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
   });
 
@@ -52,6 +56,8 @@ describe('LogoutUseCase', () => {
       message: 'Logout failed',
       status: 500,
       code: ApiErrorCodes.ERR_NETWORK,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_logout_456',
     });
 
     const result = await logoutUseCase.execute();
@@ -63,6 +69,8 @@ describe('LogoutUseCase', () => {
       message: 'Logout failed',
       status: 500,
       code: ApiErrorCodes.ERR_NETWORK,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
   });
 });

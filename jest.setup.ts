@@ -32,6 +32,9 @@ jest.mock('redux-persist', () => ({
   createTransform: jest.fn(() => ({})),
 }));
 
+// Los mocks globales del throttling han sido removidos para evitar conflictos con tests existentes.
+// La solución principal está en el hook useForm que proporciona valores por defecto cuando throttling está deshabilitado.
+
 beforeAll(async () => {
   consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});

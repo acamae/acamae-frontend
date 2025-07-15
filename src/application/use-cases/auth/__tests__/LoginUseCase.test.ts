@@ -48,6 +48,8 @@ describe('LoginUseCase', () => {
       message: 'Login successful',
       status: 200,
       code: ApiSuccessCodes.SUCCESS,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_login_123',
     });
 
     const result = await loginUseCase.execute(mockPayload);
@@ -59,6 +61,8 @@ describe('LoginUseCase', () => {
       message: 'Login successful',
       status: 200,
       code: ApiSuccessCodes.SUCCESS,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
   });
 
@@ -74,6 +78,8 @@ describe('LoginUseCase', () => {
       message: 'Invalid credentials',
       status: 401,
       code: ApiErrorCodes.AUTH_INVALID_CREDENTIALS,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_login_456',
     });
 
     const result = await loginUseCase.execute(mockPayload);
@@ -85,6 +91,130 @@ describe('LoginUseCase', () => {
       message: 'Invalid credentials',
       status: 401,
       code: ApiErrorCodes.AUTH_INVALID_CREDENTIALS,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
+  });
+
+  it('should handle INVALID_REFRESH_TOKEN error', async () => {
+    const mockPayload: LoginPayload = {
+      email: 'test@example.com',
+      password: 'password123',
+    };
+
+    mockAuthRepository.login.mockResolvedValue({
+      success: false,
+      data: null,
+      message: 'Invalid refresh token',
+      status: 401,
+      code: ApiErrorCodes.INVALID_REFRESH_TOKEN,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_login_789',
+    });
+
+    const result = await loginUseCase.execute(mockPayload);
+
+    expect(mockAuthRepository.login).toHaveBeenCalledWith(mockPayload);
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      message: 'Invalid refresh token',
+      status: 401,
+      code: ApiErrorCodes.INVALID_REFRESH_TOKEN,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
+    });
+  });
+
+  it('should handle EMAIL_NOT_VERIFIED error', async () => {
+    const mockPayload: LoginPayload = {
+      email: 'test@example.com',
+      password: 'password123',
+    };
+
+    mockAuthRepository.login.mockResolvedValue({
+      success: false,
+      data: null,
+      message: 'Email not verified',
+      status: 403,
+      code: ApiErrorCodes.EMAIL_NOT_VERIFIED,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_login_abc',
+    });
+
+    const result = await loginUseCase.execute(mockPayload);
+
+    expect(mockAuthRepository.login).toHaveBeenCalledWith(mockPayload);
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      message: 'Email not verified',
+      status: 403,
+      code: ApiErrorCodes.EMAIL_NOT_VERIFIED,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
+    });
+  });
+
+  it('should handle DATABASE_ERROR', async () => {
+    const mockPayload: LoginPayload = {
+      email: 'test@example.com',
+      password: 'password123',
+    };
+
+    mockAuthRepository.login.mockResolvedValue({
+      success: false,
+      data: null,
+      message: 'Database error occurred',
+      status: 500,
+      code: ApiErrorCodes.DATABASE_ERROR,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_login_def',
+    });
+
+    const result = await loginUseCase.execute(mockPayload);
+
+    expect(mockAuthRepository.login).toHaveBeenCalledWith(mockPayload);
+    expect(result).toEqual({
+      success: false,
+      data: null,
+      message: 'Database error occurred',
+      status: 500,
+      code: ApiErrorCodes.DATABASE_ERROR,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
+    });
+  });
+
+  it('should handle multiple error codes in sequence', async () => {
+    const mockPayload: LoginPayload = {
+      email: 'test@example.com',
+      password: 'password123',
+    };
+
+    const errorCodes = [
+      ApiErrorCodes.INVALID_REFRESH_TOKEN,
+      ApiErrorCodes.EMAIL_NOT_VERIFIED,
+      ApiErrorCodes.DATABASE_ERROR,
+    ];
+
+    for (const code of errorCodes) {
+      mockAuthRepository.login.mockResolvedValue({
+        success: false,
+        data: null,
+        message: `Error with code: ${code}`,
+        status: 500,
+        code,
+        timestamp: new Date().toISOString(),
+        requestId: `req_login_${code}`,
+      });
+
+      const result = await loginUseCase.execute(mockPayload);
+
+      expect(mockAuthRepository.login).toHaveBeenCalledWith(mockPayload);
+      expect(result.code).toBe(code);
+      expect(result.timestamp).toBeDefined();
+      expect(result.requestId).toBeDefined();
+    }
   });
 });

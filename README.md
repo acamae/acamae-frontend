@@ -43,6 +43,14 @@ Designed for accessibility, internationalization, and maintainability.
 - [Development Workflow](#development-workflow)
 - [Code Style & Conventions](#code-style--conventions)
 - [Testing & Quality](#testing--quality)
+- [Security Measures](#-security-measures)
+  - [Anti-DDoS System (Throttling)](#-anti-ddos-system-throttling)
+  - [Authentication & Authorization](#-authentication--authorization)
+  - [Input Validation & Sanitization](#-input-validation--sanitization)
+  - [Attack Protection](#-attack-protection)
+  - [Security Monitoring & Logging](#-security-monitoring--logging)
+  - [Security Configuration](#-security-configuration)
+  - [Frontend Security Checklist](#-frontend-security-checklist)
 - [Docker & Deployment](#docker--deployment)
 - [Environment Variables](#environment-variables)
 - [API Integration](#api-integration)
@@ -197,30 +205,263 @@ npm run update:snapshots
 
 ## 🔒 Security Measures
 
-**GARANTÍA**: Es **IMPOSIBLE** ejecutar operaciones en base de datos de producción desde tests de Cypress.
+### 🛡️ Anti-DDoS System (Throttling)
 
-Se han implementado **8 capas de seguridad** que previenen completamente cualquier operación accidental:
+**IMPLEMENTED PROTECTION**: Robust throttling system that prevents DDoS attacks through massive form submissions.
 
-- ✅ **Verificación de entorno**: Solo funciona en `NODE_ENV=testing`
-- ✅ **Validación de BD**: Nombres deben contener "test"
-- ✅ **Lista negra BD**: 8 nombres de producción prohibidos
-- ✅ **Validación de usuario**: Usuarios deben contener "test"
-- ✅ **Lista negra usuario**: 9 usuarios de producción prohibidos
-- ✅ **Lista negra host**: 6 hosts de producción prohibidos
-- ✅ **Validación puerto**: Puertos remotos estándar bloqueados
-- ✅ **Verificación Cypress**: Validación en cypress.config.js
+#### ✨ Features
 
-### Scripts de Base de Datos Protegidos
+- **Intelligent Throttling**: Specific configurations per form type
+- **Anti-bypass Persistence**: Critical states persist in localStorage
+- **Intuitive Interface**: Visual counters and progressive alerts
+- **Accessibility**: Maintains WCAG2 standards with ARIA attributes
+- **Multi-language**: Full Spanish/English support
 
-```bash
-# Todos los scripts incluyen validaciones de seguridad
-npm run test:e2e:setup      # Configurar BD de tests
-npm run test:e2e:cleanup    # Limpiar BD de tests
-npm run test:e2e:reset      # Reiniciar BD de tests
-npm run test:e2e:verify     # Verificar configuración segura
+#### 🔧 Throttling Configurations
+
+| Form Type          | Delay | Max Attempts | Window | Persistence |
+| ------------------ | ----- | ------------ | ------ | ----------- |
+| **Authentication** | 4s    | 3 attempts   | 1 min  | ✅ Yes      |
+| **Regular**        | 2s    | 5 attempts   | 1 min  | ❌ No       |
+| **Critical**       | 8s    | 2 attempts   | 1 min  | ✅ Yes      |
+
+#### 🎯 Protected Forms
+
+- `LoginForm` - Authentication
+- `RegisterForm` - Authentication
+- `ForgotPasswordForm` - Authentication
+- `ResetPasswordForm` - Authentication
+- `ResendVerificationForm` - Authentication
+
+#### 🔄 User Experience
+
+1. **Normal State**: Functional button without restrictions
+2. **Throttled State**: Button with countdown "Submit (3s)"
+3. **Warning**: Alert when ≤2 attempts remain
+4. **Blocked State**: Button temporarily disabled
+
+#### 📚 Technical Implementation
+
+```typescript
+// Specialized hook for throttling
+const {
+  isThrottled,
+  canSubmit,
+  timeUntilNextSubmission,
+  remainingAttempts,
+  handleThrottledSubmit,
+  resetThrottle,
+} = useAuthThrottledSubmit('login-form');
+
+// Form integration
+const formConfig = {
+  enableThrottling: true,
+  formName: 'login-form',
+  throttleConfig: 'AUTH_FORMS',
+};
 ```
 
-📖 **Documentación completa**: Ver [`README-seguridad.md`](./README-seguridad.md)
+#### 🛠️ Development Utilities
+
+```typescript
+// Clear throttling states (development)
+SecurityThrottleService.clearPersistedStates();
+
+// Check current state
+SecurityThrottleService.getThrottleState('form-name');
+```
+
+📖 **Detailed Documentation**: See [`docs/security-throttling.md`](./docs/security-throttling.md)
+
+---
+
+### 🔐 Authentication & Authorization
+
+**Secure JWT System**
+
+- **Access Tokens**: Short-lived tokens (1 day) stored in Redux
+- **Refresh Tokens**: Long-lived tokens (7 days) in HTTP-only cookies
+- **Automatic Validation**: Token verification on every request
+- **Token Rotation**: Automatic renewal of expired tokens
+- **Session Management**: Automatic logout when tokens expire
+
+**Role-Based Access Control (RBAC)**
+
+- **Protected Routes**: `PrivateRoute` component for route protection
+- **Role Validation**: Permission verification in components
+- **Automatic Redirection**: Redirect to login if unauthorized
+- **Authentication State**: Centralized management with Redux
+
+```typescript
+// Route protection
+<PrivateRoute roles={['admin', 'manager']}>
+  <AdminPanel />
+</PrivateRoute>
+
+// Role validation in components
+const { user, hasRole } = useAuth();
+if (!hasRole('admin')) return <AccessDenied />;
+```
+
+---
+
+### 🛡️ Input Validation & Sanitization
+
+**Multi-Layer Validation**
+
+- **Form Validation**: Zod schemas for real-time validation
+- **Type Validation**: TypeScript for type error prevention
+- **Format Validation**: Email, passwords, custom fields
+- **Length Validation**: Strict limits on all text fields
+
+**Advanced Sanitization**
+
+- **HTML Sanitization**: Automatic removal of dangerous HTML tags
+- **Character Escaping**: Automatic escape of special characters
+- **Data Normalization**: Automatic conversion to safe formats
+- **Email Validation**: Lowercase normalization and format validation
+
+```typescript
+// Example validation with Zod
+const userSchema = z.object({
+  email: z.string().email('Invalid email').transform(sanitizeEmail),
+  username: z.string().min(3).max(20).regex(REGEX.USERNAME),
+  password: z.string().min(8).regex(REGEX.STRONG_PASSWORD),
+});
+```
+
+---
+
+### 🚨 Attack Protection
+
+**XSS Prevention (Cross-Site Scripting)**
+
+- **Output Sanitization**: Automatic escape of dynamic content
+- **Content Security Policy**: CSP headers configured in backend
+- **Input Validation**: Strict filtering of user content
+- **Safe Rendering**: React usage for automatic XSS prevention
+
+**CSRF Protection (Cross-Site Request Forgery)**
+
+- **JWT Tokens**: Token verification in Authorization headers
+- **SameSite Cookies**: Secure cookie configuration
+- **Origin Validation**: Origin header verification
+- **Authenticated Requests**: All requests require authentication
+
+**Code Injection Prevention**
+
+- **Strict Validation**: Validation of all user inputs
+- **Data Escaping**: Automatic escape of special characters
+- **URL Sanitization**: URL parameter validation
+- **Eval Prevention**: Prohibited use of `eval()` and similar functions
+
+---
+
+### 🔍 Security Monitoring & Logging
+
+**Comprehensive Logging**
+
+- **Authentication Events**: Log successful/failed login attempts
+- **Authorization Events**: Log denied access and permissions
+- **Security Errors**: Capture security-related errors
+- **Suspicious Activity**: Detection of anomalous behavior patterns
+
+**Performance Monitoring**
+
+- **Security Metrics**: Authentication response time
+- **Error Monitoring**: Security error tracking with Sentry
+- **Usage Analysis**: Usage patterns to detect anomalies
+- **Automatic Alerts**: Notifications for critical security events
+
+```typescript
+// Example security logging
+const securityLogger = {
+  logAuthAttempt: (email: string, success: boolean) => {
+    console.log(`[SECURITY] Auth attempt: ${email}, success: ${success}`);
+  },
+  logSuspiciousActivity: (activity: string, details: any) => {
+    console.warn(`[SECURITY] Suspicious activity: ${activity}`, details);
+  },
+};
+```
+
+---
+
+### 🛠️ Security Configuration
+
+**Environment-Based Configuration**
+
+- **Development**: Detailed logs and debugging enabled
+- **Production**: Strict configuration with minimal information
+- **Testing**: Isolated configuration for secure tests
+- **Staging**: Production-like configuration
+
+**Security Headers**
+
+```typescript
+// Secure headers configuration (configured in backend)
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-XSS-Protection: 1; mode=block
+Referrer-Policy: strict-origin-when-cross-origin
+```
+
+**Secret Management**
+
+- **Environment Variables**: Secure secret configuration
+- **Key Rotation**: Process for API key rotation
+- **Secure Storage**: Use of secure services for secrets
+- **Configuration Validation**: Verification of critical configurations
+
+---
+
+### 📋 Frontend Security Checklist
+
+✅ **Input Validation**: Zod schemas for all forms
+✅ **Sanitization**: Automatic escape of dynamic content
+✅ **Authentication**: JWT system with access and refresh tokens
+✅ **Authorization**: Role-based access control (RBAC)
+✅ **XSS Protection**: Content sanitization and escaping
+✅ **CSRF Protection**: JWT tokens in Authorization headers
+✅ **Throttling**: Anti-DDoS system in critical forms
+✅ **Session Management**: Automatic logout and token renewal
+✅ **Error Handling**: Secure error messages without sensitive information
+✅ **Logging**: Security event logging
+✅ **Headers**: Secure HTTP header configuration
+✅ **Type Validation**: TypeScript for error prevention
+✅ **Protected Routes**: Protection of sensitive routes
+✅ **Configuration**: Secure environment-based configuration
+✅ **Monitoring**: Security event tracking
+
+---
+
+### 🧪 Testing Security
+
+**GUARANTEE**: It is **IMPOSSIBLE** to execute production database operations from Cypress tests.
+
+**8 security layers** have been implemented that completely prevent any accidental operations:
+
+- ✅ **Environment Verification**: Only works in `NODE_ENV=testing`
+- ✅ **Database Validation**: Names must contain "test"
+- ✅ **Database Blacklist**: 8 production names prohibited
+- ✅ **User Validation**: Users must contain "test"
+- ✅ **User Blacklist**: 9 production users prohibited
+- ✅ **Host Blacklist**: 6 production hosts prohibited
+- ✅ **Port Validation**: Standard remote ports blocked
+- ✅ **Cypress Verification**: Validation in cypress.config.js
+
+### Protected Database Scripts
+
+```bash
+# All scripts include security validations
+npm run test:e2e:setup      # Setup test DB
+npm run test:e2e:cleanup    # Clean test DB
+npm run test:e2e:reset      # Reset test DB
+npm run test:e2e:verify     # Verify secure configuration
+```
+
+📖 **Complete Documentation**: See [`docs/security-throttling.md`](./docs/security-throttling.md)
 
 ---
 

@@ -24,14 +24,39 @@ const ForgotPasswordForm: React.FC = () => {
     [t]
   );
 
-  const { values, errors, touched, isSubmitting, handleChange, handleSubmit } =
-    useForm<ForgotPasswordFormData>({
-      initialValues: { email: '' },
-      validate,
-      onSubmit: async (payload: ForgotPasswordPayload) => {
-        await forgotPassword(payload);
-      },
-    });
+  const {
+    values,
+    errors,
+    touched,
+    isSubmitting,
+    handleChange,
+    handleSubmit,
+    isThrottled,
+    canSubmit,
+    timeUntilNextSubmission,
+    remainingAttempts,
+  } = useForm<ForgotPasswordFormData>({
+    initialValues: { email: '' },
+    validate,
+    onSubmit: async (payload: ForgotPasswordPayload) => {
+      await forgotPassword(payload);
+    },
+    enableThrottling: process.env.NODE_ENV !== 'testing',
+    formName: 'forgot-password-form',
+  });
+
+  const getButtonText = () => {
+    if (isSubmitting || loading) {
+      return t('forgot.loading');
+    }
+    if (isThrottled && timeUntilNextSubmission && timeUntilNextSubmission > 0) {
+      return `${t('forgot.submit')} (${Math.ceil(timeUntilNextSubmission / 1000)}s)`;
+    }
+    return t('forgot.submit');
+  };
+
+  const showAttemptsWarning =
+    remainingAttempts !== undefined && remainingAttempts > 0 && remainingAttempts <= 2;
 
   return (
     <Form onSubmit={handleSubmit} noValidate data-testid="forgot-password-form">
@@ -59,18 +84,38 @@ const ForgotPasswordForm: React.FC = () => {
           data-testid="forgot-password-form-email-help">
           {t('forgot.email_help')}
         </Form.Text>
-        <Form.Control.Feedback type="invalid" data-testid="forgot-password-form-email-error">
+        <Form.Control.Feedback
+          type="invalid"
+          aria-live="polite"
+          aria-atomic="true"
+          role="alert"
+          data-testid="forgot-password-form-email-error">
           {errors.email}
         </Form.Control.Feedback>
       </Form.Group>
+
+      {showAttemptsWarning && (
+        <div
+          className="alert alert-warning mb-3"
+          role="alert"
+          data-testid="forgot-password-form-attempts-warning">
+          <small>
+            <i className="fas fa-exclamation-triangle me-2"></i>
+            {t('security.throttle.attempts_remaining', { count: remainingAttempts })}
+          </small>
+        </div>
+      )}
+
       <div className="d-grid">
         <Button
-          variant="primary"
+          size="lg"
+          variant="outline-theme"
+          className="d-block w-100 fw-500 mb-3"
           type="submit"
-          disabled={isSubmitting || loading}
+          disabled={isSubmitting || loading || isThrottled || !canSubmit}
           aria-busy={isSubmitting || loading}
           data-testid="forgot-password-form-button">
-          {isSubmitting || loading ? t('forgot.loading') : t('forgot.submit')}
+          {getButtonText()}
         </Button>
       </div>
     </Form>
