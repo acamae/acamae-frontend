@@ -149,7 +149,7 @@ class SecurityThrottleService {
       setTimeout(() => {
         state.isBlocked = false;
         state.attemptCount = 0;
-        state.windowStart = now;
+        state.windowStart = Date.now(); // Use current timestamp instead of stale 'now'
 
         // Persist the unblock if necessary
         if (this.requiresPersistence(finalConfig)) {

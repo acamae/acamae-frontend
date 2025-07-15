@@ -432,3 +432,30 @@ describe('THROTTLE_CONFIGS', () => {
     expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.timeWindow).toBe(60000);
   });
 });
+
+it('should update windowStart with current timestamp when unblocking after timeWindow', () => {
+  const actionId = 'test-action';
+  const config = { timeWindow: 100, maxAttempts: 2, delay: 0 };
+
+  // Perform actions to trigger blocking (need 2 attempts to reach maxAttempts)
+  expect(securityThrottleService.canPerformAction(actionId, config)).toBe(true); // First attempt
+  expect(securityThrottleService.canPerformAction(actionId, config)).toBe(true); // Second attempt
+  expect(securityThrottleService.canPerformAction(actionId, config)).toBe(false); // Should be blocked after maxAttempts
+
+  const state = securityThrottleService.getThrottleState(actionId);
+  expect(state?.isBlocked).toBe(true);
+
+  const originalWindowStart = state!.windowStart;
+
+  // Wait for the timeWindow to pass and unblock
+  return new Promise<void>(resolve => {
+    setTimeout(() => {
+      const newState = securityThrottleService.getThrottleState(actionId);
+      expect(newState?.isBlocked).toBe(false);
+      expect(newState?.attemptCount).toBe(0);
+      expect(newState?.windowStart).toBeGreaterThan(originalWindowStart); // Should be updated with current time
+
+      resolve();
+    }, 150); // Wait longer than timeWindow (100ms)
+  });
+});
