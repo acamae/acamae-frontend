@@ -49,6 +49,9 @@ const EmailVerificationPage: React.FC = () => {
             case ApiErrorCodes.AUTH_USER_ALREADY_VERIFIED:
               setVerificationStatus(ApiErrorCodes.AUTH_USER_ALREADY_VERIFIED);
               break;
+            case ApiErrorCodes.AUTH_UPDATE_FAILED:
+              setVerificationStatus(ApiErrorCodes.AUTH_UPDATE_FAILED);
+              break;
             case ApiErrorCodes.AUTH_TOKEN_INVALID:
             default:
               setVerificationStatus(ApiErrorCodes.AUTH_TOKEN_INVALID);

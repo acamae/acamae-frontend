@@ -83,7 +83,7 @@ function handleApiError<T>(error: unknown): ApiErrorResponse<T> {
 
     return {
       message: getErrorMessage(error),
-      code: networkErrorCode as unknown,
+      code: networkErrorCode,
       success: false,
       data: null,
       status: error.response?.status || 0,
