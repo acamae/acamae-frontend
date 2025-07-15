@@ -207,6 +207,17 @@ alwaysApply: true
 
 ## Project-Specific Guidelines {.section}
 
+- **Language Requirements** (CRITICAL):
+  - **ALL code must be in English** until internationalization is implemented
+  - **NO exceptions**: variables, functions, comments, messages, documentation
+  - **User-facing messages**: Use English until i18n system is in place
+  - **API responses**: All messages in English
+  - **Error messages**: English only
+  - **Comments**: English only
+  - **Documentation**: English only
+  - **Variable names**: English only
+  - **Function names**: English only
+
 ### Architecture Compliance {.subsection}
 {.architecture-rules}
 - Follow Hexagonal/Clean Architecture pattern

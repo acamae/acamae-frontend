@@ -138,4 +138,41 @@ describe('feedbackMiddleware', () => {
       expect(navigate).not.toHaveBeenCalled();
     });
   });
+
+  it('debe ignorar la acción si solo toastApi está definido pero navigateFn no', () => {
+    jest.isolateModules(() => {
+      const {
+        feedbackMiddleware,
+        configureFeedback,
+      } = require('@application/state/middleware/feedbackMiddleware');
+      const { toast, success } = createDeps();
+      // Solo configuramos toast, no navigate
+      configureFeedback({ toast, navigate: undefined });
+      const store = configureStore({
+        reducer: (state: Record<string, unknown> = {}) => state,
+        middleware: getDefault => getDefault().concat(feedbackMiddleware),
+      });
+      store.dispatch({ type: loginAction.fulfilled.type });
+      expect(success).not.toHaveBeenCalled();
+    });
+  });
+
+  it('debe ignorar la acción si solo navigateFn está definido pero toastApi no', () => {
+    jest.isolateModules(() => {
+      const {
+        feedbackMiddleware,
+        configureFeedback,
+      } = require('@application/state/middleware/feedbackMiddleware');
+      const { navigate, success } = createDeps();
+      // Solo configuramos navigate, no toast
+      configureFeedback({ toast: undefined, navigate });
+      const store = configureStore({
+        reducer: (state: Record<string, unknown> = {}) => state,
+        middleware: getDefault => getDefault().concat(feedbackMiddleware),
+      });
+      store.dispatch({ type: loginAction.fulfilled.type });
+      expect(success).not.toHaveBeenCalled();
+      expect(navigate).not.toHaveBeenCalled();
+    });
+  });
 });

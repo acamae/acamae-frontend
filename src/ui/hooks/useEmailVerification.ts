@@ -19,14 +19,14 @@ export interface UseEmailVerificationResult {
 }
 
 /**
- * Hook que encapsula la lógica de verificación de correo.
- * Maneja timeout, offline, reintentos y mapea los diferentes códigos de error.
+ * Hook that encapsulates the email verification logic.
+ * Handles timeout, offline, retries, and maps different error codes.
  */
 export const useEmailVerification = (): UseEmailVerificationResult => {
   const [status, setStatus] = useState<EmailVerificationStatus>('IDLE');
   const [errorCode, setErrorCode] = useState<string | undefined>();
 
-  // Evitamos ejecutar varias veces con useRef
+  // Avoid executing multiple times with useRef
   const controllerRef = useRef<AbortController | null>(null);
 
   const verify = useCallback((token: string | null) => {
@@ -70,27 +70,12 @@ export const useEmailVerification = (): UseEmailVerificationResult => {
           case ApiErrorCodes.AUTH_TOKEN_INVALID:
           case ApiErrorCodes.AUTH_TOKEN_REVOKED:
           case ApiErrorCodes.AUTH_TOKEN_MALICIOUS:
-            setStatus('ERROR');
-            setErrorCode(response.code);
-            break;
           case ApiErrorCodes.AUTH_TOKEN_ALREADY_USED:
-            setStatus('ERROR');
-            setErrorCode(response.code);
-            break;
           case ApiErrorCodes.AUTH_RATE_LIMIT:
           case ApiErrorCodes.SERVICE_UNAVAILABLE:
-            setStatus('ERROR');
-            setErrorCode(response.code);
-            break;
           case ApiErrorCodes.AUTH_USER_ALREADY_VERIFIED:
-            setStatus('ERROR');
-            setErrorCode(response.code);
-            break;
           case ApiErrorCodes.AUTH_USER_NOT_FOUND:
           case ApiErrorCodes.AUTH_USER_BLOCKED:
-            setStatus('ERROR');
-            setErrorCode(response.code);
-            break;
           default:
             setStatus('ERROR');
             setErrorCode(response.code);
@@ -98,15 +83,13 @@ export const useEmailVerification = (): UseEmailVerificationResult => {
       })
       .catch(error => {
         clearTimeout(timeoutId);
-        if (abortController.signal.aborted) return; // ya gestionado
+        if (abortController.signal.aborted) return;
 
-        // Podríamos inspeccionar error.code o error.message
         setStatus('ERROR');
         setErrorCode(error?.code ?? ApiErrorCodes.UNKNOWN_ERROR);
       });
   }, []);
 
-  // Listener para volver a intentar cuando regrese la conexión
   useEffect(() => {
     const onOnline = () => {
       if (status === 'OFFLINE') {

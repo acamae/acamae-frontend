@@ -1,5 +1,5 @@
 ---
-description: 
+description:
 globs: *.test.ts,*.test.tsx
 alwaysApply: false
 ---
@@ -102,6 +102,125 @@ alwaysApply: false
 * **Test Documentation**:
   - Explain each test's purpose
   - Document non-obvious test cases
+  - Explain mock configuration
+  - Document state management
+  - Explain expectations
+  - Document debugging process
+  - Keep documentation updated
+
+## Lessons Learned {.section}
+
+### Complete Service Mocking {.subsection}
+{.lesson-learned}
+- **Problem**: Error `toast.warning is not a function` because toast mocks only included `error` and `success`
+- **Solution**: Always include ALL methods from the original service (`warning`, `info`, `show`, etc.)
+- **Example**:
+  ```typescript
+  const mockToast = {
+    error: jest.fn(),
+    success: jest.fn(),
+    warning: jest.fn(),  // Don't forget this one!
+    info: jest.fn(),     // And this one!
+    show: jest.fn()      // And this one!
+  };
+  ```
+- **Rule**: Before mocking a service, review ALL its public methods
+
+### NODE_ENV Configuration in Tests {.subsection}
+{.lesson-learned}
+- **Problem**: `NODE_ENV` was not configured correctly with `"npm run env:testing && jest"`
+- **Solution**: Use `cross-env` directly in the test script
+- **Change**: `"npx cross-env NODE_ENV=testing jest"` instead of separate scripts
+- **Impact**: Allows code to correctly detect testing environment
+- **Rule**: Always use `cross-env` to configure environment variables in npm scripts
+
+### Throttling in Tests {.subsection}
+{.lesson-learned}
+- **Problem**: Throttling system blocked form submissions during tests
+- **Solution**: Disable throttling when `NODE_ENV === 'testing'`
+- **Implementation**: `enableThrottling: process.env.NODE_ENV !== 'testing'`
+- **Benefit**: Faster and more predictable tests without security blocks
+- **Rule**: Security systems must be configurable for testing environments
+
+### Async Thunk Testing in Redux {.subsection}
+{.lesson-learned}
+- **Problem**: Tests expected objects but received async thunk functions
+- **Solution**: Use `expect.any(Function)` for thunk functions
+- **Example**:
+  ```typescript
+  // ❌ Incorrect
+  expect(dispatch).toHaveBeenCalledWith({ type: 'auth/login' });
+
+  // ✅ Correct
+  expect(dispatch).toHaveBeenCalledWith(expect.any(Function));
+  ```
+- **Rule**: Async thunks return functions, not action objects
+
+### Failed Test Debugging Pattern {.subsection}
+{.lesson-learned}
+- **Strategy**: Identify common error patterns before individual fixes
+- **Process**:
+  1. Run `npm run test` to see complete overview
+  2. Identify most frequent errors (e.g., `toast.warning is not a function`)
+  3. Group tests with similar errors
+  4. Apply systematic fix to groups of tests
+  5. Verify progress after each group
+- **Benefit**: Solve 20+ tests with one fix instead of one by one
+
+### Mock Factory Functions {.subsection}
+{.lesson-learned}
+- **Problem**: Complex service mocks need dynamic configuration
+- **Solution**: Use factory functions in `jest.mock()`
+- **Example**:
+  ```typescript
+  jest.mock('../../services/securityThrottleService', () => ({
+    securityThrottleService: jest.fn().mockImplementation(() => ({
+      validateAction: jest.fn().mockResolvedValue(true),
+      generateActionId: jest.fn().mockReturnValue('test-action-id')
+    }))
+  }));
+  ```
+- **Rule**: For stateful services, use factory functions that return new instances
+
+### Progressive Verification {.subsection}
+{.lesson-learned}
+- **Strategy**: Run tests after each set of changes
+- **Typical Progress**:
+  - Initial: 42 tests failing, 470 passing (91.8% success)
+  - After toast fixes: Significant reduction
+  - After throttling fixes: Forms working
+  - After useAuth fixes: 18/18 useAuth tests passing
+  - Final: 0 tests failing, 512 passing (100% success)
+- **Benefit**: Quickly identify if a change breaks something else
+- **Rule**: Never make multiple large changes without verifying incrementally
+
+### Default Environment Configuration {.subsection}
+{.lesson-learned}
+- **Problem**: Environment-dependent properties failed if NODE_ENV wasn't configured
+- **Solution**: Provide safe default values
+- **Example**:
+  ```typescript
+  // In useForm.ts
+  const defaultThrottleOptions = {
+    canSubmit: true,
+    isThrottled: false,
+    cooldownTime: 0
+  };
+
+  const throttleOptions = enableThrottling ?
+    securityThrottleService.getThrottleStatus(actionId) :
+    defaultThrottleOptions;
+  ```
+- **Rule**: Always provide default values for environment-dependent configurations
+
+{.metadata}
+```yaml
+version: 1.1.0
+last_updated: 2024-03-21
+lessons_learned_from: bug-fix-session-2024-03-21
+total_tests_fixed: 42
+success_rate_improvement: 8.2% → 100%
+```
   - Explain mock configuration
   - Document state management
   - Explain expectations

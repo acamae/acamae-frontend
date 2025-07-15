@@ -36,6 +36,8 @@ describe('ForgotPasswordUseCase', () => {
       message: 'Password reset email sent',
       status: 200,
       code: ApiSuccessCodes.SUCCESS,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_test_123',
     });
 
     const result = await forgotPasswordUseCase.execute(mockPayload);
@@ -47,6 +49,8 @@ describe('ForgotPasswordUseCase', () => {
       message: 'Password reset email sent',
       status: 200,
       code: ApiSuccessCodes.SUCCESS,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
   });
 
@@ -61,6 +65,8 @@ describe('ForgotPasswordUseCase', () => {
       message: 'Email not found',
       status: 404,
       code: ApiErrorCodes.RESOURCE_NOT_FOUND,
+      timestamp: new Date().toISOString(),
+      requestId: 'req_test_456',
     });
 
     const result = await forgotPasswordUseCase.execute(mockPayload);
@@ -72,6 +78,8 @@ describe('ForgotPasswordUseCase', () => {
       message: 'Email not found',
       status: 404,
       code: ApiErrorCodes.RESOURCE_NOT_FOUND,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
     });
   });
 });

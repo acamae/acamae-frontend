@@ -21,5 +21,6 @@ describe('EmailVerificationUsedPage', () => {
       /ya fue usado/i
     );
     expect(screen.getByTestId('email-verification-used-login')).toBeInTheDocument();
+    expect(screen.getByTestId('email-verification-used-home')).toBeInTheDocument();
   });
 });

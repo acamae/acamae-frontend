@@ -5,6 +5,12 @@ import { DEFAULT_LAYOUT_OPTIONS } from '@shared/constants/layoutOptions';
 import { createTestProviderFactory } from '@shared/utils/renderProvider';
 import PublicLayout from '@ui/layouts/PublicLayout';
 
+// Mock FeedbackInitializer
+jest.mock('@ui/components/FeedbackInitializer', () => ({
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 const renderWithProviders = createTestProviderFactory();
 
 describe('PublicLayout', () => {
@@ -127,5 +133,18 @@ describe('PublicLayout', () => {
     expect(appContainer).toHaveClass('app-footer-fixed');
     expect(appContainer).toHaveClass('app-with-top-nav');
     expect(appContainer).toHaveClass('has-scroll');
+  });
+
+  it('no renderiza el header si appHeader es false (branch explícito)', () => {
+    const customOptions = { ...DEFAULT_LAYOUT_OPTIONS, appHeader: false };
+    renderWithProviders(
+      <Routes>
+        <Route path="/" element={<PublicLayout options={customOptions} />}>
+          <Route index element={<div>Public Layout</div>} />
+        </Route>
+      </Routes>,
+      { route: '/' }
+    );
+    expect(screen.queryByTestId('public-header')).not.toBeInTheDocument();
   });
 });

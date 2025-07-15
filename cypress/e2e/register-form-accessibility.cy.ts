@@ -2,6 +2,14 @@ import enGB from '@infrastructure/i18n/locales/en-GB.json';
 import esES from '@infrastructure/i18n/locales/es-ES.json';
 import { APP_ROUTES } from '@shared/constants/appRoutes';
 
+const tabindexHandler = (selector: string) => {
+  cy.get(selector).should('satisfy', (element: JQuery<HTMLElement>) => {
+    // Verify that the element doesn't have negative tabindex
+    const tabindex = element.attr('tabindex');
+    return !tabindex || parseInt(tabindex) >= 0;
+  });
+};
+
 describe('Register Form - Accessibility and Usability', () => {
   beforeEach(() => {
     // Visit the register page
@@ -113,13 +121,7 @@ describe('Register Form - Accessibility and Usability', () => {
       });
 
       // Additional test: verify tabindex and navigation properties
-      focusableElements.forEach(selector => {
-        cy.get(selector).should('satisfy', (element: JQuery<HTMLElement>) => {
-          // Verify that the element doesn't have negative tabindex
-          const tabindex = element.attr('tabindex');
-          return !tabindex || parseInt(tabindex) >= 0;
-        });
-      });
+      focusableElements.forEach(tabindexHandler);
     });
   });
 

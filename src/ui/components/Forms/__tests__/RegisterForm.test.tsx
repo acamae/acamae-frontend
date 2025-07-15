@@ -19,7 +19,13 @@ import RegisterForm from '@ui/components/Forms/RegisterForm';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useToast } from '@ui/hooks/useToast';
 
-const toastMock = { error: jest.fn(), success: jest.fn() };
+const toastMock = {
+  error: jest.fn(),
+  success: jest.fn(),
+  warning: jest.fn(),
+  info: jest.fn(),
+  show: jest.fn(),
+};
 const navigateMock = jest.fn();
 
 const setupUseAuth = ({
@@ -186,7 +192,29 @@ describe('RegisterForm', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('register-form-button')).toBeInTheDocument();
-      expect(screen.getByTestId('register-form-button')).not.toBeDisabled();
+      // El botón debería estar deshabilitado cuando hay errores de validación
+      expect(screen.getByTestId('register-form-button')).toBeDisabled();
+    });
+  });
+
+  it('should show invalid errors when email and username are empty', async () => {
+    render(<RegisterForm />);
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('register-form-email-input'), {
+        target: { name: 'email', value: '' },
+      });
+      fireEvent.change(screen.getByTestId('register-form-username-input'), {
+        target: { name: 'username', value: '' },
+      });
+      fireEvent.submit(screen.getByTestId('register-form'));
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId('register-form-email-error')).toHaveTextContent(
+        'errors.email.invalid'
+      );
+      expect(screen.getByTestId('register-form-username-error')).toHaveTextContent(
+        'errors.username.invalid'
+      );
     });
   });
 

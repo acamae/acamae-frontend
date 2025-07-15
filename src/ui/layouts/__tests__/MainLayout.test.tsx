@@ -6,6 +6,12 @@ import { DEFAULT_LAYOUT_OPTIONS } from '@shared/constants/layoutOptions';
 import { createTestProviderFactory } from '@shared/utils/renderProvider';
 import MainLayout from '@ui/layouts/MainLayout';
 
+// Mock FeedbackInitializer
+jest.mock('@ui/components/FeedbackInitializer', () => ({
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 const renderWithProviders = createTestProviderFactory();
 
 describe('MainLayout', () => {
@@ -141,5 +147,18 @@ describe('MainLayout', () => {
     expect(appContainer).toHaveClass('app-footer-fixed');
     expect(appContainer).toHaveClass('app-with-top-nav');
     expect(appContainer).toHaveClass('has-scroll');
+  });
+
+  it('no renderiza el header si appHeader es false (branch explícito)', () => {
+    const customOptions = { ...DEFAULT_LAYOUT_OPTIONS, appHeader: false };
+    renderWithProviders(
+      <Routes>
+        <Route path={APP_ROUTES.DASHBOARD} element={<MainLayout options={customOptions} />}>
+          <Route index element={<div>Main Layout</div>} />
+        </Route>
+      </Routes>,
+      { route: APP_ROUTES.DASHBOARD }
+    );
+    expect(screen.queryByTestId('private-header')).not.toBeInTheDocument();
   });
 });

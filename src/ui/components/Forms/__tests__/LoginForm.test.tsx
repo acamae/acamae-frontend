@@ -15,7 +15,13 @@ jest.mock('react-router-dom', () => ({
   useNavigate: jest.fn(),
 }));
 
-const toastMock = { error: jest.fn(), success: jest.fn() };
+const toastMock = {
+  error: jest.fn(),
+  success: jest.fn(),
+  warning: jest.fn(),
+  info: jest.fn(),
+  show: jest.fn(),
+};
 const navigateMock = jest.fn();
 
 function setupUseAuth({
@@ -117,6 +123,19 @@ describe('LoginForm', () => {
     });
     expect(screen.getByText('errors.email.invalid')).toBeInTheDocument();
     expect(screen.getByText('errors.password.invalid')).toBeInTheDocument();
+  });
+
+  it('should show required errors when email and password are empty', () => {
+    renderLoginForm();
+    fireEvent.change(screen.getByTestId('login-form-email-input'), {
+      target: { value: '' },
+    });
+    fireEvent.change(screen.getByTestId('login-form-password-input'), {
+      target: { value: '' },
+    });
+    fireEvent.submit(screen.getByTestId('login-form'));
+    expect(screen.getByText('errors.email.required')).toBeInTheDocument();
+    expect(screen.getByText('errors.password.required')).toBeInTheDocument();
   });
 
   it('should disable the button when loading is true', () => {

@@ -5,7 +5,8 @@
     "go_back": "Volver",
     "processing": "Procesando...",
     "required": "requerido",
-    "required_asterisk": "Los campos requeridos están marcados con un asterisco (<abbr>*</abbr>)"
+    "required_asterisk": "Los campos requeridos están marcados con un asterisco (<abbr>*</abbr>)",
+    "loading": "Cargando..."
   },
   "home": {
     "title": "Bienvenido a Gestión eSports",
@@ -29,6 +30,9 @@
     "failed": "Error al iniciar sesión",
     "success": "Sesión iniciada correctamente",
     "welcome": "¡Bienvenido de nuevo!"
+  },
+  "logout": {
+    "success": "Sesión cerrada correctamente"
   },
   "forgot": {
     "title": "Recuperar contraseña",
@@ -105,6 +109,14 @@
     },
     "unknown": "Ha ocurrido un error inesperado."
   },
+  "security": {
+    "throttle": {
+      "wait": "Por favor, espera {{seconds}} segundos antes de intentar nuevamente.",
+      "blocked": "Demasiados intentos. Inténtalo de nuevo en {{minutes}} minutos.",
+      "rate_limit_exceeded": "Límite de velocidad excedido. Inténtalo más tarde.",
+      "attempts_remaining": "Te quedan {{count}} intentos antes de ser bloqueado temporalmente."
+    }
+  },
   "session": {
     "checking": "Verificando sesión..."
   },
@@ -122,11 +134,20 @@
       "message": "Por favor, espera mientras procesamos tu enlace de verificación."
     },
     "error": {
-      "title": "Error de verificación",
+      "title": "Enlace de verificación inválido",
       "invalid_token": "El enlace de verificación no es válido o ha expirado.",
       "resend": "Reenviar verificación",
       "home": "Volver al inicio",
-      "message": "No se pudo verificar tu correo. Por favor, intenta más tarde o contacta soporte."
+      "message": "El enlace de verificación que has usado no es válido. Esto puede deberse a que:",
+      "reasons": {
+        "invalid": "• El enlace está malformado o corrupto",
+        "expired": "• El enlace ha expirado (tienen una validez de 10 minutos)",
+        "already_used": "• El enlace ya fue utilizado anteriormente",
+        "wrong_user": "• El enlace no corresponde a tu cuenta"
+      },
+      "solutions": "Para solucionarlo:",
+      "solution_resend": "• Solicita un nuevo enlace de verificación",
+      "solution_contact": "• Si el problema persiste, contacta con soporte"
     },
     "update_failed": {
       "title": "Error al actualizar la cuenta",
@@ -141,17 +162,17 @@
     },
     "expired": {
       "title": "Enlace de verificación expirado",
-      "message": "El enlace de verificación ha expirado. Por favor, solicita uno nuevo.",
+      "message": "El enlace de verificación ha expirado. Los enlaces de verificación tienen una validez de 10 minutos por seguridad.",
       "resend": "Reenviar verificación"
     },
     "used": {
       "title": "Enlace ya utilizado",
-      "message": "Este enlace de verificación ya fue usado previamente.",
+      "message": "Este enlace de verificación ya fue usado previamente. Tu cuenta ya está verificada.",
       "login": "Ir al login"
     },
     "already": {
       "title": "Ya verificado",
-      "message": "Este correo ya estaba verificado."
+      "message": "Este correo ya estaba verificado. Puedes iniciar sesión normalmente."
     },
     "sent": {
       "title": "Correo de verificación enviado",
@@ -159,7 +180,7 @@
     },
     "resend": {
       "title": "Reenviar correo de verificación",
-      "label": "Correo electrónico o nombre de usuario",
+      "label": "Correo electrónico",
       "button": "Reenviar verificación",
       "loading": "Enviando...",
       "success": "Correo de verificación enviado. Por favor, revisa tu bandeja de entrada."

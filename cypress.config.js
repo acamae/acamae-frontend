@@ -1,63 +1,135 @@
 import { defineConfig } from 'cypress';
-import { config as dotenvConfig } from 'dotenv';
-
-const env = process.env.REACT_APP_NODE_ENV || 'development';
-
-// Cargar variables de entorno según el ambiente
-dotenvConfig({ path: `.env.${env}` });
 
 export default defineConfig({
   e2e: {
-    baseUrl:
-      process.env.REACT_APP_CYPRESS_BASE_URL === '/'
-        ? 'https://localhost'
-        : process.env.REACT_APP_CYPRESS_BASE_URL || 'https://localhost',
-    supportFile: 'cypress/support/e2e.ts',
-    specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
-    video: false,
-    screenshotOnRunFailure: true,
-    viewportWidth: 1280,
-    viewportHeight: 720,
-    async setupNodeEvents(on) {
-      // Verificación de seguridad para Cypress
-      if (process.env.NODE_ENV !== 'testing') {
-        console.error('❌ SEGURIDAD: Cypress solo puede ejecutarse en NODE_ENV=testing');
-        console.error(`   NODE_ENV actual: ${process.env.NODE_ENV}`);
-        process.exit(1);
-      }
-      // Configuración para manejar certificados SSL
-      if (
-        process.env.REACT_APP_NODE_ENV === 'development' ||
-        process.env.REACT_APP_NODE_ENV === 'testing'
-      ) {
-        on('before:browser:launch', (browser, launchOptions) => {
-          if (browser.name === 'chrome' || browser.name === 'chromium') {
-            launchOptions.args.push('--ignore-certificate-errors');
-            launchOptions.args.push('--ignore-ssl-errors');
-            launchOptions.args.push('--ignore-certificate-errors-spki-list');
-            launchOptions.args.push('--disable-web-security');
-            launchOptions.args.push('--allow-running-insecure-content');
-            launchOptions.args.push('--unsafely-treat-insecure-origin-as-secure=https://localhost');
-          }
-          return launchOptions;
-        });
-      }
+    setupNodeEvents(on, _config) {
+      // implement node event listeners here
 
-      // Configuración de tareas de base de datos
-      const testDbModule = await import('./scripts/test-db-setup.js');
-      const { setupTestDatabase, cleanTestDatabase, resetTestDatabase } = testDbModule;
-
+      // Database tasks using Prisma
       on('task', {
-        dbSetup: () => {
-          return setupTestDatabase().then(() => null);
+        async dbSetup() {
+          const { setupTestDatabase } = await import('./scripts/test-db-prisma.js');
+          await setupTestDatabase();
+          return null;
         },
-        dbClean: () => {
-          return cleanTestDatabase().then(() => null);
+
+        async dbClean() {
+          const { cleanTestDatabase } = await import('./scripts/test-db-prisma.js');
+          await cleanTestDatabase();
+          return null;
         },
-        dbReset: () => {
-          return resetTestDatabase().then(() => null);
+
+        async dbReset() {
+          const { resetTestDatabase } = await import('./scripts/test-db-prisma.js');
+          await resetTestDatabase();
+          return null;
+        },
+
+        async createTestUser(userData) {
+          const { PrismaClient } = await import('@prisma/client');
+          const prisma = new PrismaClient({
+            datasources: {
+              db: {
+                url:
+                  process.env.DATABASE_URL ||
+                  'mysql://acamae_test:acamae_test_password@localhost:3306/acamae_test',
+              },
+            },
+          });
+
+          try {
+            const user = await prisma.user.create({
+              data: {
+                email: userData.email,
+                username: userData.username,
+                password: userData.password,
+                role: userData.role || 'user',
+                isVerified: false,
+              },
+            });
+            return user;
+          } finally {
+            await prisma.$disconnect();
+          }
+        },
+
+        async deleteTestUser(email) {
+          const { PrismaClient } = await import('@prisma/client');
+          const prisma = new PrismaClient({
+            datasources: {
+              db: {
+                url:
+                  process.env.DATABASE_URL ||
+                  'mysql://acamae_test:acamae_test_password@localhost:3306/acamae_test',
+              },
+            },
+          });
+
+          try {
+            await prisma.user.deleteMany({
+              where: { email },
+            });
+            return null;
+          } finally {
+            await prisma.$disconnect();
+          }
+        },
+
+        async getTestUser(email) {
+          const { PrismaClient } = await import('@prisma/client');
+          const prisma = new PrismaClient({
+            datasources: {
+              db: {
+                url:
+                  process.env.DATABASE_URL ||
+                  'mysql://acamae_test:acamae_test_password@localhost:3306/acamae_test',
+              },
+            },
+          });
+
+          try {
+            const user = await prisma.user.findUnique({
+              where: { email },
+            });
+            return user;
+          } finally {
+            await prisma.$disconnect();
+          }
         },
       });
     },
+
+    // Test database environment variables
+    env: {
+      DB_HOST: 'localhost',
+      DB_PORT: 3306,
+      DB_NAME: 'acamae_test',
+      DB_USER: 'acamae_test',
+      DB_PASSWORD: 'acamae_test_password',
+      DB_ADMIN_USER: 'root',
+      DB_ADMIN_PASSWORD: 'rootpassword',
+      NODE_ENV: 'testing',
+    },
+
+    // Test configuration
+    baseUrl: 'http://localhost:3000',
+    viewportWidth: 1280,
+    viewportHeight: 720,
+    video: false,
+    screenshotOnRunFailure: true,
+    defaultCommandTimeout: 10000,
+    requestTimeout: 10000,
+    responseTimeout: 10000,
+
+    // Test files
+    specPattern: 'cypress/e2e/**/*.cy.ts',
+
+    // Support files
+    supportFile: 'cypress/support/e2e.ts',
+
+    // Downloads and screenshots
+    downloadsFolder: 'cypress/downloads',
+    screenshotsFolder: 'cypress/screenshots',
+    videosFolder: 'cypress/videos',
   },
 });

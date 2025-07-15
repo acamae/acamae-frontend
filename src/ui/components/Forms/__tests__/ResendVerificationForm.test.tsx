@@ -11,7 +11,13 @@ jest.mock('@ui/hooks/useAuth');
 jest.mock('@ui/hooks/useToast');
 jest.mock('react-i18next');
 
-const toastMock = { error: jest.fn(), success: jest.fn() };
+const toastMock = {
+  error: jest.fn(),
+  success: jest.fn(),
+  warning: jest.fn(),
+  info: jest.fn(),
+  show: jest.fn(),
+};
 
 function setupUseAuth({
   loading = false,
@@ -63,22 +69,26 @@ describe('ResendVerificationForm', () => {
 
   it('should render fields correctly', () => {
     renderResendVerificationForm();
-    expect(screen.getByTestId('resend-verification-form-identifier-input')).toBeInTheDocument();
-    expect(screen.getByTestId('resend-verification-form-button')).toBeInTheDocument();
-    expect(screen.getByTestId('resend-verification-form-identifier-label')).toHaveTextContent(
+    expect(
+      screen.getByTestId('email-verification-resend-form-identifier-input')
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('email-verification-resend-form-button')).toBeInTheDocument();
+    expect(screen.getByTestId('email-verification-resend-form-identifier-label')).toHaveTextContent(
       'verification.resend.label'
     );
-    expect(screen.getByTestId('resend-verification-form-identifier-error')).toHaveTextContent('');
+    expect(screen.getByTestId('email-verification-resend-form-identifier-error')).toHaveTextContent(
+      ''
+    );
   });
 
   it('should show success message after successful submit', async () => {
     const resendVerificationMock = promiseMock();
     setupUseAuth({ resendVerification: resendVerificationMock });
     renderResendVerificationForm();
-    fireEvent.change(screen.getByTestId('resend-verification-form-identifier-input'), {
+    fireEvent.change(screen.getByTestId('email-verification-resend-form-identifier-input'), {
       target: { value: 'test@example.com' },
     });
-    fireEvent.click(screen.getByTestId('resend-verification-form-button'));
+    fireEvent.click(screen.getByTestId('email-verification-resend-form-button'));
     await waitFor(() => {
       expect(resendVerificationMock).toHaveBeenCalledWith({
         identifier: 'test@example.com',
@@ -91,14 +101,14 @@ describe('ResendVerificationForm', () => {
     const resendVerificationMock = promiseMock();
     setupUseAuth({ resendVerification: resendVerificationMock });
     renderResendVerificationForm();
-    fireEvent.change(screen.getByTestId('resend-verification-form-identifier-input'), {
+    fireEvent.change(screen.getByTestId('email-verification-resend-form-identifier-input'), {
       target: { value: 'invalid-email' },
     });
-    fireEvent.click(screen.getByTestId('resend-verification-form-button'));
+    fireEvent.click(screen.getByTestId('email-verification-resend-form-button'));
     await waitFor(() => {
-      expect(screen.getByTestId('resend-verification-form-identifier-error')).toHaveTextContent(
-        'errors.email.invalid'
-      );
+      expect(
+        screen.getByTestId('email-verification-resend-form-identifier-error')
+      ).toHaveTextContent('errors.email.invalid');
       expect(resendVerificationMock).not.toHaveBeenCalled();
     });
   });
@@ -107,11 +117,11 @@ describe('ResendVerificationForm', () => {
     const resendVerificationMock = promiseMock();
     setupUseAuth({ resendVerification: resendVerificationMock });
     renderResendVerificationForm();
-    fireEvent.click(screen.getByTestId('resend-verification-form-button'));
+    fireEvent.click(screen.getByTestId('email-verification-resend-form-button'));
     await waitFor(() => {
-      expect(screen.getByTestId('resend-verification-form-identifier-error')).toHaveTextContent(
-        'errors.email.invalid'
-      );
+      expect(
+        screen.getByTestId('email-verification-resend-form-identifier-error')
+      ).toHaveTextContent('errors.email.invalid');
       expect(resendVerificationMock).not.toHaveBeenCalled();
     });
   });
@@ -121,10 +131,10 @@ describe('ResendVerificationForm', () => {
     const resendVerificationMock = promiseMock({ error });
     setupUseAuth({ resendVerification: resendVerificationMock });
     renderResendVerificationForm();
-    fireEvent.change(screen.getByTestId('resend-verification-form-identifier-input'), {
+    fireEvent.change(screen.getByTestId('email-verification-resend-form-identifier-input'), {
       target: { value: 'notfound@example.com' },
     });
-    fireEvent.click(screen.getByTestId('resend-verification-form-button'));
+    fireEvent.click(screen.getByTestId('email-verification-resend-form-button'));
     await waitFor(() => {
       expect(resendVerificationMock).toHaveBeenCalledWith({
         identifier: 'notfound@example.com',
@@ -134,14 +144,14 @@ describe('ResendVerificationForm', () => {
   });
 
   it('should show error message when user is already verified', async () => {
-    const error = 'ALREADY_VERIFIED';
+    const error = 'AUTH_USER_ALREADY_VERIFIED';
     const resendVerificationMock = promiseMock({ error });
     setupUseAuth({ resendVerification: resendVerificationMock });
     renderResendVerificationForm();
-    fireEvent.change(screen.getByTestId('resend-verification-form-identifier-input'), {
+    fireEvent.change(screen.getByTestId('email-verification-resend-form-identifier-input'), {
       target: { value: 'already@example.com' },
     });
-    fireEvent.click(screen.getByTestId('resend-verification-form-button'));
+    fireEvent.click(screen.getByTestId('email-verification-resend-form-button'));
     await waitFor(() => {
       expect(resendVerificationMock).toHaveBeenCalledWith({
         identifier: 'already@example.com',
@@ -155,10 +165,10 @@ describe('ResendVerificationForm', () => {
     const resendVerificationMock = promiseMock({ error });
     setupUseAuth({ resendVerification: resendVerificationMock });
     renderResendVerificationForm();
-    fireEvent.change(screen.getByTestId('resend-verification-form-identifier-input'), {
+    fireEvent.change(screen.getByTestId('email-verification-resend-form-identifier-input'), {
       target: { value: 'fail@example.com' },
     });
-    fireEvent.click(screen.getByTestId('resend-verification-form-button'));
+    fireEvent.click(screen.getByTestId('email-verification-resend-form-button'));
     await waitFor(() => {
       expect(resendVerificationMock).toHaveBeenCalledWith({
         identifier: 'fail@example.com',
@@ -170,13 +180,13 @@ describe('ResendVerificationForm', () => {
   it('should disable button when loading is true', () => {
     setupUseAuth({ loading: true });
     renderResendVerificationForm();
-    expect(screen.getByTestId('resend-verification-form-button')).toBeDisabled();
+    expect(screen.getByTestId('email-verification-resend-form-button')).toBeDisabled();
   });
 
   it('should show correct button text when loading is true', () => {
     setupUseAuth({ loading: true });
     renderResendVerificationForm();
-    expect(screen.getByTestId('resend-verification-form-button')).toHaveTextContent(
+    expect(screen.getByTestId('email-verification-resend-form-button')).toHaveTextContent(
       'verification.resend.loading'
     );
   });
@@ -186,10 +196,10 @@ describe('ResendVerificationForm', () => {
     const resendVerificationMock = promiseMock({ error });
     setupUseAuth({ resendVerification: resendVerificationMock });
     renderResendVerificationForm();
-    fireEvent.change(screen.getByTestId('resend-verification-form-identifier-input'), {
+    fireEvent.change(screen.getByTestId('email-verification-resend-form-identifier-input'), {
       target: { value: 'test@example.com' },
     });
-    fireEvent.click(screen.getByTestId('resend-verification-form-button'));
+    fireEvent.click(screen.getByTestId('email-verification-resend-form-button'));
     await waitFor(() => {
       expect(toastMock.error).not.toHaveBeenCalled();
     });
@@ -200,10 +210,10 @@ describe('ResendVerificationForm', () => {
     const resendVerificationMock = promiseMock({ error });
     setupUseAuth({ resendVerification: resendVerificationMock });
     renderResendVerificationForm();
-    fireEvent.change(screen.getByTestId('resend-verification-form-identifier-input'), {
+    fireEvent.change(screen.getByTestId('email-verification-resend-form-identifier-input'), {
       target: { value: 'test@example.com' },
     });
-    fireEvent.click(screen.getByTestId('resend-verification-form-button'));
+    fireEvent.click(screen.getByTestId('email-verification-resend-form-button'));
     await waitFor(() => {
       expect(toastMock.error).not.toHaveBeenCalled();
     });
@@ -215,24 +225,26 @@ describe('ResendVerificationForm', () => {
     renderResendVerificationForm();
 
     // First enter invalid email
-    fireEvent.change(screen.getByTestId('resend-verification-form-identifier-input'), {
+    fireEvent.change(screen.getByTestId('email-verification-resend-form-identifier-input'), {
       target: { value: 'invalid-email' },
     });
-    fireEvent.click(screen.getByTestId('resend-verification-form-button'));
+    fireEvent.click(screen.getByTestId('email-verification-resend-form-button'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('resend-verification-form-identifier-error')).toHaveTextContent(
-        'errors.email.invalid'
-      );
+      expect(
+        screen.getByTestId('email-verification-resend-form-identifier-error')
+      ).toHaveTextContent('errors.email.invalid');
     });
 
     // Then fix the email
-    fireEvent.change(screen.getByTestId('resend-verification-form-identifier-input'), {
+    fireEvent.change(screen.getByTestId('email-verification-resend-form-identifier-input'), {
       target: { value: 'valid@example.com' },
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('resend-verification-form-identifier-error')).toHaveTextContent('');
+      expect(
+        screen.getByTestId('email-verification-resend-form-identifier-error')
+      ).toHaveTextContent('');
     });
   });
 
@@ -243,14 +255,16 @@ describe('ResendVerificationForm', () => {
     renderResendVerificationForm();
 
     const email = 'test@example.com';
-    fireEvent.change(screen.getByTestId('resend-verification-form-identifier-input'), {
+    fireEvent.change(screen.getByTestId('email-verification-resend-form-identifier-input'), {
       target: { value: email },
     });
-    fireEvent.click(screen.getByTestId('resend-verification-form-button'));
+    fireEvent.click(screen.getByTestId('email-verification-resend-form-button'));
 
     await waitFor(() => {
       expect(toastMock.error).not.toHaveBeenCalled();
-      expect(screen.getByTestId('resend-verification-form-identifier-input')).toHaveValue(email);
+      expect(screen.getByTestId('email-verification-resend-form-identifier-input')).toHaveValue(
+        email
+      );
     });
   });
 

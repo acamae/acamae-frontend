@@ -33,18 +33,43 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
     [t]
   );
 
-  const { values, errors, touched, handleChange, handleSubmit, isSubmitting } =
-    useForm<ResetPasswordFormData>({
-      initialValues: { password: '', token: tokenProp },
-      validate,
-      onSubmit: async (payload: ResetPasswordPayload) => {
-        if (!payload.token || payload.token !== tokenProp) {
-          toast.error(t('reset.invalid_token'));
-          return; // do not submit the form
-        }
-        await resetPassword(payload);
-      },
-    });
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleSubmit,
+    isSubmitting,
+    isThrottled,
+    canSubmit,
+    timeUntilNextSubmission,
+    remainingAttempts,
+  } = useForm<ResetPasswordFormData>({
+    initialValues: { password: '', token: tokenProp },
+    validate,
+    onSubmit: async (payload: ResetPasswordPayload) => {
+      if (!payload.token || payload.token !== tokenProp) {
+        toast.error(t('reset.invalid_token'));
+        return; // do not submit the form
+      }
+      await resetPassword(payload);
+    },
+    enableThrottling: process.env.NODE_ENV !== 'testing',
+    formName: 'reset-password-form',
+  });
+
+  const getButtonText = () => {
+    if (isSubmitting || loading) {
+      return t('reset.saving');
+    }
+    if (isThrottled && timeUntilNextSubmission && timeUntilNextSubmission > 0) {
+      return `${t('reset.submit')} (${Math.ceil(timeUntilNextSubmission / 1000)}s)`;
+    }
+    return t('reset.submit');
+  };
+
+  const showAttemptsWarning =
+    remainingAttempts !== undefined && remainingAttempts > 0 && remainingAttempts <= 2;
 
   if (!tokenProp) {
     return (
@@ -99,19 +124,39 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
           data-testid="reset-password-form-password-help">
           {t('register.password_help')}
         </Form.Text>
-        <Form.Control.Feedback type="invalid" data-testid="reset-password-form-password-error">
+        <Form.Control.Feedback
+          type="invalid"
+          aria-live="polite"
+          aria-atomic="true"
+          role="alert"
+          data-testid="reset-password-form-password-error">
           {errors.password}
         </Form.Control.Feedback>
         <PasswordStrengthMeter password={values.password ?? ''} t={t} />
       </Form.Group>
+
+      {showAttemptsWarning && (
+        <div
+          className="alert alert-warning mb-3"
+          role="alert"
+          data-testid="reset-password-form-attempts-warning">
+          <small>
+            <i className="fas fa-exclamation-triangle me-2"></i>
+            {t('security.throttle.attempts_remaining', { count: remainingAttempts })}
+          </small>
+        </div>
+      )}
+
       <div className="d-grid">
         <Button
-          variant="primary"
+          size="lg"
+          variant="outline-theme"
+          className="d-block w-100 fw-500 mb-3"
           type="submit"
-          disabled={isSubmitting || loading}
+          disabled={isSubmitting || loading || isThrottled || !canSubmit}
           aria-busy={isSubmitting || loading}
           data-testid="reset-password-form-button">
-          {isSubmitting || loading ? t('reset.saving') : t('reset.submit')}
+          {getButtonText()}
         </Button>
       </div>
     </Form>
