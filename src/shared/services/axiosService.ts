@@ -1,7 +1,12 @@
-import axios, { AxiosHeaders } from 'axios';
+import axios, { AxiosHeaders, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 import { tokenService } from '@infrastructure/storage/tokenService';
 import { API_ROUTES } from '@shared/constants/apiRoutes';
+
+// Extend AxiosRequestConfig to include _retry property
+interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
+  _retry?: boolean;
+}
 
 const SESSION_RENEWAL_ENDPOINTS = [
   API_ROUTES.AUTH.LOGIN,
@@ -52,7 +57,7 @@ const dispatchResetTimerFallback = () => {
     const store = getLazyStore() as StoreLike;
     store?.dispatch?.(timerSlice.resetTimer());
   } catch {
-    /* ignore */
+    // Intentionally ignored: fallback for environments where timerSlice or store is unavailable
   }
 };
 
@@ -99,29 +104,90 @@ api.interceptors.request.use(
   }
 );
 
+// Helper functions to reduce cognitive complexity
+const handleSessionRenewal = (url: string): void => {
+  if (SESSION_RENEWAL_ENDPOINTS.some(endpoint => url.includes(endpoint))) {
+    if (onSessionRenewalFn !== NOOP) {
+      onSessionRenewalFn();
+    } else {
+      dispatchResetTimerFallback();
+    }
+  }
+};
+
+const handleAnalytics = (): void => {
+  try {
+    const enableAnalytics = process.env.REACT_APP_ENABLE_ANALYTICS;
+    if (enableAnalytics && JSON.parse(String(enableAnalytics).toLowerCase())) {
+      // No-op: analytics activado
+    }
+  } catch {
+    // Silently ignore JSON parse errors
+  }
+};
+
+const handleTokenRefresh = async (
+  originalRequest: ExtendedAxiosRequestConfig
+): Promise<AxiosResponse | null> => {
+  if (originalRequest._retry) return null;
+
+  originalRequest._retry = true;
+
+  try {
+    const newTokens = await refreshToken();
+    if (newTokens) {
+      originalRequest.headers = originalRequest.headers || {};
+      originalRequest.headers.Authorization = `Bearer ${newTokens.accessToken}`;
+      return api(originalRequest);
+    }
+  } catch {
+    /* refresh falló, seguir para logout */
+  }
+
+  return null;
+};
+
+const handleUnauthorizedError = async (error: AxiosError): Promise<AxiosResponse | null> => {
+  if (error.response?.status !== 401) return null;
+
+  const originalRequest = error.config as ExtendedAxiosRequestConfig;
+  if (!originalRequest) return null;
+
+  const retryResult = await handleTokenRefresh(originalRequest);
+
+  if (retryResult) return retryResult;
+
+  tokenService.clear();
+  return null;
+};
+
+const createErrorInstance = (error: unknown): Error => {
+  if (error instanceof Error) return error;
+
+  const errorMessage =
+    typeof error === 'object'
+      ? JSON.stringify(error, Object.getOwnPropertyNames(error as object))
+      : String(error);
+
+  return new Error(errorMessage);
+};
+
+const logError = (error: unknown): void => {
+  const axiosError = error as AxiosError;
+  if (axiosError.response) {
+    console.error('Response:', axiosError.response);
+  } else if (axiosError.request) {
+    console.error('No response received. Request:', axiosError.message, axiosError.code);
+  } else {
+    console.error('Request Error:', axiosError.message, axiosError.code);
+  }
+};
+
 api.interceptors.response.use(
   response => {
     const url = response.config.url ?? '';
-
-    // If the URL is in the list of endpoints that renew the session (token expiration)
-    if (SESSION_RENEWAL_ENDPOINTS.some(endpoint => url.includes(endpoint))) {
-      if (onSessionRenewalFn !== NOOP) {
-        onSessionRenewalFn();
-      } else {
-        dispatchResetTimerFallback();
-      }
-    }
-
-    // Analytics: solo evaluar la condición para mantener cobertura, sin log
-    try {
-      const enableAnalytics = process.env.REACT_APP_ENABLE_ANALYTICS;
-      if (enableAnalytics && JSON.parse(String(enableAnalytics).toLowerCase())) {
-        // No-op: analytics activado
-      }
-    } catch {
-      // Silently ignore JSON parse errors
-    }
-
+    handleSessionRenewal(url);
+    handleAnalytics();
     return response;
   },
 
@@ -129,54 +195,14 @@ api.interceptors.response.use(
     const url = error.config?.url ?? '';
 
     if (error.response) {
-      console.error('Response:', error.response);
+      const retryResult = await handleUnauthorizedError(error);
+      if (retryResult) return retryResult;
 
-      // If the status is 401, clear the token (unauthorized)
-      if (error.response?.status === 401) {
-        // Intentar refresh si no se ha intentado aún
-        const originalRequest = error.config;
-        if (!originalRequest._retry) {
-          originalRequest._retry = true;
-
-          try {
-            const newTokens = await refreshToken();
-            if (newTokens) {
-              // Reintentar request con nuevo token
-              originalRequest.headers.Authorization = `Bearer ${newTokens.accessToken}`;
-              return api(originalRequest);
-            }
-          } catch {
-            /* refresh falló, seguir para logout */
-          }
-        }
-
-        tokenService.clear();
-      }
-
-      // If the URL is in the list of endpoints that renew the session (token expiration)
-      if (SESSION_RENEWAL_ENDPOINTS.some(endpoint => url.includes(endpoint))) {
-        if (onSessionRenewalFn !== NOOP) {
-          onSessionRenewalFn();
-        } else {
-          dispatchResetTimerFallback();
-        }
-      }
-    } else if (error.request) {
-      console.error('No response received. Request:', error.message, error.code);
-    } else {
-      console.error('Request Error:', error.message, error.code);
+      handleSessionRenewal(url);
     }
 
-    return Promise.reject(
-      (() => {
-        if (error instanceof Error) return error;
-        const errorMessage =
-          typeof error === 'object'
-            ? JSON.stringify(error, Object.getOwnPropertyNames(error))
-            : String(error);
-        return new Error(errorMessage);
-      })()
-    );
+    logError(error);
+    return Promise.reject(createErrorInstance(error));
   }
 );
 

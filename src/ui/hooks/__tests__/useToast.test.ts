@@ -68,7 +68,7 @@ describe('useToast', () => {
       const { result } = renderHook(() => useToast());
 
       act(() => {
-        result.current.error('error.message', undefined);
+        result.current.error('error.message');
       });
 
       expect(mockToastService.error).toHaveBeenCalledWith('translated_error.message');
@@ -102,7 +102,7 @@ describe('useToast', () => {
       const { result } = renderHook(() => useToast());
 
       act(() => {
-        result.current.success('success.message', undefined);
+        result.current.success('success.message');
       });
 
       expect(mockToastService.success).toHaveBeenCalledWith('translated_success.message');
@@ -136,7 +136,7 @@ describe('useToast', () => {
       const { result } = renderHook(() => useToast());
 
       act(() => {
-        result.current.warning('warning.message', undefined);
+        result.current.warning('warning.message');
       });
 
       expect(mockToastService.warning).toHaveBeenCalledWith('translated_warning.message');
@@ -170,7 +170,7 @@ describe('useToast', () => {
       const { result } = renderHook(() => useToast());
 
       act(() => {
-        result.current.info('info.message', undefined);
+        result.current.info('info.message');
       });
 
       expect(mockToastService.info).toHaveBeenCalledWith('translated_info.message');

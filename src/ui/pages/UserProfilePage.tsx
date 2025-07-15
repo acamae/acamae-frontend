@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-const USerProfilePage: React.FC = () => {
+const UserProfilePage: React.FC = () => {
   const { t } = useTranslation();
 
   return (
@@ -20,4 +20,4 @@ const USerProfilePage: React.FC = () => {
   );
 };
 
-export default USerProfilePage;
+export default UserProfilePage;
