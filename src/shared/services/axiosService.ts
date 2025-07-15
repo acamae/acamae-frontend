@@ -93,11 +93,9 @@ api.interceptors.request.use(
   },
 
   error => {
-    return Promise.reject(
-      error instanceof Error
-        ? error
-        : new Error(typeof error === 'object' ? JSON.stringify(error) : String(error))
-    );
+    const errorMessage = typeof error === 'object' ? JSON.stringify(error) : String(error);
+    const finalError = error instanceof Error ? error : new Error(errorMessage);
+    return Promise.reject(finalError);
   }
 );
 
@@ -170,13 +168,14 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(
-      error instanceof Error
-        ? error
-        : new Error(
-            typeof error === 'object'
-              ? JSON.stringify(error, Object.getOwnPropertyNames(error))
-              : String(error)
-          )
+      (() => {
+        if (error instanceof Error) return error;
+        const errorMessage =
+          typeof error === 'object'
+            ? JSON.stringify(error, Object.getOwnPropertyNames(error))
+            : String(error);
+        return new Error(errorMessage);
+      })()
     );
   }
 );
