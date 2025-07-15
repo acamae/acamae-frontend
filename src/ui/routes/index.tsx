@@ -77,45 +77,28 @@ const createPrivateRoute = (path: string, Component: React.ComponentType, roles?
   ),
 });
 
-const removeLeadingSlash = (path: string) => path;
-console.log(removeLeadingSlash(APP_ROUTES.LOGIN));
-
 // Route configuration builders
 const buildPublicRoutes = () => [
   createIndexRoute(HomePage),
-  createPublicRoute(removeLeadingSlash(APP_ROUTES.LOGIN), LoginPage),
-  createPublicRoute(removeLeadingSlash(APP_ROUTES.REGISTER), RegisterPage),
-  createPublicRoute(removeLeadingSlash(APP_ROUTES.FORGOT_PASSWORD), ForgotPasswordPage),
-  createPublicRoute(removeLeadingSlash(APP_ROUTES.RESET_PASSWORD), ResetPasswordPage),
-  createPublicRoute(
-    removeLeadingSlash(APP_ROUTES.VERIFY_EMAIL_RESEND),
-    EmailVerificationResendPage
-  ),
-  createPublicRoute(removeLeadingSlash(APP_ROUTES.VERIFY_EMAIL), EmailVerificationPage),
-  createPublicRoute(removeLeadingSlash(APP_ROUTES.VERIFY_EMAIL_SENT), EmailVerificationSentPage),
-  createPublicRoute(
-    removeLeadingSlash(APP_ROUTES.VERIFY_EMAIL_EXPIRED),
-    EmailVerificationExpiredPage
-  ),
-  createPublicRoute(
-    removeLeadingSlash(APP_ROUTES.VERIFY_EMAIL_ALREADY_VERIFIED),
-    EmailAlreadyVerifiedPage
-  ),
-  createPublicRoute(removeLeadingSlash(APP_ROUTES.VERIFY_EMAIL_ERROR), EmailVerificationErrorPage),
-  createPublicRoute(
-    removeLeadingSlash(APP_ROUTES.VERIFY_EMAIL_SUCCESS),
-    EmailVerificationSuccessPage
-  ),
+  createPublicRoute(APP_ROUTES.LOGIN, LoginPage),
+  createPublicRoute(APP_ROUTES.REGISTER, RegisterPage),
+  createPublicRoute(APP_ROUTES.FORGOT_PASSWORD, ForgotPasswordPage),
+  createPublicRoute(APP_ROUTES.RESET_PASSWORD, ResetPasswordPage),
+  createPublicRoute(APP_ROUTES.VERIFY_EMAIL_RESEND, EmailVerificationResendPage),
+  createPublicRoute(APP_ROUTES.VERIFY_EMAIL, EmailVerificationPage),
+  createPublicRoute(APP_ROUTES.VERIFY_EMAIL_SENT, EmailVerificationSentPage),
+  createPublicRoute(APP_ROUTES.VERIFY_EMAIL_EXPIRED, EmailVerificationExpiredPage),
+  createPublicRoute(APP_ROUTES.VERIFY_EMAIL_ALREADY_VERIFIED, EmailAlreadyVerifiedPage),
+  createPublicRoute(APP_ROUTES.VERIFY_EMAIL_ERROR, EmailVerificationErrorPage),
+  createPublicRoute(APP_ROUTES.VERIFY_EMAIL_SUCCESS, EmailVerificationSuccessPage),
 ];
 
 const buildPrivateRoutes = () => [
-  createPrivateRoute(removeLeadingSlash(APP_ROUTES.DASHBOARD), DashboardPage),
-  createPrivateRoute(removeLeadingSlash(APP_ROUTES.PROFILE), UserProfilePage),
-  createPrivateRoute(removeLeadingSlash(APP_ROUTES.TEAMS), TeamsPage, [USER_ROLES.ADMIN]),
-  createPrivateRoute(removeLeadingSlash(APP_ROUTES.TOURNAMENTS), TournamentsPage, [
-    USER_ROLES.ADMIN,
-  ]),
-  createPrivateRoute(removeLeadingSlash(APP_ROUTES.USERS), UsersPage, [USER_ROLES.ADMIN]),
+  createPrivateRoute(APP_ROUTES.DASHBOARD, DashboardPage),
+  createPrivateRoute(APP_ROUTES.PROFILE, UserProfilePage),
+  createPrivateRoute(APP_ROUTES.TEAMS, TeamsPage, [USER_ROLES.ADMIN]),
+  createPrivateRoute(APP_ROUTES.TOURNAMENTS, TournamentsPage, [USER_ROLES.ADMIN]),
+  createPrivateRoute(APP_ROUTES.USERS, UsersPage, [USER_ROLES.ADMIN]),
 ];
 
 // Helper function to improve testability
