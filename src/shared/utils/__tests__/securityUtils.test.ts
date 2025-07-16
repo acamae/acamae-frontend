@@ -26,10 +26,10 @@ describe('SecurityThrottleService - Environment Variables', () => {
 
   describe('getEnvVar function', () => {
     it('should handle zero values correctly', () => {
-      // Test that setting REACT_APP_THROTTLE_DELAY_DEFAULT to "0" works
-      process.env.REACT_APP_THROTTLE_DELAY_DEFAULT = '0';
-      process.env.REACT_APP_THROTTLE_MAX_ATTEMPTS_DEFAULT = '1000'; // Valor alto para permitir muchas acciones
-      process.env.REACT_APP_THROTTLE_TIME_WINDOW_DEFAULT = '0';
+      // Test that setting REACT_THROTTLE_DELAY_MS to "0" works
+      process.env.REACT_THROTTLE_DELAY_MS = '0';
+      process.env.REACT_THROTTLE_MAX_ATTEMPTS = '1000'; // Valor alto para permitir muchas acciones
+      process.env.REACT_THROTTLE_WINDOW_MS = '0';
 
       const service = new SecurityThrottleService();
 
@@ -45,9 +45,9 @@ describe('SecurityThrottleService - Environment Variables', () => {
 
     it('should handle undefined environment variables', () => {
       // Clear the environment variables
-      delete process.env.REACT_APP_THROTTLE_DELAY_DEFAULT;
-      delete process.env.REACT_APP_THROTTLE_MAX_ATTEMPTS_DEFAULT;
-      delete process.env.REACT_APP_THROTTLE_TIME_WINDOW_DEFAULT;
+      delete process.env.REACT_THROTTLE_DELAY_MS;
+      delete process.env.REACT_THROTTLE_MAX_ATTEMPTS;
+      delete process.env.REACT_THROTTLE_WINDOW_MS;
 
       const service = new SecurityThrottleService();
 
@@ -60,9 +60,9 @@ describe('SecurityThrottleService - Environment Variables', () => {
 
     it('should handle null environment variables', () => {
       // Set environment variables to null
-      process.env.REACT_APP_THROTTLE_DELAY_DEFAULT = null as unknown as string;
-      process.env.REACT_APP_THROTTLE_MAX_ATTEMPTS_DEFAULT = null as unknown as string;
-      process.env.REACT_APP_THROTTLE_TIME_WINDOW_DEFAULT = null as unknown as string;
+      process.env.REACT_THROTTLE_DELAY_MS = null as unknown as string;
+      process.env.REACT_THROTTLE_MAX_ATTEMPTS = null as unknown as string;
+      process.env.REACT_THROTTLE_WINDOW_MS = null as unknown as string;
 
       const service = new SecurityThrottleService();
 
@@ -75,9 +75,9 @@ describe('SecurityThrottleService - Environment Variables', () => {
 
     it('should handle empty string environment variables', () => {
       // Set environment variables to empty strings
-      process.env.REACT_APP_THROTTLE_DELAY_DEFAULT = '';
-      process.env.REACT_APP_THROTTLE_MAX_ATTEMPTS_DEFAULT = '';
-      process.env.REACT_APP_THROTTLE_TIME_WINDOW_DEFAULT = '';
+      process.env.REACT_THROTTLE_DELAY_MS = '';
+      process.env.REACT_THROTTLE_MAX_ATTEMPTS = '';
+      process.env.REACT_THROTTLE_WINDOW_MS = '';
 
       const service = new SecurityThrottleService();
 
@@ -85,6 +85,21 @@ describe('SecurityThrottleService - Environment Variables', () => {
       const actionId = generateActionId('test-form');
 
       // Should work with default configuration
+      expect(service.canPerformAction(actionId)).toBe(true);
+    });
+
+    it('should handle mixed empty and valid environment variables', () => {
+      // Set some variables to empty strings and others to valid values
+      process.env.REACT_THROTTLE_DELAY_MS = '';
+      process.env.REACT_THROTTLE_MAX_ATTEMPTS = '5';
+      process.env.REACT_THROTTLE_WINDOW_MS = '';
+
+      const service = new SecurityThrottleService();
+
+      // Should use default values for empty strings and valid values for non-empty
+      const actionId = generateActionId('test-form');
+
+      // Should work with mixed configuration
       expect(service.canPerformAction(actionId)).toBe(true);
     });
   });

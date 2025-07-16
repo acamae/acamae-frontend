@@ -14,8 +14,8 @@ export interface ThrottleState {
 const getEnvVar = (key: string, defaultValue: string): number => {
   try {
     const envValue = process.env[key];
-    // Check if the environment variable exists and is not undefined
-    if (envValue !== undefined && envValue !== null) {
+    // Check if the environment variable exists, is not undefined, and is not an empty string
+    if (envValue !== undefined && envValue !== null && envValue !== '') {
       return Number(envValue);
     }
     return Number(defaultValue);
@@ -27,9 +27,9 @@ const getEnvVar = (key: string, defaultValue: string): number => {
 class SecurityThrottleService {
   private readonly throttleStates: Map<string, ThrottleState> = new Map();
   private readonly defaultConfig: ThrottleConfig = {
-    delay: getEnvVar('REACT_APP_THROTTLE_DELAY_DEFAULT', '4000'), // Wait 4 seconds every attempt
-    maxAttempts: getEnvVar('REACT_APP_THROTTLE_MAX_ATTEMPTS_DEFAULT', '10'), // Maximum number of attempts
-    timeWindow: getEnvVar('REACT_APP_THROTTLE_TIME_WINDOW_DEFAULT', '300000'), // Within time window in milliseconds (5 minutes)
+    delay: getEnvVar('REACT_THROTTLE_DELAY_MS', '4000'), // Wait 4 seconds every attempt
+    maxAttempts: getEnvVar('REACT_THROTTLE_MAX_ATTEMPTS', '10'), // Maximum number of attempts
+    timeWindow: getEnvVar('REACT_THROTTLE_WINDOW_MS', '300000'), // Within time window in milliseconds (5 minutes)
     persistInClient: false,
   };
   private readonly storageKey = 'acamae-throttle-states';
