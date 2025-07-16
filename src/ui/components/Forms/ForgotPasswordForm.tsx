@@ -41,7 +41,7 @@ const ForgotPasswordForm: React.FC = () => {
     onSubmit: async (payload: ForgotPasswordPayload) => {
       await forgotPassword(payload);
     },
-    enableThrottling: process.env.NODE_ENV !== 'testing',
+    enableThrottling: process.env.NODE_ENV !== 'test',
     formName: 'forgot-password-form',
   });
 

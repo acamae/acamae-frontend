@@ -26,26 +26,25 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
-      - name: Verify branch
-        run: |
-          if [[ "${{ github.ref }}" != "refs/heads/release" ]]; then
-            echo "❌ This workflow should only run on the release branch"
-            exit 1
-          fi
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Setup environment
         uses: ./.github/actions/setup-env
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           npm-token: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
           setup-git-identity: true
-      - run: npm run build
-      - name: Version packages
+
+      - name: Build project
+        run: npm run build
+
+      - name: Version and publish
         if: ${{ !startsWith(github.event.head_commit.message, 'chore(release):') }}
-        run: npx lerna version --conventional-commits --yes --no-push
+        run: |
+          npx lerna version --conventional-commits --yes --no-push
+          git push --follow-tags
+          npx lerna publish from-package --yes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
-      - name: Push tags
-        run: git push --follow-tags
-      - name: Lerna publish
-        run: npx lerna publish from-package --yes

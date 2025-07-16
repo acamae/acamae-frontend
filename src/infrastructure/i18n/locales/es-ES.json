@@ -107,7 +107,14 @@
       "checking": "Verificando sesión...",
       "required": "Debes iniciar sesión para continuar."
     },
-    "unknown": "Ha ocurrido un error inesperado."
+    "unknown": "Ha ocurrido un error inesperado.",
+    "boundary": {
+      "title": "Algo salió mal",
+      "message": "Hemos encontrado un error inesperado. Por favor, intenta refrescar la página o volver atrás.",
+      "reload": "Refrescar página",
+      "back": "Volver atrás",
+      "details": "Detalles del error (solo desarrollo)"
+    }
   },
   "security": {
     "throttle": {

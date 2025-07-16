@@ -88,6 +88,13 @@ describe('webVitals utilities', () => {
       onTTFB: jest.fn(),
     }));
 
+    // Mock console.log to prevent actual logging during tests
+    const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    // Temporarily set NODE_ENV to development for this test
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+
     // Development environment (localhost)
     setHostname('localhost');
     jest.isolateModules(() => {
@@ -103,5 +110,41 @@ describe('webVitals utilities', () => {
       logWebVitalsReport();
       expect(onCLSSpy).toHaveBeenCalledTimes(1);
     });
+
+    // Restore environment
+    process.env.NODE_ENV = originalNodeEnv;
+    consoleLogSpy.mockRestore();
+  });
+
+  it('logWebVitalsReport should not execute during tests', () => {
+    // Mock console.log to capture output
+    const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    // Set test environment
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'test';
+
+    jest.doMock('web-vitals', () => ({
+      onCLS: jest.fn(),
+      onINP: jest.fn(),
+      onFCP: jest.fn(),
+      onLCP: jest.fn(),
+      onTTFB: jest.fn(),
+    }));
+
+    setHostname('localhost');
+    jest.isolateModules(() => {
+      const { logWebVitalsReport } = require('../webVitals');
+      logWebVitalsReport();
+
+      // Should not have called any web-vitals functions in test environment
+      expect(consoleLogSpy).not.toHaveBeenCalledWith(
+        expect.stringContaining('Web Vitals: Iniciando reporte de métricas')
+      );
+    });
+
+    // Restore environment
+    process.env.NODE_ENV = originalNodeEnv;
+    consoleLogSpy.mockRestore();
   });
 });

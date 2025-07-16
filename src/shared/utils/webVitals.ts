@@ -87,6 +87,11 @@ export const generateWebVitalsReport = (): WebVitalsReport => {
 };
 
 export const logWebVitalsReport = () => {
+  // Skip execution during tests
+  if (process.env.NODE_ENV === 'test') {
+    return;
+  }
+
   console.log('Web Vitals: Iniciando reporte de métricas');
   console.log('Web Vitals: Entorno =', isDevelopment() ? 'Desarrollo' : 'Producción');
 

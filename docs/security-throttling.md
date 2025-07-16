@@ -19,8 +19,8 @@ El sistema de throttling implementado en el frontend proporciona protección con
 ```typescript
 {
   delay: 4000,        // 4 segundos mínimo entre clics
-  maxAttempts: 3,     // 3 intentos máximos
-  timeWindow: 60000   // en 1 minuto
+  maxAttempts: 8,     // 8 intentos máximos (configuración estricta)
+  timeWindow: 300000  // en 5 minutos
 }
 ```
 
@@ -28,9 +28,9 @@ El sistema de throttling implementado en el frontend proporciona protección con
 
 ```typescript
 {
-  delay: 2000,        // 2 segundos mínimo entre clics
-  maxAttempts: 5,     // 5 intentos máximos
-  timeWindow: 60000   // en 1 minuto
+  delay: 3000,        // 3 segundos mínimo entre clics (más permisivo)
+  maxAttempts: 12,    // 12 intentos máximos (más permisivo)
+  timeWindow: 300000  // en 5 minutos
 }
 ```
 
@@ -38,11 +38,17 @@ El sistema de throttling implementado en el frontend proporciona protección con
 
 ```typescript
 {
-  delay: 8000,        // 8 segundos mínimo entre clics
-  maxAttempts: 2,     // 2 intentos máximos
-  timeWindow: 60000   // en 1 minuto
+  delay: 5000,        // 5 segundos mínimo entre clics (más estricto)
+  maxAttempts: 5,     // 5 intentos máximos (más estricto)
+  timeWindow: 300000  // en 5 minutos
 }
 ```
+
+> **Diferenciación de Seguridad**: Cada tipo de formulario tiene configuraciones específicas según su nivel de seguridad:
+>
+> - **AUTH_FORMS**: Configuración estricta para formularios de autenticación
+> - **REGULAR_FORMS**: Configuración más permisiva para mejor UX
+> - **CRITICAL_ACTIONS**: Configuración más estricta para operaciones críticas
 
 ## Implementación
 

@@ -42,7 +42,7 @@ const ResendVerificationForm: React.FC = () => {
     onSubmit: async (payload: ResendVerificationPayload) => {
       await resendVerification(payload);
     },
-    enableThrottling: process.env.NODE_ENV !== 'testing',
+    enableThrottling: process.env.NODE_ENV !== 'test',
     formName: 'email-verification-resend-form',
   });
 

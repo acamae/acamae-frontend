@@ -2,20 +2,24 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { configureFeedback } from '@application/state/middleware/feedbackMiddleware';
-import { useToast } from '@ui/hooks/useToast';
+import { useToastContext } from '@shared/services/ToastProvider';
+import { toastService } from '@shared/services/toastService';
 
 const FeedbackInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const toast = useToast();
+  const toastContext = useToastContext();
   const navigate = useNavigate();
 
   useEffect((): void => {
+    // Configurar el toastService con la implementación real del contexto
+    toastService.configure(toastContext);
+
     configureFeedback({
-      toast,
+      toast: toastContext,
       navigate: (path: string): void | Promise<void> => {
         navigate(path, { replace: true });
       },
     });
-  }, [toast, navigate]);
+  }, [toastContext, navigate]);
 
   return <>{children}</>;
 };

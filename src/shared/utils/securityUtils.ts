@@ -7,12 +7,29 @@ export interface ThrottleState {
   isBlocked: boolean;
 }
 
+/**
+ * Safe function to get environment variables with fallback
+ * This prevents errors when process.env is not available during module loading
+ */
+const getEnvVar = (key: string, defaultValue: string): number => {
+  try {
+    const envValue = process.env[key];
+    // Check if the environment variable exists, is not undefined, and is not an empty string
+    if (envValue !== undefined && envValue !== null && envValue !== '') {
+      return Number(envValue);
+    }
+    return Number(defaultValue);
+  } catch {
+    return Number(defaultValue);
+  }
+};
+
 class SecurityThrottleService {
   private readonly throttleStates: Map<string, ThrottleState> = new Map();
   private readonly defaultConfig: ThrottleConfig = {
-    delay: 1000, // 1 second minimum between clicks
-    maxAttempts: 3, // maximum 3 attempts
-    timeWindow: 60000, // in a 1 minute window
+    delay: getEnvVar('REACT_THROTTLE_DELAY_MS', '4000'), // Wait 4 seconds every attempt
+    maxAttempts: getEnvVar('REACT_THROTTLE_MAX_ATTEMPTS', '10'), // Maximum number of attempts
+    timeWindow: getEnvVar('REACT_THROTTLE_WINDOW_MS', '300000'), // Within time window in milliseconds (5 minutes)
     persistInClient: false,
   };
   private readonly storageKey = 'acamae-throttle-states';
@@ -95,6 +112,140 @@ class SecurityThrottleService {
   }
 
   /**
+   * Create a new throttle state for first-time actions
+   */
+  private createNewState(now: number): ThrottleState {
+    return {
+      lastSubmission: now,
+      attemptCount: 1,
+      windowStart: now,
+      isBlocked: false,
+    };
+  }
+
+  /**
+   * Reset attempt count if time window has passed
+   */
+  private resetAttemptCountIfNeeded(state: ThrottleState, now: number, timeWindow: number): void {
+    if (now - state.windowStart > Number(timeWindow)) {
+      state.attemptCount = 0;
+      state.windowStart = now;
+    }
+  }
+
+  /**
+   * Block state and schedule unblock
+   */
+  private blockStateAndScheduleUnblock(
+    state: ThrottleState,
+    timeWindow: number,
+    config: ThrottleConfig
+  ): void {
+    state.isBlocked = true;
+
+    if (this.requiresPersistence(config)) {
+      this.persistCriticalStates();
+    }
+
+    setTimeout(() => {
+      state.isBlocked = false;
+      state.attemptCount = 0;
+      state.windowStart = Date.now();
+      if (this.requiresPersistence(config)) {
+        this.persistCriticalStates();
+      }
+    }, Number(timeWindow));
+  }
+
+  /**
+   * Update state and persist if needed
+   */
+  private updateStateAndPersist(
+    actionId: string,
+    state: ThrottleState,
+    now: number,
+    config: ThrottleConfig
+  ): void {
+    state.lastSubmission = now;
+    state.attemptCount += 1;
+    this.throttleStates.set(actionId, state);
+
+    if (this.requiresPersistence(config)) {
+      this.persistCriticalStates();
+    }
+  }
+
+  /**
+   * Handle throttling when delay is 0 (no time-based throttling)
+   */
+  private handleZeroDelayThrottling(
+    actionId: string,
+    state: ThrottleState | undefined,
+    now: number,
+    config: ThrottleConfig
+  ): boolean {
+    if (!state) {
+      const newState = this.createNewState(now);
+      this.throttleStates.set(actionId, newState);
+      if (this.requiresPersistence(config)) {
+        this.persistCriticalStates();
+      }
+      return true;
+    }
+
+    if (state.isBlocked) {
+      return false;
+    }
+
+    this.resetAttemptCountIfNeeded(state, now, config.timeWindow);
+
+    if (state.attemptCount >= Number(config.maxAttempts)) {
+      this.blockStateAndScheduleUnblock(state, config.timeWindow, config);
+      return false;
+    }
+
+    this.updateStateAndPersist(actionId, state, now, config);
+    return true;
+  }
+
+  /**
+   * Handle throttling with delay (time-based throttling)
+   */
+  private handleDelayedThrottling(
+    actionId: string,
+    state: ThrottleState | undefined,
+    now: number,
+    config: ThrottleConfig
+  ): boolean {
+    if (!state) {
+      const newState = this.createNewState(now);
+      this.throttleStates.set(actionId, newState);
+      if (this.requiresPersistence(config)) {
+        this.persistCriticalStates();
+      }
+      return true;
+    }
+
+    if (state.isBlocked) {
+      return false;
+    }
+
+    if (now - state.lastSubmission < Number(config.delay)) {
+      return false;
+    }
+
+    this.resetAttemptCountIfNeeded(state, now, config.timeWindow);
+
+    if (state.attemptCount >= Number(config.maxAttempts)) {
+      this.blockStateAndScheduleUnblock(state, config.timeWindow, config);
+      return false;
+    }
+
+    this.updateStateAndPersist(actionId, state, now, config);
+    return true;
+  }
+
+  /**
    * Check if an action is allowed based on throttling
    */
   canPerformAction(actionId: string, config?: Partial<ThrottleConfig>): boolean {
@@ -102,75 +253,12 @@ class SecurityThrottleService {
     const now = Date.now();
     const state = this.throttleStates.get(actionId);
 
-    if (!state) {
-      // First time this action is executed
-      const newState: ThrottleState = {
-        lastSubmission: now,
-        attemptCount: 1,
-        windowStart: now,
-        isBlocked: false,
-      };
-      this.throttleStates.set(actionId, newState);
-
-      // Persist if necessary
-      if (this.requiresPersistence(finalConfig)) {
-        this.persistCriticalStates();
-      }
-
-      return true;
+    // Si delay es 0, permitir siempre la acción (no throttling por tiempo)
+    if (Number(finalConfig.delay) === 0) {
+      return this.handleZeroDelayThrottling(actionId, state, now, finalConfig);
     }
 
-    // Check if the button is blocked
-    if (state.isBlocked) {
-      return false;
-    }
-
-    // Check the minimum delay between clicks
-    if (now - state.lastSubmission < finalConfig.delay) {
-      return false;
-    }
-
-    // Reset the attempt count if the time window has passed
-    if (now - state.windowStart > finalConfig.timeWindow) {
-      state.attemptCount = 0;
-      state.windowStart = now;
-    }
-
-    // Check the attempt limit
-    if (state.attemptCount >= finalConfig.maxAttempts) {
-      state.isBlocked = true;
-
-      // Persist the block immediately if necessary
-      if (this.requiresPersistence(finalConfig)) {
-        this.persistCriticalStates();
-      }
-
-      // Unblock after the time window
-      setTimeout(() => {
-        state.isBlocked = false;
-        state.attemptCount = 0;
-        state.windowStart = Date.now(); // Use current timestamp instead of stale 'now'
-
-        // Persist the unblock if necessary
-        if (this.requiresPersistence(finalConfig)) {
-          this.persistCriticalStates();
-        }
-      }, finalConfig.timeWindow);
-
-      return false;
-    }
-
-    // Update state
-    state.lastSubmission = now;
-    state.attemptCount += 1;
-    this.throttleStates.set(actionId, state);
-
-    // Persist if necessary
-    if (this.requiresPersistence(finalConfig)) {
-      this.persistCriticalStates();
-    }
-
-    return true;
+    return this.handleDelayedThrottling(actionId, state, now, finalConfig);
   }
 
   /**
@@ -221,10 +309,10 @@ class SecurityThrottleService {
 
     const now = Date.now();
     const timeSinceLastSubmission = now - state.lastSubmission;
-    const remainingDelay = finalConfig.delay - timeSinceLastSubmission;
+    const remainingDelay = Number(finalConfig.delay) - timeSinceLastSubmission;
 
     if (state.isBlocked) {
-      const timeUntilUnblock = finalConfig.timeWindow - (now - state.windowStart);
+      const timeUntilUnblock = Number(finalConfig.timeWindow) - (now - state.windowStart);
       return Math.max(timeUntilUnblock, 0);
     }
 
@@ -240,7 +328,7 @@ class SecurityThrottleService {
 
     // If the action is not in the state, return the max attempts
     if (!state) {
-      return finalConfig.maxAttempts;
+      return Number(finalConfig.maxAttempts);
     }
 
     // If the action is blocked, return 0
@@ -250,12 +338,12 @@ class SecurityThrottleService {
 
     // Reset the attempt count if the time window has passed
     const now = Date.now();
-    if (now - state.windowStart > finalConfig.timeWindow) {
-      return finalConfig.maxAttempts;
+    if (now - state.windowStart > Number(finalConfig.timeWindow)) {
+      return Number(finalConfig.maxAttempts);
     }
 
     // Return the remaining attempts
-    return Math.max(finalConfig.maxAttempts - state.attemptCount, 0);
+    return Math.max(Number(finalConfig.maxAttempts) - state.attemptCount, 0);
   }
 }
 

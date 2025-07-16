@@ -29,5 +29,7 @@ root.render(
   </React.StrictMode>
 );
 
-// Llamar a la función después de un breve retraso
-setTimeout(logWebVitalsReport, 1000);
+// Llamar a la función después de un breve retraso, solo si no estamos en tests
+if (process.env.NODE_ENV !== 'test') {
+  setTimeout(logWebVitalsReport, 1000);
+}

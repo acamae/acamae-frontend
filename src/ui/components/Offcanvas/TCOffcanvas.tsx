@@ -18,7 +18,7 @@ const TCOffcanvas: React.FC<TCOffcanvasProps> = ({ show, onHide }) => {
       data-testid="terms-and-conditions-offcanvas">
       <Offcanvas.Header closeButton>
         <Offcanvas.Title>
-          <h2>{isEnglish ? 'Terms and Conditions' : 'Términos y Condiciones'}</h2>
+          {isEnglish ? 'Terms and Conditions' : 'Términos y Condiciones'}
         </Offcanvas.Title>
       </Offcanvas.Header>
       <Offcanvas.Body>

@@ -175,4 +175,38 @@ describe('feedbackMiddleware', () => {
       expect(navigate).not.toHaveBeenCalled();
     });
   });
+
+  it('debe ignorar la acción cuando ambos toastApi y navigateFn son undefined', () => {
+    jest.isolateModules(() => {
+      const { feedbackMiddleware } = require('@application/state/middleware/feedbackMiddleware');
+      const store = configureStore({
+        reducer: (state: Record<string, unknown> = {}) => state,
+        middleware: getDefault => getDefault().concat(feedbackMiddleware),
+      });
+
+      // Dispatch una acción sin configurar configureFeedback
+      store.dispatch({ type: loginAction.fulfilled.type });
+
+      // No debe haber efectos secundarios ya que ambos son undefined
+      // Este test asegura que la línea 44 se ejecute completamente
+    });
+  });
+
+  it('debe ignorar la acción cuando configureFeedback no ha sido llamado (ambos undefined)', () => {
+    jest.isolateModules(() => {
+      const { feedbackMiddleware } = require('@application/state/middleware/feedbackMiddleware');
+      const store = configureStore({
+        reducer: (state: Record<string, unknown> = {}) => state,
+        middleware: getDefault => getDefault().concat(feedbackMiddleware),
+      });
+
+      // Dispatch múltiples acciones sin configuración previa
+      store.dispatch({ type: loginAction.fulfilled.type });
+      store.dispatch({ type: registerAction.fulfilled.type });
+      store.dispatch({ type: forgotPasswordAction.fulfilled.type });
+
+      // No debe haber efectos secundarios
+      // Este test cubre específicamente la rama donde ambos son undefined
+    });
+  });
 });

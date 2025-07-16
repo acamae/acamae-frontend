@@ -1,3 +1,4 @@
+import ErrorBoundary from '@ui/components/ErrorBoundary';
 import AppRoutes from '@ui/routes';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '@fortawesome/fontawesome-free/css/all.css';
@@ -6,7 +7,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '@ui/styles/global.scss';
 
 function App() {
-  return <AppRoutes />;
+  return (
+    <ErrorBoundary>
+      <AppRoutes />
+    </ErrorBoundary>
+  );
 }
 
 export default App;

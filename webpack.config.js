@@ -163,13 +163,9 @@ export default env => {
       },
     },
     plugins: [
-      new HtmlWebpackPlugin({
-        template: _resolve(__dirname, 'public/index.html'),
-        inject: true,
-        favicon: _resolve(__dirname, 'public/assets/favicon.png'),
-      }),
-      new CopyPlugin({
-        patterns: [{ from: 'public/assets', to: 'assets', noErrorOnMissing: true }],
+      new webpack.ProvidePlugin({
+        // Make a global `process` variable that points to the `process` package,
+        process: 'process/browser.js',
       }),
       new webpack.DefinePlugin(envKeys),
       ...(isProduction && env.analyze
@@ -180,6 +176,14 @@ export default env => {
             }),
           ]
         : []),
+      new HtmlWebpackPlugin({
+        template: _resolve(__dirname, 'public/index.html'),
+        inject: true,
+        favicon: _resolve(__dirname, 'public/assets/favicon.png'),
+      }),
+      new CopyPlugin({
+        patterns: [{ from: 'public/assets', to: 'assets', noErrorOnMissing: true }],
+      }),
       new MiniCssExtractPlugin({
         filename: isProduction ? 'css/[name].[contenthash].chunk.css' : 'css/[name].css',
       }),
