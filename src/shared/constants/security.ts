@@ -28,23 +28,23 @@ const getEnvVar = (key: string, defaultValue: string): number => {
 export const THROTTLE_CONFIGS = {
   // Authentication forms (more strict)
   AUTH_FORMS: {
-    delay: getEnvVar('REACT_APP_THROTTLE_DELAY_AUTH_FORMS', '4000'), // Wait 4 seconds every attempt
-    maxAttempts: getEnvVar('REACT_APP_THROTTLE_MAX_ATTEMPTS_AUTH_FORMS', '10'), // Maximum number of attempts
-    timeWindow: getEnvVar('REACT_APP_THROTTLE_TIME_WINDOW_AUTH_FORMS', '300000'), // Within time window in milliseconds (5 minutes)
+    delay: getEnvVar('REACT_THROTTLE_DELAY_MS', '4000'), // Wait 4 seconds every attempt
+    maxAttempts: getEnvVar('REACT_THROTTLE_MAX_ATTEMPTS', '10'), // Maximum number of attempts
+    timeWindow: getEnvVar('REACT_THROTTLE_WINDOW_MS', '300000'), // Within time window in milliseconds (5 minutes)
     persistInClient: true, // Persist in localStorage to avoid bypass with refresh
   },
   // Regular forms
   REGULAR_FORMS: {
-    delay: getEnvVar('REACT_APP_THROTTLE_DELAY_REGULAR_FORMS', '4000'), // Wait 4 seconds every attempt
-    maxAttempts: getEnvVar('REACT_APP_THROTTLE_MAX_ATTEMPTS_REGULAR_FORMS', '10'), // Maximum number of attempts
-    timeWindow: getEnvVar('REACT_APP_THROTTLE_TIME_WINDOW_REGULAR_FORMS', '300000'), // Within time window in milliseconds (15 minutes)
+    delay: getEnvVar('REACT_THROTTLE_DELAY_MS', '4000'), // Wait 4 seconds every attempt
+    maxAttempts: getEnvVar('REACT_THROTTLE_MAX_ATTEMPTS', '10'), // Maximum number of attempts
+    timeWindow: getEnvVar('REACT_THROTTLE_WINDOW_MS', '300000'), // Within time window in milliseconds (15 minutes)
     persistInClient: false, // No persist for better UX in regular forms
   },
   // Critical actions
   CRITICAL_ACTIONS: {
-    delay: getEnvVar('REACT_APP_THROTTLE_DELAY_CRITICAL_ACTIONS', '4000'), // Wait 4 seconds every attempt
-    maxAttempts: getEnvVar('REACT_APP_THROTTLE_MAX_ATTEMPTS_CRITICAL_ACTIONS', '10'), // Maximum number of attempts
-    timeWindow: getEnvVar('REACT_APP_THROTTLE_TIME_WINDOW_CRITICAL_ACTIONS', '300000'), // Within time window in milliseconds (5 minutes)
+    delay: getEnvVar('REACT_THROTTLE_DELAY_MS', '4000'), // Wait 4 seconds every attempt
+    maxAttempts: getEnvVar('REACT_THROTTLE_MAX_ATTEMPTS', '10'), // Maximum number of attempts
+    timeWindow: getEnvVar('REACT_THROTTLE_WINDOW_MS', '300000'), // Within time window in milliseconds (5 minutes)
     persistInClient: true, // Persist for maximum security
   },
 } as const;
