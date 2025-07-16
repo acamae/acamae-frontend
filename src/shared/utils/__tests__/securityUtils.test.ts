@@ -158,60 +158,78 @@ describe('SecurityThrottleService', () => {
 
     it('should block action after max attempts', () => {
       const actionId = 'test-action';
-      const config = { delay: 1000, maxAttempts: 2, timeWindow: 60000 };
+      const config = { delay: 0, maxAttempts: 2, timeWindow: 60000 };
 
-      // First action
+      // First attempt should be allowed
       expect(service.canPerformAction(actionId, config)).toBe(true);
 
-      // Wait for delay
-      jest.advanceTimersByTime(1000);
-
-      // Second action
+      // Second attempt should be allowed
       expect(service.canPerformAction(actionId, config)).toBe(true);
 
-      // Wait for delay
-      jest.advanceTimersByTime(1000);
-
-      // Third action should be blocked (exceeds maxAttempts)
+      // Third attempt should be blocked
       expect(service.canPerformAction(actionId, config)).toBe(false);
     });
 
     it('should reset attempts after time window', () => {
       const actionId = 'test-action';
-      const config = { delay: 1000, maxAttempts: 2, timeWindow: 60000 };
+      const config = { delay: 0, maxAttempts: 2, timeWindow: 60000 };
 
-      // First action
+      // First attempt
       expect(service.canPerformAction(actionId, config)).toBe(true);
 
-      // Wait for delay
-      jest.advanceTimersByTime(1000);
-
-      // Second action
+      // Second attempt (max reached)
       expect(service.canPerformAction(actionId, config)).toBe(true);
 
-      // Wait for time window to pass
-      jest.advanceTimersByTime(60000);
+      // Third attempt (blocked)
+      expect(service.canPerformAction(actionId, config)).toBe(false);
 
-      // Third action should be allowed after time window reset
+      // Advance time beyond window
+      jest.advanceTimersByTime(70000);
+
+      // Should be allowed again
       expect(service.canPerformAction(actionId, config)).toBe(true);
     });
 
     it('should block action when user is blocked', () => {
       const actionId = 'test-action';
-      const config = { delay: 1000, maxAttempts: 1, timeWindow: 60000 };
+      const config = { delay: 0, maxAttempts: 1, timeWindow: 60000 };
 
-      // First action
+      // First attempt (allowed)
       expect(service.canPerformAction(actionId, config)).toBe(true);
 
-      // Wait for delay
-      jest.advanceTimersByTime(1000);
-
-      // Second action should block the user
+      // Second attempt (blocked)
       expect(service.canPerformAction(actionId, config)).toBe(false);
 
-      // Additional attempts should still be blocked
-      jest.advanceTimersByTime(1000);
+      // Third attempt (still blocked)
       expect(service.canPerformAction(actionId, config)).toBe(false);
+    });
+
+    it('should handle zero delay throttling correctly', () => {
+      const actionId = 'test-action';
+      const config = { delay: 0, maxAttempts: 3, timeWindow: 60000 };
+
+      // All attempts should be allowed until max is reached
+      expect(service.canPerformAction(actionId, config)).toBe(true);
+      expect(service.canPerformAction(actionId, config)).toBe(true);
+      expect(service.canPerformAction(actionId, config)).toBe(true);
+      expect(service.canPerformAction(actionId, config)).toBe(false);
+    });
+
+    it('should handle delayed throttling correctly', () => {
+      const actionId = 'test-action';
+      const config = { delay: 1000, maxAttempts: 3, timeWindow: 60000 };
+
+      // First attempt allowed
+      expect(service.canPerformAction(actionId, config)).toBe(true);
+
+      // Second attempt blocked due to delay
+      expect(service.canPerformAction(actionId, config)).toBe(false);
+
+      // Wait for delay to pass
+      jest.advanceTimersByTime(1000);
+
+      // Second attempt allowed after delay
+      expect(service.canPerformAction(actionId, config)).toBe(true);
     });
   });
 
