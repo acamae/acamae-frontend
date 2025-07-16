@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
+import { useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ThrottleConfig } from '@shared/constants/security';
@@ -43,6 +43,9 @@ export const useForm = <T extends object>({
   const [touched, setTouched] = useState<Record<keyof T, boolean>>({} as Record<keyof T, boolean>);
   const { i18n } = useTranslation();
 
+  // Ref to track component mount status
+  const isMountedRef = useRef(true);
+
   const shouldUseThrottling = enableThrottling && formName;
 
   // Throttling functionality - always call the hook
@@ -56,6 +59,13 @@ export const useForm = <T extends object>({
     },
     showToastOnThrottle: !!shouldUseThrottling,
   });
+
+  // Cleanup effect to handle component unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   // Run validation only when the language changes and only for touched fields
   useEffect(() => {
@@ -122,8 +132,11 @@ export const useForm = <T extends object>({
     } finally {
       // Use setTimeout to ensure state update happens in next tick
       // This prevents React warnings about updates not wrapped in act()
+      // Only update state if component is still mounted
       setTimeout(() => {
-        setIsSubmitting(false);
+        if (isMountedRef.current) {
+          setIsSubmitting(false);
+        }
       }, 0);
     }
   };

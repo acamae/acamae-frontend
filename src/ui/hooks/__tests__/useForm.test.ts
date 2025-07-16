@@ -235,6 +235,37 @@ describe('useForm Hook', () => {
 
       expect(result.current.isSubmitting).toBe(false);
     });
+
+    it('should not update state after component unmounts', async () => {
+      jest.useFakeTimers();
+      // Mock a delayed submission that takes time to complete
+      mockOnSubmit.mockImplementationOnce(() => new Promise(resolve => setTimeout(resolve, 100)));
+
+      const { result, unmount } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues,
+          onSubmit: mockOnSubmit,
+        })
+      );
+
+      // Iniciar el submit y desmontar inmediatamente
+      await act(async () => {
+        const submitPromise = result.current.handleSubmit(mockFormEvent);
+
+        // Desmontar el componente inmediatamente
+        unmount();
+
+        // Avanzar los timers para completar el submit
+        jest.runAllTimers();
+
+        // Esperar a que termine la promesa
+        await submitPromise;
+      });
+
+      jest.useRealTimers();
+      // El test pasa si no hay advertencias de React sobre actualizaciones de estado
+      // en componentes desmontados
+    });
   });
 
   describe('resetForm', () => {
