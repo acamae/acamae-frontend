@@ -1,5 +1,5 @@
 import { screen, waitFor } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 
 import { createTestProviderFactory } from '@shared/utils/renderProvider';
 import LoginPage from '@ui/pages/LoginPage';

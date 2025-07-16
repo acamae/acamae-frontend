@@ -51,7 +51,7 @@ function checkHttpsConnectivity(url, timeout = 5000) {
       path: urlObj.pathname,
       method: 'GET',
       timeout,
-      rejectUnauthorized: false, // Ignorar errores de certificado SSL
+      rejectUnauthorized: process.env.NODE_ENV === 'production', // Ignorar errores de certificado SSL
     };
 
     const req = https.request(options, res => {

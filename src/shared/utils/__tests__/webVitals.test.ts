@@ -88,6 +88,9 @@ describe('webVitals utilities', () => {
       onTTFB: jest.fn(),
     }));
 
+    // Mock console.log to prevent actual logging during tests
+    const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
     // Temporarily set NODE_ENV to development for this test
     const originalNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'development';
@@ -108,8 +111,9 @@ describe('webVitals utilities', () => {
       expect(onCLSSpy).toHaveBeenCalledTimes(1);
     });
 
-    // Restore NODE_ENV
+    // Restore environment
     process.env.NODE_ENV = originalNodeEnv;
+    consoleLogSpy.mockRestore();
   });
 
   it('logWebVitalsReport should not execute during tests', () => {
