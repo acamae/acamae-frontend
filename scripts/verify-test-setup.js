@@ -257,9 +257,9 @@ async function main() {
   // Cargar variables de entorno si existe el archivo
   try {
     const { config } = await import('dotenv');
-    config({ path: '.env.testing' });
+    config({ path: '.env.test' });
   } catch {
-    warnings.push('Archivo .env.testing no encontrado o no se pudo cargar');
+    warnings.push('Archivo .env.test no encontrado o no se pudo cargar');
   }
 
   const checks = [
@@ -300,7 +300,7 @@ async function main() {
     console.log('1. Asegúrate de que Docker esté ejecutándose');
     console.log('2. Verifica que los contenedores de Nginx estén activos');
     console.log('3. Confirma que MySQL esté ejecutándose');
-    console.log('4. Crea el archivo .env.testing basado en env.testing.example');
+    console.log('4. Crea el archivo .env.test basado en env.test.example');
     console.log('5. Ejecuta: npm run test:e2e:setup');
     process.exit(1);
   } else {

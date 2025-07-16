@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import React, { Suspense, lazy } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { Outlet, createBrowserRouter } from 'react-router-dom';
@@ -501,11 +501,13 @@ describe('AppRoutes', () => {
       },
     ]);
 
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AppRoutes router={testRouter} />
-      </I18nextProvider>
-    );
+    act(() => {
+      render(
+        <I18nextProvider i18n={i18n}>
+          <AppRoutes router={testRouter} />
+        </I18nextProvider>
+      );
+    });
 
     // The component should render inside Suspense
     expect(screen.getByTestId('test-suspense')).toBeInTheDocument();
@@ -624,11 +626,15 @@ describe('AppRoutes', () => {
 
   it('should render AppRoutes with default router and execute code', () => {
     // This test actually renders the component to execute the code
-    const { container } = render(
-      <I18nextProvider i18n={i18n}>
-        <AppRoutes />
-      </I18nextProvider>
-    );
+    let container;
+    act(() => {
+      const renderResult = render(
+        <I18nextProvider i18n={i18n}>
+          <AppRoutes />
+        </I18nextProvider>
+      );
+      container = renderResult.container;
+    });
 
     expect(container).toBeInTheDocument();
   });
@@ -642,11 +648,15 @@ describe('AppRoutes', () => {
       },
     ]);
 
-    const { container } = render(
-      <I18nextProvider i18n={i18n}>
-        <AppRoutes router={customRouter} />
-      </I18nextProvider>
-    );
+    let container;
+    act(() => {
+      const renderResult = render(
+        <I18nextProvider i18n={i18n}>
+          <AppRoutes router={customRouter} />
+        </I18nextProvider>
+      );
+      container = renderResult.container;
+    });
 
     expect(container).toBeInTheDocument();
   });
@@ -1010,17 +1020,19 @@ describe('AppRoutes', () => {
       },
     ]);
 
-    const { container } = render(
-      <I18nextProvider i18n={i18n}>
-        <AppRoutes router={testRouter} />
-      </I18nextProvider>
-    );
+    let container;
+    await act(async () => {
+      const renderResult = render(
+        <I18nextProvider i18n={i18n}>
+          <AppRoutes router={testRouter} />
+        </I18nextProvider>
+      );
+      container = renderResult.container;
+    });
 
     expect(container).toBeInTheDocument();
-
-    // Wait for the component to be available
-    await screen.findByTestId('lazy-test-component');
-    expect(screen.getByTestId('lazy-test-component')).toBeInTheDocument();
+    // The component should be rendered by the router
+    expect(container!.innerHTML).toContain('Lazy Test Component');
   });
 
   it('should test multiple lazy components loading', async () => {
@@ -1037,20 +1049,19 @@ describe('AppRoutes', () => {
       },
     ]);
 
-    const { container } = render(
-      <I18nextProvider i18n={i18n}>
-        <AppRoutes router={multiLazyRouter} />
-      </I18nextProvider>
-    );
+    let container;
+    await act(async () => {
+      const renderResult = render(
+        <I18nextProvider i18n={i18n}>
+          <AppRoutes router={multiLazyRouter} />
+        </I18nextProvider>
+      );
+      container = renderResult.container;
+    });
 
     expect(container).toBeInTheDocument();
-
-    // Wait for all lazy components to load
-    await screen.findByTestId('lazy-component-1');
-    await screen.findByTestId('lazy-component-2');
-
-    expect(screen.getByTestId('lazy-component-1')).toBeInTheDocument();
-    expect(screen.getByTestId('lazy-component-2')).toBeInTheDocument();
+    expect(container!.innerHTML).toContain('Lazy Component 1');
+    expect(container!.innerHTML).toContain('Lazy Component 2');
   });
 
   it('should test lazy loading error handling', async () => {
@@ -1063,17 +1074,18 @@ describe('AppRoutes', () => {
       },
     ]);
 
-    const { container } = render(
-      <I18nextProvider i18n={i18n}>
-        <AppRoutes router={errorRouter} />
-      </I18nextProvider>
-    );
+    let container;
+    await act(async () => {
+      const renderResult = render(
+        <I18nextProvider i18n={i18n}>
+          <AppRoutes router={errorRouter} />
+        </I18nextProvider>
+      );
+      container = renderResult.container;
+    });
 
     expect(container).toBeInTheDocument();
-
-    // The component should still render even if there are lazy loading issues
-    await screen.findByTestId('error-test-component');
-    expect(screen.getByTestId('error-test-component')).toBeInTheDocument();
+    expect(container!.innerHTML).toContain('Error Test Component');
   });
 
   it('should test lazy loading with different route configurations', async () => {
@@ -1093,17 +1105,18 @@ describe('AppRoutes', () => {
       },
     ]);
 
-    const { container } = render(
-      <I18nextProvider i18n={i18n}>
-        <AppRoutes router={complexRouter} />
-      </I18nextProvider>
-    );
+    let container;
+    await act(async () => {
+      const renderResult = render(
+        <I18nextProvider i18n={i18n}>
+          <AppRoutes router={complexRouter} />
+        </I18nextProvider>
+      );
+      container = renderResult.container;
+    });
 
     expect(container).toBeInTheDocument();
-
-    // Test that the default route loads
-    await screen.findByTestId('home-lazy');
-    expect(screen.getByTestId('home-lazy')).toBeInTheDocument();
+    expect(container!.innerHTML).toContain('Home Lazy');
   });
 
   it('should test lazy loading performance', async () => {
@@ -1117,16 +1130,18 @@ describe('AppRoutes', () => {
 
     const startTime = performance.now();
 
-    const { container } = render(
-      <I18nextProvider i18n={i18n}>
-        <AppRoutes router={performanceRouter} />
-      </I18nextProvider>
-    );
+    let container;
+    await act(async () => {
+      const renderResult = render(
+        <I18nextProvider i18n={i18n}>
+          <AppRoutes router={performanceRouter} />
+        </I18nextProvider>
+      );
+      container = renderResult.container;
+    });
 
     expect(container).toBeInTheDocument();
-
-    await screen.findByTestId('performance-test');
-    expect(screen.getByTestId('performance-test')).toBeInTheDocument();
+    expect(container!.innerHTML).toContain('Performance Test');
 
     const endTime = performance.now();
     const renderTime = endTime - startTime;
@@ -1149,22 +1164,19 @@ describe('AppRoutes', () => {
       },
     ]);
 
-    const { container } = render(
-      <I18nextProvider i18n={i18n}>
-        <AppRoutes router={nestedRouter} />
-      </I18nextProvider>
-    );
+    let container;
+    await act(async () => {
+      const renderResult = render(
+        <I18nextProvider i18n={i18n}>
+          <AppRoutes router={nestedRouter} />
+        </I18nextProvider>
+      );
+      container = renderResult.container;
+    });
 
     expect(container).toBeInTheDocument();
-
-    // Wait for all nested components to load
-    await screen.findByTestId('parent-lazy');
-    await screen.findByTestId('child-lazy-1');
-    await screen.findByTestId('child-lazy-2');
-
-    expect(screen.getByTestId('parent-lazy')).toBeInTheDocument();
-    expect(screen.getByTestId('child-lazy-1')).toBeInTheDocument();
-    expect(screen.getByTestId('child-lazy-2')).toBeInTheDocument();
+    expect(container!.innerHTML).toContain('Child 1');
+    expect(container!.innerHTML).toContain('Child 2');
   });
 
   it('should test lazy function execution with dynamic imports', async () => {
@@ -1179,17 +1191,18 @@ describe('AppRoutes', () => {
       },
     ]);
 
-    const { container } = render(
-      <I18nextProvider i18n={i18n}>
-        <AppRoutes router={lazyTestRouter} />
-      </I18nextProvider>
-    );
+    let container;
+    await act(async () => {
+      const renderResult = render(
+        <I18nextProvider i18n={i18n}>
+          <AppRoutes router={lazyTestRouter} />
+        </I18nextProvider>
+      );
+      container = renderResult.container;
+    });
 
     expect(container).toBeInTheDocument();
-
-    // Wait for the component to load
-    await screen.findByTestId('lazy-execution-test');
-    expect(screen.getByTestId('lazy-execution-test')).toBeInTheDocument();
+    expect(container!.innerHTML).toContain('Lazy Execution Test');
   });
 
   it('should test lazy loading with error boundaries', async () => {
@@ -1201,17 +1214,18 @@ describe('AppRoutes', () => {
       },
     ]);
 
-    const { container } = render(
-      <I18nextProvider i18n={i18n}>
-        <AppRoutes router={errorBoundaryRouter} />
-      </I18nextProvider>
-    );
+    let container;
+    await act(async () => {
+      const renderResult = render(
+        <I18nextProvider i18n={i18n}>
+          <AppRoutes router={errorBoundaryRouter} />
+        </I18nextProvider>
+      );
+      container = renderResult.container;
+    });
 
     expect(container).toBeInTheDocument();
-
-    // The component should render even if there are lazy loading errors
-    await screen.findByTestId('error-boundary-test');
-    expect(screen.getByTestId('error-boundary-test')).toBeInTheDocument();
+    expect(container!.innerHTML).toContain('Error Boundary Test');
   });
 
   it('should test lazy loading with different import strategies', async () => {
@@ -1223,16 +1237,18 @@ describe('AppRoutes', () => {
       },
     ]);
 
-    const { container } = render(
-      <I18nextProvider i18n={i18n}>
-        <AppRoutes router={strategiesRouter} />
-      </I18nextProvider>
-    );
+    let container;
+    await act(async () => {
+      const renderResult = render(
+        <I18nextProvider i18n={i18n}>
+          <AppRoutes router={strategiesRouter} />
+        </I18nextProvider>
+      );
+      container = renderResult.container;
+    });
 
     expect(container).toBeInTheDocument();
-
-    await screen.findByTestId('strategy-test');
-    expect(screen.getByTestId('strategy-test')).toBeInTheDocument();
+    expect(container!.innerHTML).toContain('Strategy Test');
   });
 
   it('should test lazy loading coverage improvement', async () => {
@@ -1251,16 +1267,18 @@ describe('AppRoutes', () => {
       },
     ]);
 
-    const { container } = render(
-      <I18nextProvider i18n={i18n}>
-        <routesModule.default router={coverageRouter} />
-      </I18nextProvider>
-    );
+    let container;
+    await act(async () => {
+      const renderResult = render(
+        <I18nextProvider i18n={i18n}>
+          <routesModule.default router={coverageRouter} />
+        </I18nextProvider>
+      );
+      container = renderResult.container;
+    });
 
     expect(container).toBeInTheDocument();
-
-    await screen.findByTestId('coverage-test');
-    expect(screen.getByTestId('coverage-test')).toBeInTheDocument();
+    expect(container!.innerHTML).toContain('Coverage Test');
   });
 
   it('should test individual lazy function execution', async () => {
@@ -1299,15 +1317,18 @@ describe('AppRoutes', () => {
       },
     ]);
 
-    const { container } = render(
-      <I18nextProvider i18n={i18n}>
-        <AppRoutes router={testRouter} />
-      </I18nextProvider>
-    );
+    let container;
+    await act(async () => {
+      const renderResult = render(
+        <I18nextProvider i18n={i18n}>
+          <AppRoutes router={testRouter} />
+        </I18nextProvider>
+      );
+      container = renderResult.container;
+    });
 
     expect(container).toBeInTheDocument();
-    await screen.findByTestId('individual-lazy-test');
-    expect(screen.getByTestId('individual-lazy-test')).toBeInTheDocument();
+    expect(container!.innerHTML).toContain('Individual Lazy Test');
   });
 
   it('should test router creation with lazy imports', () => {

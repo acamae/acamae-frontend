@@ -1,6 +1,6 @@
 import { THROTTLE_CONFIGS } from '@shared/constants/security';
 
-import { securityThrottleService, generateActionId } from '../securityUtils';
+import { SecurityThrottleService, generateActionId } from '../securityUtils';
 
 // Mock localStorage
 const localStorageMock = {
@@ -10,9 +10,92 @@ const localStorageMock = {
 };
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-describe('securityThrottleService', () => {
+// Mock process.env
+const originalEnv = process.env;
+
+describe('SecurityThrottleService - Environment Variables', () => {
   beforeEach(() => {
-    securityThrottleService.clearAllThrottleStates();
+    // Reset process.env before each test
+    process.env = { ...originalEnv };
+  });
+
+  afterEach(() => {
+    // Restore original process.env after each test
+    process.env = originalEnv;
+  });
+
+  describe('getEnvVar function', () => {
+    it('should handle zero values correctly', () => {
+      // Test that setting REACT_APP_THROTTLE_DELAY_DEFAULT to "0" works
+      process.env.REACT_APP_THROTTLE_DELAY_DEFAULT = '0';
+      process.env.REACT_APP_THROTTLE_MAX_ATTEMPTS_DEFAULT = '1000'; // Valor alto para permitir muchas acciones
+      process.env.REACT_APP_THROTTLE_TIME_WINDOW_DEFAULT = '0';
+
+      const service = new SecurityThrottleService();
+
+      // The service should now use 0 values instead of falling back to defaults
+      // We can verify this by checking that the service allows immediate actions
+      // when delay is set to 0
+      const actionId = generateActionId('test-form');
+
+      // With delay = 0, should allow immediate consecutive actions
+      expect(service.canPerformAction(actionId, { delay: 0 })).toBe(true);
+      expect(service.canPerformAction(actionId, { delay: 0 })).toBe(true);
+    });
+
+    it('should handle undefined environment variables', () => {
+      // Clear the environment variables
+      delete process.env.REACT_APP_THROTTLE_DELAY_DEFAULT;
+      delete process.env.REACT_APP_THROTTLE_MAX_ATTEMPTS_DEFAULT;
+      delete process.env.REACT_APP_THROTTLE_TIME_WINDOW_DEFAULT;
+
+      const service = new SecurityThrottleService();
+
+      // Should use default values when env vars are undefined
+      const actionId = generateActionId('test-form');
+
+      // Should work with default configuration
+      expect(service.canPerformAction(actionId)).toBe(true);
+    });
+
+    it('should handle null environment variables', () => {
+      // Set environment variables to null
+      process.env.REACT_APP_THROTTLE_DELAY_DEFAULT = null as unknown as string;
+      process.env.REACT_APP_THROTTLE_MAX_ATTEMPTS_DEFAULT = null as unknown as string;
+      process.env.REACT_APP_THROTTLE_TIME_WINDOW_DEFAULT = null as unknown as string;
+
+      const service = new SecurityThrottleService();
+
+      // Should use default values when env vars are null
+      const actionId = generateActionId('test-form');
+
+      // Should work with default configuration
+      expect(service.canPerformAction(actionId)).toBe(true);
+    });
+
+    it('should handle empty string environment variables', () => {
+      // Set environment variables to empty strings
+      process.env.REACT_APP_THROTTLE_DELAY_DEFAULT = '';
+      process.env.REACT_APP_THROTTLE_MAX_ATTEMPTS_DEFAULT = '';
+      process.env.REACT_APP_THROTTLE_TIME_WINDOW_DEFAULT = '';
+
+      const service = new SecurityThrottleService();
+
+      // Should use default values when env vars are empty strings
+      const actionId = generateActionId('test-form');
+
+      // Should work with default configuration
+      expect(service.canPerformAction(actionId)).toBe(true);
+    });
+  });
+});
+
+describe('SecurityThrottleService', () => {
+  let service: SecurityThrottleService;
+
+  beforeEach(() => {
+    service = new SecurityThrottleService();
+    service.clearAllThrottleStates();
     jest.clearAllTimers();
     jest.useFakeTimers();
     localStorageMock.getItem.mockClear();
@@ -28,7 +111,7 @@ describe('securityThrottleService', () => {
   describe('canPerformAction', () => {
     it('should allow first action', () => {
       const actionId = 'test-action';
-      const result = securityThrottleService.canPerformAction(actionId);
+      const result = service.canPerformAction(actionId);
       expect(result).toBe(true);
     });
 
@@ -37,11 +120,11 @@ describe('securityThrottleService', () => {
       const config = { delay: 1000, maxAttempts: 3, timeWindow: 60000 };
 
       // First action should be allowed
-      expect(securityThrottleService.canPerformAction(actionId, config)).toBe(true);
+      expect(service.canPerformAction(actionId, config)).toBe(true);
 
       // Second action within delay should be blocked
       jest.advanceTimersByTime(500);
-      expect(securityThrottleService.canPerformAction(actionId, config)).toBe(false);
+      expect(service.canPerformAction(actionId, config)).toBe(false);
     });
 
     it('should allow action after delay period', () => {
@@ -49,13 +132,13 @@ describe('securityThrottleService', () => {
       const config = { delay: 1000, maxAttempts: 3, timeWindow: 60000 };
 
       // First action
-      expect(securityThrottleService.canPerformAction(actionId, config)).toBe(true);
+      expect(service.canPerformAction(actionId, config)).toBe(true);
 
       // Wait for delay to pass
       jest.advanceTimersByTime(1000);
 
       // Second action after delay should be allowed
-      expect(securityThrottleService.canPerformAction(actionId, config)).toBe(true);
+      expect(service.canPerformAction(actionId, config)).toBe(true);
     });
 
     it('should block action after max attempts', () => {
@@ -63,19 +146,19 @@ describe('securityThrottleService', () => {
       const config = { delay: 1000, maxAttempts: 2, timeWindow: 60000 };
 
       // First action
-      expect(securityThrottleService.canPerformAction(actionId, config)).toBe(true);
+      expect(service.canPerformAction(actionId, config)).toBe(true);
 
       // Wait for delay
       jest.advanceTimersByTime(1000);
 
       // Second action
-      expect(securityThrottleService.canPerformAction(actionId, config)).toBe(true);
+      expect(service.canPerformAction(actionId, config)).toBe(true);
 
       // Wait for delay
       jest.advanceTimersByTime(1000);
 
       // Third action should be blocked (exceeds maxAttempts)
-      expect(securityThrottleService.canPerformAction(actionId, config)).toBe(false);
+      expect(service.canPerformAction(actionId, config)).toBe(false);
     });
 
     it('should reset attempts after time window', () => {
@@ -83,19 +166,19 @@ describe('securityThrottleService', () => {
       const config = { delay: 1000, maxAttempts: 2, timeWindow: 60000 };
 
       // First action
-      expect(securityThrottleService.canPerformAction(actionId, config)).toBe(true);
+      expect(service.canPerformAction(actionId, config)).toBe(true);
 
       // Wait for delay
       jest.advanceTimersByTime(1000);
 
       // Second action
-      expect(securityThrottleService.canPerformAction(actionId, config)).toBe(true);
+      expect(service.canPerformAction(actionId, config)).toBe(true);
 
       // Wait for time window to pass
       jest.advanceTimersByTime(60000);
 
       // Third action should be allowed after time window reset
-      expect(securityThrottleService.canPerformAction(actionId, config)).toBe(true);
+      expect(service.canPerformAction(actionId, config)).toBe(true);
     });
 
     it('should block action when user is blocked', () => {
@@ -103,31 +186,31 @@ describe('securityThrottleService', () => {
       const config = { delay: 1000, maxAttempts: 1, timeWindow: 60000 };
 
       // First action
-      expect(securityThrottleService.canPerformAction(actionId, config)).toBe(true);
+      expect(service.canPerformAction(actionId, config)).toBe(true);
 
       // Wait for delay
       jest.advanceTimersByTime(1000);
 
       // Second action should block the user
-      expect(securityThrottleService.canPerformAction(actionId, config)).toBe(false);
+      expect(service.canPerformAction(actionId, config)).toBe(false);
 
       // Additional attempts should still be blocked
       jest.advanceTimersByTime(1000);
-      expect(securityThrottleService.canPerformAction(actionId, config)).toBe(false);
+      expect(service.canPerformAction(actionId, config)).toBe(false);
     });
   });
 
   describe('getThrottleState', () => {
     it('should return null for non-existent action', () => {
-      const state = securityThrottleService.getThrottleState('non-existent');
+      const state = service.getThrottleState('non-existent');
       expect(state).toBeNull();
     });
 
     it('should return correct state for existing action', () => {
       const actionId = 'test-action';
-      securityThrottleService.canPerformAction(actionId);
+      service.canPerformAction(actionId);
 
-      const state = securityThrottleService.getThrottleState(actionId);
+      const state = service.getThrottleState(actionId);
       expect(state).not.toBeNull();
       expect(state?.attemptCount).toBe(1);
       expect(state?.isBlocked).toBe(false);
@@ -137,12 +220,12 @@ describe('securityThrottleService', () => {
   describe('clearThrottleState', () => {
     it('should clear specific action state', () => {
       const actionId = 'test-action';
-      securityThrottleService.canPerformAction(actionId);
+      service.canPerformAction(actionId);
 
-      expect(securityThrottleService.getThrottleState(actionId)).not.toBeNull();
+      expect(service.getThrottleState(actionId)).not.toBeNull();
 
-      securityThrottleService.clearThrottleState(actionId);
-      expect(securityThrottleService.getThrottleState(actionId)).toBeNull();
+      service.clearThrottleState(actionId);
+      expect(service.getThrottleState(actionId)).toBeNull();
     });
   });
 
@@ -151,22 +234,22 @@ describe('securityThrottleService', () => {
       const actionId1 = 'test-action-1';
       const actionId2 = 'test-action-2';
 
-      securityThrottleService.canPerformAction(actionId1);
-      securityThrottleService.canPerformAction(actionId2);
+      service.canPerformAction(actionId1);
+      service.canPerformAction(actionId2);
 
-      expect(securityThrottleService.getThrottleState(actionId1)).not.toBeNull();
-      expect(securityThrottleService.getThrottleState(actionId2)).not.toBeNull();
+      expect(service.getThrottleState(actionId1)).not.toBeNull();
+      expect(service.getThrottleState(actionId2)).not.toBeNull();
 
-      securityThrottleService.clearAllThrottleStates();
+      service.clearAllThrottleStates();
 
-      expect(securityThrottleService.getThrottleState(actionId1)).toBeNull();
-      expect(securityThrottleService.getThrottleState(actionId2)).toBeNull();
+      expect(service.getThrottleState(actionId1)).toBeNull();
+      expect(service.getThrottleState(actionId2)).toBeNull();
     });
   });
 
   describe('getTimeUntilNextAction', () => {
     it('should return 0 for non-existent action', () => {
-      const timeUntil = securityThrottleService.getTimeUntilNextAction('non-existent');
+      const timeUntil = service.getTimeUntilNextAction('non-existent');
       expect(timeUntil).toBe(0);
     });
 
@@ -174,15 +257,15 @@ describe('securityThrottleService', () => {
       const actionId = 'test-action';
       const config = { delay: 1000, maxAttempts: 3, timeWindow: 60000 };
 
-      securityThrottleService.canPerformAction(actionId, config);
+      service.canPerformAction(actionId, config);
 
       // Check immediately after action
-      const timeUntil = securityThrottleService.getTimeUntilNextAction(actionId, config);
+      const timeUntil = service.getTimeUntilNextAction(actionId, config);
       expect(timeUntil).toBe(1000);
 
       // Check after some time has passed
       jest.advanceTimersByTime(500);
-      const timeUntilAfter = securityThrottleService.getTimeUntilNextAction(actionId, config);
+      const timeUntilAfter = service.getTimeUntilNextAction(actionId, config);
       expect(timeUntilAfter).toBe(500);
     });
 
@@ -191,13 +274,13 @@ describe('securityThrottleService', () => {
       const config = { delay: 1000, maxAttempts: 1, timeWindow: 60000 };
 
       // First action to reach max attempts
-      securityThrottleService.canPerformAction(actionId, config);
+      service.canPerformAction(actionId, config);
       jest.advanceTimersByTime(1000);
 
       // Second action to block user
-      securityThrottleService.canPerformAction(actionId, config);
+      service.canPerformAction(actionId, config);
 
-      const timeUntil = securityThrottleService.getTimeUntilNextAction(actionId, config);
+      const timeUntil = service.getTimeUntilNextAction(actionId, config);
       expect(timeUntil).toBeGreaterThan(55000); // Allow for some timing variance
       expect(timeUntil).toBeLessThanOrEqual(60000);
     });
@@ -206,7 +289,7 @@ describe('securityThrottleService', () => {
   describe('getRemainingAttempts', () => {
     it('should return max attempts for non-existent action', () => {
       const config = { delay: 1000, maxAttempts: 3, timeWindow: 60000 };
-      const remaining = securityThrottleService.getRemainingAttempts('non-existent', config);
+      const remaining = service.getRemainingAttempts('non-existent', config);
       expect(remaining).toBe(3);
     });
 
@@ -215,21 +298,21 @@ describe('securityThrottleService', () => {
       const config = { delay: 1000, maxAttempts: 3, timeWindow: 60000 };
 
       // No actions yet
-      expect(securityThrottleService.getRemainingAttempts(actionId, config)).toBe(3);
+      expect(service.getRemainingAttempts(actionId, config)).toBe(3);
 
       // First action
-      securityThrottleService.canPerformAction(actionId, config);
-      expect(securityThrottleService.getRemainingAttempts(actionId, config)).toBe(2);
+      service.canPerformAction(actionId, config);
+      expect(service.getRemainingAttempts(actionId, config)).toBe(2);
 
       // Second action
       jest.advanceTimersByTime(1000);
-      securityThrottleService.canPerformAction(actionId, config);
-      expect(securityThrottleService.getRemainingAttempts(actionId, config)).toBe(1);
+      service.canPerformAction(actionId, config);
+      expect(service.getRemainingAttempts(actionId, config)).toBe(1);
 
       // Third action
       jest.advanceTimersByTime(1000);
-      securityThrottleService.canPerformAction(actionId, config);
-      expect(securityThrottleService.getRemainingAttempts(actionId, config)).toBe(0);
+      service.canPerformAction(actionId, config);
+      expect(service.getRemainingAttempts(actionId, config)).toBe(0);
     });
 
     it('should return 0 for blocked user', () => {
@@ -237,13 +320,13 @@ describe('securityThrottleService', () => {
       const config = { delay: 1000, maxAttempts: 1, timeWindow: 60000 };
 
       // First action to reach max attempts
-      securityThrottleService.canPerformAction(actionId, config);
+      service.canPerformAction(actionId, config);
       jest.advanceTimersByTime(1000);
 
       // Second action to block user
-      securityThrottleService.canPerformAction(actionId, config);
+      service.canPerformAction(actionId, config);
 
-      const remaining = securityThrottleService.getRemainingAttempts(actionId, config);
+      const remaining = service.getRemainingAttempts(actionId, config);
       expect(remaining).toBe(0);
     });
 
@@ -252,19 +335,19 @@ describe('securityThrottleService', () => {
       const config = { delay: 1000, maxAttempts: 3, timeWindow: 60000 };
 
       // Use all attempts
-      securityThrottleService.canPerformAction(actionId, config);
+      service.canPerformAction(actionId, config);
       jest.advanceTimersByTime(1000);
-      securityThrottleService.canPerformAction(actionId, config);
+      service.canPerformAction(actionId, config);
       jest.advanceTimersByTime(1000);
-      securityThrottleService.canPerformAction(actionId, config);
+      service.canPerformAction(actionId, config);
 
-      expect(securityThrottleService.getRemainingAttempts(actionId, config)).toBe(0);
+      expect(service.getRemainingAttempts(actionId, config)).toBe(0);
 
       // Wait for time window to pass
       jest.advanceTimersByTime(60000);
 
       // Should reset to max attempts
-      expect(securityThrottleService.getRemainingAttempts(actionId, config)).toBe(3);
+      expect(service.getRemainingAttempts(actionId, config)).toBe(3);
     });
   });
 
@@ -273,7 +356,7 @@ describe('securityThrottleService', () => {
       const actionId = 'login-form-submit';
       const config = { delay: 1000, maxAttempts: 3, timeWindow: 60000, persistInClient: true };
 
-      securityThrottleService.canPerformAction(actionId, config);
+      service.canPerformAction(actionId, config);
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'acamae-throttle-states',
@@ -285,7 +368,7 @@ describe('securityThrottleService', () => {
       const actionId = 'contact-form-submit';
       const config = { delay: 1000, maxAttempts: 3, timeWindow: 60000, persistInClient: false };
 
-      securityThrottleService.canPerformAction(actionId, config);
+      service.canPerformAction(actionId, config);
 
       expect(localStorageMock.setItem).not.toHaveBeenCalled();
     });
@@ -295,14 +378,14 @@ describe('securityThrottleService', () => {
       const config = { delay: 1000, maxAttempts: 1, timeWindow: 60000, persistInClient: true };
 
       // First action
-      securityThrottleService.canPerformAction(actionId, config);
+      service.canPerformAction(actionId, config);
       jest.advanceTimersByTime(1000);
 
       // Reset mock calls from first action
       localStorageMock.setItem.mockClear();
 
       // Second action should block and persist
-      securityThrottleService.canPerformAction(actionId, config);
+      service.canPerformAction(actionId, config);
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'acamae-throttle-states',
@@ -351,7 +434,7 @@ describe('securityThrottleService', () => {
     });
 
     it('should clear persisted states when clearing all', () => {
-      securityThrottleService.clearAllThrottleStates();
+      service.clearAllThrottleStates();
 
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('acamae-throttle-states');
     });
@@ -362,12 +445,12 @@ describe('securityThrottleService', () => {
       const config = { delay: 1000, maxAttempts: 3, timeWindow: 60000, persistInClient: true };
 
       // Create multiple persistent states
-      securityThrottleService.canPerformAction(actionId1, config);
-      securityThrottleService.canPerformAction(actionId2, config);
+      service.canPerformAction(actionId1, config);
+      service.canPerformAction(actionId2, config);
       localStorageMock.setItem.mockClear();
 
       // Clear one specific action
-      securityThrottleService.clearThrottleState(actionId1);
+      service.clearThrottleState(actionId1);
 
       // Should call setItem to update storage with remaining actions
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
@@ -385,12 +468,12 @@ describe('securityThrottleService', () => {
       const config = { delay: 1000, maxAttempts: 3, timeWindow: 60000, persistInClient: true };
 
       // Create a single persistent state
-      securityThrottleService.canPerformAction(actionId, config);
+      service.canPerformAction(actionId, config);
       localStorageMock.setItem.mockClear();
       localStorageMock.removeItem.mockClear();
 
       // Clear the last action
-      securityThrottleService.clearThrottleState(actionId);
+      service.clearThrottleState(actionId);
 
       // Should remove storage completely
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('acamae-throttle-states');
@@ -433,29 +516,41 @@ describe('THROTTLE_CONFIGS', () => {
   });
 });
 
-it('should update windowStart with current timestamp when unblocking after timeWindow', () => {
-  const actionId = 'test-action';
-  const config = { timeWindow: 100, maxAttempts: 2, delay: 0 };
+describe('SecurityThrottleService - Time Window Reset', () => {
+  let service: SecurityThrottleService;
 
-  // Perform actions to trigger blocking (need 2 attempts to reach maxAttempts)
-  expect(securityThrottleService.canPerformAction(actionId, config)).toBe(true); // First attempt
-  expect(securityThrottleService.canPerformAction(actionId, config)).toBe(true); // Second attempt
-  expect(securityThrottleService.canPerformAction(actionId, config)).toBe(false); // Should be blocked after maxAttempts
+  beforeEach(() => {
+    service = new SecurityThrottleService();
+    service.clearAllThrottleStates();
+    jest.clearAllTimers();
+    jest.useFakeTimers();
+  });
 
-  const state = securityThrottleService.getThrottleState(actionId);
-  expect(state?.isBlocked).toBe(true);
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+  });
 
-  const originalWindowStart = state!.windowStart;
+  it('should update windowStart with current timestamp when unblocking after timeWindow', () => {
+    const actionId = 'test-action';
+    const config = { timeWindow: 100, maxAttempts: 2, delay: 0 };
 
-  // Wait for the timeWindow to pass and unblock
-  return new Promise<void>(resolve => {
-    setTimeout(() => {
-      const newState = securityThrottleService.getThrottleState(actionId);
-      expect(newState?.isBlocked).toBe(false);
-      expect(newState?.attemptCount).toBe(0);
-      expect(newState?.windowStart).toBeGreaterThan(originalWindowStart); // Should be updated with current time
+    // Perform actions to trigger blocking (need 2 attempts to reach maxAttempts)
+    expect(service.canPerformAction(actionId, config)).toBe(true); // First attempt
+    expect(service.canPerformAction(actionId, config)).toBe(true); // Second attempt
+    expect(service.canPerformAction(actionId, config)).toBe(false); // Should be blocked after maxAttempts
 
-      resolve();
-    }, 150); // Wait longer than timeWindow (100ms)
+    const state = service.getThrottleState(actionId);
+    expect(state?.isBlocked).toBe(true);
+
+    const originalWindowStart = state!.windowStart;
+
+    // Advance timers to trigger unblocking
+    jest.advanceTimersByTime(150); // Wait longer than timeWindow (100ms)
+
+    const newState = service.getThrottleState(actionId);
+    expect(newState?.isBlocked).toBe(false);
+    expect(newState?.attemptCount).toBe(0);
+    expect(newState?.windowStart).toBeGreaterThan(originalWindowStart); // Should be updated with current time
   });
 });

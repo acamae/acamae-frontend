@@ -108,7 +108,7 @@ export default defineConfig({
       DB_PASSWORD: 'acamae_test_password',
       DB_ADMIN_USER: 'root',
       DB_ADMIN_PASSWORD: 'rootpassword',
-      NODE_ENV: 'testing',
+      NODE_ENV: 'test',
     },
 
     // Test configuration

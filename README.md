@@ -442,7 +442,7 @@ Referrer-Policy: strict-origin-when-cross-origin
 
 **8 security layers** have been implemented that completely prevent any accidental operations:
 
-- ✅ **Environment Verification**: Only works in `NODE_ENV=testing`
+- ✅ **Environment Verification**: Only works in `NODE_ENV=test`
 - ✅ **Database Validation**: Names must contain "test"
 - ✅ **Database Blacklist**: 8 production names prohibited
 - ✅ **User Validation**: Users must contain "test"

@@ -120,7 +120,11 @@ export const useForm = <T extends object>({
         await onSubmit(values);
       }
     } finally {
-      setIsSubmitting(false);
+      // Use setTimeout to ensure state update happens in next tick
+      // This prevents React warnings about updates not wrapped in act()
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 0);
     }
   };
 

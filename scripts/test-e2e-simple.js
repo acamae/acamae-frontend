@@ -7,7 +7,7 @@
 
 import { execSync, spawn } from 'child_process';
 
-const NODE_ENV = 'testing';
+const NODE_ENV = 'test';
 const SERVER_PORT = 3000;
 let serverProcess = null;
 const cypressProcess = null;

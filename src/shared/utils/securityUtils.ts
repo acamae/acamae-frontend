@@ -13,7 +13,12 @@ export interface ThrottleState {
  */
 const getEnvVar = (key: string, defaultValue: string): number => {
   try {
-    return Number(process.env[key]) || Number(defaultValue);
+    const envValue = process.env[key];
+    // Check if the environment variable exists and is not undefined
+    if (envValue !== undefined && envValue !== null) {
+      return Number(envValue);
+    }
+    return Number(defaultValue);
   } catch {
     return Number(defaultValue);
   }
@@ -114,6 +119,54 @@ class SecurityThrottleService {
     const now = Date.now();
     const state = this.throttleStates.get(actionId);
 
+    // Si delay es 0, permitir siempre la acción (no throttling por tiempo)
+    if (Number(finalConfig.delay) === 0) {
+      // Mantener el conteo de intentos y bloqueo si maxAttempts > 0
+      if (!state) {
+        const newState: ThrottleState = {
+          lastSubmission: now,
+          attemptCount: 1,
+          windowStart: now,
+          isBlocked: false,
+        };
+        this.throttleStates.set(actionId, newState);
+        if (this.requiresPersistence(finalConfig)) {
+          this.persistCriticalStates();
+        }
+        return true;
+      }
+      if (state.isBlocked) {
+        return false;
+      }
+      // Reset the attempt count if the time window has passed
+      if (now - state.windowStart > Number(finalConfig.timeWindow)) {
+        state.attemptCount = 0;
+        state.windowStart = now;
+      }
+      if (state.attemptCount >= Number(finalConfig.maxAttempts)) {
+        state.isBlocked = true;
+        if (this.requiresPersistence(finalConfig)) {
+          this.persistCriticalStates();
+        }
+        setTimeout(() => {
+          state.isBlocked = false;
+          state.attemptCount = 0;
+          state.windowStart = Date.now();
+          if (this.requiresPersistence(finalConfig)) {
+            this.persistCriticalStates();
+          }
+        }, Number(finalConfig.timeWindow));
+        return false;
+      }
+      state.lastSubmission = now;
+      state.attemptCount += 1;
+      this.throttleStates.set(actionId, state);
+      if (this.requiresPersistence(finalConfig)) {
+        this.persistCriticalStates();
+      }
+      return true;
+    }
+
     if (!state) {
       // First time this action is executed
       const newState: ThrottleState = {
@@ -123,12 +176,10 @@ class SecurityThrottleService {
         isBlocked: false,
       };
       this.throttleStates.set(actionId, newState);
-
       // Persist if necessary
       if (this.requiresPersistence(finalConfig)) {
         this.persistCriticalStates();
       }
-
       return true;
     }
 
@@ -151,24 +202,20 @@ class SecurityThrottleService {
     // Check the attempt limit
     if (state.attemptCount >= Number(finalConfig.maxAttempts)) {
       state.isBlocked = true;
-
       // Persist the block immediately if necessary
       if (this.requiresPersistence(finalConfig)) {
         this.persistCriticalStates();
       }
-
       // Unblock after the time window
       setTimeout(() => {
         state.isBlocked = false;
         state.attemptCount = 0;
         state.windowStart = Date.now(); // Use current timestamp instead of stale 'now'
-
         // Persist the unblock if necessary
         if (this.requiresPersistence(finalConfig)) {
           this.persistCriticalStates();
         }
       }, Number(finalConfig.timeWindow));
-
       return false;
     }
 
@@ -176,12 +223,10 @@ class SecurityThrottleService {
     state.lastSubmission = now;
     state.attemptCount += 1;
     this.throttleStates.set(actionId, state);
-
     // Persist if necessary
     if (this.requiresPersistence(finalConfig)) {
       this.persistCriticalStates();
     }
-
     return true;
   }
 

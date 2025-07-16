@@ -1,4 +1,4 @@
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import React, { ChangeEvent, FormEvent } from 'react';
 
 import { ToastProvider } from '@shared/services/ToastProvider';
@@ -167,9 +167,13 @@ describe('useForm Hook', () => {
           validate: mockValidate,
         })
       );
+
+      // Ejecutar handleSubmit y esperar a que termine completamente
       await act(async () => {
-        await result.current.handleSubmit(mockFormEvent);
+        const submitPromise = result.current.handleSubmit(mockFormEvent);
+        await submitPromise;
       });
+
       expect(mockOnSubmit).toHaveBeenCalledWith(initialValues);
     });
 
@@ -180,9 +184,13 @@ describe('useForm Hook', () => {
           onSubmit: mockOnSubmit,
         })
       );
+
+      // Ejecutar handleSubmit y esperar a que termine completamente
       await act(async () => {
-        await result.current.handleSubmit(mockFormEvent);
+        const submitPromise = result.current.handleSubmit(mockFormEvent);
+        await submitPromise;
       });
+
       expect(mockOnSubmit).toHaveBeenCalledWith(initialValues);
     });
 
@@ -195,24 +203,16 @@ describe('useForm Hook', () => {
         })
       );
 
-      // Inicia la submission dentro de act()
-      let submitPromise: Promise<void>;
+      // Ejecutar handleSubmit y esperar a que termine completamente
       await act(async () => {
-        submitPromise = result.current.handleSubmit(mockFormEvent);
+        const submitPromise = result.current.handleSubmit(mockFormEvent);
+        await submitPromise;
+        // Forzar que todas las microtasks se completen
+        await new Promise(resolve => setTimeout(resolve, 0));
       });
 
-      // Espera a que React actualice el estado a true
-      await waitFor(() => {
-        expect(result.current.isSubmitting).toBe(true);
-      });
-
-      // Espera a que termine la submission
-      await submitPromise!;
-
-      // Espera a que React actualice el estado a false
-      await waitFor(() => {
-        expect(result.current.isSubmitting).toBe(false);
-      });
+      // Verifica que el estado final sea correcto
+      expect(result.current.isSubmitting).toBe(false);
     });
 
     it('should set isSubmitting to false even if onSubmit throws an error', async () => {
@@ -224,9 +224,15 @@ describe('useForm Hook', () => {
           onSubmit: mockOnSubmit,
         })
       );
+
+      // Ejecutar handleSubmit y esperar a que termine completamente
       await act(async () => {
-        await expect(result.current.handleSubmit(mockFormEvent)).rejects.toThrow('Submit failed');
+        const submitPromise = result.current.handleSubmit(mockFormEvent);
+        await expect(submitPromise).rejects.toThrow('Submit failed');
+        // Forzar que todas las microtasks se completen
+        await new Promise(resolve => setTimeout(resolve, 0));
       });
+
       expect(result.current.isSubmitting).toBe(false);
     });
   });

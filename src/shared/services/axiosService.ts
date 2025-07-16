@@ -185,6 +185,8 @@ const createErrorInstance = (error: unknown): Error => {
 };
 
 const logError = (error: unknown): void => {
+  if (process.env.NODE_ENV === 'test') return;
+
   const axiosError = error as AxiosError;
   if (axiosError.response) {
     console.error('Response:', axiosError.response);

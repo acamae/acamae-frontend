@@ -16,7 +16,12 @@ export interface ThrottleConfig {
  */
 const getEnvVar = (key: string, defaultValue: string): number => {
   try {
-    return Number(process.env[key]) || Number(defaultValue);
+    const envValue = process.env[key];
+    // Check if the environment variable exists and is not undefined
+    if (envValue !== undefined && envValue !== null) {
+      return Number(envValue);
+    }
+    return Number(defaultValue);
   } catch {
     return Number(defaultValue);
   }

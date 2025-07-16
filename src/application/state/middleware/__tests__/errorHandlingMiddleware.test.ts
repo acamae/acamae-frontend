@@ -56,7 +56,7 @@ describe('errorHandlingMiddleware', () => {
     const errorAction = {
       type: 'test/error',
       error: true,
-      payload: new Error('Test error message'),
+      payload: { message: 'Test error message' },
     };
 
     store.dispatch(errorAction);
@@ -103,7 +103,7 @@ describe('errorHandlingMiddleware', () => {
     const errorActionNoMessage = {
       type: 'test/error',
       error: true,
-      payload: new Error(),
+      payload: {},
     };
 
     store.dispatch(errorActionNoMessage);
