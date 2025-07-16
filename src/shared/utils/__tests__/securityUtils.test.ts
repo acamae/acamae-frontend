@@ -530,22 +530,37 @@ describe('THROTTLE_CONFIGS', () => {
   it('should have auth forms config', () => {
     expect(THROTTLE_CONFIGS.AUTH_FORMS).toBeDefined();
     expect(THROTTLE_CONFIGS.AUTH_FORMS.delay).toBe(4000);
-    expect(THROTTLE_CONFIGS.AUTH_FORMS.maxAttempts).toBe(10);
+    expect(THROTTLE_CONFIGS.AUTH_FORMS.maxAttempts).toBe(8);
     expect(THROTTLE_CONFIGS.AUTH_FORMS.timeWindow).toBe(300000);
   });
 
   it('should have regular forms config', () => {
     expect(THROTTLE_CONFIGS.REGULAR_FORMS).toBeDefined();
-    expect(THROTTLE_CONFIGS.REGULAR_FORMS.delay).toBe(4000);
-    expect(THROTTLE_CONFIGS.REGULAR_FORMS.maxAttempts).toBe(10);
+    expect(THROTTLE_CONFIGS.REGULAR_FORMS.delay).toBe(3000);
+    expect(THROTTLE_CONFIGS.REGULAR_FORMS.maxAttempts).toBe(12);
     expect(THROTTLE_CONFIGS.REGULAR_FORMS.timeWindow).toBe(300000);
   });
 
   it('should have critical actions config', () => {
     expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS).toBeDefined();
-    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.delay).toBe(4000);
-    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.maxAttempts).toBe(10);
+    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.delay).toBe(5000);
+    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.maxAttempts).toBe(5);
     expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.timeWindow).toBe(300000);
+  });
+
+  it('should have differentiated security values', () => {
+    // Verify security differentiation is implemented
+    const authConfig = THROTTLE_CONFIGS.AUTH_FORMS;
+    const regularConfig = THROTTLE_CONFIGS.REGULAR_FORMS;
+    const criticalConfig = THROTTLE_CONFIGS.CRITICAL_ACTIONS;
+
+    // AUTH_FORMS should be stricter than REGULAR_FORMS
+    expect(authConfig.delay).toBeGreaterThanOrEqual(regularConfig.delay);
+    expect(authConfig.maxAttempts).toBeLessThanOrEqual(regularConfig.maxAttempts);
+
+    // CRITICAL_ACTIONS should be strictest
+    expect(criticalConfig.delay).toBeGreaterThanOrEqual(authConfig.delay);
+    expect(criticalConfig.maxAttempts).toBeLessThanOrEqual(authConfig.maxAttempts);
   });
 });
 

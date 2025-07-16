@@ -5,23 +5,23 @@ describe('Security Constants', () => {
     it('should have AUTH_FORMS configuration', () => {
       expect(THROTTLE_CONFIGS.AUTH_FORMS).toBeDefined();
       expect(THROTTLE_CONFIGS.AUTH_FORMS.delay).toBe(4000);
-      expect(THROTTLE_CONFIGS.AUTH_FORMS.maxAttempts).toBe(10);
+      expect(THROTTLE_CONFIGS.AUTH_FORMS.maxAttempts).toBe(8);
       expect(THROTTLE_CONFIGS.AUTH_FORMS.timeWindow).toBe(300000);
       expect(THROTTLE_CONFIGS.AUTH_FORMS.persistInClient).toBe(true);
     });
 
     it('should have REGULAR_FORMS configuration', () => {
       expect(THROTTLE_CONFIGS.REGULAR_FORMS).toBeDefined();
-      expect(THROTTLE_CONFIGS.REGULAR_FORMS.delay).toBe(4000);
-      expect(THROTTLE_CONFIGS.REGULAR_FORMS.maxAttempts).toBe(10);
+      expect(THROTTLE_CONFIGS.REGULAR_FORMS.delay).toBe(3000);
+      expect(THROTTLE_CONFIGS.REGULAR_FORMS.maxAttempts).toBe(12);
       expect(THROTTLE_CONFIGS.REGULAR_FORMS.timeWindow).toBe(300000);
       expect(THROTTLE_CONFIGS.REGULAR_FORMS.persistInClient).toBe(false);
     });
 
     it('should have CRITICAL_ACTIONS configuration', () => {
       expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS).toBeDefined();
-      expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.delay).toBe(4000);
-      expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.maxAttempts).toBe(10);
+      expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.delay).toBe(5000);
+      expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.maxAttempts).toBe(5);
       expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.timeWindow).toBe(300000);
       expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.persistInClient).toBe(true);
     });

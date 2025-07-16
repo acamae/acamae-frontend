@@ -221,9 +221,11 @@ npm run update:snapshots
 
 | Form Type          | Delay | Max Attempts | Window | Persistence |
 | ------------------ | ----- | ------------ | ------ | ----------- |
-| **Authentication** | 4s    | 3 attempts   | 1 min  | ✅ Yes      |
-| **Regular**        | 2s    | 5 attempts   | 1 min  | ❌ No       |
-| **Critical**       | 8s    | 2 attempts   | 1 min  | ✅ Yes      |
+| **Authentication** | 4s    | 8 attempts   | 5 min  | ✅ Yes      |
+| **Regular**        | 3s    | 12 attempts  | 5 min  | ❌ No       |
+| **Critical**       | 5s    | 5 attempts   | 5 min  | ✅ Yes      |
+
+> **Diferenciación de Seguridad**: Cada tipo tiene configuraciones específicas según su nivel de seguridad.
 
 #### 🎯 Protected Forms
 
