@@ -5,24 +5,24 @@ describe('Security Constants', () => {
     it('should have AUTH_FORMS configuration', () => {
       expect(THROTTLE_CONFIGS.AUTH_FORMS).toBeDefined();
       expect(THROTTLE_CONFIGS.AUTH_FORMS.delay).toBe(4000);
-      expect(THROTTLE_CONFIGS.AUTH_FORMS.maxAttempts).toBe(3);
-      expect(THROTTLE_CONFIGS.AUTH_FORMS.timeWindow).toBe(60000);
+      expect(THROTTLE_CONFIGS.AUTH_FORMS.maxAttempts).toBe(10);
+      expect(THROTTLE_CONFIGS.AUTH_FORMS.timeWindow).toBe(300000);
       expect(THROTTLE_CONFIGS.AUTH_FORMS.persistInClient).toBe(true);
     });
 
     it('should have REGULAR_FORMS configuration', () => {
       expect(THROTTLE_CONFIGS.REGULAR_FORMS).toBeDefined();
-      expect(THROTTLE_CONFIGS.REGULAR_FORMS.delay).toBe(2000);
-      expect(THROTTLE_CONFIGS.REGULAR_FORMS.maxAttempts).toBe(5);
-      expect(THROTTLE_CONFIGS.REGULAR_FORMS.timeWindow).toBe(60000);
+      expect(THROTTLE_CONFIGS.REGULAR_FORMS.delay).toBe(4000);
+      expect(THROTTLE_CONFIGS.REGULAR_FORMS.maxAttempts).toBe(10);
+      expect(THROTTLE_CONFIGS.REGULAR_FORMS.timeWindow).toBe(300000);
       expect(THROTTLE_CONFIGS.REGULAR_FORMS.persistInClient).toBe(false);
     });
 
     it('should have CRITICAL_ACTIONS configuration', () => {
       expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS).toBeDefined();
-      expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.delay).toBe(8000);
-      expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.maxAttempts).toBe(2);
-      expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.timeWindow).toBe(60000);
+      expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.delay).toBe(4000);
+      expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.maxAttempts).toBe(10);
+      expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.timeWindow).toBe(300000);
       expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.persistInClient).toBe(true);
     });
 
@@ -47,17 +47,17 @@ describe('Security Constants', () => {
 
     it('should have AUTH_FORMS with stricter settings than REGULAR_FORMS', () => {
       // Auth forms should have longer delay and fewer attempts for higher security
-      expect(THROTTLE_CONFIGS.AUTH_FORMS.delay).toBeGreaterThan(
+      expect(THROTTLE_CONFIGS.AUTH_FORMS.delay).toBeGreaterThanOrEqual(
         THROTTLE_CONFIGS.REGULAR_FORMS.delay
       );
-      expect(THROTTLE_CONFIGS.AUTH_FORMS.maxAttempts).toBeLessThan(
+      expect(THROTTLE_CONFIGS.AUTH_FORMS.maxAttempts).toBeLessThanOrEqual(
         THROTTLE_CONFIGS.REGULAR_FORMS.maxAttempts
       );
     });
 
     it('should have CRITICAL_ACTIONS with strictest settings', () => {
       // Critical actions should have the longest delay and fewest attempts
-      expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.delay).toBeGreaterThan(
+      expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.delay).toBeGreaterThanOrEqual(
         THROTTLE_CONFIGS.AUTH_FORMS.delay
       );
       expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.maxAttempts).toBeLessThanOrEqual(

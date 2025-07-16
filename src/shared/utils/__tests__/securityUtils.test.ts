@@ -414,22 +414,22 @@ describe('THROTTLE_CONFIGS', () => {
   it('should have auth forms config', () => {
     expect(THROTTLE_CONFIGS.AUTH_FORMS).toBeDefined();
     expect(THROTTLE_CONFIGS.AUTH_FORMS.delay).toBe(4000);
-    expect(THROTTLE_CONFIGS.AUTH_FORMS.maxAttempts).toBe(3);
-    expect(THROTTLE_CONFIGS.AUTH_FORMS.timeWindow).toBe(60000);
+    expect(THROTTLE_CONFIGS.AUTH_FORMS.maxAttempts).toBe(10);
+    expect(THROTTLE_CONFIGS.AUTH_FORMS.timeWindow).toBe(300000);
   });
 
   it('should have regular forms config', () => {
     expect(THROTTLE_CONFIGS.REGULAR_FORMS).toBeDefined();
-    expect(THROTTLE_CONFIGS.REGULAR_FORMS.delay).toBe(2000);
-    expect(THROTTLE_CONFIGS.REGULAR_FORMS.maxAttempts).toBe(5);
-    expect(THROTTLE_CONFIGS.REGULAR_FORMS.timeWindow).toBe(60000);
+    expect(THROTTLE_CONFIGS.REGULAR_FORMS.delay).toBe(4000);
+    expect(THROTTLE_CONFIGS.REGULAR_FORMS.maxAttempts).toBe(10);
+    expect(THROTTLE_CONFIGS.REGULAR_FORMS.timeWindow).toBe(300000);
   });
 
   it('should have critical actions config', () => {
     expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS).toBeDefined();
-    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.delay).toBe(8000);
-    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.maxAttempts).toBe(2);
-    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.timeWindow).toBe(60000);
+    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.delay).toBe(4000);
+    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.maxAttempts).toBe(10);
+    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.timeWindow).toBe(300000);
   });
 });
 

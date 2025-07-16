@@ -7,12 +7,24 @@ export interface ThrottleState {
   isBlocked: boolean;
 }
 
+/**
+ * Safe function to get environment variables with fallback
+ * This prevents errors when process.env is not available during module loading
+ */
+const getEnvVar = (key: string, defaultValue: string): number => {
+  try {
+    return Number(process.env[key]) || Number(defaultValue);
+  } catch {
+    return Number(defaultValue);
+  }
+};
+
 class SecurityThrottleService {
   private readonly throttleStates: Map<string, ThrottleState> = new Map();
   private readonly defaultConfig: ThrottleConfig = {
-    delay: 1000, // 1 second minimum between clicks
-    maxAttempts: 3, // maximum 3 attempts
-    timeWindow: 60000, // in a 1 minute window
+    delay: getEnvVar('REACT_APP_THROTTLE_DELAY_DEFAULT', '4000'), // Wait 4 seconds every attempt
+    maxAttempts: getEnvVar('REACT_APP_THROTTLE_MAX_ATTEMPTS_DEFAULT', '10'), // Maximum number of attempts
+    timeWindow: getEnvVar('REACT_APP_THROTTLE_TIME_WINDOW_DEFAULT', '300000'), // Within time window in milliseconds (5 minutes)
     persistInClient: false,
   };
   private readonly storageKey = 'acamae-throttle-states';
@@ -126,18 +138,18 @@ class SecurityThrottleService {
     }
 
     // Check the minimum delay between clicks
-    if (now - state.lastSubmission < finalConfig.delay) {
+    if (now - state.lastSubmission < Number(finalConfig.delay)) {
       return false;
     }
 
     // Reset the attempt count if the time window has passed
-    if (now - state.windowStart > finalConfig.timeWindow) {
+    if (now - state.windowStart > Number(finalConfig.timeWindow)) {
       state.attemptCount = 0;
       state.windowStart = now;
     }
 
     // Check the attempt limit
-    if (state.attemptCount >= finalConfig.maxAttempts) {
+    if (state.attemptCount >= Number(finalConfig.maxAttempts)) {
       state.isBlocked = true;
 
       // Persist the block immediately if necessary
@@ -155,7 +167,7 @@ class SecurityThrottleService {
         if (this.requiresPersistence(finalConfig)) {
           this.persistCriticalStates();
         }
-      }, finalConfig.timeWindow);
+      }, Number(finalConfig.timeWindow));
 
       return false;
     }
@@ -221,10 +233,10 @@ class SecurityThrottleService {
 
     const now = Date.now();
     const timeSinceLastSubmission = now - state.lastSubmission;
-    const remainingDelay = finalConfig.delay - timeSinceLastSubmission;
+    const remainingDelay = Number(finalConfig.delay) - timeSinceLastSubmission;
 
     if (state.isBlocked) {
-      const timeUntilUnblock = finalConfig.timeWindow - (now - state.windowStart);
+      const timeUntilUnblock = Number(finalConfig.timeWindow) - (now - state.windowStart);
       return Math.max(timeUntilUnblock, 0);
     }
 
@@ -240,7 +252,7 @@ class SecurityThrottleService {
 
     // If the action is not in the state, return the max attempts
     if (!state) {
-      return finalConfig.maxAttempts;
+      return Number(finalConfig.maxAttempts);
     }
 
     // If the action is blocked, return 0
@@ -250,12 +262,12 @@ class SecurityThrottleService {
 
     // Reset the attempt count if the time window has passed
     const now = Date.now();
-    if (now - state.windowStart > finalConfig.timeWindow) {
-      return finalConfig.maxAttempts;
+    if (now - state.windowStart > Number(finalConfig.timeWindow)) {
+      return Number(finalConfig.maxAttempts);
     }
 
     // Return the remaining attempts
-    return Math.max(finalConfig.maxAttempts - state.attemptCount, 0);
+    return Math.max(Number(finalConfig.maxAttempts) - state.attemptCount, 0);
   }
 }
 

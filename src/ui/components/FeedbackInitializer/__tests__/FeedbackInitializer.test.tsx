@@ -1,30 +1,46 @@
 import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
+import { ToastProvider } from '@shared/services/ToastProvider';
 import FeedbackInitializer from '@ui/components/FeedbackInitializer';
 
 // Mocks necesarios
-jest.mock('@ui/hooks/useToast', () => ({
-  useToast: jest.fn().mockReturnValue({
-    error: jest.fn(),
-    success: jest.fn(),
-    warning: jest.fn(),
-    info: jest.fn(),
-    show: jest.fn(),
-  }),
+jest.mock('@shared/services/ToastProvider', () => ({
+  ...jest.requireActual('@shared/services/ToastProvider'),
+  useToastContext: jest.fn(),
 }));
 
 jest.mock('@application/state/middleware/feedbackMiddleware', () => ({
   configureFeedback: jest.fn(),
 }));
 
-const renderWithRouter = (component: React.ReactElement) => {
-  return render(<MemoryRouter>{component}</MemoryRouter>);
+const mockUseToastContext = require('@shared/services/ToastProvider').useToastContext;
+
+const renderWithProviders = (component: React.ReactElement) => {
+  const mockToastContext = {
+    error: jest.fn(),
+    success: jest.fn(),
+    warning: jest.fn(),
+    info: jest.fn(),
+    show: jest.fn(),
+  };
+
+  mockUseToastContext.mockReturnValue(mockToastContext);
+
+  return render(
+    <MemoryRouter>
+      <ToastProvider>{component}</ToastProvider>
+    </MemoryRouter>
+  );
 };
 
 describe('FeedbackInitializer', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('debe renderizar sus hijos sin afectar la estructura del DOM', () => {
-    const { container } = renderWithRouter(
+    const { container } = renderWithProviders(
       <FeedbackInitializer>
         <div data-testid="test-child">Test Child</div>
       </FeedbackInitializer>
@@ -40,7 +56,7 @@ describe('FeedbackInitializer', () => {
     const { configureFeedback } = require('@application/state/middleware/feedbackMiddleware');
     configureFeedback.mockImplementation(mockConfigureFeedback);
 
-    renderWithRouter(
+    renderWithProviders(
       <FeedbackInitializer>
         <div>Test Child</div>
       </FeedbackInitializer>

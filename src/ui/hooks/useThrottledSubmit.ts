@@ -23,7 +23,7 @@ export interface UseThrottledSubmitReturn {
 
 export const useThrottledSubmit = ({
   formName,
-  throttleConfig = THROTTLE_CONFIGS.AUTH_FORMS,
+  throttleConfig = THROTTLE_CONFIGS.AUTH_FORMS as Partial<ThrottleConfig>,
   onSubmit,
   showToastOnThrottle = true,
 }: UseThrottledSubmitConfig): UseThrottledSubmitReturn => {
@@ -129,7 +129,7 @@ export const useAuthThrottledSubmit = (
 ): UseThrottledSubmitReturn => {
   return useThrottledSubmit({
     formName,
-    throttleConfig: THROTTLE_CONFIGS.AUTH_FORMS,
+    throttleConfig: THROTTLE_CONFIGS.AUTH_FORMS as Partial<ThrottleConfig>,
     onSubmit,
     showToastOnThrottle: true,
   });
@@ -144,7 +144,7 @@ export const useRegularThrottledSubmit = (
 ): UseThrottledSubmitReturn => {
   return useThrottledSubmit({
     formName,
-    throttleConfig: THROTTLE_CONFIGS.REGULAR_FORMS,
+    throttleConfig: THROTTLE_CONFIGS.REGULAR_FORMS as Partial<ThrottleConfig>,
     onSubmit,
     showToastOnThrottle: true,
   });
@@ -159,7 +159,7 @@ export const useCriticalThrottledSubmit = (
 ): UseThrottledSubmitReturn => {
   return useThrottledSubmit({
     formName,
-    throttleConfig: THROTTLE_CONFIGS.CRITICAL_ACTIONS,
+    throttleConfig: THROTTLE_CONFIGS.CRITICAL_ACTIONS as Partial<ThrottleConfig>,
     onSubmit,
     showToastOnThrottle: true,
   });

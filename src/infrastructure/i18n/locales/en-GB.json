@@ -107,7 +107,14 @@
       "checking": "Checking session...",
       "required": "You must be logged in to continue."
     },
-    "unknown": "An unexpected error occurred."
+    "unknown": "An unexpected error occurred.",
+    "boundary": {
+      "title": "Something went wrong",
+      "message": "We encountered an unexpected error. Please try refreshing the page or going back.",
+      "reload": "Refresh page",
+      "back": "Go back",
+      "details": "Error details (development only)"
+    }
   },
   "security": {
     "throttle": {

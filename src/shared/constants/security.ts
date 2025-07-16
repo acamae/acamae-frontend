@@ -11,28 +11,40 @@ export interface ThrottleConfig {
 }
 
 /**
+ * Safe function to get environment variables with fallback
+ * This prevents errors when process.env is not available during module loading
+ */
+const getEnvVar = (key: string, defaultValue: string): number => {
+  try {
+    return Number(process.env[key]) || Number(defaultValue);
+  } catch {
+    return Number(defaultValue);
+  }
+};
+
+/**
  * Types of configuration for different types of forms
  */
 export const THROTTLE_CONFIGS = {
   // Authentication forms (more strict)
   AUTH_FORMS: {
-    delay: 4000, // 4 seconds
-    maxAttempts: 3,
-    timeWindow: 60000, // 1 minute
+    delay: getEnvVar('REACT_APP_THROTTLE_DELAY_AUTH_FORMS', '4000'), // Wait 4 seconds every attempt
+    maxAttempts: getEnvVar('REACT_APP_THROTTLE_MAX_ATTEMPTS_AUTH_FORMS', '10'), // Maximum number of attempts
+    timeWindow: getEnvVar('REACT_APP_THROTTLE_TIME_WINDOW_AUTH_FORMS', '300000'), // Within time window in milliseconds (5 minutes)
     persistInClient: true, // Persist in localStorage to avoid bypass with refresh
   },
   // Regular forms
   REGULAR_FORMS: {
-    delay: 2000, // 2 seconds
-    maxAttempts: 5,
-    timeWindow: 60000, // 1 minute
+    delay: getEnvVar('REACT_APP_THROTTLE_DELAY_REGULAR_FORMS', '4000'), // Wait 4 seconds every attempt
+    maxAttempts: getEnvVar('REACT_APP_THROTTLE_MAX_ATTEMPTS_REGULAR_FORMS', '10'), // Maximum number of attempts
+    timeWindow: getEnvVar('REACT_APP_THROTTLE_TIME_WINDOW_REGULAR_FORMS', '300000'), // Within time window in milliseconds (15 minutes)
     persistInClient: false, // No persist for better UX in regular forms
   },
   // Critical actions
   CRITICAL_ACTIONS: {
-    delay: 8000, // 8 seconds
-    maxAttempts: 2,
-    timeWindow: 60000, // 1 minute
+    delay: getEnvVar('REACT_APP_THROTTLE_DELAY_CRITICAL_ACTIONS', '4000'), // Wait 4 seconds every attempt
+    maxAttempts: getEnvVar('REACT_APP_THROTTLE_MAX_ATTEMPTS_CRITICAL_ACTIONS', '10'), // Maximum number of attempts
+    timeWindow: getEnvVar('REACT_APP_THROTTLE_TIME_WINDOW_CRITICAL_ACTIONS', '300000'), // Within time window in milliseconds (5 minutes)
     persistInClient: true, // Persist for maximum security
   },
 } as const;
