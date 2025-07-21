@@ -39,9 +39,7 @@ const LoginForm: React.FC = () => {
     touched,
     handleChange,
     handleSubmit,
-    isSubmitting,
     isThrottled,
-    canSubmit,
     timeUntilNextSubmission,
     remainingAttempts,
   } = useForm<LoginFormData>({
@@ -58,7 +56,7 @@ const LoginForm: React.FC = () => {
   });
 
   const getButtonText = () => {
-    if (isSubmitting || loading) {
+    if (loading) {
       return t('global.accessing');
     }
     if (isThrottled && timeUntilNextSubmission && timeUntilNextSubmission > 0) {
@@ -159,8 +157,8 @@ const LoginForm: React.FC = () => {
           variant="outline-theme"
           className="d-block w-100 fw-500 mb-3"
           type="submit"
-          disabled={isSubmitting || loading || isThrottled || !canSubmit}
-          aria-busy={isSubmitting || loading || isThrottled || !canSubmit}
+          disabled={loading || isThrottled}
+          aria-busy={loading || isThrottled}
           data-testid="login-form-button">
           {getButtonText()}
         </Button>

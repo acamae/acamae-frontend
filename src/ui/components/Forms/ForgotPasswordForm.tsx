@@ -28,11 +28,9 @@ const ForgotPasswordForm: React.FC = () => {
     values,
     errors,
     touched,
-    isSubmitting,
     handleChange,
     handleSubmit,
     isThrottled,
-    canSubmit,
     timeUntilNextSubmission,
     remainingAttempts,
   } = useForm<ForgotPasswordFormData>({
@@ -46,7 +44,7 @@ const ForgotPasswordForm: React.FC = () => {
   });
 
   const getButtonText = () => {
-    if (isSubmitting || loading) {
+    if (loading) {
       return t('forgot.loading');
     }
     if (isThrottled && timeUntilNextSubmission && timeUntilNextSubmission > 0) {
@@ -112,8 +110,8 @@ const ForgotPasswordForm: React.FC = () => {
           variant="outline-theme"
           className="d-block w-100 fw-500 mb-3"
           type="submit"
-          disabled={isSubmitting || loading || isThrottled || !canSubmit}
-          aria-busy={isSubmitting || loading}
+          disabled={loading || isThrottled}
+          aria-busy={loading || isThrottled}
           data-testid="forgot-password-form-button">
           {getButtonText()}
         </Button>

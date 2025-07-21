@@ -39,9 +39,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
     touched,
     handleChange,
     handleSubmit,
-    isSubmitting,
     isThrottled,
-    canSubmit,
     timeUntilNextSubmission,
     remainingAttempts,
   } = useForm<ResetPasswordFormData>({
@@ -59,7 +57,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
   });
 
   const getButtonText = () => {
-    if (isSubmitting || loading) {
+    if (loading) {
       return t('reset.saving');
     }
     if (isThrottled && timeUntilNextSubmission && timeUntilNextSubmission > 0) {
@@ -153,8 +151,8 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
           variant="outline-theme"
           className="d-block w-100 fw-500 mb-3"
           type="submit"
-          disabled={isSubmitting || loading || isThrottled || !canSubmit}
-          aria-busy={isSubmitting || loading}
+          disabled={loading || isThrottled}
+          aria-busy={loading || isThrottled}
           data-testid="reset-password-form-button">
           {getButtonText()}
         </Button>

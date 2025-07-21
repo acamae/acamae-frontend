@@ -20,10 +20,8 @@ export type UseFormReturn<T> = {
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleCheckboxChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent) => void;
-  isSubmitting?: boolean;
   // Throttling properties
   isThrottled?: boolean;
-  canSubmit?: boolean;
   timeUntilNextSubmission?: number;
   remainingAttempts?: number;
   resetThrottle?: () => void;
@@ -39,7 +37,6 @@ export const useForm = <T extends object>({
 }: UseFormConfig<T>) => {
   const [values, setValues] = useState<T>(initialValues);
   const [errors, setErrors] = useState<Partial<Record<keyof T, string | React.ReactNode>>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [touched, setTouched] = useState<Record<keyof T, boolean>>({} as Record<keyof T, boolean>);
   const { i18n } = useTranslation();
 
@@ -121,23 +118,11 @@ export const useForm = <T extends object>({
       return;
     }
 
-    setIsSubmitting(true);
-
-    try {
-      if (shouldUseThrottling && throttledSubmit) {
-        await throttledSubmit.handleThrottledSubmit();
-      } else {
-        await onSubmit(values);
-      }
-    } finally {
-      // Use setTimeout to ensure state update happens in next tick
-      // This prevents React warnings about updates not wrapped in act()
-      // Only update state if component is still mounted
-      setTimeout(() => {
-        if (isMountedRef.current) {
-          setIsSubmitting(false);
-        }
-      }, 0);
+    // Solo llamar a throttledSubmit o onSubmit, sin setIsSubmitting
+    if (shouldUseThrottling && throttledSubmit) {
+      await throttledSubmit.handleThrottledSubmit();
+    } else {
+      await onSubmit(values);
     }
   };
 
@@ -150,15 +135,13 @@ export const useForm = <T extends object>({
   return {
     values,
     errors,
-    isSubmitting,
     touched,
     handleChange,
     handleCheckboxChange,
     handleSubmit,
     resetForm,
-    // Throttling properties (always available with defaults)
+    // Throttling properties (siempre disponibles con defaults)
     isThrottled: shouldUseThrottling && throttledSubmit ? throttledSubmit.isThrottled : false,
-    canSubmit: shouldUseThrottling && throttledSubmit ? throttledSubmit.canSubmit : true,
     timeUntilNextSubmission:
       shouldUseThrottling && throttledSubmit ? throttledSubmit.timeUntilNextSubmission : 0,
     remainingAttempts:

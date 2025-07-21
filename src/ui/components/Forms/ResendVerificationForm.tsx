@@ -29,9 +29,7 @@ const ResendVerificationForm: React.FC = () => {
     touched,
     handleChange,
     handleSubmit,
-    isSubmitting,
     isThrottled,
-    canSubmit,
     timeUntilNextSubmission,
     remainingAttempts,
   } = useForm<ResendVerificationFormData>({
@@ -47,7 +45,7 @@ const ResendVerificationForm: React.FC = () => {
   });
 
   const getButtonText = () => {
-    if (isSubmitting || loading) {
+    if (loading) {
       return t('verification.resend.loading');
     }
     if (isThrottled && timeUntilNextSubmission && timeUntilNextSubmission > 0) {
@@ -117,8 +115,8 @@ const ResendVerificationForm: React.FC = () => {
             variant="outline-theme"
             className="d-block w-100 fw-500 mb-3"
             type="submit"
-            disabled={isSubmitting || loading || isThrottled || !canSubmit}
-            aria-busy={isSubmitting || loading}
+            disabled={loading || isThrottled}
+            aria-busy={loading || isThrottled}
             data-testid="email-verification-resend-form-button">
             {getButtonText()}
           </Button>

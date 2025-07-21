@@ -60,10 +60,8 @@ const RegisterForm: React.FC = () => {
     touched,
     handleChange,
     handleSubmit,
-    isSubmitting,
     handleCheckboxChange,
     isThrottled,
-    canSubmit,
     timeUntilNextSubmission,
     remainingAttempts,
   } = useForm<RegisterFormData>({
@@ -83,7 +81,7 @@ const RegisterForm: React.FC = () => {
   });
 
   const getButtonText = () => {
-    if (loading || isSubmitting) {
+    if (loading) {
       return t('global.processing');
     }
     if (isThrottled && timeUntilNextSubmission && timeUntilNextSubmission > 0) {
@@ -279,6 +277,7 @@ const RegisterForm: React.FC = () => {
               <>
                 <Trans
                   i18nKey="register.terms_and_conditions"
+                  title={t('register.terms_and_conditions_help')}
                   components={{ url: <a href="#" onClick={handleShow} /> }} // NOSONAR: This is valid
                 />{' '}
                 <abbr className="text-danger" title={t('global.required')}>
@@ -330,8 +329,8 @@ const RegisterForm: React.FC = () => {
             variant="outline-theme"
             className="d-block w-100 fw-500 mb-3"
             type="submit"
-            disabled={loading || isSubmitting || isThrottled || !canSubmit}
-            aria-busy={loading || isSubmitting}
+            disabled={loading || isThrottled}
+            aria-busy={loading || isThrottled}
             data-testid="register-form-button">
             {getButtonText()}
           </Button>
