@@ -124,7 +124,10 @@ $visibility-values: (none, initial);
 }
 .text-gradient {
   -webkit-background-clip: text !important;
+  background-clip: text !important;
+
   -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
 }
 .line-height-1 {
   line-height: 1 !important;

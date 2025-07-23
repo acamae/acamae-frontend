@@ -128,7 +128,7 @@ const LoginForm: React.FC = () => {
             aria-label={t('login.toggle_password')}
             tabIndex={-1}
             data-testid="login-form-password-toggle">
-            {showPassword ? '👁️' : '👁️‍🗨️'}
+            <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
           </Button>
         </InputGroup>
         <Form.Text className="text-muted" data-testid="login-form-password-help">

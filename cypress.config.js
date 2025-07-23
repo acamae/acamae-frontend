@@ -1,4 +1,8 @@
 import { defineConfig } from 'cypress';
+import { config } from 'dotenv';
+
+// Cargar variables de entorno desde .env.test
+config({ path: '.env.test' });
 
 export default defineConfig({
   e2e: {
@@ -101,18 +105,21 @@ export default defineConfig({
 
     // Test database environment variables
     env: {
-      DB_HOST: 'localhost',
-      DB_PORT: 3306,
-      DB_NAME: 'acamae_test',
-      DB_USER: 'acamae_test',
-      DB_PASSWORD: 'acamae_test_password',
-      DB_ADMIN_USER: 'root',
-      DB_ADMIN_PASSWORD: 'rootpassword',
-      NODE_ENV: 'test',
+      DB_HOST: process.env.REACT_APP_DB_HOST || 'localhost',
+      DB_PORT: parseInt(process.env.REACT_APP_DB_PORT) || 3306,
+      DB_NAME: process.env.REACT_APP_DB_NAME || 'acamae_test',
+      DB_USER: process.env.REACT_APP_DB_USER || 'acamae_test',
+      DB_PASSWORD: process.env.REACT_APP_DB_PASSWORD || 'acamae_test_password',
+      DB_ADMIN_USER: process.env.REACT_APP_DB_ADMIN_USER || 'root',
+      DB_ADMIN_PASSWORD: process.env.REACT_APP_DB_ADMIN_PASSWORD || 'rootpassword',
+      NODE_ENV: process.env.NODE_ENV || 'test',
+      BASE_URL: process.env.CYPRESS_BASE_URL || 'https://localhost',
+      API_URL: process.env.CYPRESS_API_URL || 'https://localhost/api',
     },
 
     // Test configuration
-    baseUrl: 'https://localhost',
+    baseUrl:
+      process.env.CYPRESS_BASE_URL || `https://localhost:${process.env.CYPRESS_SERVER_PORT || 80}`,
     viewportWidth: 1280,
     viewportHeight: 720,
     video: false,

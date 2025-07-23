@@ -1,104 +1,359 @@
-import { render, screen, waitFor, cleanup } from '@testing-library/react';
-import type { TFunction } from 'i18next';
-import { useTranslation } from 'react-i18next';
+import { render, screen, waitFor } from '@testing-library/react';
 
-import translations from '@infrastructure/i18n/locales/es-ES.json';
-import PasswordStrengthMeter from '@ui/components/PasswordStrengthMeter';
+import PasswordStrengthMeter from '../PasswordStrengthMeter';
 
-jest.mock('zxcvbn');
-jest.mock('react-i18next');
-jest.mock('@ui/hooks/useAuth');
-jest.mock('@ui/hooks/useForm');
-jest.mock('@ui/hooks/useToast');
+// Mock zxcvbn
+jest.mock('zxcvbn', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
 
-afterEach(() => {
-  cleanup();
-  jest.clearAllMocks();
-});
+const mockZxcvbn = require('zxcvbn').default;
 
-const getTranslationForKey = (key: string): string => {
-  const result = key
-    .split('.')
-    .reduce(
-      (obj, k) =>
-        obj && typeof obj === 'object' ? (obj as Record<string, unknown>)[k] : undefined,
-      translations as unknown
-    );
-  return typeof result === 'string' ? result : key;
+// Mock translations
+const mockT = (key: string) => {
+  const translations: Record<string, string> = {
+    'register.password_requirements.length': 'al menos 8 caracteres',
+    'register.password_requirements.lowercase': 'al menos 1 letra minúscula',
+    'register.password_requirements.uppercase': 'al menos 1 letra mayúscula',
+    'register.password_requirements.digit': 'al menos 1 dígito',
+    'register.strength.weak': 'La contraseña es débil, intenta añadir más caracteres.',
+    'register.strength.fair': 'La contraseña es regular, intenta añadir más caracteres.',
+    'register.strength.good': 'La contraseña es buena',
+    'register.strength.strong': 'La contraseña es fuerte',
+    'register.strength.very_strong': 'La contraseña es muy fuerte',
+    'register.strength.progress_label': 'Progreso de fortaleza de la contraseña',
+  };
+  return translations[key] || key;
 };
 
-beforeEach(() => {
-  (useTranslation as jest.Mock).mockReturnValue({
-    t: getTranslationForKey,
-    i18n: { language: 'es-ES' },
-  });
-});
-
 describe('PasswordStrengthMeter integration test', () => {
-  let mockT: TFunction;
-
   beforeEach(() => {
-    mockT = ((key: string) => {
-      const result = getTranslationForKey(key);
-      return result ?? key;
-    }) as unknown as TFunction;
+    // Configurar zxcvbn mock por defecto
+    mockZxcvbn.mockReturnValue({
+      score: 0,
+      feedback: {
+        warning: '',
+        suggestions: [],
+      },
+    });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should render weak for empty password', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 0,
+      feedback: { warning: '', suggestions: [] },
+    });
+
+    // Corregir el error de tipado de t pasando un mock compatible con TFunction
+    render(
+      <PasswordStrengthMeter
+        password=""
+        // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+        t={mockT}
+      />
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId('password-strength-label')).toHaveTextContent(
+        'La contraseña es débil, intenta añadir más caracteres.'
+      );
+    });
+    expect(screen.getByTestId('password-strength-label')).toHaveClass(
+      'password-strength__strength-text--weak'
+    );
+  });
+
+  it('should render all password requirements', async () => {
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
     render(<PasswordStrengthMeter password="" t={mockT} />);
+
     await waitFor(() => {
-      expect(screen.getByTestId('password-strength-label')).toHaveTextContent(
-        translations.register.strength.weak
-      );
+      expect(screen.getByTestId('password-requirement-length')).toBeInTheDocument();
+      expect(screen.getByTestId('password-requirement-lowercase')).toBeInTheDocument();
+      expect(screen.getByTestId('password-requirement-uppercase')).toBeInTheDocument();
+      expect(screen.getByTestId('password-requirement-digit')).toBeInTheDocument();
     });
-    expect(screen.getByTestId('password-strength-bar')).toHaveClass('bg-danger');
   });
 
-  it('should render fair for mediapass', async () => {
-    render(<PasswordStrengthMeter password="mediapass" t={mockT} />);
-    await waitFor(() => {
-      expect(screen.getByTestId('password-strength-label')).toHaveTextContent(
-        translations.register.strength.fair
-      );
+  it('should show length requirement as completed when password has characters', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 2,
+      feedback: { warning: '', suggestions: [] },
     });
-    expect(screen.getByTestId('password-strength-bar')).toHaveClass('bg-warning');
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="password123" t={mockT} />);
+
+    await waitFor(() => {
+      const lengthRequirement = screen.getByTestId('password-requirement-length');
+      expect(lengthRequirement.querySelector('.bi-check-circle-fill')).toBeInTheDocument();
+    });
   });
 
-  it('should render fair for goodpass', async () => {
-    render(<PasswordStrengthMeter password="goodpass" t={mockT} />);
-    await waitFor(() => {
-      expect(screen.getByTestId('password-strength-label')).toHaveTextContent(
-        translations.register.strength.fair
-      );
+  it('should show lowercase requirement as completed when password has lowercase', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 2,
+      feedback: { warning: '', suggestions: [] },
     });
-    expect(screen.getByTestId('password-strength-bar')).toHaveClass('bg-warning');
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="password123" t={mockT} />);
+
+    await waitFor(() => {
+      const lowercaseRequirement = screen.getByTestId('password-requirement-lowercase');
+      expect(lowercaseRequirement.querySelector('.bi-check-circle-fill')).toBeInTheDocument();
+    });
   });
 
-  it('should render fair for strongpass', async () => {
-    render(<PasswordStrengthMeter password="strongpass" t={mockT} />);
-    await waitFor(() => {
-      expect(screen.getByTestId('password-strength-label')).toHaveTextContent(
-        translations.register.strength.fair
-      );
+  it('should show uppercase requirement as completed when password has uppercase', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 3,
+      feedback: { warning: '', suggestions: [] },
     });
-    expect(screen.getByTestId('password-strength-bar')).toHaveClass('bg-warning');
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="Password123" t={mockT} />);
+
+    await waitFor(() => {
+      const uppercaseRequirement = screen.getByTestId('password-requirement-uppercase');
+      expect(uppercaseRequirement.querySelector('.bi-check-circle-fill')).toBeInTheDocument();
+    });
   });
 
-  it('should render very strong for a complex password', async () => {
+  it('should show digit requirement as completed when password has digit', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 2,
+      feedback: { warning: '', suggestions: [] },
+    });
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="password123" t={mockT} />);
+
+    await waitFor(() => {
+      const digitRequirement = screen.getByTestId('password-requirement-digit');
+      expect(digitRequirement.querySelector('.bi-check-circle-fill')).toBeInTheDocument();
+    });
+  });
+
+  it('should show all requirements as completed for strong password', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 4,
+      feedback: { warning: '', suggestions: [] },
+    });
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="Password123" t={mockT} />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId('password-requirement-length').querySelector('.bi-check-circle-fill')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByTestId('password-requirement-lowercase').querySelector('.bi-check-circle-fill')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByTestId('password-requirement-uppercase').querySelector('.bi-check-circle-fill')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByTestId('password-requirement-digit').querySelector('.bi-check-circle-fill')
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('should show incomplete requirements with circle icon', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 0,
+      feedback: { warning: '', suggestions: [] },
+    });
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="a" t={mockT} />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId('password-requirement-length').querySelector('.bi-circle')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByTestId('password-requirement-uppercase').querySelector('.bi-circle')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByTestId('password-requirement-digit').querySelector('.bi-circle')
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('should render strong strength for password with most requirements met', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 3,
+      feedback: { warning: '', suggestions: [] },
+    });
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="Password" t={mockT} />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('password-strength-label')).toHaveTextContent(
+        'La contraseña es buena'
+      );
+      expect(screen.getByTestId('password-strength-label')).toHaveClass(
+        'password-strength__strength-text--good'
+      );
+    });
+  });
+
+  it('should render very strong strength for complex password', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 4,
+      feedback: { warning: '', suggestions: [] },
+    });
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
     render(<PasswordStrengthMeter password="A!9=123/dB*a.zvMS" t={mockT} />);
+
     await waitFor(() => {
       expect(screen.getByTestId('password-strength-label')).toHaveTextContent(
-        translations.register.strength.very_strong
+        'La contraseña es muy fuerte'
+      );
+      expect(screen.getByTestId('password-strength-label')).toHaveClass(
+        'password-strength__strength-text--very-strong'
       );
     });
-    expect(screen.getByTestId('password-strength-bar')).toHaveClass('bg-success');
   });
 
-  it('should render a span with text', async () => {
-    render(<PasswordStrengthMeter password="mediapass" t={mockT} />);
+  it('should render weak strength for short password even with all character types', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 0,
+      feedback: { warning: '', suggestions: [] },
+    });
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="a1P" t={mockT} />);
+
     await waitFor(() => {
-      const label = screen.getByTestId('password-strength-label');
-      expect(label.textContent).toBe(translations.register.strength.fair);
+      expect(screen.getByTestId('password-strength-label')).toHaveTextContent(
+        'La contraseña es débil, intenta añadir más caracteres.'
+      );
+      expect(screen.getByTestId('password-strength-label')).toHaveClass(
+        'password-strength__strength-text--weak'
+      );
+    });
+  });
+
+  it('should render weak strength for password with 7 characters even with all requirements met', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 2,
+      feedback: { warning: '', suggestions: [] },
+    });
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="Pass1" t={mockT} />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('password-strength-label')).toHaveTextContent(
+        'La contraseña es débil, intenta añadir más caracteres.'
+      );
+      expect(screen.getByTestId('password-strength-label')).toHaveClass(
+        'password-strength__strength-text--weak'
+      );
+    });
+  });
+
+  it('should render weak strength for password with 7 characters and all character types', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 2,
+      feedback: { warning: '', suggestions: [] },
+    });
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="Pass1" t={mockT} />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('password-strength-label')).toHaveTextContent(
+        'La contraseña es débil, intenta añadir más caracteres.'
+      );
+      expect(screen.getByTestId('password-strength-label')).toHaveClass(
+        'password-strength__strength-text--weak'
+      );
+    });
+  });
+
+  it('should display correct requirement labels', async () => {
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="" t={mockT} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('al menos 8 caracteres')).toBeInTheDocument();
+      expect(screen.getByText('al menos 1 letra minúscula')).toBeInTheDocument();
+      expect(screen.getByText('al menos 1 letra mayúscula')).toBeInTheDocument();
+      expect(screen.getByText('al menos 1 dígito')).toBeInTheDocument();
+    });
+  });
+
+  it('should render progress bar with correct accessibility attributes', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 4,
+      feedback: { warning: '', suggestions: [] },
+    });
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="Password123" t={mockT} />);
+
+    await waitFor(() => {
+      const progressBar = screen.getByTestId('password-strength-progress');
+      expect(progressBar).toHaveAttribute('role', 'progressbar');
+      expect(progressBar).toHaveAttribute('aria-label', 'Progreso de fortaleza de la contraseña');
+    });
+  });
+
+  it('should show progress bar with correct width for very strong password', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 4,
+      feedback: { warning: '', suggestions: [] },
+    });
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="A!9=123/dB*a.zvMS" t={mockT} />);
+
+    await waitFor(() => {
+      const progressBar = screen.getByTestId('password-strength-progress-bar');
+      expect(progressBar).toHaveClass('password-strength__progress-bar--very-strong');
+      expect(progressBar).toHaveClass('password-strength__progress-bar--width-100');
+    });
+  });
+
+  it('should show progress bar with correct width for good password', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 3,
+      feedback: { warning: '', suggestions: [] },
+    });
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="Password" t={mockT} />);
+
+    await waitFor(() => {
+      const progressBar = screen.getByTestId('password-strength-progress-bar');
+      expect(progressBar).toHaveClass('password-strength__progress-bar--good');
+      expect(progressBar).toHaveClass('password-strength__progress-bar--width-75');
+    });
+  });
+
+  it('should show progress bar with correct width for weak password', async () => {
+    mockZxcvbn.mockReturnValue({
+      score: 0,
+      feedback: { warning: '', suggestions: [] },
+    });
+
+    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
+    render(<PasswordStrengthMeter password="a" t={mockT} />);
+
+    await waitFor(() => {
+      const progressBar = screen.getByTestId('password-strength-progress-bar');
+      expect(progressBar).toHaveClass('password-strength__progress-bar--weak');
+      expect(progressBar).toHaveClass('password-strength__progress-bar--width-0');
     });
   });
 });

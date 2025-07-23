@@ -65,7 +65,14 @@
       "fair": "The password is fair, try adding more characters.",
       "good": "The password is good",
       "strong": "The password is strong",
-      "very_strong": "The password is very strong"
+      "very_strong": "The password is very strong",
+      "progress_label": "Password strength progress"
+    },
+    "password_requirements": {
+      "length": "at least 8 characters",
+      "lowercase": "at least 1 lowercase letter",
+      "uppercase": "at least 1 uppercase letter",
+      "digit": "at least 1 digit"
     },
     "success": "Registration successful",
     "welcome": "You can now log in!"

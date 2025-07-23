@@ -7,9 +7,28 @@ import ResetPasswordForm from '@ui/components/Forms/ResetPasswordForm';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useToast } from '@ui/hooks/useToast';
 
+// Mock zxcvbn
+jest.mock('zxcvbn', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({
+    score: 0,
+    feedback: {
+      warning: '',
+      suggestions: [],
+    },
+  })),
+}));
+
+// Mock hooks
 jest.mock('@ui/hooks/useAuth');
 jest.mock('@ui/hooks/useToast');
 jest.mock('react-i18next');
+
+// Mock TCOffcanvas component
+jest.mock('@ui/components/Offcanvas/TCOffcanvas', () => ({
+  __esModule: true,
+  default: () => null,
+}));
 
 const toastMock = {
   error: jest.fn(),
@@ -80,7 +99,7 @@ describe('ResetPasswordForm', () => {
       'password'
     );
     expect(screen.getByTestId('btn-toggle-password')).toBeInTheDocument();
-    expect(screen.getByTestId('btn-toggle-password')).toHaveTextContent('👁️');
+    expect(screen.getByTestId('btn-toggle-password').querySelector('.bi-eye')).toBeInTheDocument();
     expect(screen.getByTestId('reset-password-form')).toBeInTheDocument();
     expect(screen.getByTestId('label-reset-password')).toHaveTextContent('reset.password');
   });
@@ -180,21 +199,21 @@ describe('ResetPasswordForm', () => {
     const toggleButton = screen.getByTestId('btn-toggle-password');
 
     expect(passwordInput).toHaveAttribute('type', 'password');
-    expect(toggleButton).toHaveTextContent('👁️');
+    expect(toggleButton.querySelector('.bi-eye')).toBeInTheDocument();
 
     await act(async () => {
       fireEvent.click(toggleButton);
     });
 
     expect(passwordInput).toHaveAttribute('type', 'text');
-    expect(toggleButton).toHaveTextContent('🙈');
+    expect(toggleButton.querySelector('.bi-eye-slash')).toBeInTheDocument();
 
     await act(async () => {
       fireEvent.click(toggleButton);
     });
 
     expect(passwordInput).toHaveAttribute('type', 'password');
-    expect(toggleButton).toHaveTextContent('👁️');
+    expect(toggleButton.querySelector('.bi-eye')).toBeInTheDocument();
   });
 
   it('should handle error when token becomes invalid', async () => {
@@ -309,7 +328,7 @@ describe('ResetPasswordForm', () => {
       isThrottled: false,
       canSubmit: true,
       timeUntilNextSubmission: 0,
-      remainingAttempts: 2, // Esto debería mostrar el warning
+      remainingAttempts: 2, // This should show the warning
       resetThrottle: jest.fn(),
       handleCheckboxChange: jest.fn(),
       resetForm: jest.fn(),

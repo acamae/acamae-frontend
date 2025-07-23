@@ -215,7 +215,7 @@ const RegisterForm: React.FC = () => {
               aria-label={t('register.toggle_password')}
               data-testid="btn-toggle-password"
               type="button">
-              {showPassword ? '🙈' : '👁️'}
+              <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
             </Button>
           </InputGroup>
           <Form.Text id="passwordHelp" className="text-muted">
@@ -264,7 +264,7 @@ const RegisterForm: React.FC = () => {
               aria-label={t('register.toggle_password')}
               data-testid="btn-toggle-confirm-password"
               type="button">
-              {showConfirmPassword ? '🙈' : '👁️'}
+              <i className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
             </Button>
           </InputGroup>
           <Form.Text id="confirmPasswordHelp" className="text-muted">

@@ -1,94 +1,97 @@
 #!/usr/bin/env node
 
 /**
- * Script simple para ejecutar tests E2E
- * Usa wait-on para esperar al servidor
+ * Simple script to run E2E tests
+ * Uses wait-on to wait for the server
  *
- * Uso:
- *   node scripts/test-e2e-simple.js                    # Ejecuta todos los tests
- *   node scripts/test-e2e-simple.js register-form      # Ejecuta tests que contengan "register-form"
- *   node scripts/test-e2e-simple.js comprehensive      # Ejecuta tests que contengan "comprehensive"
+ * Usage:
+ *   node scripts/test-e2e-simple.js                    # Run all tests
+ *   node scripts/test-e2e-simple.js register-form      # Run tests containing "register-form"
+ *   node scripts/test-e2e-simple.js comprehensive      # Run tests containing "comprehensive"
  */
 
 import { execSync, spawn } from 'child_process';
 
-const NODE_ENV = 'test';
-const SERVER_PORT = 3000;
-let serverProcess = null;
+import { config } from 'dotenv';
+
+// Load environment variables from .env.test
+config({ path: '.env.test' });
+
+const NODE_ENV = process.env.NODE_ENV || 'test';
+const BASE_URL = process.env.CYPRESS_BASE_URL || 'https://localhost';
 let cypressProcess = null;
 
-// Obtener el patrón de test desde los argumentos de línea de comandos
+// Get test pattern from command line arguments
 const testPattern = process.argv[2];
 
-console.log('🚀 Iniciando tests E2E...');
+console.log('Starting E2E tests...');
+console.log(`Base URL: ${BASE_URL}`);
 if (testPattern) {
-  console.log(`🎯 Patrón de test: ${testPattern}`);
+  console.log(`Test pattern: ${testPattern}`);
 }
 
 /**
- * Limpiar recursos
+ * Run verification before tests
+ */
+function runVerification() {
+  console.log('🔍 Running pre-test verification...');
+  try {
+    execSync(`npx cross-env NODE_ENV=${NODE_ENV} node scripts/verify-test-setup.js`, {
+      stdio: 'inherit',
+      timeout: 60000, // 60 seconds timeout for verification
+    });
+    console.log('✅ Verification completed successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Verification failed:', error.message);
+    console.log('Please fix the issues before running tests');
+    return false;
+  }
+}
+
+/**
+ * Clean up resources
  */
 function cleanup() {
-  console.log('🧹 Limpiando...');
+  console.log('Cleaning up...');
   try {
     execSync(`npx cross-env NODE_ENV=${NODE_ENV} npm run test:e2e:cleanup`, {
       stdio: 'inherit',
     });
-    execSync(`npx kill-port ${SERVER_PORT}`, { stdio: 'ignore' });
   } catch (cleanupError) {
-    console.error('⚠️ Error durante limpieza:', cleanupError.message);
-  }
-
-  if (serverProcess) {
-    serverProcess.kill('SIGTERM');
-    console.log('✅ Servidor detenido');
+    console.error('⚠️ Error during cleanup:', cleanupError.message);
   }
 
   if (cypressProcess) {
     cypressProcess.kill('SIGTERM');
-    console.log('✅ Proceso de Cypress detenido');
+    console.log('✅ Cypress process stopped');
   }
-
-  try {
-    execSync(`npx kill-port ${SERVER_PORT}`, { stdio: 'ignore' });
-  } catch {}
 }
 
 try {
-  console.log('🔧 Configurando base de datos...');
+  // Run verification first
+  if (!runVerification()) {
+    console.log('❌ Pre-test verification failed. Exiting.');
+    process.exit(1);
+  }
+
+  console.log('Setting up database...');
   execSync(`npx cross-env NODE_ENV=${NODE_ENV} npm run test:e2e:setup`, {
     stdio: 'inherit',
   });
 
-  console.log('🌐 Iniciando servidor de desarrollo...');
-
-  serverProcess = spawn('npm', ['run', 'start:dev'], {
-    stdio: 'pipe',
-    shell: true,
-    env: { ...process.env, NODE_ENV: NODE_ENV },
-  });
-
-  console.log('⏳ Esperando a que el servidor esté disponible...');
-
-  // Esperar a que el servidor esté disponible
-  execSync(`npx wait-on http://localhost:${SERVER_PORT}`, {
-    stdio: 'inherit',
-    timeout: 60000,
-  });
-
-  // Esperar adicionalmente para que la compilación termine y no haya errores
-  console.log('⏳ Esperando a que la compilación termine...');
-  execSync(`npx wait-on http://localhost:${SERVER_PORT} --timeout 30000 --interval 1000`, {
+  console.log('Checking if server is available...');
+  execSync(`npx wait-on ${BASE_URL} --timeout 30000 --interval 1000`, {
     stdio: 'inherit',
     timeout: 30000,
   });
 
-  console.log('✅ Servidor disponible, ejecutando tests...');
+  console.log('✅ Server available, running tests...');
 
-  // Construir el comando de Cypress
+  // Build Cypress command
   const cypressArgs = ['cross-env', `NODE_ENV=${NODE_ENV}`, 'cypress', 'run'];
 
-  // Si se especificó un patrón, agregar el filtro
+  // If a pattern was specified, add the filter
   if (testPattern) {
     cypressArgs.push('--spec', `cypress/e2e/**/*${testPattern}*.cy.ts`);
   }
@@ -99,19 +102,19 @@ try {
     env: { ...process.env, NODE_ENV: NODE_ENV },
   });
 
-  // Esperar a que el proceso de Cypress termine
+  // Wait for Cypress process to finish
   await new Promise((resolve, reject) => {
     cypressProcess.on('close', code => {
       if (code === 0) {
-        console.log('✅ Tests completados exitosamente');
+        console.log('✅ Tests completed successfully');
         resolve();
       } else {
-        reject(new Error(`Cypress terminó con código de salida: ${code}`));
+        reject(new Error(`Cypress exited with code: ${code}`));
       }
     });
 
     cypressProcess.on('error', error => {
-      reject(new Error(`Error en proceso de Cypress: ${error.message}`));
+      reject(new Error(`Error in Cypress process: ${error.message}`));
     });
   });
 } catch (error) {
@@ -122,15 +125,15 @@ try {
   cleanup();
 }
 
-// Manejar señales de terminación
+// Handle termination signals
 process.on('SIGINT', () => {
-  console.log('\n🛑 Recibida señal de interrupción, limpiando...');
+  console.log('\n🛑 Interrupt signal received, cleaning up...');
   cleanup();
   process.exit(0);
 });
 
 process.on('SIGTERM', () => {
-  console.log('\n🛑 Recibida señal de terminación, limpiando...');
+  console.log('\n🛑 Termination signal received, cleaning up...');
   cleanup();
   process.exit(0);
 });

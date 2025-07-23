@@ -1,5 +1,45 @@
-import { THROTTLE_CONFIGS, ThrottleConfig } from '../security';
+import { THROTTLE_CONFIGS, ThrottleConfig, getEnvVar } from '../security';
 
+// --- NUEVOS TESTS PARA getEnvVar ---
+describe('getEnvVar helper', () => {
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    jest.resetModules();
+    process.env = { ...originalEnv };
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+    jest.restoreAllMocks();
+  });
+
+  it('should return the env variable value if it exists and is valid (not test env)', () => {
+    process.env.NODE_ENV = 'production';
+    process.env.TEST_ENV_VAR = '1234';
+    expect(getEnvVar('TEST_ENV_VAR', '42')).toBe(1234);
+  });
+
+  it('should return the default value if env variable does not exist (not test env)', () => {
+    process.env.NODE_ENV = 'production';
+    delete process.env.TEST_ENV_VAR;
+    expect(getEnvVar('TEST_ENV_VAR', '42')).toBe(42);
+  });
+
+  it('should return the default value if env variable is empty string (not test env)', () => {
+    process.env.NODE_ENV = 'production';
+    process.env.TEST_ENV_VAR = '';
+    expect(getEnvVar('TEST_ENV_VAR', '42')).toBe(42);
+  });
+
+  it('should always return default value in test env', () => {
+    process.env.NODE_ENV = 'test';
+    process.env.TEST_ENV_VAR = '9999';
+    expect(getEnvVar('TEST_ENV_VAR', '42')).toBe(42);
+  });
+});
+
+// --- TESTS EXISTENTES ---
 describe('Security Constants', () => {
   describe('THROTTLE_CONFIGS', () => {
     it('should have AUTH_FORMS configuration', () => {

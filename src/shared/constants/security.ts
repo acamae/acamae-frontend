@@ -68,3 +68,7 @@ export const THROTTLE_CONFIGS = {
  * Configurations that require persistence in the client
  */
 export const PERSISTENT_THROTTLE_CONFIGS = ['AUTH_FORMS', 'CRITICAL_ACTIONS'] as const;
+
+// Only export for testing
+
+export { getEnvVar };

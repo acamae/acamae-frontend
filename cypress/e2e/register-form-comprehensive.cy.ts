@@ -1,3 +1,5 @@
+import enGB from '@infrastructure/i18n/locales/en-GB.json';
+import esES from '@infrastructure/i18n/locales/es-ES.json';
 import { APP_ROUTES } from '@shared/constants/appRoutes';
 
 describe('Register Form - Comprehensive Test Suite', () => {
@@ -122,7 +124,7 @@ describe('Register Form - Comprehensive Test Suite', () => {
 
       // Verify redirection and English message
       cy.url().should('include', APP_ROUTES.VERIFY_EMAIL_SENT);
-      cy.get('body').should('contain.text', 'Registration successful');
+      cy.get('body').should('contain.text', enGB.register.success);
     });
   });
 
@@ -414,7 +416,7 @@ describe('Register Form - Comprehensive Test Suite', () => {
         // Verify error message appears
         cy.get('[data-testid="register-form-email-error"]')
           .should('be.visible')
-          .and('contain.text', 'Por favor, introduce un email válido');
+          .and('contain.text', esES.errors.email.invalid);
       });
     });
 
@@ -435,7 +437,7 @@ describe('Register Form - Comprehensive Test Suite', () => {
         // Verify error message appears
         cy.get('[data-testid="register-form-username-error"]')
           .should('be.visible')
-          .and('contain.text', 'El nombre de usuario debe tener entre 3 y 32 caracteres');
+          .and('contain.text', esES.errors.username.invalid);
       });
     });
 
@@ -457,7 +459,7 @@ describe('Register Form - Comprehensive Test Suite', () => {
         // Verify error message appears
         cy.get('[data-testid="register-form-password-error"]')
           .should('be.visible')
-          .and('contain.text', 'La contraseña debe tener mínimo 8 caracteres');
+          .and('contain.text', esES.errors.password.invalid);
       });
     });
 
@@ -471,7 +473,7 @@ describe('Register Form - Comprehensive Test Suite', () => {
       // Verify error message appears
       cy.get('[data-testid="register-form-confirm-password-error"]')
         .should('be.visible')
-        .and('contain.text', 'Las contraseñas no coinciden');
+        .and('contain.text', esES.errors.password.mismatch);
     });
 
     it('should require terms acceptance', () => {
@@ -481,8 +483,30 @@ describe('Register Form - Comprehensive Test Suite', () => {
       cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
 
-      // Try to submit without accepting terms
-      cy.get('[data-testid="register-form-button"]').should('be.disabled');
+      // Intercept registration to prevent actual submission
+      cy.intercept('POST', '**/api/auth/register', {
+        statusCode: 400,
+        body: {
+          success: false,
+          data: null,
+          status: 400,
+          code: 'VALIDATION_ERROR',
+          message: 'Terms and conditions must be accepted',
+          timestamp: new Date().toISOString(),
+          requestId: 'req_123456789',
+        },
+      }).as('registerTermsError');
+
+      // Submit form without accepting terms
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
+      cy.get('[data-testid="register-form-button"]').click();
+
+      // Verify that the form shows validation error for terms
+      cy.get('[data-testid="register-form-terms-error"]').should('be.visible');
+      cy.get('[data-testid="register-form-terms-error"]').should(
+        'contain.text',
+        esES.errors.terms.required
+      );
 
       // Verify form doesn't submit (stays on page)
       cy.url().should('include', APP_ROUTES.REGISTER);

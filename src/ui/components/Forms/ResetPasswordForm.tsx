@@ -126,7 +126,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
             aria-label={t('register.toggle_password')}
             data-testid="btn-toggle-password"
             tabIndex={-1}>
-            {showPassword ? '🙈' : '👁️'}
+            <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
           </Button>
         </InputGroup>
         <Form.Text
@@ -176,7 +176,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
             aria-label={t('register.toggle_password')}
             data-testid="btn-toggle-confirm-password"
             tabIndex={-1}>
-            {showConfirmPassword ? '🙈' : '👁️'}
+            <i className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
           </Button>
         </InputGroup>
         <Form.Text

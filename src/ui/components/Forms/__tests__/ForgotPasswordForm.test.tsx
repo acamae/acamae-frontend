@@ -197,6 +197,7 @@ describe('ForgotPasswordForm', () => {
       handleCheckboxChange: jest.fn(),
       resetForm: jest.fn(),
       hasValidationErrors: false,
+      isFormValid: true,
     } as ReturnType<typeof useFormModule.useForm>);
     renderForgotPasswordForm();
     expect(screen.getByTestId('forgot-password-form-attempts-warning')).toBeInTheDocument();

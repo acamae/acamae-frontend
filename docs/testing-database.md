@@ -83,7 +83,6 @@ cp env.test.example .env.test
 NODE_ENV=test
 REACT_APP_NODE_ENV=test
 REACT_APP_API_URL=https://localhost/api
-REACT_APP_CYPRESS_BASE_URL=https://localhost
 
 # Configuración de base de datos para tests (MySQL/MariaDB)
 REACT_APP_DB_HOST=localhost
