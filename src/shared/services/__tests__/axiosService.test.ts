@@ -113,22 +113,49 @@ const getAxiosMock = () =>
     }
   ).__mock;
 
+// Variables de entorno originales para restaurar
+let originalApiUrl: string | undefined;
+let originalApiTimeout: string | undefined;
+
 beforeAll(() => {
   jest.spyOn(global.console, 'log').mockImplementation(() => {});
   jest.spyOn(global.console, 'error').mockImplementation(() => {});
 });
 
-describe('axiosService unit tests', () => {
-  beforeEach(() => {
-    getAxiosMock().reqOk.length = 0;
-    getAxiosMock().resOk.length = 0;
-    getAxiosMock().resErr.length = 0;
-    jest.resetModules();
-    jest.clearAllMocks();
-    jest.spyOn(global.console, 'log').mockImplementation(() => {});
-    jest.spyOn(global.console, 'error').mockImplementation(() => {});
-  });
+beforeEach(() => {
+  // Guardar valores originales
+  originalApiUrl = process.env.REACT_APP_API_URL;
+  originalApiTimeout = process.env.REACT_APP_API_TIMEOUT;
 
+  // Establecer valores para los tests
+  process.env.REACT_APP_API_URL = '/api';
+  process.env.REACT_APP_API_TIMEOUT = '10000';
+
+  getAxiosMock().reqOk.length = 0;
+  getAxiosMock().resOk.length = 0;
+  getAxiosMock().resErr.length = 0;
+  jest.resetModules();
+  jest.clearAllMocks();
+  jest.spyOn(global.console, 'log').mockImplementation(() => {});
+  jest.spyOn(global.console, 'error').mockImplementation(() => {});
+});
+
+afterEach(() => {
+  // Restaurar valores originales
+  if (originalApiUrl === undefined) {
+    delete process.env.REACT_APP_API_URL;
+  } else {
+    process.env.REACT_APP_API_URL = originalApiUrl;
+  }
+
+  if (originalApiTimeout === undefined) {
+    delete process.env.REACT_APP_API_TIMEOUT;
+  } else {
+    process.env.REACT_APP_API_TIMEOUT = originalApiTimeout;
+  }
+});
+
+describe('axiosService unit tests', () => {
   it('should load the module and expose the instance', () => {
     jest.isolateModules(() => {
       const api = require('@shared/services/axiosService').default;
