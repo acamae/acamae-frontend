@@ -16,19 +16,16 @@ export interface ThrottleConfig {
  */
 const getEnvVar = (key: string, defaultValue: string): number => {
   try {
-    // In test environment, use hardcoded values for consistent testing
-    if (process.env.NODE_ENV === 'test') {
-      return Number(defaultValue);
-    }
-
     const envValue = process.env[key];
-    // Check if the environment variable exists, is not undefined, and is not an empty string
-    if (envValue !== undefined && envValue !== null && envValue !== '') {
-      return Number(envValue);
+    const parsed = Number(envValue);
+    if (envValue !== undefined && envValue !== null && envValue !== '' && Number.isFinite(parsed)) {
+      return parsed;
     }
-    return Number(defaultValue);
+    const fallback = Number(defaultValue);
+    return Number.isFinite(fallback) ? fallback : 0;
   } catch {
-    return Number(defaultValue);
+    const fallback = Number(defaultValue);
+    return Number.isFinite(fallback) ? fallback : 0;
   }
 };
 

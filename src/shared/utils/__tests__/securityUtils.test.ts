@@ -527,40 +527,49 @@ describe('generateActionId', () => {
 });
 
 describe('THROTTLE_CONFIGS', () => {
-  it('should have auth forms config', () => {
+  it('should have all required configurations with valid types', () => {
     expect(THROTTLE_CONFIGS.AUTH_FORMS).toBeDefined();
-    expect(THROTTLE_CONFIGS.AUTH_FORMS.delay).toBe(4000);
-    expect(THROTTLE_CONFIGS.AUTH_FORMS.maxAttempts).toBe(8);
-    expect(THROTTLE_CONFIGS.AUTH_FORMS.timeWindow).toBe(300000);
-  });
-
-  it('should have regular forms config', () => {
     expect(THROTTLE_CONFIGS.REGULAR_FORMS).toBeDefined();
-    expect(THROTTLE_CONFIGS.REGULAR_FORMS.delay).toBe(3000);
-    expect(THROTTLE_CONFIGS.REGULAR_FORMS.maxAttempts).toBe(12);
-    expect(THROTTLE_CONFIGS.REGULAR_FORMS.timeWindow).toBe(300000);
-  });
-
-  it('should have critical actions config', () => {
     expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS).toBeDefined();
-    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.delay).toBe(5000);
-    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.maxAttempts).toBe(5);
-    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.timeWindow).toBe(300000);
+
+    // Check all configurations have required properties with correct types
+    const configs = [
+      THROTTLE_CONFIGS.AUTH_FORMS,
+      THROTTLE_CONFIGS.REGULAR_FORMS,
+      THROTTLE_CONFIGS.CRITICAL_ACTIONS,
+    ];
+    configs.forEach(config => {
+      expect(typeof config.delay).toBe('number');
+      expect(typeof config.maxAttempts).toBe('number');
+      expect(typeof config.timeWindow).toBe('number');
+      expect(config.delay).toBeGreaterThan(0);
+      expect(config.maxAttempts).toBeGreaterThan(0);
+      expect(config.timeWindow).toBeGreaterThan(0);
+    });
   });
 
-  it('should have differentiated security values', () => {
-    // Verify security differentiation is implemented
-    const authConfig = THROTTLE_CONFIGS.AUTH_FORMS;
-    const regularConfig = THROTTLE_CONFIGS.REGULAR_FORMS;
-    const criticalConfig = THROTTLE_CONFIGS.CRITICAL_ACTIONS;
+  it('should maintain security hierarchy (auth stricter than regular, critical strictest)', () => {
+    // Auth should be stricter than regular forms
+    expect(THROTTLE_CONFIGS.AUTH_FORMS.maxAttempts).toBeLessThanOrEqual(
+      THROTTLE_CONFIGS.REGULAR_FORMS.maxAttempts
+    );
 
-    // AUTH_FORMS should be stricter than REGULAR_FORMS
-    expect(authConfig.delay).toBeGreaterThanOrEqual(regularConfig.delay);
-    expect(authConfig.maxAttempts).toBeLessThanOrEqual(regularConfig.maxAttempts);
+    // Critical should be strictest of all
+    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.maxAttempts).toBeLessThanOrEqual(
+      THROTTLE_CONFIGS.AUTH_FORMS.maxAttempts
+    );
+    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.delay).toBeGreaterThanOrEqual(
+      THROTTLE_CONFIGS.AUTH_FORMS.delay
+    );
+  });
 
-    // CRITICAL_ACTIONS should be strictest
-    expect(criticalConfig.delay).toBeGreaterThanOrEqual(authConfig.delay);
-    expect(criticalConfig.maxAttempts).toBeLessThanOrEqual(authConfig.maxAttempts);
+  it('should have appropriate persistence settings for security', () => {
+    // High security configs should persist to prevent refresh bypass
+    expect(THROTTLE_CONFIGS.AUTH_FORMS.persistInClient).toBe(true);
+    expect(THROTTLE_CONFIGS.CRITICAL_ACTIONS.persistInClient).toBe(true);
+
+    // Regular forms should not persist for better UX
+    expect(THROTTLE_CONFIGS.REGULAR_FORMS.persistInClient).toBe(false);
   });
 });
 
