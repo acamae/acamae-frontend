@@ -2,20 +2,21 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ToastOptions } from '@domain/types/toast';
-import { toastService } from '@shared/services/toastService';
+import { useToastContext } from '@shared/services/ToastProvider';
 
 /**
  * Hook que proporciona funcionalidad de toast con soporte para i18n.
- * Utiliza toastService internamente y traduce automáticamente las claves.
+ * Utiliza el contexto del ToastProvider para mostrar toasts reales.
  */
 export const useToast = () => {
   const { t } = useTranslation();
+  const toastContext = useToastContext();
 
   /**
    * Inicializa el sistema de toast.
    */
   const initialize = useCallback(() => {
-    toastService.initialize();
+    // No es necesario inicializar nada ya que el ToastProvider ya está configurado
   }, []);
 
   /**
@@ -23,11 +24,12 @@ export const useToast = () => {
    * Si el mensaje es una clave de traducción, la traduce automáticamente.
    */
   const error = useCallback(
-    (message: string, title?: string, _options?: Partial<ToastOptions>) => {
-      const translatedMessage = title ? `${t(title)}: ${t(message)}` : t(message);
-      toastService.error(translatedMessage);
+    (message: string, title?: string, options?: Partial<ToastOptions>) => {
+      const translatedMessage = t(message);
+      const translatedTitle = title ? t(title) : undefined;
+      toastContext.error(translatedMessage, translatedTitle, options);
     },
-    [t]
+    [t, toastContext]
   );
 
   /**
@@ -35,11 +37,12 @@ export const useToast = () => {
    * Si el mensaje es una clave de traducción, la traduce automáticamente.
    */
   const success = useCallback(
-    (message: string, title?: string, _options?: Partial<ToastOptions>) => {
-      const translatedMessage = title ? `${t(title)}: ${t(message)}` : t(message);
-      toastService.success(translatedMessage);
+    (message: string, title?: string, options?: Partial<ToastOptions>) => {
+      const translatedMessage = t(message);
+      const translatedTitle = title ? t(title) : undefined;
+      toastContext.success(translatedMessage, translatedTitle, options);
     },
-    [t]
+    [t, toastContext]
   );
 
   /**
@@ -47,11 +50,12 @@ export const useToast = () => {
    * Si el mensaje es una clave de traducción, la traduce automáticamente.
    */
   const warning = useCallback(
-    (message: string, title?: string, _options?: Partial<ToastOptions>) => {
-      const translatedMessage = title ? `${t(title)}: ${t(message)}` : t(message);
-      toastService.warning(translatedMessage);
+    (message: string, title?: string, options?: Partial<ToastOptions>) => {
+      const translatedMessage = t(message);
+      const translatedTitle = title ? t(title) : undefined;
+      toastContext.warning(translatedMessage, translatedTitle, options);
     },
-    [t]
+    [t, toastContext]
   );
 
   /**
@@ -59,11 +63,12 @@ export const useToast = () => {
    * Si el mensaje es una clave de traducción, la traduce automáticamente.
    */
   const info = useCallback(
-    (message: string, title?: string, _options?: Partial<ToastOptions>) => {
-      const translatedMessage = title ? `${t(title)}: ${t(message)}` : t(message);
-      toastService.info(translatedMessage);
+    (message: string, title?: string, options?: Partial<ToastOptions>) => {
+      const translatedMessage = t(message);
+      const translatedTitle = title ? t(title) : undefined;
+      toastContext.info(translatedMessage, translatedTitle, options);
     },
-    [t]
+    [t, toastContext]
   );
 
   /**
@@ -72,12 +77,14 @@ export const useToast = () => {
    */
   const show = useCallback(
     (options: ToastOptions) => {
-      const translatedMessage = options.title
-        ? `${t(options.title)}: ${t(options.message)}`
-        : t(options.message);
-      toastService.show(translatedMessage);
+      const translatedOptions: ToastOptions = {
+        ...options,
+        message: t(options.message),
+        title: options.title ? t(options.title) : undefined,
+      };
+      toastContext.show(translatedOptions);
     },
-    [t]
+    [t, toastContext]
   );
 
   return {

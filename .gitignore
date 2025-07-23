@@ -23,8 +23,10 @@ docker/volumes/
 coverage/
 
 # Environment variables
-**/.env.local
-**/.env.*.local
+.env
+.env.*
+**/.env
+**/.env.*
 
 # IDEs (IntelliJ IDEA, Visual Studio Code, etc.)
 .idea/
@@ -46,3 +48,5 @@ docker/ssl/*.pem
 /dependency-graph*.*
 
 /generated/prisma
+
+cypress/screenshots/

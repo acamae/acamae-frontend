@@ -1,3 +1,5 @@
+import enGB from '@infrastructure/i18n/locales/en-GB.json';
+import esES from '@infrastructure/i18n/locales/es-ES.json';
 import { APP_ROUTES } from '@shared/constants/appRoutes';
 
 describe('Register Form - Comprehensive Test Suite', () => {
@@ -15,10 +17,10 @@ describe('Register Form - Comprehensive Test Suite', () => {
   describe('✅ Successful Registration Scenarios', () => {
     it('should register successfully with valid data and redirect to email verification', () => {
       // Fill form with valid data
-      cy.get('[data-testid="register-form-email-input"]').type('nuevo@example.com');
-      cy.get('[data-testid="register-form-username-input"]').type('usuarionuevo');
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-email-input"]').type('nuevo@example.com').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('usuarionuevo').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
       // Intercept API call with new v2.0 structure
@@ -35,7 +37,8 @@ describe('Register Form - Comprehensive Test Suite', () => {
         },
       }).as('registerSuccess');
 
-      // Submit form
+      // Submit button should be enabled when there are no validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
 
       // Wait for API call
@@ -49,14 +52,14 @@ describe('Register Form - Comprehensive Test Suite', () => {
 
     it('should handle button state during registration process', () => {
       // Fill form with valid data
-      cy.get('[data-testid="register-form-email-input"]').type('test@example.com');
-      cy.get('[data-testid="register-form-username-input"]').type('testuser');
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-email-input"]').type('test@example.com').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('testuser').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
       // Verify button is enabled before submission
-      cy.get('[data-testid="register-form-button"]').should('not.be.disabled');
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
 
       // Intercept with delay to test button state
       cy.intercept('POST', '**/api/auth/register', {
@@ -73,7 +76,8 @@ describe('Register Form - Comprehensive Test Suite', () => {
         delay: 1000,
       }).as('registerWithDelay');
 
-      // Submit form
+      // Submit button should be enabled when there are no validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
 
       // Verify button is disabled during submission
@@ -91,10 +95,10 @@ describe('Register Form - Comprehensive Test Suite', () => {
       cy.get('[data-testid="language-picker-select"]').select('en-GB');
 
       // Fill form with valid data
-      cy.get('[data-testid="register-form-email-input"]').type('english@example.com');
-      cy.get('[data-testid="register-form-username-input"]').type('englishuser');
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-email-input"]').type('english@example.com').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('englishuser').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
       // Intercept API call
@@ -111,7 +115,8 @@ describe('Register Form - Comprehensive Test Suite', () => {
         },
       }).as('registerEnglish');
 
-      // Submit form
+      // Submit button should be enabled when there are no validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
 
       // Wait for API call
@@ -119,17 +124,17 @@ describe('Register Form - Comprehensive Test Suite', () => {
 
       // Verify redirection and English message
       cy.url().should('include', APP_ROUTES.VERIFY_EMAIL_SENT);
-      cy.get('body').should('contain.text', 'Registration successful');
+      cy.get('body').should('contain.text', enGB.register.success);
     });
   });
 
   describe('❌ Error Scenarios - API Errors', () => {
     it('should handle existing email error (AUTH_USER_ALREADY_EXISTS)', () => {
       // Fill form with existing email
-      cy.get('[data-testid="register-form-email-input"]').type('existente@example.com');
-      cy.get('[data-testid="register-form-username-input"]').type('usuarionuevo');
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-email-input"]').type('existente@example.com').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('usuarionuevo').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
       // Intercept with existing email error
@@ -156,7 +161,8 @@ describe('Register Form - Comprehensive Test Suite', () => {
         },
       }).as('registerExistingEmail');
 
-      // Submit form
+      // Submit button should be enabled when there are no validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
 
       // Wait for API call
@@ -171,10 +177,10 @@ describe('Register Form - Comprehensive Test Suite', () => {
 
     it('should handle validation errors (VALIDATION_ERROR)', () => {
       // Fill form with data that passes client validation but server rejects
-      cy.get('[data-testid="register-form-email-input"]').type('test@example.com');
-      cy.get('[data-testid="register-form-username-input"]').type('testuser');
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-email-input"]').type('test@example.com').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('testuser').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
       // Intercept with validation error
@@ -212,7 +218,8 @@ describe('Register Form - Comprehensive Test Suite', () => {
         },
       }).as('registerValidationError');
 
-      // Submit form
+      // Submit button should be enabled when there are no validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
 
       // Wait for API call
@@ -227,10 +234,10 @@ describe('Register Form - Comprehensive Test Suite', () => {
 
     it('should handle email service unavailable (SERVICE_UNAVAILABLE)', () => {
       // Fill form with valid data
-      cy.get('[data-testid="register-form-email-input"]').type('test@example.com');
-      cy.get('[data-testid="register-form-username-input"]').type('testuser');
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-email-input"]').type('test@example.com').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('testuser').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
       // Intercept with service unavailable error
@@ -258,7 +265,8 @@ describe('Register Form - Comprehensive Test Suite', () => {
         },
       }).as('registerServiceUnavailable');
 
-      // Submit form
+      // Submit button should be enabled when there are no validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
 
       // Wait for API call
@@ -276,10 +284,10 @@ describe('Register Form - Comprehensive Test Suite', () => {
 
     it('should handle database error (DATABASE_ERROR)', () => {
       // Fill form with valid data
-      cy.get('[data-testid="register-form-email-input"]').type('test@example.com');
-      cy.get('[data-testid="register-form-username-input"]').type('testuser');
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-email-input"]').type('test@example.com').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('testuser').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
       // Intercept with database error
@@ -306,7 +314,8 @@ describe('Register Form - Comprehensive Test Suite', () => {
         },
       }).as('registerDatabaseError');
 
-      // Submit form
+      // Submit button should be enabled when there are no validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
 
       // Wait for API call
@@ -321,10 +330,10 @@ describe('Register Form - Comprehensive Test Suite', () => {
 
     it('should handle network errors (ERR_NETWORK)', () => {
       // Fill form with valid data
-      cy.get('[data-testid="register-form-email-input"]').type('test@example.com');
-      cy.get('[data-testid="register-form-username-input"]').type('testuser');
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-email-input"]').type('test@example.com').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('testuser').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
       // Intercept with network error (no response)
@@ -332,7 +341,8 @@ describe('Register Form - Comprehensive Test Suite', () => {
         forceNetworkError: true,
       }).as('registerNetworkError');
 
-      // Submit form
+      // Submit button should be enabled when there are no validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
 
       // Wait for API call
@@ -347,10 +357,10 @@ describe('Register Form - Comprehensive Test Suite', () => {
 
     it('should handle timeout errors (ETIMEDOUT)', () => {
       // Fill form with valid data
-      cy.get('[data-testid="register-form-email-input"]').type('test@example.com');
-      cy.get('[data-testid="register-form-username-input"]').type('testuser');
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-email-input"]').type('test@example.com').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('testuser').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
       // Intercept with REAL timeout - force network error to simulate timeout
@@ -359,7 +369,8 @@ describe('Register Form - Comprehensive Test Suite', () => {
         delay: 5000, // 5 second delay to ensure timeout
       }).as('registerTimeout');
 
-      // Submit form
+      // Submit button should be enabled when there are no validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
 
       // Wait for the network error to occur
@@ -405,7 +416,7 @@ describe('Register Form - Comprehensive Test Suite', () => {
         // Verify error message appears
         cy.get('[data-testid="register-form-email-error"]')
           .should('be.visible')
-          .and('contain.text', 'Por favor, introduce un email válido');
+          .and('contain.text', esES.errors.email.invalid);
       });
     });
 
@@ -426,7 +437,7 @@ describe('Register Form - Comprehensive Test Suite', () => {
         // Verify error message appears
         cy.get('[data-testid="register-form-username-error"]')
           .should('be.visible')
-          .and('contain.text', 'El nombre de usuario debe tener entre 3 y 32 caracteres');
+          .and('contain.text', esES.errors.username.invalid);
       });
     });
 
@@ -448,33 +459,54 @@ describe('Register Form - Comprehensive Test Suite', () => {
         // Verify error message appears
         cy.get('[data-testid="register-form-password-error"]')
           .should('be.visible')
-          .and('contain.text', 'La contraseña debe tener mínimo 8 caracteres');
+          .and('contain.text', esES.errors.password.invalid);
       });
     });
 
     it('should validate password confirmation match', () => {
       // Fill password
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
 
       // Fill different confirmation password
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Different123!');
-      cy.get('[data-testid="register-form-confirm-password-input"]').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Different123!').blur();
 
       // Verify error message appears
       cy.get('[data-testid="register-form-confirm-password-error"]')
         .should('be.visible')
-        .and('contain.text', 'Las contraseñas no coinciden');
+        .and('contain.text', esES.errors.password.mismatch);
     });
 
     it('should require terms acceptance', () => {
       // Fill form without accepting terms
-      cy.get('[data-testid="register-form-email-input"]').type('test@example.com');
-      cy.get('[data-testid="register-form-username-input"]').type('testuser');
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-email-input"]').type('test@example.com').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('testuser').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
 
-      // Try to submit without accepting terms
+      // Intercept registration to prevent actual submission
+      cy.intercept('POST', '**/api/auth/register', {
+        statusCode: 400,
+        body: {
+          success: false,
+          data: null,
+          status: 400,
+          code: 'VALIDATION_ERROR',
+          message: 'Terms and conditions must be accepted',
+          timestamp: new Date().toISOString(),
+          requestId: 'req_123456789',
+        },
+      }).as('registerTermsError');
+
+      // Submit form without accepting terms
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
+
+      // Verify that the form shows validation error for terms
+      cy.get('[data-testid="register-form-terms-error"]').should('be.visible');
+      cy.get('[data-testid="register-form-terms-error"]').should(
+        'contain.text',
+        esES.errors.terms.required
+      );
 
       // Verify form doesn't submit (stays on page)
       cy.url().should('include', APP_ROUTES.REGISTER);
@@ -484,14 +516,17 @@ describe('Register Form - Comprehensive Test Suite', () => {
   describe('🔄 Retry and Recovery Scenarios', () => {
     it('should allow retrying after validation errors', () => {
       // Fill form with invalid data
-      cy.get('[data-testid="register-form-email-input"]').type('invalid-email');
-      cy.get('[data-testid="register-form-username-input"]').type('a');
-      cy.get('[data-testid="register-form-password-input"]').type('weak');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('different');
+      cy.get('[data-testid="register-form-email-input"]').type('invalid-email').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('a').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('weak').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('different').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      // Submit form
-      cy.get('[data-testid="register-form-button"]').click();
+      // Submit form to trigger validation errors
+      cy.get('[data-testid="register-form"]').submit();
+
+      // Verify that the button is disabled when there are validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       // Verify validation errors appear
       cy.get('[data-testid="register-form-email-error"]').should('be.visible');
@@ -501,9 +536,13 @@ describe('Register Form - Comprehensive Test Suite', () => {
 
       // Correct the data
       cy.get('[data-testid="register-form-email-input"]').clear().type('valid@example.com');
+      cy.get('[data-testid="register-form-email-input"]').blur();
       cy.get('[data-testid="register-form-username-input"]').clear().type('validuser');
+      cy.get('[data-testid="register-form-username-input"]').blur();
       cy.get('[data-testid="register-form-password-input"]').clear().type('Password123!');
+      cy.get('[data-testid="register-form-password-input"]').blur();
       cy.get('[data-testid="register-form-confirm-password-input"]').clear().type('Password123!');
+      cy.get('[data-testid="register-form-confirm-password-input"]').blur();
 
       // Intercept successful registration
       cy.intercept('POST', '**/api/auth/register', {
@@ -520,6 +559,7 @@ describe('Register Form - Comprehensive Test Suite', () => {
       }).as('registerRetrySuccess');
 
       // Submit corrected form
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
 
       // Wait for API call
@@ -531,10 +571,10 @@ describe('Register Form - Comprehensive Test Suite', () => {
 
     it('should allow retrying after server errors', () => {
       // Fill form with valid data
-      cy.get('[data-testid="register-form-email-input"]').type('test@example.com');
-      cy.get('[data-testid="register-form-username-input"]').type('testuser');
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-email-input"]').type('test@example.com').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('testuser').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
       // Intercept with server error first
@@ -551,7 +591,8 @@ describe('Register Form - Comprehensive Test Suite', () => {
         },
       }).as('registerServerError');
 
-      // Submit form
+      // Submit button should be enabled when there are no validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
 
       // Wait for API call
@@ -590,7 +631,7 @@ describe('Register Form - Comprehensive Test Suite', () => {
   describe('🔐 Security and Accessibility Scenarios', () => {
     it('should toggle password visibility', () => {
       // Fill password
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
 
       // Verify password is hidden by default
       cy.get('[data-testid="register-form-password-input"]').should(
@@ -618,7 +659,7 @@ describe('Register Form - Comprehensive Test Suite', () => {
 
     it('should toggle confirm password visibility', () => {
       // Fill confirm password
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
 
       // Verify password is hidden by default
       cy.get('[data-testid="register-form-confirm-password-input"]').should(
@@ -650,10 +691,10 @@ describe('Register Form - Comprehensive Test Suite', () => {
 
     it('should maintain form state during errors', () => {
       // Fill form with valid data
-      cy.get('[data-testid="register-form-email-input"]').type('test@example.com');
-      cy.get('[data-testid="register-form-username-input"]').type('testuser');
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-email-input"]').type('test@example.com').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('testuser').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
       // Intercept with error
@@ -670,7 +711,8 @@ describe('Register Form - Comprehensive Test Suite', () => {
         },
       }).as('registerError');
 
-      // Submit form
+      // Submit button should be enabled when there are no validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
 
       // Wait for API call
@@ -713,14 +755,14 @@ describe('Register Form - Comprehensive Test Suite', () => {
   describe('🌐 Internationalization Scenarios', () => {
     it('should display error messages in Spanish by default', () => {
       // Fill form with invalid data
-      cy.get('[data-testid="register-form-email-input"]').type('invalid-email');
-      cy.get('[data-testid="register-form-username-input"]').type('a');
-      cy.get('[data-testid="register-form-password-input"]').type('weak');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('different');
+      cy.get('[data-testid="register-form-email-input"]').type('invalid-email').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('a').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('weak').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('different').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      // Submit form
-      cy.get('[data-testid="register-form-button"]').click();
+      // Submit button should be disabled when there are validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       // Verify Spanish error messages
       cy.get('[data-testid="register-form-email-error"]').should(
@@ -746,14 +788,14 @@ describe('Register Form - Comprehensive Test Suite', () => {
       cy.get('[data-testid="language-picker-select"]').select('en-GB');
 
       // Fill form with invalid data
-      cy.get('[data-testid="register-form-email-input"]').type('invalid-email');
-      cy.get('[data-testid="register-form-username-input"]').type('a');
-      cy.get('[data-testid="register-form-password-input"]').type('weak');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('different');
+      cy.get('[data-testid="register-form-email-input"]').type('invalid-email').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('a').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('weak').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('different').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      // Submit form
-      cy.get('[data-testid="register-form-button"]').click();
+      // Submit button should be disabled when there are validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       // Verify English error messages
       cy.get('[data-testid="register-form-email-error"]').should(
@@ -776,10 +818,10 @@ describe('Register Form - Comprehensive Test Suite', () => {
 
     it('should handle API error messages in both languages', () => {
       // Test Spanish error
-      cy.get('[data-testid="register-form-email-input"]').type('test@example.com');
-      cy.get('[data-testid="register-form-username-input"]').type('testuser');
-      cy.get('[data-testid="register-form-password-input"]').type('Password123!');
-      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-email-input"]').type('test@example.com').blur();
+      cy.get('[data-testid="register-form-username-input"]').type('testuser').blur();
+      cy.get('[data-testid="register-form-password-input"]').type('Password123!').blur();
+      cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
       cy.intercept('POST', '**/api/auth/register', {
@@ -795,7 +837,11 @@ describe('Register Form - Comprehensive Test Suite', () => {
         },
       }).as('registerSpanishError');
 
+      // Submit button should be enabled when there are no validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
+
+      // Wait for API call
       cy.wait('@registerSpanishError');
       cy.get('body').should('contain.text', 'El email ya está registrado');
 
@@ -816,7 +862,7 @@ describe('Register Form - Comprehensive Test Suite', () => {
       }).as('registerEnglishError');
 
       // Wait for button to be enabled after throttling
-      cy.get('[data-testid="register-form-button"]', { timeout: 10000 }).should('not.be.disabled');
+      cy.get('[data-testid="register-form-button"]', { timeout: 10000 }).should('be.enabled');
       cy.get('[data-testid="register-form-button"]').click();
       cy.wait('@registerEnglishError');
       cy.get('body').should('contain.text', 'The email is already registered');

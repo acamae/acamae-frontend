@@ -66,9 +66,7 @@
       "exact": true,
       "skipGit": false,
       "skipNpm": false,
-      "yes": true,
-      "preid": "pr",
-      "prerelease": true
+      "yes": true
     },
     "version": {
       "skipChangelog": false,
@@ -76,7 +74,15 @@
       "createRelease": "github",
       "message": "chore(release): %s",
       "allowBranch": ["release"],
-      "ignoreChanges": ["**/*.md", "**/test/**", "**/tests/**", "**/__tests__/**", "**/coverage/**"]
+      "ignoreChanges": [
+        "**/*.md",
+        "**/test/**",
+        "**/tests/**",
+        "**/__tests__/**",
+        "**/coverage/**"
+      ],
+      "conventionalPrerelease": false,
+      "conventionalGraduate": false
     }
   }
 }

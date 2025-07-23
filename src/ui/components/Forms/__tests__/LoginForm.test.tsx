@@ -113,7 +113,7 @@ describe('LoginForm', () => {
     });
   });
 
-  it('should show validation errors', () => {
+  it('should show validation errors', async () => {
     renderLoginForm();
     fireEvent.change(screen.getByTestId('login-form-email-input'), {
       target: { value: 'invalid-email' },
@@ -121,8 +121,12 @@ describe('LoginForm', () => {
     fireEvent.change(screen.getByTestId('login-form-password-input'), {
       target: { value: 'invalid-password' },
     });
+    fireEvent.submit(screen.getByTestId('login-form'));
     expect(screen.getByText('errors.email.invalid')).toBeInTheDocument();
     expect(screen.getByText('errors.password.invalid')).toBeInTheDocument();
+    // The button should be disabled when there are validation errors
+    expect(screen.getByTestId('login-form-button')).toBeDisabled();
+    // Optionally, check hasValidationErrors if needed
   });
 
   it('should show required errors when email and password are empty', () => {

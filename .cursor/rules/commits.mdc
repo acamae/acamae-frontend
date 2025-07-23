@@ -3,9 +3,11 @@ description:
 globs:
 alwaysApply: true
 ---
+
 # Commit Message Guidelines
 
 ## Format
+
 ```
 type(scope): concise description
 
@@ -13,12 +15,16 @@ type(scope): concise description
 ```
 
 ## Critical Rules
+
 - ⚠️ **Header Length**: Must not exceed 100 characters (type + scope + description)
+- Each line in body header not be longer than 100 characters
+- Descriptions in body shouldn't take more than 1 line
 - Use imperative mood ("add" not "added")
 - No period at the end
 - Scope is optional but recommended
 
 ## Types
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -29,6 +35,7 @@ type(scope): concise description
 - `ci`: Changes to CI configuration files and scripts
 
 ## Best Practices
+
 - Keep bullet points under 100 characters
 - Prefer single-line messages when possible
 - Use English for all messages
@@ -36,7 +43,9 @@ type(scope): concise description
 - Separate subject from body with a blank line
 
 ## Examples
+
 ✅ Good:
+
 ```
 feat(auth): implement OAuth2 login flow
 fix(api): handle null responses in user service
@@ -46,6 +55,7 @@ refactor(store): simplify Redux middleware configuration
 ```
 
 ❌ Bad:
+
 ```
 feat(authentication): implement comprehensive OAuth2 authentication flow with Google, Facebook, and Twitter providers including token refresh mechanism
 fix: fixed some bugs
@@ -53,11 +63,14 @@ Updated stuff
 ```
 
 ## Common Errors
+
 1. **Header Too Long** (✖ header must not be longer than 100 characters)
+
    - Bad: `feat(user-management): implement comprehensive user authentication system with email verification, password recovery, and two-factor authentication`
    - Good: `feat(auth): implement user authentication system`
 
 2. **Missing Type**
+
    - Bad: `update user service`
    - Good: `fix(user): update service error handling`
 
@@ -66,6 +79,7 @@ Updated stuff
    - Good: `feat(api): add new endpoint`
 
 ## Metadata
+
 ```yaml
 version: 1.0.0
 last_updated: 2024-03-20

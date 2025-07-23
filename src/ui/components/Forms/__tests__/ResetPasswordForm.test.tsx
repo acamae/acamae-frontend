@@ -7,9 +7,28 @@ import ResetPasswordForm from '@ui/components/Forms/ResetPasswordForm';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useToast } from '@ui/hooks/useToast';
 
+// Mock zxcvbn
+jest.mock('zxcvbn', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({
+    score: 0,
+    feedback: {
+      warning: '',
+      suggestions: [],
+    },
+  })),
+}));
+
+// Mock hooks
 jest.mock('@ui/hooks/useAuth');
 jest.mock('@ui/hooks/useToast');
 jest.mock('react-i18next');
+
+// Mock TCOffcanvas component
+jest.mock('@ui/components/Offcanvas/TCOffcanvas', () => ({
+  __esModule: true,
+  default: () => null,
+}));
 
 const toastMock = {
   error: jest.fn(),
@@ -80,7 +99,7 @@ describe('ResetPasswordForm', () => {
       'password'
     );
     expect(screen.getByTestId('btn-toggle-password')).toBeInTheDocument();
-    expect(screen.getByTestId('btn-toggle-password')).toHaveTextContent('👁️');
+    expect(screen.getByTestId('btn-toggle-password').querySelector('.bi-eye')).toBeInTheDocument();
     expect(screen.getByTestId('reset-password-form')).toBeInTheDocument();
     expect(screen.getByTestId('label-reset-password')).toHaveTextContent('reset.password');
   });
@@ -100,7 +119,10 @@ describe('ResetPasswordForm', () => {
       fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
         target: { value: 'Password123!' },
       });
-      fireEvent.click(screen.getByTestId('reset-password-form-button'));
+      fireEvent.change(screen.getByTestId('reset-password-form-confirm-password-input'), {
+        target: { value: 'Password123!' },
+      });
+      fireEvent.submit(screen.getByTestId('reset-password-form'));
     });
 
     await waitFor(() => {
@@ -115,11 +137,19 @@ describe('ResetPasswordForm', () => {
   it('should show validation error when password is invalid', async () => {
     renderResetPasswordForm();
 
+    // First fill the field to enable the button
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
+        target: { value: 'test' },
+      });
+    });
+
+    // Then clear it and try to submit
     await act(async () => {
       fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
         target: { value: '' },
       });
-      fireEvent.click(screen.getByTestId('reset-password-form-button'));
+      fireEvent.submit(screen.getByTestId('reset-password-form'));
     });
 
     expect(screen.getByText('errors.password.required')).toBeInTheDocument();
@@ -147,7 +177,10 @@ describe('ResetPasswordForm', () => {
       fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
         target: { value: 'Password123!' },
       });
-      fireEvent.click(screen.getByTestId('reset-password-form-button'));
+      fireEvent.change(screen.getByTestId('reset-password-form-confirm-password-input'), {
+        target: { value: 'Password123!' },
+      });
+      fireEvent.submit(screen.getByTestId('reset-password-form'));
     });
 
     await waitFor(() => {
@@ -166,21 +199,21 @@ describe('ResetPasswordForm', () => {
     const toggleButton = screen.getByTestId('btn-toggle-password');
 
     expect(passwordInput).toHaveAttribute('type', 'password');
-    expect(toggleButton).toHaveTextContent('👁️');
+    expect(toggleButton.querySelector('.bi-eye')).toBeInTheDocument();
 
     await act(async () => {
       fireEvent.click(toggleButton);
     });
 
     expect(passwordInput).toHaveAttribute('type', 'text');
-    expect(toggleButton).toHaveTextContent('🙈');
+    expect(toggleButton.querySelector('.bi-eye-slash')).toBeInTheDocument();
 
     await act(async () => {
       fireEvent.click(toggleButton);
     });
 
     expect(passwordInput).toHaveAttribute('type', 'password');
-    expect(toggleButton).toHaveTextContent('👁️');
+    expect(toggleButton.querySelector('.bi-eye')).toBeInTheDocument();
   });
 
   it('should handle error when token becomes invalid', async () => {
@@ -213,7 +246,7 @@ describe('ResetPasswordForm', () => {
       fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
         target: { value: 'weak' },
       });
-      fireEvent.click(screen.getByTestId('reset-password-form-button'));
+      fireEvent.submit(screen.getByTestId('reset-password-form'));
     });
 
     expect(screen.getByText('errors.password.invalid')).toBeInTheDocument();
@@ -247,6 +280,7 @@ describe('ResetPasswordForm', () => {
       errors: {},
       touched: {},
       handleChange: jest.fn(),
+      handleBlur: jest.fn(),
       handleSubmit: jest.fn(e => {
         e.preventDefault();
         toastMock.error('reset.invalid_token');
@@ -259,6 +293,7 @@ describe('ResetPasswordForm', () => {
       resetThrottle: jest.fn(),
       handleCheckboxChange: jest.fn(),
       resetForm: jest.fn(),
+      hasValidationErrors: false,
     });
 
     renderResetPasswordForm({ tokenProp: 'expected-token' });
@@ -287,15 +322,17 @@ describe('ResetPasswordForm', () => {
       errors: {},
       touched: {},
       handleChange: jest.fn(),
+      handleBlur: jest.fn(),
       handleSubmit: jest.fn(),
       isSubmitting: false,
       isThrottled: false,
       canSubmit: true,
       timeUntilNextSubmission: 0,
-      remainingAttempts: 2, // Esto debería mostrar el warning
+      remainingAttempts: 2, // This should show the warning
       resetThrottle: jest.fn(),
       handleCheckboxChange: jest.fn(),
       resetForm: jest.fn(),
+      hasValidationErrors: false,
     });
 
     renderResetPasswordForm({ tokenProp: 'valid-token' });
@@ -306,5 +343,29 @@ describe('ResetPasswordForm', () => {
     );
 
     mockUseForm.mockRestore();
+  });
+
+  it('should show validation errors', async () => {
+    const resetPasswordMock = promiseMock();
+    setupUseAuth({ resetPassword: resetPasswordMock });
+    renderResetPasswordForm();
+
+    // First fill the field to enable the button
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
+        target: { value: 'test' },
+      });
+    });
+
+    // Then clear it and try to submit
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
+        target: { value: '' },
+      });
+      fireEvent.submit(screen.getByTestId('reset-password-form'));
+    });
+
+    expect(screen.getByText('errors.password.required')).toBeInTheDocument();
+    expect(screen.getByTestId('reset-password-form-button')).toBeDisabled();
   });
 });

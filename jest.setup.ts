@@ -2,7 +2,7 @@ import path from 'path';
 
 import { config as dotenvConfig } from 'dotenv';
 
-dotenvConfig({ path: path.resolve(__dirname, '.env.testing') });
+dotenvConfig({ path: path.resolve(__dirname, '.env.test') });
 
 import '@testing-library/jest-dom';
 import i18n from '@infrastructure/i18n';

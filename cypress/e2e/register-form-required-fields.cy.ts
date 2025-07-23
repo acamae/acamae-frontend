@@ -52,8 +52,8 @@ describe('Register Form - Required Fields Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      // Click register button
-      cy.get('[data-testid="register-form-button"]').click();
+      // Submit the form (not click the button)
+      cy.get('[data-testid="register-form"]').submit();
 
       // Verify that only email error appears
       cy.get('[data-testid="register-form-email-error"]')
@@ -65,6 +65,9 @@ describe('Register Form - Required Fields Validations', () => {
       cy.get('[data-testid="register-form-password-error"]').should('not.be.visible');
       cy.get('[data-testid="register-form-confirm-password-error"]').should('not.be.visible');
       cy.get('[data-testid="register-form-terms-error"]').should('not.be.visible');
+
+      // Verify that the button is disabled when there are validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       // Verify that the form was not submitted
       cy.url().should('include', APP_ROUTES.REGISTER);
@@ -79,8 +82,8 @@ describe('Register Form - Required Fields Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      // Click register button
-      cy.get('[data-testid="register-form-button"]').click();
+      // Submit the form (not click the button)
+      cy.get('[data-testid="register-form"]').submit();
 
       // Verify that only username error appears
       cy.get('[data-testid="register-form-username-error"]')
@@ -92,6 +95,9 @@ describe('Register Form - Required Fields Validations', () => {
       cy.get('[data-testid="register-form-password-error"]').should('not.be.visible');
       cy.get('[data-testid="register-form-confirm-password-error"]').should('not.be.visible');
       cy.get('[data-testid="register-form-terms-error"]').should('not.be.visible');
+
+      // Verify that the button is disabled when there are validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       // Verify that the form was not submitted
       cy.url().should('include', APP_ROUTES.REGISTER);
@@ -106,8 +112,8 @@ describe('Register Form - Required Fields Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      // Click register button
-      cy.get('[data-testid="register-form-button"]').click();
+      // Submit the form (not click the button)
+      cy.get('[data-testid="register-form"]').submit();
 
       // Verify that errors appear on password and confirmation
       cy.get('[data-testid="register-form-password-error"]')
@@ -123,6 +129,9 @@ describe('Register Form - Required Fields Validations', () => {
       cy.get('[data-testid="register-form-username-error"]').should('not.be.visible');
       cy.get('[data-testid="register-form-terms-error"]').should('not.be.visible');
 
+      // Verify that the button is disabled when there are validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
+
       // Verify that the form was not submitted
       cy.url().should('include', APP_ROUTES.REGISTER);
     });
@@ -136,8 +145,8 @@ describe('Register Form - Required Fields Validations', () => {
       cy.get('[data-testid="register-form-password-input"]').type('Password123!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      // Click register button
-      cy.get('[data-testid="register-form-button"]').click();
+      // Submit the form (not click the button)
+      cy.get('[data-testid="register-form"]').submit();
 
       // Verify that only password confirmation error appears
       cy.get('[data-testid="register-form-confirm-password-error"]')
@@ -149,6 +158,9 @@ describe('Register Form - Required Fields Validations', () => {
       cy.get('[data-testid="register-form-username-error"]').should('not.be.visible');
       cy.get('[data-testid="register-form-password-error"]').should('not.be.visible');
       cy.get('[data-testid="register-form-terms-error"]').should('not.be.visible');
+
+      // Verify that the button is disabled when there are validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       // Verify that the form was not submitted
       cy.url().should('include', APP_ROUTES.REGISTER);
@@ -163,8 +175,8 @@ describe('Register Form - Required Fields Validations', () => {
       cy.get('[data-testid="register-form-password-input"]').type('Password123!');
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
 
-      // Click register button
-      cy.get('[data-testid="register-form-button"]').click();
+      // Submit the form (not click the button)
+      cy.get('[data-testid="register-form"]').submit();
 
       // Verify that only terms and conditions error appears
       cy.get('[data-testid="register-form-terms-error"]')
@@ -177,6 +189,9 @@ describe('Register Form - Required Fields Validations', () => {
       cy.get('[data-testid="register-form-password-error"]').should('not.be.visible');
       cy.get('[data-testid="register-form-confirm-password-error"]').should('not.be.visible');
 
+      // Verify that the button is disabled when there are validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
+
       // Verify that the form was not submitted
       cy.url().should('include', APP_ROUTES.REGISTER);
     });
@@ -184,8 +199,8 @@ describe('Register Form - Required Fields Validations', () => {
 
   describe('Real-time validation behavior', () => {
     it('should hide error messages when fields are corrected', () => {
-      // First generate errors by clicking submit without data
-      cy.get('[data-testid="register-form-button"]').click();
+      // First generate errors by submitting form without data
+      cy.get('[data-testid="register-form"]').submit();
 
       // Verify that errors appear
       cy.get('[data-testid="register-form-email-error"]').should('be.visible');
@@ -222,8 +237,8 @@ describe('Register Form - Required Fields Validations', () => {
       cy.get('[data-testid="register-form-terms-checkbox"]').focus().should('have.focus');
       cy.get('[data-testid="register-form-button"]').focus().should('have.focus');
 
-      // Submit form with Enter to generate errors
-      cy.get('[data-testid="register-form-button"]').type('{enter}');
+      // Submit form to generate errors
+      cy.get('[data-testid="register-form"]').submit();
 
       // Verify that errors have appropriate accessibility attributes
       cy.get('[data-testid="register-form-email-error"]')

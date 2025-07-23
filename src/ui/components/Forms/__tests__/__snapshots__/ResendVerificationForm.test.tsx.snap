@@ -22,6 +22,7 @@ exports[`ResendVerificationForm should render snapshot correctly 1`] = `
       </label>
       <input
         aria-errormessage="email-verification-resend-form-identifier-error"
+        aria-invalid="false"
         aria-required="true"
         class="bg-white bg-opacity-5 form-control form-control-lg"
         data-testid="email-verification-resend-form-identifier-input"

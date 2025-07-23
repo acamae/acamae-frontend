@@ -28,20 +28,23 @@ const ForgotPasswordForm: React.FC = () => {
     values,
     errors,
     touched,
-    isSubmitting,
     handleChange,
+    handleBlur,
     handleSubmit,
+    isSubmitting,
     isThrottled,
-    canSubmit,
     timeUntilNextSubmission,
     remainingAttempts,
+    hasValidationErrors,
   } = useForm<ForgotPasswordFormData>({
-    initialValues: { email: '' },
-    validate,
-    onSubmit: async (payload: ForgotPasswordPayload) => {
-      await forgotPassword(payload);
+    initialValues: {
+      email: '',
     },
-    enableThrottling: process.env.NODE_ENV !== 'testing',
+    validate,
+    onSubmit: async (data: ForgotPasswordPayload) => {
+      await forgotPassword(data);
+    },
+    enableThrottling: true,
     formName: 'forgot-password-form',
   });
 
@@ -69,8 +72,9 @@ const ForgotPasswordForm: React.FC = () => {
           name="email"
           value={values.email}
           onChange={handleChange}
+          onBlur={handleBlur}
           isInvalid={touched.email && !!errors.email}
-          aria-invalid={touched.email && !!errors.email}
+          aria-invalid={touched.email && !!errors.email ? 'true' : 'false'}
           aria-required="true"
           required
           autoComplete="email"
@@ -112,8 +116,8 @@ const ForgotPasswordForm: React.FC = () => {
           variant="outline-theme"
           className="d-block w-100 fw-500 mb-3"
           type="submit"
-          disabled={isSubmitting || loading || isThrottled || !canSubmit}
-          aria-busy={isSubmitting || loading}
+          disabled={hasValidationErrors || loading || isSubmitting || isThrottled}
+          aria-busy={loading || isSubmitting || isThrottled}
           data-testid="forgot-password-form-button">
           {getButtonText()}
         </Button>

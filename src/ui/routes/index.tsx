@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import { USER_ROLES, type UserRole } from '@domain/constants/user';
 import { PUBLIC_ROUTES, getPrivateRoutesRelative } from '@shared/constants/appRoutes';
+import ErrorBoundary from '@ui/components/ErrorBoundary';
 import Loading from '@ui/components/Loading';
 import PrivateRoute from '@ui/components/PrivateRoute';
 import MainLayout from '@ui/layouts/MainLayout';
@@ -114,16 +115,19 @@ const createRouter = () => {
     {
       path: '/',
       element: <PublicLayout options={createPublicLayoutOptions(true, true)} />,
+      errorElement: <ErrorBoundary />,
       children: publicRoutes,
     },
     {
       path: '/app',
       element: <MainLayout />,
+      errorElement: <ErrorBoundary />,
       children: privateRoutes,
     },
     {
       path: '*',
       element: <PublicLayout options={createPublicLayoutOptions(true, false)} />,
+      errorElement: <ErrorBoundary />,
       children: [
         {
           index: true,
@@ -271,9 +275,11 @@ const AppRoutes = ({ router: customRouter }: AppRoutesProps = {}) => {
   }
 
   return (
-    <Suspense fallback={<Loading />}>
-      <RouterProvider router={selectedRouter} />
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={<Loading />}>
+        <RouterProvider router={selectedRouter} />
+      </Suspense>
+    </ErrorBoundary>
   );
 };
 

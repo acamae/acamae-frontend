@@ -24,27 +24,65 @@ export const useAuth = () => {
   );
 
   const login = async (loginPayload: LoginPayload) => {
-    return await dispatch(loginAction(loginPayload));
+    try {
+      const result = await dispatch(loginAction(loginPayload));
+      return result;
+    } catch (error) {
+      console.error('Login error:', error);
+      return { error };
+    }
   };
 
   const register = async (registerPayload: RegisterPayload) => {
-    return await dispatch(registerAction(registerPayload));
+    try {
+      const result = await dispatch(registerAction(registerPayload));
+      return result;
+    } catch (error) {
+      // Ensure loading state is reset even when there's an error
+      // The error will be handled by the Redux action and displayed via toast
+      console.error('Registration error:', error);
+      return { error };
+    }
   };
 
   const forgotPassword = async (forgotPasswordPayload: ForgotPasswordPayload) => {
-    return await dispatch(forgotPasswordAction(forgotPasswordPayload));
+    try {
+      const result = await dispatch(forgotPasswordAction(forgotPasswordPayload));
+      return result;
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      return { error };
+    }
   };
 
   const resetPassword = async (resetPasswordPayload: ResetPasswordPayload) => {
-    return await dispatch(resetPasswordAction(resetPasswordPayload));
+    try {
+      const result = await dispatch(resetPasswordAction(resetPasswordPayload));
+      return result;
+    } catch (error) {
+      console.error('Reset password error:', error);
+      return { error };
+    }
   };
 
   const logout = async () => {
-    return await dispatch(logoutAction());
+    try {
+      const result = await dispatch(logoutAction());
+      return result;
+    } catch (error) {
+      console.error('Logout error:', error);
+      return { error };
+    }
   };
 
   const resendVerification = async (payload: ResendVerificationPayload) => {
-    return await dispatch(resendVerificationAction(payload));
+    try {
+      const result = await dispatch(resendVerificationAction(payload));
+      return result;
+    } catch (error) {
+      console.error('Resend verification error:', error);
+      return { error };
+    }
   };
 
   /**

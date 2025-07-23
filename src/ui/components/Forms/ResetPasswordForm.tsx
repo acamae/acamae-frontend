@@ -8,7 +8,6 @@ import { ResetPasswordFormData } from '@domain/types/forms';
 import PasswordStrengthMeter from '@ui/components/PasswordStrengthMeter';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
-import { useToast } from '@ui/hooks/useToast';
 
 interface ResetPasswordFormProps {
   tokenProp?: string;
@@ -17,16 +16,21 @@ interface ResetPasswordFormProps {
 const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' }) => {
   const { t } = useTranslation();
   const { resetPassword, loading } = useAuth();
-  const toast = useToast();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validate = useCallback(
-    (values: ResetPasswordPayload) => {
-      const errors: Partial<ResetPasswordPayload> = {};
+    (values: ResetPasswordFormData) => {
+      const errors: Partial<ResetPasswordFormData> = {};
       if (!values.password) {
         errors.password = t('errors.password.required');
       } else if (!validatePassword(values.password)) {
         errors.password = t('errors.password.invalid');
+      }
+      if (!values.confirmPassword) {
+        errors.confirmPassword = t('errors.password.confirm_required');
+      } else if (values.password !== values.confirmPassword) {
+        errors.confirmPassword = t('errors.password.mismatch');
       }
       return errors;
     },
@@ -38,23 +42,29 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
     errors,
     touched,
     handleChange,
+    handleBlur,
     handleSubmit,
     isSubmitting,
     isThrottled,
-    canSubmit,
     timeUntilNextSubmission,
     remainingAttempts,
+    hasValidationErrors,
   } = useForm<ResetPasswordFormData>({
-    initialValues: { password: '', token: tokenProp },
+    initialValues: {
+      password: '',
+      confirmPassword: '',
+      token: tokenProp,
+    },
     validate,
-    onSubmit: async (payload: ResetPasswordPayload) => {
-      if (!payload.token || payload.token !== tokenProp) {
-        toast.error(t('reset.invalid_token'));
-        return; // do not submit the form
-      }
+    onSubmit: async (data: ResetPasswordFormData) => {
+      // Only send password and token to server, exclude confirmPassword
+      const payload: ResetPasswordPayload = {
+        password: data.password,
+        token: tokenProp,
+      };
       await resetPassword(payload);
     },
-    enableThrottling: process.env.NODE_ENV !== 'testing',
+    enableThrottling: true,
     formName: 'reset-password-form',
   });
 
@@ -100,8 +110,9 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
             name="password"
             value={values.password}
             onChange={handleChange}
+            onBlur={handleBlur}
             isInvalid={touched.password && !!errors.password}
-            aria-invalid={touched.password && !!errors.password}
+            aria-invalid={touched.password && !!errors.password ? 'true' : 'false'}
             aria-required="true"
             aria-errormessage="reset-password-form-password-error"
             required
@@ -115,7 +126,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
             aria-label={t('register.toggle_password')}
             data-testid="btn-toggle-password"
             tabIndex={-1}>
-            {showPassword ? '🙈' : '👁️'}
+            <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
           </Button>
         </InputGroup>
         <Form.Text
@@ -133,6 +144,55 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
           {errors.password}
         </Form.Control.Feedback>
         <PasswordStrengthMeter password={values.password ?? ''} t={t} />
+      </Form.Group>
+
+      <Form.Group className="mb-3" controlId="confirmPassword">
+        <Form.Label data-testid="label-reset-confirm-password">
+          {t('reset.confirm_password')}
+        </Form.Label>
+        <InputGroup
+          hasValidation
+          className={touched.confirmPassword && !!errors.confirmPassword ? 'is-invalid' : ''}>
+          <Form.Control
+            size="lg"
+            className="bg-white bg-opacity-5"
+            type={showConfirmPassword ? 'text' : 'password'}
+            name="confirmPassword"
+            value={values.confirmPassword}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            isInvalid={touched.confirmPassword && !!errors.confirmPassword}
+            aria-invalid={touched.confirmPassword && !!errors.confirmPassword ? 'true' : 'false'}
+            aria-required="true"
+            aria-errormessage="reset-password-form-confirm-password-error"
+            required
+            autoComplete="new-password"
+            aria-describedby="confirmPasswordHelp"
+            data-testid="reset-password-form-confirm-password-input"
+          />
+          <Button
+            variant="outline-secondary"
+            onClick={() => setShowConfirmPassword(prev => !prev)}
+            aria-label={t('register.toggle_password')}
+            data-testid="btn-toggle-confirm-password"
+            tabIndex={-1}>
+            <i className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
+          </Button>
+        </InputGroup>
+        <Form.Text
+          id="confirmPasswordHelp"
+          className="text-muted"
+          data-testid="reset-password-form-confirm-password-help">
+          {t('reset.confirm_password_help')}
+        </Form.Text>
+        <Form.Control.Feedback
+          type="invalid"
+          aria-live="polite"
+          aria-atomic="true"
+          role="alert"
+          data-testid="reset-password-form-confirm-password-error">
+          {errors.confirmPassword}
+        </Form.Control.Feedback>
       </Form.Group>
 
       {showAttemptsWarning && (
@@ -153,8 +213,8 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
           variant="outline-theme"
           className="d-block w-100 fw-500 mb-3"
           type="submit"
-          disabled={isSubmitting || loading || isThrottled || !canSubmit}
-          aria-busy={isSubmitting || loading}
+          disabled={hasValidationErrors || loading || isSubmitting || isThrottled}
+          aria-busy={loading || isSubmitting || isThrottled}
           data-testid="reset-password-form-button">
           {getButtonText()}
         </Button>
