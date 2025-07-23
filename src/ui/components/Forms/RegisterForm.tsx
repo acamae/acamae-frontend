@@ -59,11 +59,14 @@ const RegisterForm: React.FC = () => {
     errors,
     touched,
     handleChange,
+    handleBlur,
     handleSubmit,
+    isSubmitting,
     handleCheckboxChange,
     isThrottled,
     timeUntilNextSubmission,
     remainingAttempts,
+    hasValidationErrors,
   } = useForm<RegisterFormData>({
     initialValues: {
       email: '',
@@ -81,7 +84,7 @@ const RegisterForm: React.FC = () => {
   });
 
   const getButtonText = () => {
-    if (loading) {
+    if (loading || isSubmitting) {
       return t('global.processing');
     }
     if (isThrottled && timeUntilNextSubmission && timeUntilNextSubmission > 0) {
@@ -121,8 +124,9 @@ const RegisterForm: React.FC = () => {
             name="email"
             value={values.email}
             onChange={handleChange}
+            onBlur={handleBlur}
             isInvalid={touched.email && !!errors.email}
-            aria-invalid={touched.email && !!errors.email}
+            aria-invalid={touched.email && !!errors.email ? 'true' : 'false'}
             required
             aria-required="true"
             autoComplete="email"
@@ -134,6 +138,7 @@ const RegisterForm: React.FC = () => {
             {t('register.email_help')}
           </Form.Text>
           <Form.Control.Feedback
+            id="register-form-email-error"
             type="invalid"
             data-testid="register-form-email-error"
             aria-live="polite"
@@ -155,8 +160,9 @@ const RegisterForm: React.FC = () => {
             name="username"
             value={values.username}
             onChange={handleChange}
+            onBlur={handleBlur}
             isInvalid={touched.username && !!errors.username}
-            aria-invalid={touched.username && !!errors.username}
+            aria-invalid={touched.username && !!errors.username ? 'true' : 'false'}
             required
             aria-required="true"
             autoComplete="username"
@@ -168,6 +174,7 @@ const RegisterForm: React.FC = () => {
             {t('register.username_help')}
           </Form.Text>
           <Form.Control.Feedback
+            id="register-form-username-error"
             type="invalid"
             data-testid="register-form-username-error"
             aria-live="polite"
@@ -192,8 +199,9 @@ const RegisterForm: React.FC = () => {
               name="password"
               value={values.password}
               onChange={handleChange}
+              onBlur={handleBlur}
               isInvalid={touched.password && !!errors.password}
-              aria-invalid={touched.password && !!errors.password}
+              aria-invalid={touched.password && !!errors.password ? 'true' : 'false'}
               required
               aria-required="true"
               autoComplete="new-password"
@@ -214,6 +222,7 @@ const RegisterForm: React.FC = () => {
             {t('register.password_help')}
           </Form.Text>
           <Form.Control.Feedback
+            id="register-form-password-error"
             type="invalid"
             data-testid="register-form-password-error"
             aria-live="polite"
@@ -239,8 +248,9 @@ const RegisterForm: React.FC = () => {
               name="confirmPassword"
               value={values.confirmPassword}
               onChange={handleChange}
+              onBlur={handleBlur}
               isInvalid={touched.confirmPassword && !!errors.confirmPassword}
-              aria-invalid={touched.confirmPassword && !!errors.confirmPassword}
+              aria-invalid={touched.confirmPassword && !!errors.confirmPassword ? 'true' : 'false'}
               required
               aria-required="true"
               autoComplete="new-password"
@@ -261,6 +271,7 @@ const RegisterForm: React.FC = () => {
             {t('register.confirm_password_help')}
           </Form.Text>
           <Form.Control.Feedback
+            id="register-form-confirm-password-error"
             type="invalid"
             data-testid="register-form-confirm-password-error"
             aria-live="polite"
@@ -288,9 +299,10 @@ const RegisterForm: React.FC = () => {
             id="terms"
             name="terms"
             onChange={handleCheckboxChange}
+            onBlur={handleBlur}
             className={touched.terms && !!errors.terms ? 'is-invalid' : ''}
             isInvalid={touched.terms && !!errors.terms}
-            aria-invalid={touched.terms && !!errors.terms}
+            aria-invalid={touched.terms && !!errors.terms ? 'true' : 'false'}
             required
             aria-required="true"
             autoComplete="terms"
@@ -302,6 +314,7 @@ const RegisterForm: React.FC = () => {
             {t('register.terms_and_conditions_help')}{' '}
           </Form.Text>
           <Form.Control.Feedback
+            id="register-form-terms-error"
             type="invalid"
             data-testid="register-form-terms-error"
             aria-live="polite"
@@ -329,8 +342,8 @@ const RegisterForm: React.FC = () => {
             variant="outline-theme"
             className="d-block w-100 fw-500 mb-3"
             type="submit"
-            disabled={loading || isThrottled}
-            aria-busy={loading || isThrottled}
+            disabled={hasValidationErrors || loading || isSubmitting || isThrottled}
+            aria-busy={loading || isSubmitting || isThrottled}
             data-testid="register-form-button">
             {getButtonText()}
           </Button>

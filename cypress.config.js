@@ -112,7 +112,7 @@ export default defineConfig({
     },
 
     // Test configuration
-    baseUrl: 'http://localhost:3000',
+    baseUrl: 'https://localhost',
     viewportWidth: 1280,
     viewportHeight: 720,
     video: false,

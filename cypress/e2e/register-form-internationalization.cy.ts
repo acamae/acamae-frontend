@@ -134,12 +134,17 @@ describe('Register Form - Internationalization', () => {
 
       // Fill form with different passwords
       cy.get('[data-testid="register-form-email-input"]').type('test@example.com');
+      cy.get('[data-testid="register-form-email-input"]').blur();
       cy.get('[data-testid="register-form-username-input"]').type('usuariotest');
+      cy.get('[data-testid="register-form-username-input"]').blur();
       cy.get('[data-testid="register-form-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-password-input"]').blur();
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password456!');
+      cy.get('[data-testid="register-form-confirm-password-input"]').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      // Submit form to trigger validation
+      cy.get('[data-testid="register-form"]').submit();
 
       cy.get('[data-testid="register-form-confirm-password-error"]')
         .should('be.visible')
@@ -155,12 +160,17 @@ describe('Register Form - Internationalization', () => {
 
       // Fill form with different passwords
       cy.get('[data-testid="register-form-email-input"]').type('test@example.com');
+      cy.get('[data-testid="register-form-email-input"]').blur();
       cy.get('[data-testid="register-form-username-input"]').type('usuariotest');
+      cy.get('[data-testid="register-form-username-input"]').blur();
       cy.get('[data-testid="register-form-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-password-input"]').blur();
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password456!');
+      cy.get('[data-testid="register-form-confirm-password-input"]').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      // Submit form to trigger validation
+      cy.get('[data-testid="register-form"]').submit();
 
       cy.get('[data-testid="register-form-confirm-password-error"]')
         .should('be.visible')

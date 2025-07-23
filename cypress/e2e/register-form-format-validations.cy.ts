@@ -23,7 +23,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
       // Try to submit the form
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       // Verify that email format error appears
       cy.get('[data-testid="register-form-email-error"]')
@@ -41,7 +41,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-email-error"]')
         .should('be.visible')
@@ -57,7 +57,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-email-error"]')
         .should('be.visible')
@@ -75,11 +75,17 @@ describe('Register Form - Format Validations', () => {
         .trigger('blur');
 
       cy.get('[data-testid="register-form-username-input"]').type('usuariotest');
+      cy.get('[data-testid="register-form-username-input"]').blur();
       cy.get('[data-testid="register-form-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-password-input"]').blur();
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
+      cy.get('[data-testid="register-form-confirm-password-input"]').blur();
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      // Submit form to trigger validation
+      cy.get('[data-testid="register-form"]').submit();
+
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-email-error"]')
         .should('be.visible')
@@ -110,7 +116,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-username-error"]')
         .should('be.visible')
@@ -128,7 +134,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-username-error"]')
         .should('be.visible')
@@ -144,7 +150,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-username-error"]')
         .should('be.visible')
@@ -160,7 +166,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-username-error"]')
         .should('be.visible')
@@ -176,7 +182,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password123!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-username-error"]')
         .should('be.visible')
@@ -220,7 +226,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Pass1!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-password-error"]')
         .should('be.visible')
@@ -236,7 +242,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('password123!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-password-error"]')
         .should('be.visible')
@@ -252,7 +258,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('PASSWORD123!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-password-error"]')
         .should('be.visible')
@@ -268,7 +274,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-password-error"]')
         .should('be.visible')
@@ -284,7 +290,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('PasswordSolo');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-password-error"]')
         .should('be.visible')
@@ -328,7 +334,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('Password456!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-confirm-password-error"]')
         .should('be.visible')
@@ -344,7 +350,7 @@ describe('Register Form - Format Validations', () => {
       cy.get('[data-testid="register-form-confirm-password-input"]').type('password123!');
       cy.get('[data-testid="register-form-terms-checkbox"]').check();
 
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       cy.get('[data-testid="register-form-confirm-password-error"]')
         .should('be.visible')

@@ -46,3 +46,5 @@ docker/ssl/*.pem
 /dependency-graph*.*
 
 /generated/prisma
+
+cypress/screenshots/

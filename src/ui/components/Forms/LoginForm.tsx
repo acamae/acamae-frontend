@@ -38,25 +38,28 @@ const LoginForm: React.FC = () => {
     errors,
     touched,
     handleChange,
+    handleBlur,
     handleSubmit,
+    isSubmitting,
     isThrottled,
     timeUntilNextSubmission,
     remainingAttempts,
+    hasValidationErrors,
   } = useForm<LoginFormData>({
     initialValues: {
       email: '',
       password: '',
     },
     validate,
-    onSubmit: async (payload: LoginPayload) => {
-      await login(payload);
+    onSubmit: async (data: LoginPayload) => {
+      await login(data);
     },
     enableThrottling: true,
     formName: 'login-form',
   });
 
   const getButtonText = () => {
-    if (loading) {
+    if (isSubmitting || loading) {
       return t('global.accessing');
     }
     if (isThrottled && timeUntilNextSubmission && timeUntilNextSubmission > 0) {
@@ -78,8 +81,9 @@ const LoginForm: React.FC = () => {
           name="email"
           value={values.email}
           onChange={handleChange}
+          onBlur={handleBlur}
           isInvalid={touched.email && !!errors.email}
-          aria-invalid={touched.email && !!errors.email}
+          aria-invalid={touched.email && !!errors.email ? 'true' : 'false'}
           aria-required="true"
           required
           aria-errormessage="login-form-email-error"
@@ -110,8 +114,9 @@ const LoginForm: React.FC = () => {
             name="password"
             value={values.password}
             onChange={handleChange}
+            onBlur={handleBlur}
             isInvalid={touched.password && !!errors.password}
-            aria-invalid={touched.password && !!errors.password}
+            aria-invalid={touched.password && !!errors.password ? 'true' : 'false'}
             aria-required="true"
             required
             aria-errormessage="login-form-password-error"
@@ -157,8 +162,8 @@ const LoginForm: React.FC = () => {
           variant="outline-theme"
           className="d-block w-100 fw-500 mb-3"
           type="submit"
-          disabled={loading || isThrottled}
-          aria-busy={loading || isThrottled}
+          disabled={hasValidationErrors || loading || isSubmitting || isThrottled}
+          aria-busy={loading || isSubmitting || isThrottled}
           data-testid="login-form-button">
           {getButtonText()}
         </Button>

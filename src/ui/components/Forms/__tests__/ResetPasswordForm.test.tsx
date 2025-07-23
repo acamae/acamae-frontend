@@ -100,7 +100,10 @@ describe('ResetPasswordForm', () => {
       fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
         target: { value: 'Password123!' },
       });
-      fireEvent.click(screen.getByTestId('reset-password-form-button'));
+      fireEvent.change(screen.getByTestId('reset-password-form-confirm-password-input'), {
+        target: { value: 'Password123!' },
+      });
+      fireEvent.submit(screen.getByTestId('reset-password-form'));
     });
 
     await waitFor(() => {
@@ -115,11 +118,19 @@ describe('ResetPasswordForm', () => {
   it('should show validation error when password is invalid', async () => {
     renderResetPasswordForm();
 
+    // First fill the field to enable the button
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
+        target: { value: 'test' },
+      });
+    });
+
+    // Then clear it and try to submit
     await act(async () => {
       fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
         target: { value: '' },
       });
-      fireEvent.click(screen.getByTestId('reset-password-form-button'));
+      fireEvent.submit(screen.getByTestId('reset-password-form'));
     });
 
     expect(screen.getByText('errors.password.required')).toBeInTheDocument();
@@ -147,7 +158,10 @@ describe('ResetPasswordForm', () => {
       fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
         target: { value: 'Password123!' },
       });
-      fireEvent.click(screen.getByTestId('reset-password-form-button'));
+      fireEvent.change(screen.getByTestId('reset-password-form-confirm-password-input'), {
+        target: { value: 'Password123!' },
+      });
+      fireEvent.submit(screen.getByTestId('reset-password-form'));
     });
 
     await waitFor(() => {
@@ -213,7 +227,7 @@ describe('ResetPasswordForm', () => {
       fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
         target: { value: 'weak' },
       });
-      fireEvent.click(screen.getByTestId('reset-password-form-button'));
+      fireEvent.submit(screen.getByTestId('reset-password-form'));
     });
 
     expect(screen.getByText('errors.password.invalid')).toBeInTheDocument();
@@ -247,6 +261,7 @@ describe('ResetPasswordForm', () => {
       errors: {},
       touched: {},
       handleChange: jest.fn(),
+      handleBlur: jest.fn(),
       handleSubmit: jest.fn(e => {
         e.preventDefault();
         toastMock.error('reset.invalid_token');
@@ -259,6 +274,7 @@ describe('ResetPasswordForm', () => {
       resetThrottle: jest.fn(),
       handleCheckboxChange: jest.fn(),
       resetForm: jest.fn(),
+      hasValidationErrors: false,
     });
 
     renderResetPasswordForm({ tokenProp: 'expected-token' });
@@ -287,6 +303,7 @@ describe('ResetPasswordForm', () => {
       errors: {},
       touched: {},
       handleChange: jest.fn(),
+      handleBlur: jest.fn(),
       handleSubmit: jest.fn(),
       isSubmitting: false,
       isThrottled: false,
@@ -296,6 +313,7 @@ describe('ResetPasswordForm', () => {
       resetThrottle: jest.fn(),
       handleCheckboxChange: jest.fn(),
       resetForm: jest.fn(),
+      hasValidationErrors: false,
     });
 
     renderResetPasswordForm({ tokenProp: 'valid-token' });
@@ -306,5 +324,29 @@ describe('ResetPasswordForm', () => {
     );
 
     mockUseForm.mockRestore();
+  });
+
+  it('should show validation errors', async () => {
+    const resetPasswordMock = promiseMock();
+    setupUseAuth({ resetPassword: resetPasswordMock });
+    renderResetPasswordForm();
+
+    // First fill the field to enable the button
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
+        target: { value: 'test' },
+      });
+    });
+
+    // Then clear it and try to submit
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
+        target: { value: '' },
+      });
+      fireEvent.submit(screen.getByTestId('reset-password-form'));
+    });
+
+    expect(screen.getByText('errors.password.required')).toBeInTheDocument();
+    expect(screen.getByTestId('reset-password-form-button')).toBeDisabled();
   });
 });

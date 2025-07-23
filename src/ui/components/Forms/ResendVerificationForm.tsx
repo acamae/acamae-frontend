@@ -28,24 +28,27 @@ const ResendVerificationForm: React.FC = () => {
     errors,
     touched,
     handleChange,
+    handleBlur,
     handleSubmit,
+    isSubmitting,
     isThrottled,
     timeUntilNextSubmission,
     remainingAttempts,
+    hasValidationErrors,
   } = useForm<ResendVerificationFormData>({
     initialValues: {
       identifier: '',
     },
     validate,
-    onSubmit: async (payload: ResendVerificationPayload) => {
-      await resendVerification(payload);
+    onSubmit: async (data: ResendVerificationPayload) => {
+      await resendVerification(data);
     },
-    enableThrottling: process.env.NODE_ENV !== 'test',
-    formName: 'email-verification-resend-form',
+    enableThrottling: true,
+    formName: 'resend-verification-form',
   });
 
   const getButtonText = () => {
-    if (loading) {
+    if (isSubmitting || loading) {
       return t('verification.resend.loading');
     }
     if (isThrottled && timeUntilNextSubmission && timeUntilNextSubmission > 0) {
@@ -79,8 +82,9 @@ const ResendVerificationForm: React.FC = () => {
             name="identifier"
             value={values.identifier}
             onChange={handleChange}
+            onBlur={handleBlur}
             isInvalid={touched.identifier && !!errors.identifier}
-            aria-invalid={touched.identifier && !!errors.identifier}
+            aria-invalid={touched.identifier && !!errors.identifier ? 'true' : 'false'}
             aria-required="true"
             aria-errormessage="email-verification-resend-form-identifier-error"
             required
@@ -115,8 +119,8 @@ const ResendVerificationForm: React.FC = () => {
             variant="outline-theme"
             className="d-block w-100 fw-500 mb-3"
             type="submit"
-            disabled={loading || isThrottled}
-            aria-busy={loading || isThrottled}
+            disabled={hasValidationErrors || loading || isSubmitting || isThrottled}
+            aria-busy={loading || isSubmitting || isThrottled}
             data-testid="email-verification-resend-form-button">
             {getButtonText()}
           </Button>

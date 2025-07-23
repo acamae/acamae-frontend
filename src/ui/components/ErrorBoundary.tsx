@@ -86,9 +86,7 @@ class ErrorBoundaryClass extends Component<Props & { t: (key: string) => string 
                 <div className="card shadow-sm">
                   <div className="card-body text-center p-5">
                     <div className="mb-4">
-                      <i
-                        className="fa-solid fa-exclamation-triangle text-warning"
-                        style={{ fontSize: '3rem' }}></i>
+                      <i className="fa-solid fa-exclamation-triangle text-warning h1"></i>
                     </div>
                     <h2 className="h4 mb-3">{t('error.boundary.title')}</h2>
                     <p className="text-muted mb-4">{t('error.boundary.message')}</p>

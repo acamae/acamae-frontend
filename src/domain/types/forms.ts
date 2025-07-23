@@ -10,6 +10,8 @@ export interface RegisterFormData extends Pick<User, 'email' | 'password' | 'use
 export interface ForgotPasswordFormData extends Pick<User, 'email'> {}
 
 export interface ResetPasswordFormData extends Pick<User, 'password'> {
+  confirmPassword: string;
+  password: string;
   token: string;
 }
 
