@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.10.19 (2025-07-23)
+
+**Note:** Version bump only for package @acamae/frontend
+
+## 0.10.19 (2025-07-23)
+
+**Note:** Version bump only for package @acamae/frontend
+
 ## 0.10.18 (2025-07-15)
 
 **Note:** Version bump only for package @acamae/frontend
