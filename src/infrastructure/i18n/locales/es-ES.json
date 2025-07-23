@@ -65,7 +65,14 @@
       "fair": "La contraseña es regular, intenta añadir más caracteres.",
       "good": "La contraseña es buena",
       "strong": "La contraseña es fuerte",
-      "very_strong": "La contraseña es muy fuerte"
+      "very_strong": "La contraseña es muy fuerte",
+      "progress_label": "Progreso de fortaleza de la contraseña"
+    },
+    "password_requirements": {
+      "length": "al menos 8 caracteres",
+      "lowercase": "al menos 1 letra minúscula",
+      "uppercase": "al menos 1 letra mayúscula",
+      "digit": "al menos 1 dígito"
     },
     "success": "Registro completado correctamente",
     "welcome": "¡Ya puedes iniciar sesión!"
@@ -107,7 +114,14 @@
       "checking": "Verificando sesión...",
       "required": "Debes iniciar sesión para continuar."
     },
-    "unknown": "Ha ocurrido un error inesperado."
+    "unknown": "Ha ocurrido un error inesperado.",
+    "boundary": {
+      "title": "Algo salió mal",
+      "message": "Hemos encontrado un error inesperado. Por favor, intenta refrescar la página o volver atrás.",
+      "reload": "Refrescar página",
+      "back": "Volver atrás",
+      "details": "Detalles del error (solo desarrollo)"
+    }
   },
   "security": {
     "throttle": {

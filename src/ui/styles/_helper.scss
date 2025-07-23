@@ -124,7 +124,10 @@ $visibility-values: (none, initial);
 }
 .text-gradient {
   -webkit-background-clip: text !important;
+  background-clip: text !important;
+
   -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
 }
 .line-height-1 {
   line-height: 1 !important;
@@ -495,8 +498,21 @@ $visibility-values: (none, initial);
     border-color: var(--#{$prefix}theme);
   }
   &.disabled,
-  &:disabled {
+  &:disabled,
+  &.disabled:active,
+  &:disabled:active,
+  &.disabled:focus,
+  &:disabled:focus,
+  &.disabled:focus-visible,
+  &:disabled:focus-visible,
+  &.disabled:hover,
+  &:disabled:hover {
+    background-color: var(--bs-btn-disabled-bg);
+    border-color: var(--bs-btn-disabled-border-color);
     color: var(--#{$prefix}theme);
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: revert;
   }
   &:focus,
   &:active,

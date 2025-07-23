@@ -1,15 +1,3 @@
-jest.mock('react-i18next');
-jest.mock('@ui/hooks/useToast');
-jest.mock('@ui/hooks/useAuth');
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: jest.fn(),
-}));
-jest.mock('@ui/components/Offcanvas/TCOffcanvas', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +6,33 @@ import { IPromiseMock, promiseMock } from '@shared/utils/apiTestUtils';
 import RegisterForm from '@ui/components/Forms/RegisterForm';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useToast } from '@ui/hooks/useToast';
+
+// Mock zxcvbn
+jest.mock('zxcvbn', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({
+    score: 0,
+    feedback: {
+      warning: '',
+      suggestions: [],
+    },
+  })),
+}));
+
+// Mock hooks
+jest.mock('react-i18next');
+jest.mock('@ui/hooks/useAuth');
+jest.mock('@ui/hooks/useToast');
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: jest.fn(),
+}));
+
+// Mock TCOffcanvas component
+jest.mock('@ui/components/Offcanvas/TCOffcanvas', () => ({
+  __esModule: true,
+  default: () => null,
+}));
 
 const toastMock = {
   error: jest.fn(),
@@ -192,7 +207,7 @@ describe('RegisterForm', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('register-form-button')).toBeInTheDocument();
-      // El botón debería estar deshabilitado cuando hay errores de validación
+      // The button should be disabled when there are validation errors
       expect(screen.getByTestId('register-form-button')).toBeDisabled();
     });
   });
@@ -254,17 +269,17 @@ describe('RegisterForm', () => {
     const toggleButton = screen.getByTestId('btn-toggle-password');
 
     expect(passwordInput).toHaveAttribute('type', 'password');
-    expect(toggleButton).toHaveTextContent('👁️');
+    expect(toggleButton.querySelector('.bi-eye')).toBeInTheDocument();
 
     fireEvent.click(toggleButton);
 
     expect(passwordInput).toHaveAttribute('type', 'text');
-    expect(toggleButton).toHaveTextContent('🙈');
+    expect(toggleButton.querySelector('.bi-eye-slash')).toBeInTheDocument();
 
     fireEvent.click(toggleButton);
 
     expect(passwordInput).toHaveAttribute('type', 'password');
-    expect(toggleButton).toHaveTextContent('👁️');
+    expect(toggleButton.querySelector('.bi-eye')).toBeInTheDocument();
   });
 
   it('should toggle confirm password visibility', () => {
@@ -274,16 +289,16 @@ describe('RegisterForm', () => {
     const toggleButton = screen.getByTestId('btn-toggle-confirm-password');
 
     expect(confirmPasswordInput).toHaveAttribute('type', 'password');
-    expect(toggleButton).toHaveTextContent('👁️');
+    expect(toggleButton.querySelector('.bi-eye')).toBeInTheDocument();
 
     fireEvent.click(toggleButton);
 
     expect(confirmPasswordInput).toHaveAttribute('type', 'text');
-    expect(toggleButton).toHaveTextContent('🙈');
+    expect(toggleButton.querySelector('.bi-eye-slash')).toBeInTheDocument();
 
     fireEvent.click(toggleButton);
 
     expect(confirmPasswordInput).toHaveAttribute('type', 'password');
-    expect(toggleButton).toHaveTextContent('👁️');
+    expect(toggleButton.querySelector('.bi-eye')).toBeInTheDocument();
   });
 });

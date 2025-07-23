@@ -75,6 +75,22 @@ export const configureAxiosService = (
   if (options.onSessionRenewal) onSessionRenewalFn = options.onSessionRenewal;
 };
 
+/**
+ * Convierte cualquier error a string de forma segura, evitando '[object Object]' y referencias circulares.
+ */
+const safeStringifyError = (error: unknown): string => {
+  if (typeof error === 'string') return error;
+  if (error instanceof Error) return error.message;
+  try {
+    return JSON.stringify(error, Object.getOwnPropertyNames(error as object));
+  } catch {
+    if (typeof error === 'object' && error && 'toString' in error) {
+      return (error as { toString: () => string }).toString();
+    }
+    return '[Unknown error]';
+  }
+};
+
 api.interceptors.request.use(
   config => {
     // Get authentication token from local storage (localStorage)
@@ -98,7 +114,7 @@ api.interceptors.request.use(
   },
 
   error => {
-    const errorMessage = typeof error === 'object' ? JSON.stringify(error) : String(error);
+    const errorMessage = safeStringifyError(error);
     const finalError = error instanceof Error ? error : new Error(errorMessage);
     return Promise.reject(finalError);
   }
@@ -164,15 +180,13 @@ const handleUnauthorizedError = async (error: AxiosError): Promise<AxiosResponse
 const createErrorInstance = (error: unknown): Error => {
   if (error instanceof Error) return error;
 
-  const errorMessage =
-    typeof error === 'object'
-      ? JSON.stringify(error, Object.getOwnPropertyNames(error as object))
-      : String(error);
-
+  const errorMessage = safeStringifyError(error);
   return new Error(errorMessage);
 };
 
 const logError = (error: unknown): void => {
+  if (process.env.NODE_ENV === 'test') return;
+
   const axiosError = error as AxiosError;
   if (axiosError.response) {
     console.error('Response:', axiosError.response);

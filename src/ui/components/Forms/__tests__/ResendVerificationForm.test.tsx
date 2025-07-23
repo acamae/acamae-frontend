@@ -117,7 +117,18 @@ describe('ResendVerificationForm', () => {
     const resendVerificationMock = promiseMock();
     setupUseAuth({ resendVerification: resendVerificationMock });
     renderResendVerificationForm();
-    fireEvent.click(screen.getByTestId('email-verification-resend-form-button'));
+
+    // First fill the field to enable the button
+    fireEvent.change(screen.getByTestId('email-verification-resend-form-identifier-input'), {
+      target: { value: 'test@example.com' },
+    });
+
+    // Then clear it and try to submit
+    fireEvent.change(screen.getByTestId('email-verification-resend-form-identifier-input'), {
+      target: { value: '' },
+    });
+    fireEvent.submit(screen.getByTestId('email-verification-resend-form'));
+
     await waitFor(() => {
       expect(
         screen.getByTestId('email-verification-resend-form-identifier-error')
@@ -271,5 +282,18 @@ describe('ResendVerificationForm', () => {
   it('should render snapshot correctly', () => {
     const { asFragment } = renderResendVerificationForm();
     expect(asFragment()).toMatchSnapshot();
+  });
+
+  it('should show validation errors', async () => {
+    const resendVerificationMock = promiseMock();
+    setupUseAuth({ resendVerification: resendVerificationMock });
+    renderResendVerificationForm();
+
+    // Simulate submit to mark field as touched and trigger validation
+    fireEvent.submit(screen.getByTestId('email-verification-resend-form'));
+
+    // The button should be disabled when there are validation errors
+    expect(screen.getByTestId('email-verification-resend-form-button')).toBeDisabled();
+    // Optionally, check hasValidationErrors if needed
   });
 });

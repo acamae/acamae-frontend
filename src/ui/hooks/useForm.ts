@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
+import { useState, ChangeEvent, FormEvent, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ThrottleConfig } from '@shared/constants/security';
@@ -19,11 +19,13 @@ export type UseFormReturn<T> = {
   touched: Partial<Record<keyof T, boolean>>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleCheckboxChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent) => void;
-  isSubmitting?: boolean;
+  isSubmitting: boolean;
+  hasValidationErrors: boolean;
+  isFormValid: boolean;
   // Throttling properties
   isThrottled?: boolean;
-  canSubmit?: boolean;
   timeUntilNextSubmission?: number;
   remainingAttempts?: number;
   resetThrottle?: () => void;
@@ -43,6 +45,9 @@ export const useForm = <T extends object>({
   const [touched, setTouched] = useState<Record<keyof T, boolean>>({} as Record<keyof T, boolean>);
   const { i18n } = useTranslation();
 
+  // AbortController ref to handle component unmounting during submission
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   const shouldUseThrottling = enableThrottling && formName;
 
   // Throttling functionality - always call the hook
@@ -57,15 +62,26 @@ export const useForm = <T extends object>({
     showToastOnThrottle: !!shouldUseThrottling,
   });
 
-  // Run validation only when the language changes and only for touched fields
+  // Cleanup effect to abort any pending submission on unmount
   useEffect(() => {
-    const validationErrors =
-      validate && Object.keys(touched).length > 0 ? validate(values) || {} : {};
-    setErrors(validationErrors);
-  }, [i18n.language, validate, values, touched]);
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  // Run validation only when the language changes
+  useEffect(() => {
+    // Only re-validate if there are existing errors and the language changed
+    if (Object.keys(errors).length > 0 && validate) {
+      const validationErrors = validate(values) || {};
+      setErrors(validationErrors);
+    }
+  }, [i18n.language, validate, values]);
+
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    // Update values
     setValues(
       prev =>
         ({
@@ -83,52 +99,143 @@ export const useForm = <T extends object>({
         }) as Record<keyof T, boolean>
     );
 
-    const validationErrors = validate ? validate({ ...values, [name]: value }) || {} : {};
-    setErrors(validationErrors);
-  };
+    // Don't clear errors here to prevent flickering
+    // Errors will be cleared in handleBlur when the field becomes valid
+  }, []);
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setValues(prev => ({ ...prev, [name]: checked }));
-    setTouched(prev => ({ ...prev, [name]: true }));
-  };
+  const handleBlur = useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      const { name } = e.target;
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+      // Set the field as touched
+      setTouched(
+        prev =>
+          ({
+            ...prev,
+            [name]: true,
+          }) as Record<keyof T, boolean>
+      );
 
-    // Set all fields as touched
-    const allTouched = Object.keys(values).reduce(
-      (acc, key) => ({ ...acc, [key]: true }),
-      {} as Record<keyof T, boolean>
-    );
+      // Validate the field on blur
+      if (validate) {
+        const validationErrors = validate(values) || {};
 
-    setTouched(allTouched);
+        // Only update errors if there are changes to prevent unnecessary re-renders
+        setErrors(prev => {
+          const currentFieldError = prev[name as keyof T];
+          const newFieldError = validationErrors[name as keyof T];
 
-    const validationErrors = validate ? validate(values) || {} : {};
-    setErrors(validationErrors);
+          // If the error for this field hasn't changed, return the same object
+          if (currentFieldError === newFieldError) {
+            return prev;
+          }
 
-    if (Object.keys(validationErrors).length > 0) {
-      return;
-    }
+          // If the field is now valid (no error), clear it
+          if (!newFieldError && currentFieldError) {
+            const newErrors = { ...prev };
+            delete newErrors[name as keyof T];
+            return newErrors;
+          }
 
-    setIsSubmitting(true);
+          // If there's a new error or the error changed, update it
+          if (newFieldError !== currentFieldError) {
+            return { ...prev, [name]: newFieldError };
+          }
 
-    try {
-      if (shouldUseThrottling && throttledSubmit) {
-        await throttledSubmit.handleThrottledSubmit();
-      } else {
-        await onSubmit(values);
+          return prev;
+        });
       }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    },
+    [validate, values]
+  );
 
-  const resetForm = () => {
+  const handleCheckboxChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, checked } = e.target;
+      setValues(prev => ({ ...prev, [name]: checked }));
+      setTouched(prev => ({ ...prev, [name]: true }));
+
+      // For checkboxes, validate immediately since they're binary
+      if (validate) {
+        const validationErrors = validate({ ...values, [name]: checked }) || {};
+        setErrors(validationErrors);
+      }
+    },
+    [validate, values]
+  );
+
+  const handleSubmit = useCallback(
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      // Prevent multiple simultaneous submissions
+      if (isSubmitting) {
+        return;
+      }
+
+      // Set all fields as touched
+      const allTouched = Object.keys(values).reduce(
+        (acc, key) => ({ ...acc, [key]: true }),
+        {} as Record<keyof T, boolean>
+      );
+      setTouched(allTouched);
+
+      const validationErrors = validate ? validate(values) || {} : {};
+      setErrors(validationErrors);
+
+      if (Object.keys(validationErrors).length > 0) {
+        return;
+      }
+
+      setIsSubmitting(true);
+
+      // Create a new AbortController for this submission
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      try {
+        if (shouldUseThrottling && throttledSubmit) {
+          await throttledSubmit.handleThrottledSubmit();
+          // Reset throttle on success
+          throttledSubmit.resetThrottle?.();
+        } else {
+          await onSubmit(values);
+        }
+      } catch (error) {
+        // Check if the operation was aborted (component unmounted)
+        if (controller.signal.aborted) {
+          return; // Don't handle error or reset state if aborted
+        }
+        // Handle error normally if not aborted
+        console.error('Form submission error:', error);
+      } finally {
+        // Only reset isSubmitting if the operation wasn't aborted
+        if (!controller.signal.aborted) {
+          setIsSubmitting(false);
+        }
+      }
+    },
+    [isSubmitting, values, validate, shouldUseThrottling, throttledSubmit, onSubmit]
+  );
+
+  const resetForm = useCallback(() => {
     setValues(initialValues);
     setErrors({});
     setTouched({} as Record<keyof T, boolean>);
-  };
+  }, [initialValues]);
+
+  const hasValidationErrors = useMemo(() => Object.values(errors).some(Boolean), [errors]);
+
+  // Check if form is valid (no errors and all required fields are filled)
+  const isFormValid = useMemo(() => {
+    if (hasValidationErrors) return false;
+
+    return Object.keys(values).every(key => {
+      const value = values[key as keyof T];
+      // Consider empty strings, null, undefined as invalid
+      return value !== '' && value !== null && value !== undefined;
+    });
+  }, [hasValidationErrors, values]);
 
   return {
     values,
@@ -137,11 +244,13 @@ export const useForm = <T extends object>({
     touched,
     handleChange,
     handleCheckboxChange,
+    handleBlur,
     handleSubmit,
     resetForm,
+    hasValidationErrors,
+    isFormValid,
     // Throttling properties (always available with defaults)
     isThrottled: shouldUseThrottling && throttledSubmit ? throttledSubmit.isThrottled : false,
-    canSubmit: shouldUseThrottling && throttledSubmit ? throttledSubmit.canSubmit : true,
     timeUntilNextSubmission:
       shouldUseThrottling && throttledSubmit ? throttledSubmit.timeUntilNextSubmission : 0,
     remainingAttempts:

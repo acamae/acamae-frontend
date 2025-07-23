@@ -858,4 +858,46 @@ describe('AuthApiRepository', () => {
 
     expect(result.message).toBe('123');
   });
+
+  it('should handle getErrorMessage with null error message', async () => {
+    const error = new AxiosError(undefined) as CreateAxiosMockError;
+    error.code = 'UNKNOWN_CODE';
+    error.request = {};
+    getMock().post.mockRejectedValue(error);
+
+    const result = await repo.login({ email: 'test@example.com', password: 'password' });
+
+    expect(result.message).toBe('Error de conexión');
+  });
+
+  it('should handle different error status codes for getErrorType', async () => {
+    const testCases = [
+      { status: 401 },
+      { status: 403 },
+      { status: 422 },
+      { status: 400 },
+      { status: 404 },
+      { status: 500 },
+      { status: 503 },
+    ];
+
+    for (const { status } of testCases) {
+      const error = new AxiosError('Error') as CreateAxiosMockError;
+      error.response = {
+        status,
+        data: { message: 'Error' },
+        statusText: 'Error',
+        headers: {},
+        config: {} as InternalAxiosRequestConfig,
+      };
+      getMock().post.mockRejectedValue(error);
+
+      const result = await repo.login({ email: 'test@example.com', password: 'password' });
+
+      expect(result.success).toBe(false);
+      expect(result.status).toBe(status);
+      // When there's a server response, the error type is not set in the error object
+      // The getErrorType function is used internally but the result structure depends on the response
+    }
+  });
 });

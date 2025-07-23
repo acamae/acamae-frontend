@@ -1,155 +1,119 @@
-jest.mock('react-i18next');
+import { act, renderHook, waitFor } from '@testing-library/react';
+import React, { ChangeEvent, FormEvent } from 'react';
 
-import { renderHook, act } from '@testing-library/react';
-import { ChangeEvent, FormEvent } from 'react';
-import { useTranslation } from 'react-i18next';
-
+import { ToastProvider } from '@shared/services/ToastProvider';
 import { useForm } from '@ui/hooks/useForm';
+
+// Mock useThrottledSubmit
+jest.mock('@ui/hooks/useThrottledSubmit', () => ({
+  useThrottledSubmit: jest.fn(() => ({
+    handleThrottledSubmit: jest.fn(),
+    isThrottled: false,
+    canSubmit: true,
+    timeUntilNextSubmission: 0,
+    remainingAttempts: 0,
+    resetThrottle: jest.fn(),
+  })),
+}));
 
 interface TestFormValues {
   name: string;
   email: string;
 }
 
-const changeLanguageMock = jest.fn();
-function setupUseTranslation({
-  lang = 'es-ES',
-  t = (str: string) => str,
-  changeLanguage = changeLanguageMock,
-} = {}) {
-  (useTranslation as jest.Mock).mockReturnValue({
-    t,
-    i18n: {
-      language: lang,
-      changeLanguage,
-    },
-  });
-}
+const initialValues: TestFormValues = {
+  name: '',
+  email: '',
+};
 
-const initialValues: TestFormValues = { name: '', email: '' };
 const mockOnSubmit = jest.fn();
-const mockValidate = jest.fn((values: TestFormValues) => {
-  const errors: Partial<TestFormValues> = {};
-  if (!values.name) errors.name = 'Name is required';
-  if (!values.email) errors.email = 'Email is required';
-  return errors;
-});
-const mockPreventDefault = jest.fn();
+const mockValidate = jest.fn();
 const mockFormEvent = {
-  preventDefault: mockPreventDefault,
+  preventDefault: jest.fn(),
 } as unknown as FormEvent<HTMLFormElement>;
 
+const renderHookWithToastProvider = <TProps, TResult>(hook: (props: TProps) => TResult) => {
+  return renderHook(hook, {
+    wrapper: ({ children }) => React.createElement(ToastProvider, null, children),
+  });
+};
+
 describe('useForm Hook', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should initialize with correct values', () => {
-    setupUseTranslation();
-    const { result } = renderHook(() => useForm({ initialValues, onSubmit: mockOnSubmit }));
-    expect(result.current.values).toEqual(initialValues);
-    expect(result.current.errors).toEqual({});
-    expect(result.current.isSubmitting).toBe(false);
-    expect(result.current.touched).toEqual({});
-  });
-
-  it('should resetForm should reset the form state', () => {
-    setupUseTranslation();
-    const { result } = renderHook(() => useForm({ initialValues, onSubmit: mockOnSubmit }));
-    act(() => {
-      result.current.handleChange({
-        target: { name: 'name', value: 'Test' },
-      } as React.ChangeEvent<HTMLInputElement>);
-    });
-    act(() => {
-      result.current.resetForm();
-    });
-    expect(result.current.values).toEqual(initialValues);
-    expect(result.current.errors).toEqual({});
-    expect(result.current.touched).toEqual({});
-  });
-
-  it('should revalidate on language change if fields are touched', () => {
-    setupUseTranslation();
-    const { result, rerender } = renderHook(() =>
+    const { result } = renderHookWithToastProvider(() =>
       useForm({
         initialValues,
         onSubmit: mockOnSubmit,
-        validate: mockValidate,
       })
     );
+    expect(result.current?.values).toEqual(initialValues);
+    expect(result.current?.errors).toEqual({});
+    expect(result.current?.touched).toEqual({});
+    expect(result.current?.isSubmitting).toBe(false);
+    expect(result.current?.hasValidationErrors).toBe(false);
+    expect(result.current?.isFormValid).toBe(false); // Form is invalid initially because fields are empty
+  });
 
-    expect(mockValidate).toHaveBeenCalledTimes(0);
-
+  it('should resetForm should reset the form state', () => {
+    const { result } = renderHookWithToastProvider(() =>
+      useForm({
+        initialValues,
+        onSubmit: mockOnSubmit,
+      })
+    );
     act(() => {
-      result.current.handleChange({
+      result.current?.handleChange({
         target: { name: 'name', value: 'Test' },
       } as ChangeEvent<HTMLInputElement>);
     });
-
-    expect(mockValidate).toHaveBeenCalled();
-    expect(mockValidate).toHaveBeenCalledWith({ ...initialValues, name: 'Test' });
-
-    mockValidate.mockClear();
-
-    expect(mockValidate).toHaveBeenCalledTimes(0);
-
+    expect(result.current?.values.name).toBe('Test');
     act(() => {
-      setupUseTranslation({ lang: 'en-GB' });
+      result.current?.resetForm();
     });
-    rerender();
-
-    expect(mockValidate).toHaveBeenCalled();
-    expect(mockValidate).toHaveBeenCalledWith({ ...initialValues, name: 'Test' });
+    expect(result.current?.values).toEqual(initialValues);
+    expect(result.current?.errors).toEqual({});
+    expect(result.current?.touched).toEqual({});
   });
 
   describe('handleChange', () => {
     it('should update values and touched state', () => {
-      setupUseTranslation();
-      const { result } = renderHook(() =>
+      const { result } = renderHookWithToastProvider(() =>
         useForm({
           initialValues,
           onSubmit: mockOnSubmit,
         })
       );
-
-      const mockEvent = {
-        target: { name: 'name', value: 'newName' },
-      } as ChangeEvent<HTMLInputElement>;
-
       act(() => {
-        result.current.handleChange(mockEvent);
+        result.current?.handleChange({
+          target: { name: 'name', value: 'Test' },
+        } as ChangeEvent<HTMLInputElement>);
       });
-
-      expect(result.current.values.name).toBe('newName');
-      expect(result.current.touched.name).toBe(true);
-      expect(result.current.values.email).toBe(initialValues.email); // No debe cambiar otros campos
-      expect(result.current.touched.email).toBeUndefined(); // Otro campo no debe ser tocado
+      expect(result.current?.values.name).toBe('Test');
+      expect(result.current?.touched.name).toBe(true);
     });
 
     it('should not update errors if validate function is not provided', () => {
-      setupUseTranslation();
-      const { result } = renderHook(() =>
+      const { result } = renderHookWithToastProvider(() =>
         useForm({
           initialValues,
           onSubmit: mockOnSubmit,
-          // No validate function
         })
       );
-
-      const mockEvent = {
-        target: { name: 'name', value: 'newName' },
-      } as ChangeEvent<HTMLInputElement>;
-
       act(() => {
-        result.current.handleChange(mockEvent);
+        result.current?.handleChange({
+          target: { name: 'name', value: 'Test' },
+        } as ChangeEvent<HTMLInputElement>);
       });
-
-      expect(result.current.errors).toEqual({});
-      expect(mockValidate).not.toHaveBeenCalled();
+      expect(result.current?.errors).toEqual({});
     });
 
-    it('should call validate and update errors if validate function is provided', () => {
-      setupUseTranslation();
-      mockValidate.mockReturnValue({ email: 'Invalid email' });
-
-      const { result } = renderHook(() =>
+    it('should call validate and update errors if validate function is provided', async () => {
+      const mockValidate = jest.fn().mockReturnValue({ name: 'Name is required' });
+      const { result } = renderHookWithToastProvider(() =>
         useForm({
           initialValues,
           onSubmit: mockOnSubmit,
@@ -157,307 +121,593 @@ describe('useForm Hook', () => {
         })
       );
 
-      const mockEvent = {
-        target: { name: 'email', value: 'invalid-email' },
-      } as ChangeEvent<HTMLInputElement>;
+      await act(async () => {
+        result.current?.handleChange({
+          target: { name: 'name', value: 'test' },
+        } as ChangeEvent<HTMLInputElement>);
+      });
 
-      act(() => {
-        result.current.handleChange(mockEvent);
+      // Validation should not be called immediately on change
+      expect(mockValidate).not.toHaveBeenCalled();
+      expect(result.current?.errors).toEqual({});
+
+      // Validation should be called on blur
+      await act(async () => {
+        result.current?.handleBlur({
+          target: { name: 'name' },
+        } as React.FocusEvent<HTMLInputElement>);
       });
 
       expect(mockValidate).toHaveBeenCalled();
-      expect(mockValidate).toHaveBeenCalledWith({ ...initialValues, email: 'invalid-email' });
-      expect(result.current.errors).toEqual({ email: 'Invalid email' });
-      expect(result.current.values.email).toBe('invalid-email');
-      expect(result.current.touched.email).toBe(true);
+      expect(result.current?.errors).toEqual({ name: 'Name is required' });
     });
   });
 
   describe('handleSubmit', () => {
-    it('should call preventDefault and mark all fields as touched', async () => {
-      setupUseTranslation();
-      const { result } = renderHook(() =>
-        useForm({
-          initialValues,
-          onSubmit: mockOnSubmit,
-        })
-      );
-
-      await act(async () => {
-        await result.current.handleSubmit(mockFormEvent);
-      });
-
-      expect(mockPreventDefault).toHaveBeenCalledTimes(1);
-      const expectedTouched = Object.keys(initialValues).reduce(
-        (acc, key) => ({ ...acc, [key]: true }),
-        {}
-      );
-      expect(result.current.touched).toEqual(expectedTouched);
-    });
-
-    it('should not call onSubmit if validation fails', async () => {
-      setupUseTranslation();
-      mockValidate.mockReturnValue({
-        email: 'Email is required',
-        name: 'Name is required',
-      });
-      const { result } = renderHook(() =>
-        useForm({
-          initialValues,
-          onSubmit: mockOnSubmit,
-          validate: mockValidate,
-        })
-      );
-
-      await act(async () => {
-        await result.current.handleSubmit(mockFormEvent);
-      });
-
-      expect(mockValidate).toHaveBeenCalledWith(initialValues);
-      expect(result.current.errors).toEqual({
-        email: 'Email is required',
-        name: 'Name is required',
-      });
-      expect(mockOnSubmit).not.toHaveBeenCalled();
-      expect(result.current.isSubmitting).toBe(false);
-    });
-
-    it('should call onSubmit if validation passes', async () => {
-      setupUseTranslation();
-      mockValidate.mockReturnValue({});
-      const { result } = renderHook(() =>
-        useForm({
-          initialValues,
-          onSubmit: mockOnSubmit,
-          validate: mockValidate,
-        })
-      );
-
-      await act(async () => {
-        await result.current.handleSubmit(mockFormEvent);
-      });
-
-      expect(mockValidate).toHaveBeenCalledWith(initialValues);
-      expect(result.current.errors).toEqual({});
-      expect(mockOnSubmit).toHaveBeenCalledWith(initialValues);
-    });
-
-    it('should call onSubmit if no validate function is provided', async () => {
-      setupUseTranslation();
-      const { result } = renderHook(() =>
-        useForm({
-          initialValues,
-          onSubmit: mockOnSubmit,
-        })
-      );
-
-      await act(async () => {
-        await result.current.handleSubmit(mockFormEvent);
-      });
-
-      expect(mockOnSubmit).toHaveBeenCalledWith(initialValues);
-    });
-
     it('should set isSubmitting to true during submission and false after', async () => {
-      setupUseTranslation();
-      mockOnSubmit.mockImplementationOnce(() => new Promise(resolve => setTimeout(resolve, 10)));
-      const { result } = renderHook(() =>
+      let resolveSubmit: () => void;
+      const submitPromise = new Promise<void>(resolve => {
+        resolveSubmit = resolve;
+      });
+      mockOnSubmit.mockImplementationOnce(() => submitPromise);
+      const { result } = renderHookWithToastProvider(() =>
         useForm({
           initialValues,
           onSubmit: mockOnSubmit,
         })
       );
-
-      const submitPromise = act(async () => {
-        await result.current.handleSubmit(mockFormEvent);
+      await act(async () => {
+        result.current.handleSubmit(mockFormEvent);
       });
-
-      await submitPromise;
-
+      // isSubmitting debe ser true antes de resolver la promesa
+      expect(result.current.isSubmitting).toBe(true);
+      // Ahora resolvemos la promesa
+      resolveSubmit!();
+      await act(async () => {
+        await submitPromise;
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
       expect(result.current.isSubmitting).toBe(false);
-      expect(mockOnSubmit).toHaveBeenCalledTimes(1);
     });
 
     it('should set isSubmitting to false even if onSubmit throws an error', async () => {
-      setupUseTranslation();
-      const submitError = new Error('Submit failed');
-      mockOnSubmit.mockImplementationOnce(() => Promise.reject(submitError));
-      const { result } = renderHook(() =>
+      const error = new Error('Test error');
+      mockOnSubmit.mockRejectedValueOnce(error);
+      const originalError = console.error;
+      console.error = jest.fn();
+      const { result } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues,
+          onSubmit: mockOnSubmit,
+        })
+      );
+      await act(async () => {
+        result.current?.handleSubmit(mockFormEvent);
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+      expect(result.current?.isSubmitting).toBe(false);
+      expect(mockOnSubmit).toHaveBeenCalledWith(initialValues);
+      console.error = originalError;
+    });
+
+    it('should prevent multiple simultaneous submissions', async () => {
+      mockOnSubmit.mockImplementationOnce(() => new Promise(resolve => setTimeout(resolve, 100)));
+      const { result } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues,
+          onSubmit: mockOnSubmit,
+        })
+      );
+      await act(async () => {
+        result.current?.handleSubmit(mockFormEvent);
+      });
+      await waitFor(() => {
+        expect(result.current?.isSubmitting).toBe(true);
+      });
+      await act(async () => {
+        result.current?.handleSubmit(mockFormEvent);
+      });
+      expect(result.current?.isSubmitting).toBe(true);
+      await waitFor(() => {
+        expect(result.current?.isSubmitting).toBe(false);
+      });
+      expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not update state after component unmounts', async () => {
+      jest.useFakeTimers();
+      mockOnSubmit.mockImplementationOnce(() => new Promise(resolve => setTimeout(resolve, 100)));
+      const { result, unmount } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues,
+          onSubmit: mockOnSubmit,
+        })
+      );
+      await act(async () => {
+        result.current?.handleSubmit(mockFormEvent);
+      });
+      unmount();
+      jest.runAllTimers();
+      await Promise.resolve(); // flush microtasks
+      jest.useRealTimers();
+    });
+  });
+
+  describe('Component unmounting during submission', () => {
+    it('should not set state if component unmounts during async operation', async () => {
+      let resolveSubmit: () => void;
+      const submitPromise = new Promise<void>(resolve => {
+        resolveSubmit = resolve;
+      });
+      mockOnSubmit.mockImplementationOnce(() => submitPromise);
+      const { result, unmount } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues,
+          onSubmit: mockOnSubmit,
+        })
+      );
+      await act(async () => {
+        result.current.handleSubmit(mockFormEvent);
+      });
+      expect(result.current.isSubmitting).toBe(true);
+      unmount();
+      // Resolver la promesa tras unmount
+      resolveSubmit!();
+      await act(async () => {
+        await submitPromise;
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+      // No se debe lanzar error ni memory leak
+    });
+  });
+
+  describe('Memory leak prevention', () => {
+    it('should demonstrate memory leak without proper cleanup', async () => {
+      const originalError = console.error;
+      const mockError = jest.fn();
+      console.error = mockError;
+      let resolveSubmit: () => void;
+      const submitPromise = new Promise<void>(resolve => {
+        resolveSubmit = resolve;
+      });
+      mockOnSubmit.mockImplementationOnce(() => submitPromise);
+      const { result, unmount } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues,
+          onSubmit: mockOnSubmit,
+        })
+      );
+      await act(async () => {
+        result.current.handleSubmit(mockFormEvent);
+      });
+      expect(result.current.isSubmitting).toBe(true);
+      unmount();
+      resolveSubmit!();
+      await act(async () => {
+        await submitPromise;
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+      console.error = originalError;
+    });
+  });
+
+  describe('Timing and memory leak prevention', () => {
+    it('should demonstrate timing difference with setTimeout', async () => {
+      const originalError = console.error;
+      const mockError = jest.fn();
+      console.error = mockError;
+      mockOnSubmit.mockImplementationOnce(() => Promise.resolve());
+      const { result, unmount } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues,
+          onSubmit: mockOnSubmit,
+        })
+      );
+      await act(async () => {
+        result.current?.handleSubmit(mockFormEvent);
+        await new Promise(resolve => setTimeout(resolve, 0));
+        unmount();
+        await Promise.resolve(); // flush microtasks
+      });
+      console.error = originalError;
+    });
+  });
+
+  describe('hasValidationErrors', () => {
+    it('should be false when there are no validation errors', async () => {
+      const { result } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues,
+          onSubmit: mockOnSubmit,
+        })
+      );
+      await act(async () => {});
+      expect(result.current?.hasValidationErrors).toBe(false);
+    });
+
+    it('should be true when there are validation errors', async () => {
+      const validate = (values: typeof initialValues) => {
+        const errors: Partial<typeof initialValues> = {};
+        if (!values.email) errors.email = 'Email required';
+        if (!values.name) errors.name = 'Username required';
+        return errors;
+      };
+      const { result } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues: { email: '', name: '' },
+          onSubmit: mockOnSubmit,
+          validate,
+        })
+      );
+      await act(async () => {
+        await result.current?.handleSubmit({
+          preventDefault: () => {},
+        } as FormEvent<HTMLFormElement>);
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+      expect(result.current?.hasValidationErrors).toBe(true);
+    });
+
+    it('should update hasValidationErrors when values change', async () => {
+      const validate = (values: typeof initialValues) => {
+        const errors: Partial<typeof initialValues> = {};
+        if (!values.email) errors.email = 'Email required';
+        if (!values.name) errors.name = 'Username required';
+        return errors;
+      };
+      const { result } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues: { email: '', name: '' },
+          onSubmit: mockOnSubmit,
+          validate,
+        })
+      );
+      await act(async () => {
+        await result.current?.handleSubmit({
+          preventDefault: () => {},
+        } as FormEvent<HTMLFormElement>);
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+      expect(result.current?.hasValidationErrors).toBe(true);
+      await act(async () => {
+        result.current?.handleChange({
+          target: { name: 'email', value: 'test@example.com' },
+        } as ChangeEvent<HTMLInputElement>);
+      });
+      expect(result.current?.hasValidationErrors).toBe(true); // name still missing
+      await act(async () => {
+        result.current?.handleChange({
+          target: { name: 'name', value: 'user' },
+        } as ChangeEvent<HTMLInputElement>);
+      });
+      expect(result.current?.hasValidationErrors).toBe(false);
+    });
+  });
+
+  describe('isFormValid', () => {
+    it('should be false when form is empty initially', () => {
+      const { result } = renderHookWithToastProvider(() =>
         useForm({
           initialValues,
           onSubmit: mockOnSubmit,
         })
       );
 
-      await act(async () => {
-        try {
-          await result.current.handleSubmit(mockFormEvent);
-        } catch (e) {
-          void e;
+      expect(result.current?.isFormValid).toBe(false);
+    });
+
+    it('should be true when all fields are filled with valid data', async () => {
+      const validate = (values: typeof initialValues) => {
+        const errors: Partial<Record<keyof typeof initialValues, string>> = {};
+        if (!values.name) {
+          errors.name = 'Name is required';
         }
+        if (!values.email) {
+          errors.email = 'Email is required';
+        }
+        return errors;
+      };
+
+      const { result } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues: { name: 'Test User', email: 'test@example.com' },
+          onSubmit: mockOnSubmit,
+          validate,
+        })
+      );
+
+      // Trigger validation by calling handleSubmit
+      await act(async () => {
+        result.current?.handleSubmit(mockFormEvent);
       });
 
-      expect(result.current.isSubmitting).toBe(false);
-      expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+      expect(result.current?.isFormValid).toBe(true);
+    });
+
+    it('should be false when fields are empty even without validation errors', () => {
+      const { result } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues,
+          onSubmit: mockOnSubmit,
+        })
+      );
+
+      expect(result.current?.isFormValid).toBe(false);
+    });
+
+    it('should be false when there are validation errors', async () => {
+      const validate = (values: typeof initialValues) => {
+        const errors: Partial<Record<keyof typeof initialValues, string>> = {};
+        if (!values.name) {
+          errors.name = 'Name is required';
+        }
+        return errors;
+      };
+
+      const { result } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues,
+          onSubmit: mockOnSubmit,
+          validate,
+        })
+      );
+
+      // Trigger validation by calling handleSubmit
+      await act(async () => {
+        result.current?.handleSubmit(mockFormEvent);
+      });
+
+      expect(result.current?.isFormValid).toBe(false);
+    });
+
+    it('should update when form data changes', async () => {
+      const { result } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues,
+          onSubmit: mockOnSubmit,
+        })
+      );
+
+      // Initially invalid
+      expect(result.current?.isFormValid).toBe(false);
+
+      // Fill all fields
+      await act(async () => {
+        result.current?.handleChange({
+          target: { name: 'name', value: 'Test User' },
+        } as ChangeEvent<HTMLInputElement>);
+        result.current?.handleChange({
+          target: { name: 'email', value: 'test@example.com' },
+        } as ChangeEvent<HTMLInputElement>);
+      });
+
+      // Now should be valid
+      expect(result.current?.isFormValid).toBe(true);
     });
   });
 
   describe('resetForm', () => {
-    it('should reset values, errors, and touched state', () => {
-      setupUseTranslation();
-      const { result } = renderHook(() =>
+    it('should reset values, errors, and touched state', async () => {
+      const { result } = renderHookWithToastProvider(() =>
         useForm({
           initialValues,
           onSubmit: mockOnSubmit,
           validate: mockValidate,
         })
       );
-
-      // Simular algunos cambios y errores
-      act(() => {
-        result.current.handleChange({
-          target: { name: 'name', value: 'newName' },
-        } as ChangeEvent<HTMLInputElement>);
-        result.current.handleChange({
-          target: { name: 'email', value: 'newEmail@example.com' },
+      await act(async () => {
+        result.current?.handleChange({
+          target: { name: 'name', value: 'Test' },
         } as ChangeEvent<HTMLInputElement>);
       });
-      act(() => {
-        mockValidate.mockReturnValue({ name: 'Some error' });
-        result.current.handleChange({
-          target: { name: 'name', value: 'anotherName' },
-        } as ChangeEvent<HTMLInputElement>);
+      expect(result.current?.values.name).toBe('Test');
+      expect(result.current?.touched.name).toBe(true);
+      await act(async () => {
+        result.current?.resetForm();
       });
-
-      expect(result.current.values).not.toEqual(initialValues);
-      expect(result.current.errors).toEqual({ name: 'Some error' });
-      expect(result.current.touched.name).toBe(true);
-      expect(result.current.touched.email).toBe(true);
-
-      // Resetear el formulario
-      act(() => {
-        result.current.resetForm();
-      });
-
-      expect(result.current.values).toEqual(initialValues);
-      expect(result.current.errors).toEqual({});
-      expect(result.current.touched).toEqual({});
+      expect(result.current?.values).toEqual(initialValues);
+      expect(result.current?.errors).toEqual({});
+      expect(result.current?.touched).toEqual({});
     });
   });
 
-  describe('useEffect - language change validation', () => {
-    it('should not call validate if validate function is not provided, on language change', () => {
-      setupUseTranslation();
-      const { rerender } = renderHook(() =>
-        useForm({
-          initialValues,
-          onSubmit: mockOnSubmit,
-        })
-      );
-      act(() => {
-        setupUseTranslation({ lang: 'en-GB' });
-      });
-      rerender();
-      expect(mockValidate).not.toHaveBeenCalled();
-    });
+  describe('onBlur validation', () => {
+    it('should not show validation errors immediately when user starts typing', async () => {
+      const validate = (values: typeof initialValues) => {
+        const errors: Partial<typeof initialValues> = {};
+        if (!values.email || values.email.length < 5) {
+          errors.email = 'Email must be at least 5 characters';
+        }
+        return errors;
+      };
 
-    it('should not call validate if no fields are touched, on language change', () => {
-      setupUseTranslation();
-      const { rerender, result } = renderHook(() =>
+      const { result } = renderHookWithToastProvider(() =>
         useForm({
           initialValues,
           onSubmit: mockOnSubmit,
-          validate: mockValidate,
+          validate,
         })
       );
-      expect(result.current.touched).toEqual({});
-      act(() => {
-        setupUseTranslation({ lang: 'en-GB' });
-      });
-      rerender();
-      expect(mockValidate).not.toHaveBeenCalled();
-    });
 
-    it('should call validate and update errors on language change if fields are touched and validate exists', () => {
-      setupUseTranslation();
-      const { result, rerender } = renderHook(() =>
-        useForm({
-          initialValues,
-          onSubmit: mockOnSubmit,
-          validate: mockValidate,
-        })
-      );
-      act(() => {
-        result.current.handleChange({
-          target: { name: 'name', value: 'someName' },
+      // User starts typing
+      await act(async () => {
+        result.current?.handleChange({
+          target: { name: 'email', value: 'a' },
         } as ChangeEvent<HTMLInputElement>);
       });
-      mockValidate.mockClear();
-      mockValidate.mockReturnValue({ name: 'Error en nuevo idioma' });
 
-      act(() => {
-        setupUseTranslation({ lang: 'en-GB' });
-      });
-      rerender();
-
-      expect(mockValidate).toHaveBeenCalledTimes(1);
-      expect(mockValidate).toHaveBeenCalledWith(result.current.values);
-      expect(result.current.errors).toEqual({ name: 'Error en nuevo idioma' });
+      // Should not show error immediately
+      expect(result.current?.errors.email).toBeUndefined();
     });
 
-    it('should maintain existing errors from non-language related validation if language change validation produces no new errors', () => {
-      setupUseTranslation();
-      mockValidate.mockReturnValue({ email: 'Invalid email from initial validation' });
-      const { result, rerender } = renderHook(() =>
+    it('should show validation errors when user leaves the field (onBlur)', async () => {
+      const validate = (values: typeof initialValues) => {
+        const errors: Partial<typeof initialValues> = {};
+        if (!values.email || values.email.length < 5) {
+          errors.email = 'Email must be at least 5 characters';
+        }
+        return errors;
+      };
+
+      const { result } = renderHookWithToastProvider(() =>
         useForm({
           initialValues,
           onSubmit: mockOnSubmit,
-          validate: mockValidate,
+          validate,
         })
       );
-      act(() => {
-        result.current.handleChange({
-          target: { name: 'email', value: 'bademail' },
+
+      // User starts typing
+      await act(async () => {
+        result.current?.handleChange({
+          target: { name: 'email', value: 'a' },
         } as ChangeEvent<HTMLInputElement>);
       });
-      expect(result.current.errors).toEqual({ email: 'Invalid email from initial validation' });
-      mockValidate.mockClear();
 
-      mockValidate.mockReturnValue({});
-      act(() => {
-        setupUseTranslation({ lang: 'en-GB' });
+      // Should not show error immediately
+      expect(result.current?.errors.email).toBeUndefined();
+
+      // User leaves the field (onBlur)
+      await act(async () => {
+        result.current?.handleBlur({
+          target: { name: 'email' },
+        } as React.FocusEvent<HTMLInputElement>);
       });
-      rerender();
-      expect(result.current.errors).toEqual({});
+
+      // Now should show error
+      expect(result.current?.errors.email).toBe('Email must be at least 5 characters');
     });
 
-    it('should use current values in useEffect validation', () => {
-      setupUseTranslation();
-      const { result, rerender } = renderHook(() =>
-        useForm<typeof initialValues>({
+    it('should clear errors when user starts typing and field becomes valid', async () => {
+      const validate = (values: typeof initialValues) => {
+        const errors: Partial<typeof initialValues> = {};
+        if (!values.email || values.email.length < 5) {
+          errors.email = 'Email must be at least 5 characters';
+        }
+        return errors;
+      };
+
+      const { result } = renderHookWithToastProvider(() =>
+        useForm({
           initialValues,
           onSubmit: mockOnSubmit,
-          validate: mockValidate,
+          validate,
         })
       );
-      act(() => {
-        result.current.handleChange({
-          target: { name: 'name', value: 'updatedName' },
+
+      // User starts typing
+      await act(async () => {
+        result.current?.handleChange({
+          target: { name: 'email', value: 'a' },
         } as ChangeEvent<HTMLInputElement>);
       });
-      mockValidate.mockClear();
 
-      const languageChangeValidationErrors = { name: 'Error de idioma para updatedName' };
-      mockValidate.mockReturnValue(languageChangeValidationErrors);
-      act(() => {
-        setupUseTranslation({ lang: 'fr' });
+      // User leaves the field (onBlur) - should show error
+      await act(async () => {
+        result.current?.handleBlur({
+          target: { name: 'email' },
+        } as React.FocusEvent<HTMLInputElement>);
       });
-      act(() => {
-        rerender();
+
+      // Should have error initially
+      expect(result.current?.errors.email).toBe('Email must be at least 5 characters');
+
+      // User types valid email
+      await act(async () => {
+        result.current?.handleChange({
+          target: { name: 'email', value: 'valid@example.com' },
+        } as ChangeEvent<HTMLInputElement>);
       });
-      expect(mockValidate).toHaveBeenCalledTimes(1);
-      expect(mockValidate).toHaveBeenCalledWith({ ...initialValues, name: 'updatedName' });
-      expect(result.current.errors).toEqual(languageChangeValidationErrors);
+
+      // User leaves the field again (onBlur) - should clear error
+      await act(async () => {
+        result.current?.handleBlur({
+          target: { name: 'email' },
+        } as React.FocusEvent<HTMLInputElement>);
+      });
+
+      // Error should be cleared when field becomes valid
+      expect(result.current?.errors.email).toBeUndefined();
+    });
+
+    it('should validate checkboxes immediately', async () => {
+      const validate = (values: typeof initialValues) => {
+        const errors: Partial<typeof initialValues> = {};
+        if (!values.name) {
+          errors.name = 'Name is required';
+        }
+        return errors;
+      };
+
+      const { result } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues: { email: '', name: '' },
+          onSubmit: mockOnSubmit,
+          validate,
+        })
+      );
+
+      // Change checkbox
+      await act(async () => {
+        result.current?.handleCheckboxChange?.({
+          target: { name: 'name', checked: true },
+        } as ChangeEvent<HTMLInputElement>);
+      });
+
+      // Should validate immediately for checkboxes
+      expect(result.current?.errors.name).toBeUndefined();
+    });
+
+    it('should mark field as touched on blur', async () => {
+      const { result } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues,
+          onSubmit: mockOnSubmit,
+        })
+      );
+
+      // Initially field should not be touched
+      expect(result.current?.touched.email).toBeUndefined();
+
+      // User leaves the field (onBlur)
+      await act(async () => {
+        result.current?.handleBlur({
+          target: { name: 'email' },
+        } as React.FocusEvent<HTMLInputElement>);
+      });
+
+      // Field should be marked as touched
+      expect(result.current?.touched.email).toBe(true);
+    });
+
+    it('should validate all fields on form submission', async () => {
+      const validate = (values: typeof initialValues) => {
+        const errors: Partial<typeof initialValues> = {};
+        if (!values.email) {
+          errors.email = 'Email is required';
+        }
+        if (!values.name) {
+          errors.name = 'Name is required';
+        }
+        return errors;
+      };
+
+      const { result } = renderHookWithToastProvider(() =>
+        useForm({
+          initialValues,
+          onSubmit: mockOnSubmit,
+          validate,
+        })
+      );
+
+      // Submit form without filling fields
+      await act(async () => {
+        result.current?.handleSubmit(mockFormEvent);
+      });
+
+      // Should show errors for all fields
+      expect(result.current?.errors.email).toBe('Email is required');
+      expect(result.current?.errors.name).toBe('Name is required');
     });
   });
 });

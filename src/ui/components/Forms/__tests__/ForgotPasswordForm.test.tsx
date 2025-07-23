@@ -187,6 +187,7 @@ describe('ForgotPasswordForm', () => {
       touched: {},
       isSubmitting: false,
       handleChange: jest.fn(),
+      handleBlur: jest.fn(),
       handleSubmit: jest.fn(),
       isThrottled: false,
       canSubmit: true,
@@ -195,8 +196,34 @@ describe('ForgotPasswordForm', () => {
       resetThrottle: jest.fn(),
       handleCheckboxChange: jest.fn(),
       resetForm: jest.fn(),
+      hasValidationErrors: false,
+      isFormValid: true,
     } as ReturnType<typeof useFormModule.useForm>);
     renderForgotPasswordForm();
     expect(screen.getByTestId('forgot-password-form-attempts-warning')).toBeInTheDocument();
+  });
+
+  it('should show validation errors', async () => {
+    const forgotPasswordMock = promiseMock();
+    setupUseAuth({ forgotPassword: forgotPasswordMock });
+    renderForgotPasswordForm();
+
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('forgot-password-form-email-input'), {
+        target: { value: 'invalid-email' },
+      });
+      fireEvent.submit(screen.getByTestId('forgot-password-form'));
+    });
+
+    await waitFor(() => {
+      expect(forgotPasswordMock).not.toHaveBeenCalled();
+      expect(screen.getByTestId('forgot-password-form-email-error')).toHaveTextContent(
+        'errors.email.invalid'
+      );
+    });
+
+    // The button should be disabled when there are validation errors
+    expect(screen.getByTestId('forgot-password-form-button')).toBeDisabled();
+    // Optionally, check hasValidationErrors if needed
   });
 });

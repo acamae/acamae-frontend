@@ -44,8 +44,8 @@ const prisma = new PrismaClient({
 function validateTestEnvironment() {
   console.log('🔒 Validating test environment...');
 
-  if (process.env.NODE_ENV !== 'testing') {
-    console.error('❌ SECURITY: This script can only run with NODE_ENV=testing');
+  if (process.env.NODE_ENV !== 'test') {
+    console.error('❌ SECURITY: This script can only run with NODE_ENV=test');
     console.error(`   Current NODE_ENV: ${process.env.NODE_ENV}`);
     process.exit(1);
   }
@@ -142,7 +142,7 @@ async function runMigrations() {
     // Create a safe environment object with only necessary variables
     const safeEnv = {
       DATABASE_URL: databaseUrl,
-      NODE_ENV: process.env.NODE_ENV || 'testing',
+      NODE_ENV: process.env.NODE_ENV || 'test',
       // Only include essential environment variables, avoid PATH manipulation
       HOME: process.env.HOME,
       USER: process.env.USER,

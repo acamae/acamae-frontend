@@ -38,20 +38,21 @@ const LoginForm: React.FC = () => {
     errors,
     touched,
     handleChange,
+    handleBlur,
     handleSubmit,
     isSubmitting,
     isThrottled,
-    canSubmit,
     timeUntilNextSubmission,
     remainingAttempts,
+    hasValidationErrors,
   } = useForm<LoginFormData>({
     initialValues: {
       email: '',
       password: '',
     },
     validate,
-    onSubmit: async (payload: LoginPayload) => {
-      await login(payload);
+    onSubmit: async (data: LoginPayload) => {
+      await login(data);
     },
     enableThrottling: true,
     formName: 'login-form',
@@ -80,8 +81,9 @@ const LoginForm: React.FC = () => {
           name="email"
           value={values.email}
           onChange={handleChange}
+          onBlur={handleBlur}
           isInvalid={touched.email && !!errors.email}
-          aria-invalid={touched.email && !!errors.email}
+          aria-invalid={touched.email && !!errors.email ? 'true' : 'false'}
           aria-required="true"
           required
           aria-errormessage="login-form-email-error"
@@ -112,8 +114,9 @@ const LoginForm: React.FC = () => {
             name="password"
             value={values.password}
             onChange={handleChange}
+            onBlur={handleBlur}
             isInvalid={touched.password && !!errors.password}
-            aria-invalid={touched.password && !!errors.password}
+            aria-invalid={touched.password && !!errors.password ? 'true' : 'false'}
             aria-required="true"
             required
             aria-errormessage="login-form-password-error"
@@ -125,7 +128,7 @@ const LoginForm: React.FC = () => {
             aria-label={t('login.toggle_password')}
             tabIndex={-1}
             data-testid="login-form-password-toggle">
-            {showPassword ? '👁️' : '👁️‍🗨️'}
+            <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
           </Button>
         </InputGroup>
         <Form.Text className="text-muted" data-testid="login-form-password-help">
@@ -159,8 +162,8 @@ const LoginForm: React.FC = () => {
           variant="outline-theme"
           className="d-block w-100 fw-500 mb-3"
           type="submit"
-          disabled={isSubmitting || loading || isThrottled || !canSubmit}
-          aria-busy={isSubmitting || loading || isThrottled || !canSubmit}
+          disabled={hasValidationErrors || loading || isSubmitting || isThrottled}
+          aria-busy={loading || isSubmitting || isThrottled}
           data-testid="login-form-button">
           {getButtonText()}
         </Button>

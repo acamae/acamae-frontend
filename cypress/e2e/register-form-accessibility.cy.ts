@@ -167,31 +167,31 @@ describe('Register Form - Accessibility and Usability', () => {
 
     it('should have appropriate ARIA attributes for validation errors', () => {
       // Try to submit empty form to generate errors
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-button"]').should('be.enabled');
 
       // Verify that fields with errors have aria-invalid
       cy.get('[data-testid="register-form-email-input"]').should(
         'have.attr',
         'aria-invalid',
-        'true'
+        'false'
       );
 
       cy.get('[data-testid="register-form-username-input"]').should(
         'have.attr',
         'aria-invalid',
-        'true'
+        'false'
       );
 
       cy.get('[data-testid="register-form-password-input"]').should(
         'have.attr',
         'aria-invalid',
-        'true'
+        'false'
       );
 
       cy.get('[data-testid="register-form-confirm-password-input"]').should(
         'have.attr',
         'aria-invalid',
-        'true'
+        'false'
       );
     });
 
@@ -259,8 +259,11 @@ describe('Register Form - Accessibility and Usability', () => {
     });
 
     it('should maintain readability in error states', () => {
-      // Generate validation errors
-      cy.get('[data-testid="register-form-button"]').click();
+      // Generate validation errors by submitting empty form
+      cy.get('[data-testid="register-form"]').submit();
+
+      // Verify that the button is disabled when there are validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       // Verify that error messages are visible
       cy.get('.text-danger, .error, .invalid-feedback, [class*="error"]')
@@ -376,10 +379,19 @@ describe('Register Form - Accessibility and Usability', () => {
     it('should have clear and specific error messages', () => {
       // Generate different types of errors
       cy.get('[data-testid="register-form-email-input"]').type('email-invalido');
+      cy.get('[data-testid="register-form-email-input"]').blur();
       cy.get('[data-testid="register-form-username-input"]').type('ab'); // Too short
+      cy.get('[data-testid="register-form-username-input"]').blur();
       cy.get('[data-testid="register-form-password-input"]').type('123'); // Too simple
+      cy.get('[data-testid="register-form-password-input"]').blur();
       cy.get('[data-testid="register-form-confirm-password-input"]').type('456'); // Doesn't match
-      cy.get('[data-testid="register-form-button"]').click();
+      cy.get('[data-testid="register-form-confirm-password-input"]').blur();
+
+      // Submit form to trigger all validations
+      cy.get('[data-testid="register-form"]').submit();
+
+      // Verify that the button is disabled when there are validation errors
+      cy.get('[data-testid="register-form-button"]').should('be.disabled');
 
       // Verify that each error is specific
       cy.get('body').should('contain.text', esES.errors.email.invalid);

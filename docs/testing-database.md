@@ -70,20 +70,19 @@ Cypress está configurado para ignorar errores de certificados SSL durante los t
 
 ### 2. Variables de Entorno
 
-Crea un archivo `.env.testing` basado en `env.testing.example`:
+Crea un archivo `.env.test` basado en `env.test.example`:
 
 ```bash
-cp env.testing.example .env.testing
+cp env.test.example .env.test
 ```
 
 #### ✅ Configuración Segura (Obligatoria)
 
 ```env
 # Configuración de entorno
-NODE_ENV=testing
-REACT_APP_NODE_ENV=testing
+NODE_ENV=test
+REACT_APP_NODE_ENV=test
 REACT_APP_API_URL=https://localhost/api
-REACT_APP_CYPRESS_BASE_URL=https://localhost
 
 # Configuración de base de datos para tests (MySQL/MariaDB)
 REACT_APP_DB_HOST=localhost
@@ -122,9 +121,9 @@ FLUSH PRIVILEGES;
 ### 1. Verificación de Entorno
 
 ```javascript
-// Solo se permite NODE_ENV=testing
-if (nodeEnv !== 'testing') {
-  console.error('❌ SEGURIDAD: Este script solo puede ejecutarse en NODE_ENV=testing');
+// Solo se permite NODE_ENV=test
+if (nodeEnv !== 'test') {
+  console.error('❌ SEGURIDAD: Este script solo puede ejecutarse en NODE_ENV=test');
   process.exit(1);
 }
 ```
@@ -216,8 +215,8 @@ if (config.host !== 'localhost' && config.host !== '127.0.0.1') {
 
 ```javascript
 // cypress.config.js - Verificación adicional
-if (process.env.NODE_ENV !== 'testing') {
-  console.error('❌ SEGURIDAD: Cypress solo puede ejecutarse en NODE_ENV=testing');
+if (process.env.NODE_ENV !== 'test') {
+  console.error('❌ SEGURIDAD: Cypress solo puede ejecutarse en NODE_ENV=test');
   process.exit(1);
 }
 ```
@@ -226,7 +225,7 @@ if (process.env.NODE_ENV !== 'testing') {
 
 | Medida de Seguridad     | Estado    | Descripción                     |
 | ----------------------- | --------- | ------------------------------- |
-| Verificación de entorno | ✅ ACTIVA | Solo NODE_ENV=testing           |
+| Verificación de entorno | ✅ ACTIVA | Solo NODE_ENV=test              |
 | Validación de BD        | ✅ ACTIVA | Debe contener "test"            |
 | Lista negra BD          | ✅ ACTIVA | 8 nombres prohibidos            |
 | Validación de usuario   | ✅ ACTIVA | Debe contener "test"            |
@@ -442,12 +441,12 @@ npx cypress run --spec "cypress/e2e/register-form-database.cy.ts" --headed
 
 3. **Base de datos no accesible**:
 
-   - Verifica credenciales en `.env.testing`
+   - Verifica credenciales en `.env.test`
    - Confirma que MySQL esté ejecutándose
    - Revisa permisos del usuario de pruebas
 
 4. **Violación de seguridad**:
-   - Verifica que `NODE_ENV=testing`
+   - Verifica que `NODE_ENV=test`
    - Confirma que nombres de BD y usuario contengan "test"
    - Revisa que no estés usando nombres de la lista negra
 
@@ -484,7 +483,7 @@ Para integración continua, configura las variables de entorno:
 ```yaml
 # .github/workflows/test.yml
 env:
-  NODE_ENV: testing
+  NODE_ENV: test
   REACT_APP_DB_HOST: localhost
   REACT_APP_DB_PORT: 3306
   REACT_APP_DB_NAME: acamae_test
@@ -554,7 +553,7 @@ Para añadir nuevas medidas de seguridad:
 - Los tests pueden usar datos reales si es necesario
 - La configuración es flexible y soporta múltiples SGBD
 - Los scripts manejan errores gracefully para evitar fallos en CI/CD
-- **Todas las operaciones requieren `NODE_ENV=testing`**
+- **Todas las operaciones requieren `NODE_ENV=test`**
 - **Nombres de BD y usuarios deben contener "test"**
 - **Hosts y usuarios de producción están completamente bloqueados**
 
