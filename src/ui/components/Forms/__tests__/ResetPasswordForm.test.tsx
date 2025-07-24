@@ -7,22 +7,35 @@ import ResetPasswordForm from '@ui/components/Forms/ResetPasswordForm';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useToast } from '@ui/hooks/useToast';
 
-// Mock zxcvbn
+// Mock de las dependencias
+jest.mock('@ui/hooks/useAuth');
+jest.mock('@ui/hooks/useToast');
+jest.mock('react-i18next');
+
+// Mock específico para useThrottledSubmit que deshabilita el throttling en tests
+jest.mock('@ui/hooks/useThrottledSubmit', () => ({
+  useThrottledSubmit: jest.fn(() => ({
+    handleThrottledSubmit: jest.fn(),
+    isThrottled: false,
+    canSubmit: true,
+    timeUntilNextSubmission: 0,
+    remainingAttempts: 0,
+    resetThrottle: jest.fn(),
+    activateThrottle: jest.fn(),
+  })),
+}));
+
+// Mock específico para zxcvbn
 jest.mock('zxcvbn', () => ({
   __esModule: true,
   default: jest.fn(() => ({
-    score: 0,
+    score: 2,
     feedback: {
       warning: '',
       suggestions: [],
     },
   })),
 }));
-
-// Mock hooks
-jest.mock('@ui/hooks/useAuth');
-jest.mock('@ui/hooks/useToast');
-jest.mock('react-i18next');
 
 // Mock TCOffcanvas component
 jest.mock('@ui/components/Offcanvas/TCOffcanvas', () => ({
@@ -168,19 +181,26 @@ describe('ResetPasswordForm', () => {
   });
 
   it('should handle reset error when it is a string', async () => {
-    const error = 'Error de reset';
-    const resetPasswordMock = promiseMock({ error });
+    const resetPasswordMock = promiseMock({ error: 'Invalid or expired token' });
     setupUseAuth({ resetPassword: resetPasswordMock });
-    renderResetPasswordForm();
+    renderResetPasswordForm({ tokenProp: 'mock-token' });
 
     await act(async () => {
       fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
         target: { value: 'Password123!' },
       });
+      fireEvent.blur(screen.getByTestId('reset-password-form-password-input'));
+    });
+
+    await act(async () => {
       fireEvent.change(screen.getByTestId('reset-password-form-confirm-password-input'), {
         target: { value: 'Password123!' },
       });
-      fireEvent.submit(screen.getByTestId('reset-password-form'));
+      fireEvent.blur(screen.getByTestId('reset-password-form-confirm-password-input'));
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('reset-password-form-button'));
     });
 
     await waitFor(() => {
@@ -188,6 +208,9 @@ describe('ResetPasswordForm', () => {
         token: 'mock-token',
         password: 'Password123!',
       });
+    });
+
+    await waitFor(() => {
       expect(toastMock.error).not.toHaveBeenCalled();
     });
   });
@@ -291,6 +314,7 @@ describe('ResetPasswordForm', () => {
       timeUntilNextSubmission: 0,
       remainingAttempts: 0,
       resetThrottle: jest.fn(),
+      activateThrottle: jest.fn(),
       handleCheckboxChange: jest.fn(),
       resetForm: jest.fn(),
       hasValidationErrors: false,
@@ -330,6 +354,7 @@ describe('ResetPasswordForm', () => {
       timeUntilNextSubmission: 0,
       remainingAttempts: 2, // This should show the warning
       resetThrottle: jest.fn(),
+      activateThrottle: jest.fn(),
       handleCheckboxChange: jest.fn(),
       resetForm: jest.fn(),
       hasValidationErrors: false,

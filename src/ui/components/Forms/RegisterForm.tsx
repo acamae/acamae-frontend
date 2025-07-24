@@ -289,7 +289,15 @@ const RegisterForm: React.FC = () => {
                 <Trans
                   i18nKey="register.terms_and_conditions"
                   title={t('register.terms_and_conditions_help')}
-                  components={{ url: <a href="#" onClick={handleShow} /> }} // NOSONAR: This is valid
+                  components={{
+                    url: (
+                      <a
+                        title={t('register.terms_and_conditions_link_title')}
+                        href="#"
+                        onClick={handleShow}
+                      />
+                    ),
+                  }} // NOSONAR: This is valid
                 />{' '}
                 <abbr className="text-danger" title={t('global.required')}>
                   *

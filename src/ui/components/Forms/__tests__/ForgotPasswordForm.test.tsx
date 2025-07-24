@@ -11,6 +11,20 @@ import { useToast } from '@ui/hooks/useToast';
 jest.mock('@ui/hooks/useAuth');
 jest.mock('@ui/hooks/useToast');
 jest.mock('react-i18next');
+
+// Mock específico para useThrottledSubmit que deshabilita el throttling en tests
+jest.mock('@ui/hooks/useThrottledSubmit', () => ({
+  useThrottledSubmit: jest.fn(() => ({
+    handleThrottledSubmit: jest.fn(),
+    isThrottled: false,
+    canSubmit: true,
+    timeUntilNextSubmission: 0,
+    remainingAttempts: 0,
+    resetThrottle: jest.fn(),
+    activateThrottle: jest.fn(),
+  })),
+}));
+
 // Los mocks del throttling ahora están configurados globalmente en jest.setup.ts
 
 const toastMock = {
@@ -84,11 +98,18 @@ describe('ForgotPasswordForm', () => {
       fireEvent.change(screen.getByTestId('forgot-password-form-email-input'), {
         target: { value: 'test@mail.com' },
       });
-      fireEvent.submit(screen.getByTestId('forgot-password-form'));
+      fireEvent.blur(screen.getByTestId('forgot-password-form-email-input'));
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('forgot-password-form-button'));
     });
 
     await waitFor(() => {
       expect(forgotPasswordMock).toHaveBeenCalledWith({ email: 'test@mail.com' });
+    });
+
+    await waitFor(() => {
       expect(screen.getByTestId('forgot-password-form-email-error')).toBeEmptyDOMElement();
       expect(toastMock.success).not.toHaveBeenCalled();
       expect(toastMock.error).not.toHaveBeenCalled();
@@ -104,7 +125,11 @@ describe('ForgotPasswordForm', () => {
       fireEvent.change(screen.getByTestId('forgot-password-form-email-input'), {
         target: { value: 'test@mail.com' },
       });
-      fireEvent.submit(screen.getByTestId('forgot-password-form'));
+      fireEvent.blur(screen.getByTestId('forgot-password-form-email-input'));
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('forgot-password-form-button'));
     });
 
     await waitFor(() => {
@@ -194,6 +219,7 @@ describe('ForgotPasswordForm', () => {
       timeUntilNextSubmission: 0,
       remainingAttempts: 2,
       resetThrottle: jest.fn(),
+      activateThrottle: jest.fn(),
       handleCheckboxChange: jest.fn(),
       resetForm: jest.fn(),
       hasValidationErrors: false,

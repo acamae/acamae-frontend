@@ -1,5 +1,5 @@
 .calendar {
-  min-height: calc(100vh - #{$app-header-height});
+  min-height: calc(100vh - $app-header-height);
   display: flex;
 
   @if ($enable-rtl) {
@@ -13,7 +13,7 @@
 
   & .calendar-body {
     flex: 1;
-    height: calc(100vh - #{$app-header-height});
+    height: calc(100vh - $app-header-height);
 
     & + .calendar-sidebar {
       @if ($enable-rtl) {
@@ -67,7 +67,7 @@
     padding: $spacer;
 
     @include media-breakpoint-up(lg) {
-      height: calc(100vh - #{$app-header-height});
+      height: calc(100vh - $app-header-height);
     }
     @include media-breakpoint-down(lg) {
       display: none;

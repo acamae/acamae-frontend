@@ -1,9 +1,11 @@
-import { t } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import LoginForm from '@ui/components/Forms/LoginForm';
 
 const LoginPage: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="login" data-testid="login-page">
       <main className="login-content">

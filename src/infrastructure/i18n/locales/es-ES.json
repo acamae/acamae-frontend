@@ -24,8 +24,6 @@
     "button": "Acceder",
     "forgot": "¿Olvidaste tu contraseña?",
     "remember": "Mantener sesión iniciada",
-    "email_help": "Introduce tu correo electrónico registrado.",
-    "password_help": "Mínimo 8 caracteres, al menos una letra mayúscula, una minúscula y un número.",
     "toggle_password": "Mostrar/ocultar contraseña",
     "failed": "Error al iniciar sesión",
     "success": "Sesión iniciada correctamente",
@@ -52,7 +50,7 @@
     "email_help": "Necesario para confirmar tu cuenta y recuperar la contraseña.",
     "failed": "Error al registrarse",
     "password": "Contraseña",
-    "password_help": "Mínimo 8 caracteres, al menos una letra mayúscula, una minúscula y un número.",
+    "password_help": "La contraseña debe cumplir los requisitos indicados a continuación:",
     "confirm_password": "Confirmar contraseña",
     "confirm_password_help": "Escribe la misma contraseña para verificar.",
     "button": "Registrarse",
@@ -60,6 +58,7 @@
     "toggle_password": "Mostrar/ocultar contraseña",
     "terms_and_conditions": "Acepto los <url>términos y condiciones</url>",
     "terms_and_conditions_help": "Al crear una cuenta, aceptas nuestros términos y condiciones.",
+    "terms_and_conditions_link_title": "Abrir modal con términos y condiciones",
     "strength": {
       "weak": "La contraseña es débil, intenta añadir más caracteres.",
       "fair": "La contraseña es regular, intenta añadir más caracteres.",
@@ -128,7 +127,8 @@
       "wait": "Por favor, espera {{seconds}} segundos antes de intentar nuevamente.",
       "blocked": "Demasiados intentos. Inténtalo de nuevo en {{minutes}} minutos.",
       "rate_limit_exceeded": "Límite de velocidad excedido. Inténtalo más tarde.",
-      "attempts_remaining": "Te quedan {{count}} intentos antes de ser bloqueado temporalmente."
+      "attempts_remaining": "Te quedan {{count}} intentos antes de ser bloqueado temporalmente.",
+      "server_blocked": "El servidor ha detectado demasiados intentos. Por favor, espera antes de intentar nuevamente."
     }
   },
   "session": {

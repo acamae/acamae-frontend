@@ -23,8 +23,6 @@
     "button": "Login",
     "forgot": "Forgot your password?",
     "remember": "Keep me logged in",
-    "email_help": "Enter your registered email address.",
-    "password_help": "Minimum 8 characters, at least one uppercase letter, one lowercase letter and one number.",
     "toggle_password": "Show/hide password",
     "failed": "Login failed",
     "sign_up": "Sign up",
@@ -52,7 +50,7 @@
     "email_help": "Required to confirm your account and recover password.",
     "failed": "Registration failed",
     "password": "Password",
-    "password_help": "Minimum 8 characters, at least one uppercase letter, one lowercase letter and one number.",
+    "password_help": "The password must meet the following requirements:",
     "confirm_password": "Confirm password",
     "confirm_password_help": "Type the same password to verify.",
     "button": "Sign up",
@@ -60,6 +58,7 @@
     "toggle_password": "Show/hide password",
     "terms_and_conditions": "I accept the <url>terms and conditions</url>",
     "terms_and_conditions_help": "By creating an account, you agree to our terms and conditions.",
+    "terms_and_conditions_link_title": "Open modal dialog with terms and conditions",
     "strength": {
       "weak": "The password is weak, try adding more characters.",
       "fair": "The password is fair, try adding more characters.",
@@ -127,8 +126,9 @@
     "throttle": {
       "wait": "Please wait {{seconds}} seconds before trying again.",
       "blocked": "Too many attempts. Try again in {{minutes}} minutes.",
-      "rate_limit_exceeded": "Rate limit exceeded. Please try again later.",
-      "attempts_remaining": "You have {{count}} attempts remaining before being temporarily blocked."
+      "rate_limit_exceeded": "Rate limit exceeded. Try again later.",
+      "attempts_remaining": "You have {{count}} attempts remaining before being temporarily blocked.",
+      "server_blocked": "The server has detected too many attempts. Please wait before trying again."
     }
   },
   "session": {

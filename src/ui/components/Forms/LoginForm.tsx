@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { validateEmail, validatePassword } from '@domain/services/validationService';
-import { LoginPayload } from '@domain/types/apiSchema';
+import { LoginPayload, ApiErrorResponse } from '@domain/types/apiSchema';
 import { LoginFormData } from '@domain/types/forms';
 import { APP_ROUTES } from '@shared/constants/appRoutes';
 import { useAuth } from '@ui/hooks/useAuth';
@@ -45,6 +45,7 @@ const LoginForm: React.FC = () => {
     timeUntilNextSubmission,
     remainingAttempts,
     hasValidationErrors,
+    activateThrottle,
   } = useForm<LoginFormData>({
     initialValues: {
       email: '',
@@ -52,7 +53,42 @@ const LoginForm: React.FC = () => {
     },
     validate,
     onSubmit: async (data: LoginPayload) => {
-      await login(data);
+      try {
+        const result = await login(data);
+
+        // Check if the result contains an error
+        if (result && 'error' in result && result.error) {
+          const error = result.error as ApiErrorResponse<unknown>;
+
+          // Check if it's a throttling error from the server
+          if (error?.status === 429 || error?.code === 'AUTH_RATE_LIMIT') {
+            // Activate client-side throttling when server returns throttling error
+            if (activateThrottle) {
+              activateThrottle();
+            }
+            console.log('Server throttling detected, activating client-side throttling');
+            return; // Don't proceed with normal error handling
+          }
+        }
+      } catch (error: unknown) {
+        // Handle any other errors
+        console.error('Login error:', error);
+
+        // Check if it's a throttling error from the server
+        if (
+          error &&
+          typeof error === 'object' &&
+          'status' in error &&
+          (error as { status: unknown }).status === 429
+        ) {
+          // Activate client-side throttling when server returns throttling error
+          if (activateThrottle) {
+            activateThrottle();
+          }
+          console.log('Server throttling detected, activating client-side throttling');
+          return; // Don't proceed with normal error handling
+        }
+      }
     },
     enableThrottling: true,
     formName: 'login-form',
@@ -89,9 +125,6 @@ const LoginForm: React.FC = () => {
           aria-errormessage="login-form-email-error"
           data-testid="login-form-email-input"
         />
-        <Form.Text className="text-muted" data-testid="login-form-email-help">
-          {t('login.email_help')}
-        </Form.Text>
         <Form.Control.Feedback
           type="invalid"
           aria-live="polite"
@@ -131,9 +164,6 @@ const LoginForm: React.FC = () => {
             <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
           </Button>
         </InputGroup>
-        <Form.Text className="text-muted" data-testid="login-form-password-help">
-          {t('login.password_help')}
-        </Form.Text>
         <Form.Control.Feedback
           type="invalid"
           aria-live="polite"
@@ -171,6 +201,9 @@ const LoginForm: React.FC = () => {
       <div className="text-center text-inverse text-opacity-50">
         {t('login.no_account')} <Link to={APP_ROUTES.REGISTER}>{t('login.sign_up')}</Link>{' '}
         {t('login.no_account_suffix')}
+      </div>
+      <div className="text-center text-inverse text-opacity-50 mt-3">
+        <Link to={APP_ROUTES.FORGOT_PASSWORD}>{t('login.forgot')}</Link>
       </div>
     </Form>
   );

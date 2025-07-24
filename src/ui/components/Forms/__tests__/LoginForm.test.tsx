@@ -84,8 +84,6 @@ describe('LoginForm', () => {
     expect(screen.getByTestId('login-form-email-input')).toBeInTheDocument();
     expect(screen.getByTestId('login-form-password-input')).toBeInTheDocument();
     expect(screen.getByTestId('login-form-password-toggle')).toBeInTheDocument();
-    expect(screen.getByTestId('login-form-email-help')).toHaveTextContent('login.email_help');
-    expect(screen.getByTestId('login-form-password-help')).toHaveTextContent('login.password_help');
     expect(screen.queryByTestId('login-form-email-error')).toBeEmptyDOMElement();
     expect(screen.queryByTestId('login-form-password-error')).toBeEmptyDOMElement();
     expect(screen.getByTestId('login-form-button')).toBeInTheDocument();
