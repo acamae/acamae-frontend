@@ -9,6 +9,8 @@ import {
   ResendVerificationPayload,
   VerifyEmailPayload,
   EmailVerificationResponse,
+  ValidateResetTokenPayload,
+  ResetTokenValidationResponse,
 } from '@domain/types/apiSchema';
 
 /**
@@ -20,8 +22,9 @@ export interface IAuthRepository extends Repository<User> {
   register(payload: RegisterPayload): ApiPromise<void>;
   forgotPassword(payload: ForgotPasswordPayload): ApiPromise<void>;
   resetPassword(payload: ResetPasswordPayload): ApiPromise<void>;
+  validateResetToken(payload: ValidateResetTokenPayload): ApiPromise<ResetTokenValidationResponse>;
   logout(): ApiPromise<void>;
   getCurrentUser(): ApiPromise<User>;
-  resendVerification(payload: ResendVerificationPayload): ApiPromise<void>;
   verifyEmail(payload: VerifyEmailPayload): ApiPromise<EmailVerificationResponse>;
+  resendVerification(payload: ResendVerificationPayload): ApiPromise<void>;
 }

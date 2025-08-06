@@ -1,9 +1,10 @@
 import { screen, waitFor } from '@testing-library/react';
+import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
 import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { ApiSuccessCodes } from '@domain/constants/successCodes';
 import i18n from '@infrastructure/i18n';
-import { APP_ROUTES } from '@shared/constants/appRoutes';
+import { APP_ROUTES, PUBLIC_ROUTES } from '@shared/constants/appRoutes';
 import { createTestProviderFactory } from '@shared/utils/renderProvider';
 import EmailVerificationPage from '@ui/pages/EmailVerificationPage';
 
@@ -40,17 +41,35 @@ describe('EmailVerificationPage', () => {
     AuthApiRepository.mockImplementation(() => ({}));
   });
 
-  const renderEmailVerificationPage = (queryParams = '?token=valid-token') => {
+  const renderEmailVerificationPage = (token = 'valid-token') => {
     const renderWithProviders = createTestProviderFactory();
-    return renderWithProviders(<EmailVerificationPage />, {
-      route: `/verify-email${queryParams}`,
+
+    // Create router with proper route definition
+    const router = createMemoryRouter(
+      [
+        {
+          path: PUBLIC_ROUTES.VERIFY_EMAIL, // '/verify-email/:token'
+          element: <EmailVerificationPage />,
+        },
+        {
+          path: '/verify-email', // Route without token
+          element: <EmailVerificationPage />,
+        },
+      ],
+      {
+        initialEntries: [token ? `/verify-email/${token}` : '/verify-email'],
+      }
+    );
+
+    return renderWithProviders(<RouterProvider router={router} />, {
+      withRouter: false, // Disable default MemoryRouter since we provide our own
     });
   };
 
   it('should show loading state initially', () => {
     mockExecute.mockImplementation(() => new Promise(() => {})); // Never resolves
 
-    renderEmailVerificationPage();
+    renderEmailVerificationPage('valid-token');
 
     expect(screen.getByTestId('email-verification-page')).toBeInTheDocument();
     expect(screen.getByTestId('email-verification-loading-title')).toBeInTheDocument();
@@ -71,7 +90,7 @@ describe('EmailVerificationPage', () => {
       code: ApiSuccessCodes.SUCCESS,
     });
 
-    renderEmailVerificationPage();
+    renderEmailVerificationPage('valid-token');
 
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith(APP_ROUTES.VERIFY_EMAIL_SUCCESS);

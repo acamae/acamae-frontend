@@ -430,17 +430,14 @@ npx cypress run --spec "cypress/e2e/register-form-database.cy.ts" --headed
 #### Errores Comunes
 
 1. **Error de certificado SSL**:
-
    - Verifica que Nginx esté ejecutándose
    - Confirma que los certificados estén configurados
 
 2. **API no accesible**:
-
    - Verifica que el proxy de Nginx esté configurado para `/api`
    - Confirma que el backend esté ejecutándose
 
 3. **Base de datos no accesible**:
-
    - Verifica credenciales en `.env.test`
    - Confirma que MySQL esté ejecutándose
    - Revisa permisos del usuario de pruebas

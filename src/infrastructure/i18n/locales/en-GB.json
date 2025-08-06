@@ -202,14 +202,46 @@
   },
   "reset": {
     "title": "Reset password",
+    "processing": {
+      "title": "Validating link...",
+      "message": "Please wait while we verify your reset link."
+    },
     "email_sent": "If your email exists, you will receive a password reset email.",
+    "success": {
+      "title": "Password updated!",
+      "message": "Your password has been successfully changed. You can now log in with your new password.",
+      "login": "Go to login"
+    },
+    "error": {
+      "title": "Invalid reset link",
+      "message": "The reset link you used is not valid. This could be because:",
+      "reasons": {
+        "invalid": "• The link is malformed or corrupted",
+        "expired": "• The link has expired (they are valid for 15 minutes)",
+        "already_used": "• The link was already used previously",
+        "wrong_user": "• The link doesn't correspond to your account"
+      },
+      "solutions": "To fix this:",
+      "solution_retry": "• Request a new reset link",
+      "solution_contact": "• If the problem persists, contact support",
+      "retry": "New link"
+    },
+    "expired": {
+      "title": "Reset link expired",
+      "message": "The reset link has expired. Reset links are valid for 15 minutes for security.",
+      "retry": "Request new link"
+    },
     "failed": "Password reset failed",
-    "success": "Password updated. Redirecting...",
     "password": "New password",
     "confirm_password": "Confirm new password",
+    "confirm_password_help": "Must match the password above.",
     "submit": "Update password",
     "saving": "Updating...",
     "invalid_token": "The reset link is invalid or has expired."
+  },
+  "resetPasswordSent": {
+    "email_sent_title": "Link sent",
+    "email_sent_message": "If your email exists in our system, you will receive an email with a link to reset your password. Check your inbox and follow the instructions."
   },
   "not_found": {
     "title": "Page not found",

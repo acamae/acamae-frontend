@@ -6,7 +6,6 @@ describe('ApiError', () => {
   const createTestResponse = (message: unknown) => ({
     message,
     data: null,
-    status: 500,
     code: ApiErrorCodes.UNKNOWN_ERROR,
     success: false,
     timestamp: new Date().toISOString(),
@@ -17,7 +16,6 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: 'Test error message',
       data: { test: 'data' },
-      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: false,
       timestamp: new Date().toISOString(),
@@ -26,7 +24,6 @@ describe('ApiError', () => {
 
     expect(error.message).toBe('Test error message');
     expect(error.data).toEqual({ test: 'data' });
-    expect(error.status).toBe(500);
     expect(error.code).toBe(ApiErrorCodes.UNKNOWN_ERROR);
     expect(error.success).toBe(false);
   });
@@ -35,7 +32,6 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: 'Success message treated as error',
       data: { test: 'data' },
-      status: 200,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: true,
       timestamp: new Date().toISOString(),
@@ -44,7 +40,6 @@ describe('ApiError', () => {
 
     expect(error.message).toBe('Success message treated as error');
     expect(error.data).toEqual({ test: 'data' });
-    expect(error.status).toBe(200);
     expect(error.success).toBe(true);
   });
 
@@ -52,7 +47,6 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: '',
       data: null,
-      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: false,
       timestamp: new Date().toISOString(),
@@ -61,7 +55,6 @@ describe('ApiError', () => {
 
     expect(error.message).toBe(ApiErrorCodes.UNKNOWN_ERROR);
     expect(error.data).toBe(null);
-    expect(error.status).toBe(500);
     expect(error.success).toBe(false);
   });
 
@@ -69,7 +62,6 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: '   ',
       data: null,
-      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: false,
       timestamp: new Date().toISOString(),
@@ -78,7 +70,6 @@ describe('ApiError', () => {
 
     expect(error.message).toBe(ApiErrorCodes.UNKNOWN_ERROR);
     expect(error.data).toBe(null);
-    expect(error.status).toBe(500);
     expect(error.success).toBe(false);
   });
 
@@ -90,7 +81,6 @@ describe('ApiError', () => {
 
     expect(error.message).toBe(ApiErrorCodes.UNKNOWN_ERROR);
     expect(error.data).toBe(null);
-    expect(error.status).toBe(500);
     expect(error.success).toBe(false);
   });
 
@@ -102,7 +92,6 @@ describe('ApiError', () => {
 
     expect(error.message).toBe(ApiErrorCodes.UNKNOWN_ERROR);
     expect(error.data).toBe(null);
-    expect(error.status).toBe(500);
     expect(error.success).toBe(false);
   });
 
@@ -111,7 +100,6 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: '\t\n\r ',
       data: null,
-      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: false,
       timestamp: new Date().toISOString(),
@@ -120,7 +108,6 @@ describe('ApiError', () => {
 
     expect(error.message).toBe(ApiErrorCodes.UNKNOWN_ERROR);
     expect(error.data).toBe(null);
-    expect(error.status).toBe(500);
     expect(error.success).toBe(false);
   });
 
@@ -129,7 +116,6 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: '  Valid Message  ',
       data: null,
-      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: false,
       timestamp: new Date().toISOString(),
@@ -138,7 +124,6 @@ describe('ApiError', () => {
 
     expect(error.message).toBe('  Valid Message  ');
     expect(error.data).toBe(null);
-    expect(error.status).toBe(500);
     expect(error.success).toBe(false);
   });
 
@@ -148,7 +133,6 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: originalMessage,
       data: null,
-      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: false,
       timestamp: new Date().toISOString(),
@@ -166,7 +150,6 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: '\u00A0\u2000\u2001', // Non-breaking space and em spaces that trim to empty
       data: null,
-      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: false,
       timestamp: new Date().toISOString(),
@@ -181,7 +164,6 @@ describe('ApiError', () => {
     const response = {
       message: 'Test message',
       data: null,
-      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       // Intentionally omitting 'success' to trigger default parameter
       timestamp: new Date().toISOString(),
@@ -194,6 +176,5 @@ describe('ApiError', () => {
     expect(error.message).toBe('Test message');
     expect(error.success).toBe(false); // Should use the default value
     expect(error.data).toBe(null);
-    expect(error.status).toBe(500);
   });
 });

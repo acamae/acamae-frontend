@@ -8,7 +8,11 @@ import { ForgotPasswordFormData } from '@domain/types/forms';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
 
-const ForgotPasswordForm: React.FC = () => {
+interface ForgotPasswordFormProps {
+  onSuccess?: () => void;
+}
+
+const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSuccess }) => {
   const { t } = useTranslation();
   const { forgotPassword, loading } = useAuth();
   const validate = useCallback(
@@ -42,7 +46,14 @@ const ForgotPasswordForm: React.FC = () => {
     },
     validate,
     onSubmit: async (data: ForgotPasswordPayload) => {
-      await forgotPassword(data);
+      try {
+        await forgotPassword(data).unwrap();
+      } catch (error: unknown) {
+        console.error(error);
+      } finally {
+        // Siempre redirigir, independientemente del resultado
+        if (onSuccess) onSuccess();
+      }
     },
     enableThrottling: true,
     formName: 'forgot-password-form',
@@ -50,7 +61,7 @@ const ForgotPasswordForm: React.FC = () => {
 
   const getButtonText = () => {
     if (isSubmitting || loading) {
-      return t('forgot.loading');
+      return t('global.loading');
     }
     if (isThrottled && timeUntilNextSubmission && timeUntilNextSubmission > 0) {
       return `${t('forgot.submit')} (${Math.ceil(timeUntilNextSubmission / 1000)}s)`;

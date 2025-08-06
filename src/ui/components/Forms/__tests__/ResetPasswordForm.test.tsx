@@ -83,7 +83,9 @@ function setupUseToast() {
   (useToast as jest.Mock).mockReturnValue(toastMock);
 }
 
-function renderResetPasswordForm(props = { tokenProp: 'mock-token' }) {
+function renderResetPasswordForm(
+  props: React.ComponentProps<typeof ResetPasswordForm> = { tokenProp: 'mock-token' }
+) {
   return render(
     <MemoryRouter>
       <ResetPasswordForm {...props} />
@@ -147,25 +149,50 @@ describe('ResetPasswordForm', () => {
     });
   });
 
-  it('should show validation error when password is invalid', async () => {
-    renderResetPasswordForm();
-
-    // First fill the field to enable the button
-    await act(async () => {
-      fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
-        target: { value: 'test' },
-      });
+  it('should call onSuccess after successful submit', async () => {
+    const resetPasswordMock = jest.fn().mockReturnValue({
+      unwrap: jest.fn().mockResolvedValue({
+        success: true,
+        data: null,
+        message: 'Password reset successfully',
+        status: 200,
+        code: 'SUCCESS',
+        timestamp: new Date().toISOString(),
+        requestId: 'test-request-id',
+      }),
     });
+    setupUseAuth({ resetPassword: resetPasswordMock });
+    const onSuccess = jest.fn();
+    renderResetPasswordForm({ tokenProp: 'mock-token', onSuccess });
 
-    // Then clear it and try to submit
     await act(async () => {
       fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
-        target: { value: '' },
+        target: { value: 'Password123!' },
+      });
+      fireEvent.change(screen.getByTestId('reset-password-form-confirm-password-input'), {
+        target: { value: 'Password123!' },
       });
       fireEvent.submit(screen.getByTestId('reset-password-form'));
     });
 
-    expect(screen.getByText('errors.password.required')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(resetPasswordMock).toHaveBeenCalledWith({
+        token: 'mock-token',
+        password: 'Password123!',
+      });
+      expect(onSuccess).toHaveBeenCalled();
+    });
+  });
+
+  it('should show validation error when password is invalid', () => {
+    renderResetPasswordForm();
+
+    fireEvent.change(screen.getByTestId('reset-password-form-password-input'), {
+      target: { value: '' },
+    });
+    fireEvent.submit(screen.getByTestId('reset-password-form'));
+    expect(screen.getByText('reset.password_required')).toBeInTheDocument();
+    expect(screen.getByTestId('reset-password-form-button')).toBeDisabled();
   });
 
   it('should show error when token is invalid', () => {
@@ -272,7 +299,7 @@ describe('ResetPasswordForm', () => {
       fireEvent.submit(screen.getByTestId('reset-password-form'));
     });
 
-    expect(screen.getByText('errors.password.invalid')).toBeInTheDocument();
+    expect(screen.getByText('reset.password_min_length')).toBeInTheDocument();
     expect(resetPasswordMock).not.toHaveBeenCalled();
     expect(toastMock.error).not.toHaveBeenCalled();
   });
@@ -390,7 +417,7 @@ describe('ResetPasswordForm', () => {
       fireEvent.submit(screen.getByTestId('reset-password-form'));
     });
 
-    expect(screen.getByText('errors.password.required')).toBeInTheDocument();
+    expect(screen.getByText('reset.password_required')).toBeInTheDocument();
     expect(screen.getByTestId('reset-password-form-button')).toBeDisabled();
   });
 });

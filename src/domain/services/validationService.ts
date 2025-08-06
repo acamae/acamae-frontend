@@ -1,9 +1,4 @@
-import {
-  EMAIL_REGEX,
-  PASSWORD_REGEX,
-  USERNAME_REGEX,
-  TOKEN_LENGTH,
-} from '@shared/constants/validation';
+import { EMAIL_REGEX, PASSWORD_REGEX, USERNAME_REGEX } from '@shared/constants/validation';
 
 /**
  * Valida el formato de un email.
@@ -35,10 +30,27 @@ export const validateUsername = (username: string): boolean => {
 };
 
 /**
- * Valida un token de seguridad por longitud.
+ * Valida un token de seguridad.
+ * Acepta tanto UUIDs (36 caracteres con guiones) como tokens hexadecimales (64 caracteres).
  * @param token Token a validar
- * @returns true si el token cumple con la longitud requerida
+ * @returns true si el token cumple con alguno de los formatos esperados
  */
 export const validateToken = (token: string): boolean => {
-  return token.trim().length === TOKEN_LENGTH;
+  if (!token || typeof token !== 'string') return false;
+
+  const trimmedToken = token.trim();
+
+  // Formato UUID: 8-4-4-4-12 caracteres hexadecimales separados por guiones
+  const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+  if (uuidRegex.test(trimmedToken)) {
+    return true;
+  }
+
+  // Formato token hexadecimal: exactamente 64 caracteres hexadecimales
+  const hexTokenRegex = /^[0-9a-fA-F]{64}$/;
+  if (hexTokenRegex.test(trimmedToken)) {
+    return true;
+  }
+
+  return false;
 };

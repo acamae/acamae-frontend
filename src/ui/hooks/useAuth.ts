@@ -23,67 +23,20 @@ export const useAuth = () => {
     (state: RootState) => state.auth
   );
 
-  const login = async (loginPayload: LoginPayload) => {
-    try {
-      const result = await dispatch(loginAction(loginPayload));
-      return result;
-    } catch (error) {
-      console.error('Login error:', error);
-      return { error };
-    }
-  };
+  const login = (loginPayload: LoginPayload) => dispatch(loginAction(loginPayload));
 
-  const register = async (registerPayload: RegisterPayload) => {
-    try {
-      const result = await dispatch(registerAction(registerPayload));
-      return result;
-    } catch (error) {
-      // Ensure loading state is reset even when there's an error
-      // The error will be handled by the Redux action and displayed via toast
-      console.error('Registration error:', error);
-      return { error };
-    }
-  };
+  const register = (registerPayload: RegisterPayload) => dispatch(registerAction(registerPayload));
 
-  const forgotPassword = async (forgotPasswordPayload: ForgotPasswordPayload) => {
-    try {
-      const result = await dispatch(forgotPasswordAction(forgotPasswordPayload));
-      return result;
-    } catch (error) {
-      console.error('Forgot password error:', error);
-      return { error };
-    }
-  };
+  const forgotPassword = (forgotPasswordPayload: ForgotPasswordPayload) =>
+    dispatch(forgotPasswordAction(forgotPasswordPayload));
 
-  const resetPassword = async (resetPasswordPayload: ResetPasswordPayload) => {
-    try {
-      const result = await dispatch(resetPasswordAction(resetPasswordPayload));
-      return result;
-    } catch (error) {
-      console.error('Reset password error:', error);
-      return { error };
-    }
-  };
+  const resetPassword = (resetPasswordPayload: ResetPasswordPayload) =>
+    dispatch(resetPasswordAction(resetPasswordPayload));
 
-  const logout = async () => {
-    try {
-      const result = await dispatch(logoutAction());
-      return result;
-    } catch (error) {
-      console.error('Logout error:', error);
-      return { error };
-    }
-  };
+  const logout = () => dispatch(logoutAction());
 
-  const resendVerification = async (payload: ResendVerificationPayload) => {
-    try {
-      const result = await dispatch(resendVerificationAction(payload));
-      return result;
-    } catch (error) {
-      console.error('Resend verification error:', error);
-      return { error };
-    }
-  };
+  const resendVerification = (payload: ResendVerificationPayload) =>
+    dispatch(resendVerificationAction(payload));
 
   /**
    * Check if the current user has one of the specified roles

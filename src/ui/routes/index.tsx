@@ -23,6 +23,10 @@ const loadLoginPage = () => import('@ui/pages/LoginPage');
 const loadRegisterPage = () => import('@ui/pages/RegisterPage');
 const loadEmailVerificationResendPage = () => import('@ui/pages/EmailVerificationResendPage');
 const loadResetPasswordPage = () => import('@ui/pages/ResetPasswordPage');
+const loadResetPasswordSuccessPage = () => import('@ui/pages/ResetPasswordSuccessPage');
+const loadResetPasswordErrorPage = () => import('@ui/pages/ResetPasswordErrorPage');
+const loadResetPasswordExpiredPage = () => import('@ui/pages/ResetPasswordExpiredPage');
+const loadResetPasswordSentPage = () => import('@ui/pages/ResetPasswordSentPage');
 const loadTeamsPage = () => import('@ui/pages/TeamsPage');
 const loadTournamentsPage = () => import('@ui/pages/TournamentsPage');
 const loadUserProfilePage = () => import('@ui/pages/UserProfilePage');
@@ -43,6 +47,10 @@ const LoginPage = lazy(loadLoginPage);
 const RegisterPage = lazy(loadRegisterPage);
 const EmailVerificationResendPage = lazy(loadEmailVerificationResendPage);
 const ResetPasswordPage = lazy(loadResetPasswordPage);
+const ResetPasswordSuccessPage = lazy(loadResetPasswordSuccessPage);
+const ResetPasswordErrorPage = lazy(loadResetPasswordErrorPage);
+const ResetPasswordExpiredPage = lazy(loadResetPasswordExpiredPage);
+const ResetPasswordSentPage = lazy(loadResetPasswordSentPage);
 const TeamsPage = lazy(loadTeamsPage);
 const TournamentsPage = lazy(loadTournamentsPage);
 const UserProfilePage = lazy(loadUserProfilePage);
@@ -84,9 +92,13 @@ const buildPublicRoutes = () => [
   createPublicRoute(PUBLIC_ROUTES.LOGIN, LoginPage),
   createPublicRoute(PUBLIC_ROUTES.REGISTER, RegisterPage),
   createPublicRoute(PUBLIC_ROUTES.FORGOT_PASSWORD, ForgotPasswordPage),
-  createPublicRoute(PUBLIC_ROUTES.RESET_PASSWORD, ResetPasswordPage),
+  createPublicRoute(PUBLIC_ROUTES.RESET_PASSWORD, ResetPasswordPage), // Ahora incluye :token
+  createPublicRoute(PUBLIC_ROUTES.RESET_PASSWORD_SUCCESS, ResetPasswordSuccessPage),
+  createPublicRoute(PUBLIC_ROUTES.RESET_PASSWORD_ERROR, ResetPasswordErrorPage),
+  createPublicRoute(PUBLIC_ROUTES.RESET_PASSWORD_EXPIRED, ResetPasswordExpiredPage),
+  createPublicRoute(PUBLIC_ROUTES.RESET_PASSWORD_SENT, ResetPasswordSentPage),
   createPublicRoute(PUBLIC_ROUTES.VERIFY_EMAIL_RESEND, EmailVerificationResendPage),
-  createPublicRoute(PUBLIC_ROUTES.VERIFY_EMAIL, EmailVerificationPage),
+  createPublicRoute(PUBLIC_ROUTES.VERIFY_EMAIL, EmailVerificationPage), // Ahora incluye :token
   createPublicRoute(PUBLIC_ROUTES.VERIFY_EMAIL_SENT, EmailVerificationSentPage),
   createPublicRoute(PUBLIC_ROUTES.VERIFY_EMAIL_EXPIRED, EmailVerificationExpiredPage),
   createPublicRoute(PUBLIC_ROUTES.VERIFY_EMAIL_ALREADY_VERIFIED, EmailAlreadyVerifiedPage),
@@ -178,6 +190,10 @@ const executeAllLoaders = async () => {
     loadRegisterPage,
     loadEmailVerificationResendPage,
     loadResetPasswordPage,
+    loadResetPasswordSuccessPage,
+    loadResetPasswordErrorPage,
+    loadResetPasswordExpiredPage,
+    loadResetPasswordSentPage,
     loadTeamsPage,
     loadTournamentsPage,
     loadUserProfilePage,
@@ -300,6 +316,10 @@ export {
   loadRegisterPage,
   loadEmailVerificationResendPage,
   loadResetPasswordPage,
+  loadResetPasswordSuccessPage,
+  loadResetPasswordErrorPage,
+  loadResetPasswordExpiredPage,
+  loadResetPasswordSentPage,
   loadTeamsPage,
   loadTournamentsPage,
   loadUserProfilePage,
