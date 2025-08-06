@@ -202,10 +202,40 @@
   },
   "reset": {
     "title": "Restablecer contraseña",
+    "processing": {
+      "title": "Validando enlace...",
+      "message": "Por favor, espera mientras verificamos tu enlace de restablecimiento."
+    },
     "email_sent": "Si tu correo existe, recibirás un email para restablecer la contraseña.",
-    "success": "Contraseña actualizada. Redirigiendo...",
+    "email_sent_title": "Enlace enviado",
+    "email_sent_message": "Si tu correo existe en nuestro sistema, recibirás un email con un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada y sigue las instrucciones.",
+    "success": {
+      "title": "¡Contraseña actualizada!",
+      "message": "Tu contraseña ha sido cambiada exitosamente. Ya puedes iniciar sesión con tu nueva contraseña.",
+      "login": "Ir al login"
+    },
+    "error": {
+      "title": "Enlace de restablecimiento inválido",
+      "message": "El enlace de restablecimiento que has usado no es válido. Esto puede deberse a que:",
+      "reasons": {
+        "invalid": "• El enlace está malformado o corrupto",
+        "expired": "• El enlace ha expirado (tienen una validez de 15 minutos)",
+        "already_used": "• El enlace ya fue utilizado anteriormente",
+        "wrong_user": "• El enlace no corresponde a tu cuenta"
+      },
+      "solutions": "Para solucionarlo:",
+      "solution_retry": "• Solicita un nuevo enlace de restablecimiento",
+      "solution_contact": "• Si el problema persiste, contacta con soporte",
+      "retry": "Nuevo enlace"
+    },
+    "expired": {
+      "title": "Enlace de restablecimiento expirado",
+      "message": "El enlace de restablecimiento ha expirado. Los enlaces tienen una validez de 15 minutos por seguridad.",
+      "retry": "Solicitar nuevo enlace"
+    },
     "password": "Nueva contraseña",
     "confirm_password": "Confirmar nueva contraseña",
+    "confirm_password_help": "Debe coincidir con la contraseña anterior.",
     "submit": "Actualizar contraseña",
     "saving": "Actualizando...",
     "invalid_token": "El enlace de restablecimiento no es válido o ha expirado.",

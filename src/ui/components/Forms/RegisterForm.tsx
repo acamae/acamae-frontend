@@ -15,7 +15,11 @@ import { useForm } from '@ui/hooks/useForm';
 
 import TCOffcanvas from '../Offcanvas/TCOffcanvas';
 
-const RegisterForm: React.FC = () => {
+interface RegisterFormProps {
+  onSuccess?: () => void;
+}
+
+const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   const { t } = useTranslation();
   const { register, loading } = useAuth();
 
@@ -77,7 +81,12 @@ const RegisterForm: React.FC = () => {
     },
     validate,
     onSubmit: async (data: RegisterPayload) => {
-      await register(data);
+      try {
+        await register(data).unwrap();
+        if (onSuccess) onSuccess();
+      } catch {
+        // El feedbackMiddleware mostrará el toast de error
+      }
     },
     enableThrottling: true,
     formName: 'register-form',

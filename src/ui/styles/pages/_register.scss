@@ -1,5 +1,7 @@
 .login,
 .register,
+.reset-password,
+.reset-password-sent,
 .email-verification,
 .email-verification-resend,
 .forgot-password {
@@ -14,6 +16,8 @@
 
   & .login-content,
   & .register-content,
+  & .reset-password-content,
+  & .reset-password-sent-content,
   & .email-verification-content,
   & .email-verification-resend-content,
   & .forgot-password-content {
@@ -24,7 +28,11 @@
   }
 
   & .email-verification-icon,
-  & .email-verification-resend-icon {
+  & .email-verification-resend-icon,
+  & .reset-password-icon,
+  & .reset-password-success-icon,
+  & .reset-password-error-icon,
+  & .reset-password-sent-icon {
     font-size: rem(64px);
   }
 

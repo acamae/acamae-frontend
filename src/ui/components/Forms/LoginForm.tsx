@@ -4,13 +4,17 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { validateEmail, validatePassword } from '@domain/services/validationService';
-import { LoginPayload, ApiErrorResponse } from '@domain/types/apiSchema';
+import { LoginPayload } from '@domain/types/apiSchema';
 import { LoginFormData } from '@domain/types/forms';
 import { APP_ROUTES } from '@shared/constants/appRoutes';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
 
-const LoginForm: React.FC = () => {
+interface LoginFormProps {
+  onSuccess?: () => void;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const { t } = useTranslation();
   const { login, loading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
@@ -54,39 +58,19 @@ const LoginForm: React.FC = () => {
     validate,
     onSubmit: async (data: LoginPayload) => {
       try {
-        const result = await login(data);
-
-        // Check if the result contains an error
-        if (result && 'error' in result && result.error) {
-          const error = result.error as ApiErrorResponse<unknown>;
-
-          // Check if it's a throttling error from the server
-          if (error?.status === 429 || error?.code === 'AUTH_RATE_LIMIT') {
-            // Activate client-side throttling when server returns throttling error
-            if (activateThrottle) {
-              activateThrottle();
-            }
-            console.log('Server throttling detected, activating client-side throttling');
-            return; // Don't proceed with normal error handling
-          }
-        }
-      } catch (error: unknown) {
-        // Handle any other errors
-        console.error('Login error:', error);
-
-        // Check if it's a throttling error from the server
+        await login(data).unwrap();
+        if (onSuccess) onSuccess();
+      } catch (error) {
+        // El feedbackMiddleware mostrará el toast de error
+        // Aquí puedes hacer lógica adicional si lo necesitas
         if (
+          activateThrottle &&
           error &&
           typeof error === 'object' &&
           'status' in error &&
           (error as { status: unknown }).status === 429
         ) {
-          // Activate client-side throttling when server returns throttling error
-          if (activateThrottle) {
-            activateThrottle();
-          }
-          console.log('Server throttling detected, activating client-side throttling');
-          return; // Don't proceed with normal error handling
+          activateThrottle();
         }
       }
     },

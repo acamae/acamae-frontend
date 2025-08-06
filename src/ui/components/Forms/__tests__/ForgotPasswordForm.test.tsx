@@ -252,4 +252,62 @@ describe('ForgotPasswordForm', () => {
     expect(screen.getByTestId('forgot-password-form-button')).toBeDisabled();
     // Optionally, check hasValidationErrors if needed
   });
+
+  it('should call onSuccess after successful submit', async () => {
+    const forgotPasswordMock = jest.fn().mockReturnValue({
+      unwrap: jest.fn().mockResolvedValue({
+        success: true,
+        data: null,
+        message: 'Email sent successfully',
+        status: 200,
+        code: 'SUCCESS',
+        timestamp: new Date().toISOString(),
+        requestId: 'test-request-id',
+      }),
+    });
+    setupUseAuth({ forgotPassword: forgotPasswordMock });
+    const onSuccess = jest.fn();
+    render(<ForgotPasswordForm onSuccess={onSuccess} />);
+
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('forgot-password-form-email-input'), {
+        target: { value: 'test@mail.com' },
+      });
+      fireEvent.blur(screen.getByTestId('forgot-password-form-email-input'));
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('forgot-password-form-button'));
+    });
+
+    await waitFor(() => {
+      expect(forgotPasswordMock).toHaveBeenCalledWith({ email: 'test@mail.com' });
+      expect(onSuccess).toHaveBeenCalled();
+    });
+  });
+
+  it('should call onSuccess even when request fails', async () => {
+    const forgotPasswordMock = jest.fn().mockReturnValue({
+      unwrap: jest.fn().mockRejectedValue(new Error('Network error')),
+    });
+    setupUseAuth({ forgotPassword: forgotPasswordMock });
+    const onSuccess = jest.fn();
+    render(<ForgotPasswordForm onSuccess={onSuccess} />);
+
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('forgot-password-form-email-input'), {
+        target: { value: 'test@mail.com' },
+      });
+      fireEvent.blur(screen.getByTestId('forgot-password-form-email-input'));
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('forgot-password-form-button'));
+    });
+
+    await waitFor(() => {
+      expect(forgotPasswordMock).toHaveBeenCalledWith({ email: 'test@mail.com' });
+      expect(onSuccess).toHaveBeenCalled();
+    });
+  });
 });

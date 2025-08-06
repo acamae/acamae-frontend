@@ -59,7 +59,7 @@ const successMap: Record<string, Handler> = {
   ),
   [loginAction.fulfilled.type]: showSuccess('login.success', 'login.welcome', APP_ROUTES.DASHBOARD),
   [forgotPasswordAction.fulfilled.type]: showSuccess('forgot.success', 'forgot.check_email'),
-  [resetPasswordAction.fulfilled.type]: showSuccess('reset.success'),
+  [resetPasswordAction.fulfilled.type]: showSuccess('reset.success.title', 'reset.success.message'),
   [logoutAction.fulfilled.type]: showSuccess('logout.success'),
   [resendVerificationAction.fulfilled.type]: showSuccess('verification.resend.success'),
 };
