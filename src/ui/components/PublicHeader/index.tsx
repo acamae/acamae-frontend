@@ -9,7 +9,7 @@ import { useAuth } from '@ui/hooks/useAuth';
 
 const PublicHeader: React.FC = () => {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <div id="header" className="app-header" data-testid="public-header">
@@ -34,7 +34,7 @@ const PublicHeader: React.FC = () => {
         </Link>
       </div>
       <div className="menu">
-        {user ? (
+        {isAuthenticated ? (
           <div className="menu-item">
             <div className="menu-link">
               <Link
