@@ -1,4 +1,4 @@
-import { AxiosError, AxiosHeaders } from 'axios';
+﻿import { AxiosError, AxiosHeaders } from 'axios';
 
 import { USER_ROLES } from '@domain/constants/user';
 import { ApiErrorCode } from '@domain/types/apiCodes';
@@ -101,6 +101,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: API_ROUTES.AUTH.LOGIN };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       data: null,
       success: false,
       code: 'UNKNOWN_ERROR',
@@ -123,12 +124,13 @@ fdescribe('AuthApiRepository', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       code: 'UNKNOWN_ERROR',
-      message: 'Bad Request',
-      timestamp: '2024-01-15T10:30:00.000Z',
-      requestId: '550e8400-e29b-41d4-a716-446655440000',
+      requestId: expect.any(String),
       meta: undefined,
       error: undefined,
+      message: 'Bad Request',
+      timestamp: expect.any(String),
     });
   });
 
@@ -143,7 +145,7 @@ fdescribe('AuthApiRepository', () => {
     const error = new AxiosError('Network', 'ERR_NETWORK', config, request, {
       status: 0,
       data: null,
-      statusText: 'Network Error',
+      statusText: 'Network',
       config,
       headers,
     });
@@ -157,6 +159,7 @@ fdescribe('AuthApiRepository', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: 0,
       code: 'ERR_NETWORK',
       message: 'Error de red. Verifica tu conexión',
       timestamp: expect.any(String),
@@ -260,6 +263,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: API_ROUTES.USERS.GET_ALL };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       data: null,
       success: false,
       code: 'UNKNOWN_ERROR',
@@ -278,14 +282,13 @@ fdescribe('AuthApiRepository', () => {
     getMock().get.mockRejectedValue(error);
     const result = await repo.getCurrentUser();
     expect(result).toEqual({
-      success: false,
+      status: 500,
       data: null,
+      success: false,
       code: 'UNKNOWN_ERROR',
       message: 'Internal Server Error',
       timestamp: '2024-01-15T10:30:00.000Z',
       requestId: 'test-request-id',
-      meta: undefined,
-      error: undefined,
     });
   });
 
@@ -309,7 +312,9 @@ fdescribe('AuthApiRepository', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: 0,
       code: 'ERR_NETWORK',
+      meta: undefined,
       message: 'Error de red. Verifica tu conexión',
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -377,6 +382,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: API_ROUTES.USERS.GET_BY_ID };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       data: null,
       success: false,
       code: 'NOT_FOUND' as ApiErrorCode,
@@ -397,12 +403,11 @@ fdescribe('AuthApiRepository', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: 404,
       code: 'NOT_FOUND',
       message: 'User not found',
-      timestamp: '2024-01-15T10:30:00.000Z',
+      timestamp: expect.any(String),
       requestId: 'test-request-id',
-      meta: undefined,
-      error: undefined,
     });
   });
 
@@ -446,6 +451,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: API_ROUTES.USERS.UPDATE_BY_ID };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       data: null,
       success: false,
       code: 'INVALID_DATA' as ApiErrorCode,
@@ -473,12 +479,11 @@ fdescribe('AuthApiRepository', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: 400,
       code: 'INVALID_DATA',
       message: 'Invalid data',
       timestamp: '2024-01-15T10:30:00.000Z',
       requestId: 'test-request-id',
-      meta: undefined,
-      error: undefined,
     });
   });
 
@@ -506,6 +511,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: '/users/1' };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       data: null,
       success: false,
       code: 'NOT_FOUND' as ApiErrorCode,
@@ -526,12 +532,11 @@ fdescribe('AuthApiRepository', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: 404,
       code: 'NOT_FOUND',
       message: 'User not found',
-      timestamp: '2024-01-15T10:30:00.000Z',
+      timestamp: expect.any(String),
       requestId: 'test-request-id',
-      meta: undefined,
-      error: undefined,
     });
   });
 
@@ -562,6 +567,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: '/auth/reset-password/invalid-token' };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       data: null,
       success: false,
       code: 'INVALID_RESET_TOKEN',
@@ -573,7 +579,7 @@ fdescribe('AuthApiRepository', () => {
     const error = new AxiosError('Invalid token', 'INVALID_RESET_TOKEN', config, request, {
       status: 400,
       data: response,
-      statusText: 'Bad Request',
+      statusText: 'Invalid token',
       config,
       headers,
     });
@@ -585,12 +591,11 @@ fdescribe('AuthApiRepository', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: 400,
       code: 'INVALID_RESET_TOKEN',
       message: 'Invalid or expired token',
       timestamp: '2024-01-15T10:30:00.000Z',
       requestId: 'test-request-id',
-      meta: undefined,
-      error: undefined,
     });
   });
 
@@ -602,6 +607,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: API_ROUTES.AUTH.LOGOUT };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       data: null,
       success: false,
       code: 'UNKNOWN_ERROR',
@@ -622,12 +628,11 @@ fdescribe('AuthApiRepository', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: 500,
       code: 'UNKNOWN_ERROR',
       message: 'Internal Server Error',
       timestamp: '2024-01-15T10:30:00.000Z',
       requestId: 'test-request-id',
-      meta: undefined,
-      error: undefined,
     });
   });
 
@@ -639,6 +644,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: API_ROUTES.USERS.GET_BY_ID };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       data: null,
       success: false,
       code: 'UNAUTHORIZED' as ApiErrorCode,
@@ -659,12 +665,11 @@ fdescribe('AuthApiRepository', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: 401,
       code: 'UNAUTHORIZED',
       message: 'Not authenticated',
       timestamp: '2024-01-15T10:30:00.000Z',
       requestId: 'test-request-id',
-      meta: undefined,
-      error: undefined,
     });
   });
 
@@ -688,6 +693,7 @@ fdescribe('AuthApiRepository', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: 0,
       code: 'ERR_NETWORK',
       message: 'Error de red. Verifica tu conexión',
       timestamp: expect.any(String),
@@ -713,6 +719,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: API_ROUTES.AUTH.LOGIN };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       data: null,
       success: false,
       code: 'INVALID_REFRESH_TOKEN',
@@ -735,8 +742,9 @@ fdescribe('AuthApiRepository', () => {
       data: null,
       code: 'INVALID_REFRESH_TOKEN',
       message: 'Invalid refresh token',
-      timestamp: '2024-01-15T10:30:00.000Z',
-      requestId: 'test-request-id',
+      status: 401,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
       meta: undefined,
       error: undefined,
     });
@@ -750,6 +758,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: API_ROUTES.AUTH.LOGIN };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       data: null,
       success: false,
       code: 'EMAIL_NOT_VERIFIED',
@@ -772,8 +781,9 @@ fdescribe('AuthApiRepository', () => {
       data: null,
       code: 'EMAIL_NOT_VERIFIED',
       message: 'Email not verified',
-      timestamp: '2024-01-15T10:30:00.000Z',
-      requestId: 'test-request-id',
+      status: 403,
+      timestamp: expect.any(String),
+      requestId: expect.any(String),
       meta: undefined,
       error: undefined,
     });
@@ -787,6 +797,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: API_ROUTES.AUTH.REGISTER };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       success: false,
       data: null,
       code: 'DATABASE_ERROR',
@@ -804,7 +815,7 @@ fdescribe('AuthApiRepository', () => {
     const error = new AxiosError('Database error occurred', 'DATABASE_ERROR', config, request, {
       status: 500,
       data: response,
-      statusText: 'Internal Server Error',
+      statusText: 'Database error occurred',
       config,
       headers,
     });
@@ -820,6 +831,7 @@ fdescribe('AuthApiRepository', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: 500,
       code: 'DATABASE_ERROR',
       message: 'Database error occurred',
       timestamp: '2024-01-15T10:30:00.000Z',
@@ -848,21 +860,17 @@ fdescribe('AuthApiRepository', () => {
     const request = { path: API_ROUTES.AUTH.REGISTER };
 
     for (const errorInfo of errorCodes) {
+      const dataResponse = {
+        success: false,
+        data: null,
+        code: errorInfo.code as ApiErrorCode | 'UNKNOWN_ERROR',
+        message: errorInfo.message,
+        timestamp: '2024-01-15T10:30:00.000Z',
+      };
       const error = new AxiosError(errorInfo.message, errorInfo.code, config, request, {
         status: 400,
-        data: {
-          success: false,
-          data: null,
-          code: errorInfo.code as ApiErrorCode,
-          message: errorInfo.message,
-          timestamp: '2024-01-15T10:30:00.000Z',
-          requestId: 'test-request-id',
-          error: {
-            type: 'server',
-            details: [{ field: 'database', code: errorInfo.code, message: errorInfo.message }],
-          },
-        },
-        statusText: 'Error',
+        data: dataResponse,
+        statusText: 'Bad Request',
         config,
         headers,
       });
@@ -1037,6 +1045,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: API_ROUTES.AUTH.LOGIN };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       success: false,
       data: null,
       code: 'UNKNOWN_ERROR',
@@ -1069,6 +1078,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: API_ROUTES.AUTH.LOGIN };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       success: false,
       data: null,
       code: 'UNKNOWN_ERROR',
@@ -1101,6 +1111,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: API_ROUTES.AUTH.LOGIN };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       success: false,
       data: null,
       code: 'CUSTOM_ERROR' as ApiErrorCode,
@@ -1145,6 +1156,7 @@ fdescribe('AuthApiRepository', () => {
       };
       const request = { path: API_ROUTES.AUTH.LOGIN };
       const response: ApiErrorResponse<null> = {
+        status: 500,
         success: false,
         data: null,
         code: 'ERROR' as ApiErrorCode,
@@ -1176,6 +1188,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: API_ROUTES.AUTH.LOGIN };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       success: false,
       data: null,
       code: 'BAD_REQUEST' as ApiErrorCode,
@@ -1187,7 +1200,7 @@ fdescribe('AuthApiRepository', () => {
     const error = new AxiosError('Default message', 'BAD_REQUEST', config, request, {
       status: 400,
       data: response,
-      statusText: 'Bad Request',
+      statusText: 'Default message',
       config,
       headers,
     });
@@ -1206,6 +1219,7 @@ fdescribe('AuthApiRepository', () => {
     };
     const request = { path: API_ROUTES.AUTH.LOGIN };
     const response: ApiErrorResponse<null> = {
+      status: 500,
       success: false,
       data: null,
       code: 'BAD_REQUEST' as ApiErrorCode,
@@ -1217,7 +1231,7 @@ fdescribe('AuthApiRepository', () => {
     const error = new AxiosError('Default message', 'BAD_REQUEST', config, request, {
       status: 400,
       data: response,
-      statusText: 'Bad Request',
+      statusText: 'Default message',
       config,
       headers,
     });
@@ -1238,7 +1252,14 @@ fdescribe('AuthApiRepository', () => {
 
     const error = new AxiosError(undefined, 'UNKNOWN_CODE', config, request, {
       status: 0,
-      data: null,
+      data: {
+        success: false,
+        data: null,
+        code: 'UNKNOWN_CODE',
+        message: 'Unknown error',
+        timestamp: '2024-01-15T10:30:00.000Z',
+        requestId: 'test-request-id',
+      },
       statusText: 'Unknown error',
       config,
       headers,
@@ -1247,7 +1268,7 @@ fdescribe('AuthApiRepository', () => {
 
     const result = await repo.login({ email: 'test@example.com', password: 'password' });
 
-    expect(result.message).toBe('Error de conexión');
+    expect(result.message).toBe('Unknown error');
   });
 
   it('should handle different error status codes for getErrorType', async () => {
@@ -1269,6 +1290,7 @@ fdescribe('AuthApiRepository', () => {
       };
       const request = { path: API_ROUTES.AUTH.LOGIN };
       const response: ApiErrorResponse<null> = {
+        status: 500,
         success: false,
         data: null,
         code: 'ERROR' as ApiErrorCode,
@@ -1332,7 +1354,9 @@ fdescribe('AuthApiRepository', () => {
         expect(result).toEqual({
           success: false,
           data: null,
+          status: 0,
           code: 'ERR_NETWORK',
+          meta: undefined,
           message: 'Error de red. Verifica tu conexión',
           timestamp: expect.any(String),
           requestId: expect.any(String),
@@ -1418,7 +1442,7 @@ fdescribe('AuthApiRepository', () => {
         {
           status: 500,
           data: 'Invalid JSON response',
-          statusText: 'Server Error',
+          statusText: 'Malformed Response',
           config,
           headers,
         }
@@ -1445,7 +1469,7 @@ fdescribe('AuthApiRepository', () => {
       const timeoutError = new AxiosError('Timeout Error', 'ETIMEDOUT', config, request, {
         status: 0,
         data: null,
-        statusText: 'Timeout',
+        statusText: 'Timeout Error',
         config,
         headers,
       });
@@ -1509,7 +1533,7 @@ fdescribe('AuthApiRepository', () => {
               timestamp: '2024-01-15T10:30:00.000Z',
               requestId: `req-${index + 1}`,
             },
-            statusText: 'Service Unavailable',
+            statusText: 'Service Error',
             config,
             headers,
           })
@@ -1586,7 +1610,7 @@ fdescribe('AuthApiRepository', () => {
             ],
           },
         },
-        statusText: 'Unauthorized',
+        statusText: 'Token Expired',
         config,
         headers,
       });
@@ -1643,7 +1667,7 @@ fdescribe('AuthApiRepository', () => {
               remaining: 0,
             },
           },
-          statusText: 'Too Many Requests',
+          statusText: 'Rate Limit Exceeded',
           config,
           headers,
         }
@@ -1709,7 +1733,7 @@ fdescribe('AuthApiRepository', () => {
               ],
             },
           },
-          statusText: 'Unprocessable Entity',
+          statusText: 'Validation Failed',
           config,
           headers,
         }

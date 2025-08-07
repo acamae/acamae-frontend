@@ -33,6 +33,7 @@ describe('ForgotPasswordUseCase', () => {
     mockAuthRepository.forgotPassword.mockResolvedValue({
       success: true,
       data: null,
+      status: 200,
       message: 'Password reset email sent',
       code: ApiSuccessCodes.SUCCESS,
       timestamp: new Date().toISOString(),
@@ -45,6 +46,7 @@ describe('ForgotPasswordUseCase', () => {
     expect(result).toEqual({
       success: true,
       data: null,
+      status: expect.any(Number),
       message: 'Password reset email sent',
       code: ApiSuccessCodes.SUCCESS,
       timestamp: expect.any(String),
@@ -60,6 +62,7 @@ describe('ForgotPasswordUseCase', () => {
     mockAuthRepository.forgotPassword.mockResolvedValue({
       success: false,
       data: null,
+      status: 200,
       message: 'Email not found',
       code: ApiErrorCodes.RESOURCE_NOT_FOUND,
       timestamp: new Date().toISOString(),
@@ -72,6 +75,7 @@ describe('ForgotPasswordUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       message: 'Email not found',
       code: ApiErrorCodes.RESOURCE_NOT_FOUND,
       timestamp: expect.any(String),

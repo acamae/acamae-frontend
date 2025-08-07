@@ -122,16 +122,14 @@ const PasswordStrengthMeter: React.FC<Props> = ({ password, t }) => {
       <div
         className="password-strength__progress-container mt-2"
         data-testid="password-strength-progress-container">
-        <div
+        <progress
           className="progress password-strength__progress"
-          role="progressbar"
           aria-label={t('register.strength.progress_label')}
-          data-testid="password-strength-progress">
-          <div
-            className={`progress-bar password-strength__progress-bar password-strength__progress-bar--${strengthLevel} password-strength__progress-bar--width-${progressPercentage}`}
-            data-testid="password-strength-progress-bar"
-          />
-        </div>
+          data-testid="password-strength-progress"
+          value={progressPercentage}
+          max="100">
+          {progressPercentage}%
+        </progress>
       </div>
 
       <div

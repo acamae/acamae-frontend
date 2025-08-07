@@ -76,19 +76,20 @@ function mapUserResponse(data: UserResponse): User {
 function handleApiSuccess<T>({ response }: { response: AxiosResponse<T> }): ApiSuccessResponse<T> {
   const data = response.data as ApiSuccessResponse<T>;
   const requestId =
-    response.headers?.['x-request-id'] ||
-    data.requestId ||
+    response.headers?.['x-request-id'] ??
+    data.requestId ??
     `req_${Date.now()}_${generateSecureId()}`;
-  const message = data.message || response.statusText || 'Operation successful';
+  const message = data.message ?? response.statusText ?? 'Operation successful';
 
-  const meta = data.meta || response.headers;
+  const meta = data.meta ?? response.headers;
 
   return {
-    data: data.data ?? null,
     success: data.success,
+    data: data.data ?? null,
+    status: response.status,
     code: data.code,
     message,
-    timestamp: data.timestamp,
+    timestamp: data.timestamp ?? new Date().toISOString(),
     requestId,
     meta,
   };
@@ -143,35 +144,39 @@ function handleApiSuccess<T>({ response }: { response: AxiosResponse<T> }): ApiS
  * @returns ApiErrorResponse<T>
  */
 function handleApiError<T>(error: AxiosError): ApiErrorResponse<T> {
-  console.log('error', error);
   if (error) {
     // Si hay respuesta del servidor, usar esos datos
     if (error.response?.data && typeof error.response.data === 'object') {
       const serverData = error.response.data as ApiErrorResponse<T>;
       return {
         success: false,
-        data: serverData.data || null,
-        code: serverData.code || ApiErrorCodes.UNKNOWN_ERROR,
-        message: serverData.message || error.message || 'Server error',
-        timestamp: serverData.timestamp,
-        requestId: serverData.requestId,
+        data: serverData.data ?? null,
+        status: error.response.status,
+        code: serverData.code ?? ApiErrorCodes.UNKNOWN_ERROR,
+        message: serverData.message ?? error.message ?? 'Server error',
+        timestamp: serverData.timestamp ?? new Date().toISOString(),
+        requestId:
+          serverData.requestId ??
+          error.config?.headers?.['x-request-id'] ??
+          `req_${Date.now()}_${generateSecureId()}`,
         meta: serverData.meta,
         error: serverData.error,
       } as ApiErrorResponse<T>;
     }
 
     // Si no hay respuesta del servidor, manejar errores de red/cliente
-    const networkErrorCode = (error.code as string) || ApiErrorCodes.ERR_NETWORK;
+    const networkErrorCode = (error.code as string) ?? ApiErrorCodes.ERR_NETWORK;
     const errorType = getErrorType(error);
 
     return {
       success: false,
       data: null,
+      status: 0, // Network errors always have status 0
       code: networkErrorCode,
       message: getErrorMessage(error),
       timestamp: new Date().toISOString(),
       requestId:
-        error.config?.headers?.['x-request-id'] || `req_${Date.now()}_${generateSecureId()}`,
+        error.config?.headers?.['x-request-id'] ?? `req_${Date.now()}_${generateSecureId()}`,
       error: {
         type: errorType,
         details: [
@@ -187,11 +192,13 @@ function handleApiError<T>(error: AxiosError): ApiErrorResponse<T> {
 
   // Error no identificado
   return {
-    message: 'Unknown error occurred',
-    code: ApiErrorCodes.UNKNOWN_ERROR,
     success: false,
     data: null,
+    status: 500, // Unknown errors default to 500
+    code: ApiErrorCodes.UNKNOWN_ERROR,
+    message: 'Unknown error occurred',
     timestamp: new Date().toISOString(),
+    requestId: `req_${Date.now()}_${generateSecureId()}`,
     error: {
       type: 'server',
       details: [
@@ -245,7 +252,7 @@ function getErrorMessage(error: AxiosError): string {
     case 'ERR_CANCELED':
       return 'La solicitud fue cancelada';
     default:
-      return error.message || 'Error de conexión';
+      return error.message ?? 'Error de conexión';
   }
 }
 

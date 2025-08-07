@@ -37,6 +37,7 @@ describe('RegisterUseCase', () => {
     mockAuthRepository.register.mockResolvedValue({
       success: true,
       data: null,
+      status: 201,
       message: 'User registered successfully',
       code: ApiSuccessCodes.SUCCESS,
       timestamp: new Date().toISOString(),
@@ -49,6 +50,7 @@ describe('RegisterUseCase', () => {
     expect(result).toEqual({
       success: true,
       data: null,
+      status: expect.any(Number),
       message: 'User registered successfully',
       code: ApiSuccessCodes.SUCCESS,
       timestamp: expect.any(String),
@@ -68,6 +70,7 @@ describe('RegisterUseCase', () => {
     mockAuthRepository.register.mockResolvedValue({
       success: false,
       data: null,
+      status: 400,
       message: 'Email already exists',
       code: ApiErrorCodes.VALIDATION_ERROR,
       timestamp: new Date().toISOString(),
@@ -80,6 +83,7 @@ describe('RegisterUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       message: 'Email already exists',
       code: ApiErrorCodes.VALIDATION_ERROR,
       timestamp: expect.any(String),
@@ -99,6 +103,7 @@ describe('RegisterUseCase', () => {
     mockAuthRepository.register.mockResolvedValue({
       success: false,
       data: null,
+      status: 500,
       message: 'Database error occurred during registration',
       code: ApiErrorCodes.DATABASE_ERROR,
       timestamp: new Date().toISOString(),
@@ -111,6 +116,7 @@ describe('RegisterUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       message: 'Database error occurred during registration',
       code: ApiErrorCodes.DATABASE_ERROR,
       timestamp: expect.any(String),
@@ -130,6 +136,7 @@ describe('RegisterUseCase', () => {
     mockAuthRepository.register.mockResolvedValue({
       success: false,
       data: null,
+      status: 403,
       message: 'Email verification required',
       code: ApiErrorCodes.EMAIL_NOT_VERIFIED,
       timestamp: new Date().toISOString(),
@@ -142,6 +149,7 @@ describe('RegisterUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       message: 'Email verification required',
       code: ApiErrorCodes.EMAIL_NOT_VERIFIED,
       timestamp: expect.any(String),
@@ -168,6 +176,7 @@ describe('RegisterUseCase', () => {
       mockAuthRepository.register.mockResolvedValue({
         success: false,
         data: null,
+        status: 400,
         message: `Registration error: ${code}`,
         code,
         timestamp: new Date().toISOString(),

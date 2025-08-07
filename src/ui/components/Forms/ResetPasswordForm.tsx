@@ -82,8 +82,6 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '', o
               navigate(APP_ROUTES.RESET_PASSWORD_EXPIRED);
               return;
             case ApiErrorCodes.AUTH_TOKEN_INVALID:
-              navigate(APP_ROUTES.RESET_PASSWORD_ERROR);
-              return;
             case ApiErrorCodes.AUTH_UPDATE_FAILED:
               navigate(APP_ROUTES.RESET_PASSWORD_ERROR);
               return;
