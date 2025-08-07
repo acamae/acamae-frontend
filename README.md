@@ -38,22 +38,13 @@ Designed for accessibility, internationalization, and maintainability.
 
 - [Overview](#overview)
 - [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
 - [Development Workflow](#development-workflow)
-- [Code Style & Conventions](#code-style--conventions)
-- [Testing & Quality](#testing--quality)
-- [Security Measures](#-security-measures)
-  - [Anti-DDoS System (Throttling)](#-anti-ddos-system-throttling)
-  - [Authentication & Authorization](#-authentication--authorization)
-  - [Input Validation & Sanitization](#-input-validation--sanitization)
-  - [Attack Protection](#-attack-protection)
-  - [Security Monitoring & Logging](#-security-monitoring--logging)
-  - [Security Configuration](#-security-configuration)
-  - [Frontend Security Checklist](#-frontend-security-checklist)
+- [Project Structure](#project-structure)
+- [Key Features](#key-features)
+- [Documentation](#documentation)
+- [Testing](#testing)
 - [Docker & Deployment](#docker--deployment)
-- [Environment Variables](#environment-variables)
-- [API Integration](#api-integration)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -61,61 +52,120 @@ Designed for accessibility, internationalization, and maintainability.
 
 ## Overview
 
-This package contains the full-featured frontend for the Esports Management platform, built with React 19, TypeScript, and Redux Toolkit.
-It follows Clean/Hexagonal Architecture and is optimized for accessibility (WCAG2), internationalization, and robust state management.
+The Acamae platform is a modern React application for professional esports management. Built with the latest technologies and best practices, it provides a secure, accessible, and maintainable foundation for esports teams and organizations.
+
+**Perfect for**: Esports teams, tournament organizers, and gaming communities who need a professional management platform.
+
+**Built with quality in mind**: 90%+ test coverage, accessibility compliance, and enterprise-grade security features.
 
 ---
 
 ## Tech Stack
 
-- React 19 + TypeScript
-- Redux Toolkit (slice pattern, redux-persist)
-- React Router v7
-- Bootstrap 5.3
-- i18next for internationalization
-- Axios for HTTP requests
-- Jest & Testing Library for unit tests
-- Cypress for E2E tests
-- Webpack 5
-- Docker for local and production environments
+**Frontend Core**
+
+- **React 19** + **TypeScript** - Modern UI with type safety
+- **Redux Toolkit** - Predictable state management
+- **React Router v7** - Client-side routing
+- **Bootstrap 5.3** - Responsive UI components
+
+**Developer Experience**
+
+- **Webpack 5** - Fast development and optimized builds
+- **Jest + Testing Library** - Comprehensive unit testing
+- **Cypress** - End-to-end testing
+- **ESLint + Prettier** - Code quality and formatting
+
+**Features**
+
+- **i18next** - Multi-language support (Spanish/English)
+- **Axios** - HTTP client with interceptors
+- **Docker** - Containerized development and deployment
+- **Redux Persist** - State persistence across sessions
 
 ---
 
-## Architecture
+## Quick Start
 
-- Hexagonal/Clean Architecture:
-  - `domain/`, `application/`, `infrastructure/`, `ui/`, `shared/`
-- State Management:
-  - Modular Redux slices, persisted with redux-persist
-- API Layer:
-  - Centralized API route management, Axios clients
-- Accessibility:
-  - WCAG2 compliance, semantic HTML, keyboard navigation
-- Internationalization:
-  - i18next, dynamic language switching
+### For New Developers
+
+1. **Clone and install**:
+
+   ```bash
+   git clone <repository-url>
+   cd acamae-frontend
+   npm install
+   ```
+
+2. **Start development server**:
+
+   ```bash
+   npm run dev
+   ```
+
+3. **Open browser**: Navigate to `http://localhost:3000`
+
+That's it! The app includes:
+
+- ✅ Hot reload for instant development
+- ✅ Mock API responses for offline development
+- ✅ Pre-configured testing environment
+- ✅ Accessibility tools built-in
+
+### Architecture Overview
+
+The project follows **Clean/Hexagonal Architecture**:
+
+```
+src/
+├── domain/          # Business logic and entities
+├── application/     # Use cases and state management
+├── infrastructure/  # External services (API, storage)
+├── ui/             # React components and pages
+└── shared/         # Common utilities and constants
+```
+
+**Why this structure?**
+
+- **Easy to test** - Business logic is separate from UI
+- **Easy to maintain** - Clear separation of concerns
+- **Easy to understand** - Logical organization of code
 
 ---
 
 ## Project Structure
 
+### File Organization
+
 ```
 src/
-  domain/
-  application/
-  infrastructure/
-  ui/
-    components/
-    hooks/
-    layouts/
-    pages/
-    routes/
-  shared/
-  i18n/
+├── domain/
+│   ├── entities/          # User, Team (business objects)
+│   ├── repositories/      # Interface definitions
+│   └── services/         # Business logic
+├── application/
+│   ├── use-cases/        # Login, Register (user actions)
+│   └── state/           # Redux slices and store
+├── infrastructure/
+│   ├── api/             # HTTP clients and API calls
+│   └── storage/         # localStorage, sessionStorage
+├── ui/
+│   ├── components/      # Reusable UI components
+│   ├── pages/          # Full page components
+│   ├── layouts/        # Page layout wrappers
+│   └── hooks/          # Custom React hooks
+└── shared/
+    ├── constants/      # API routes, config values
+    └── utils/         # Helper functions
 ```
 
-- Component Folders: PascalCase (`LoginForm/`, `UserProfile/`)
-- Pages: Folders end with `Page` (`LoginPage/`)
-- Layouts: Folders end with `Layout` (`MainLayout/`)
+### Naming Conventions
+
+- **Components**: PascalCase (`LoginForm`, `UserProfile`)
+- **Pages**: End with "Page" (`LoginPage`, `DashboardPage`)
+- **Hooks**: Start with "use" (`useAuth`, `useForm`)
+- **Files**: Match the main export (`LoginForm.tsx`)
+- **Tests**: In `__tests__` folders (`LoginForm.test.tsx`)
 
 ---
 
@@ -123,426 +173,221 @@ src/
 
 ### Prerequisites
 
-- Node.js 22+
-- Yarn or npm
+- **Node.js 22+** (recommended: use nvm)
+- **npm** (comes with Node.js)
 
-### Installation
+### Development Commands
 
-```
-npm install
-```
-
-### Running Locally
-
-```
+```bash
+# Start development server (with hot reload)
 npm run dev
-```
 
-### Running with Docker
+# Run tests (with watch mode)
+npm test
 
-```
-npm run docker:up:dev
-```
-
-### Linting & Formatting
-
-```
+# Check code style
 npm run lint
+
+# Fix code style issues
 npm run format
+
+# Build for production
+npm run build
+
+# Start production build locally
+npm run preview
 ```
 
-### Testing
+### Code Quality
 
-```
-npm run test
+- **ESLint**: Catches common errors and enforces code style
+- **Prettier**: Automatically formats code on save
+- **TypeScript**: Provides type safety and better IDE support
+- **Husky**: Runs checks before commits
+
+**Pro tip**: Use VS Code with the recommended extensions for the best development experience!
+
+---
+
+## Key Features
+
+### 🔐 Enterprise Security
+
+- **Anti-DDoS protection** with intelligent throttling
+- **JWT authentication** with automatic token refresh
+- **Input validation** and sanitization
+- **XSS/CSRF protection** built-in
+
+### ♿ Accessibility First
+
+- **WCAG 2.1 compliant** components
+- **Keyboard navigation** support
+- **Screen reader** friendly
+- **Color contrast** validated
+
+### 🌍 Internationalization
+
+- **Multi-language support** (Spanish/English)
+- **Dynamic language switching**
+- **Date/time localization**
+- **Right-to-left** language ready
+
+### 🚀 Performance Optimized
+
+- **Code splitting** for faster loads
+- **Lazy loading** of routes and components
+- **Optimized bundles** with Webpack 5
+- **Progressive Web App** features
+
+---
+
+## Documentation
+
+### For Developers
+
+- **[API Specification](docs/api-specification.md)** - Complete API documentation
+- **[User Authentication Flows](docs/user-flows.md)** - Login, registration, password reset
+- **[Testing Guide](docs/testing-guide.md)** - Unit, integration, and E2E testing
+- **[Security Features](docs/security-features.md)** - Security implementations and best practices
+
+### For DevOps/Deployment
+
+- **[OpenAPI Specification](docs/swagger.yml)** - Machine-readable API docs
+- **[Conventional Commits](docs/conventional-versioning.md)** - Git workflow and versioning
+
+### Quick References
+
+- **API Endpoints**: All endpoints follow consistent response structure
+- **Component Library**: Bootstrap 5.3 with custom theme
+- **State Management**: Redux Toolkit with persist
+- **Routing**: React Router v7 with lazy loading
+
+---
+
+## Testing
+
+### Test Coverage
+
+- **Minimum**: 90% coverage for all code
+- **Current**: Check latest build status above
+- **Reports**: Generated in `coverage/` folder
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run with coverage
 npm run test:coverage
+
+# Run specific test file
+npm test LoginForm
+
+# Run E2E tests
+npm run test:e2e
+
+# Update snapshots (after review)
 npm run update:snapshots
 ```
 
-- Coverage: Minimum 90% for statements, branches, functions, and lines.
-- Test location: `__tests__` subfolders next to components/pages.
+### Test Types
 
----
+- **Unit Tests**: Individual components and functions
+- **Integration Tests**: Component interactions and flows
+- **E2E Tests**: Complete user journeys with Cypress
+- **API Tests**: Backend integration testing
 
-## Code Style & Conventions
-
-- Prettier: 2-space indent, single quotes, trailing commas, max 100 chars/line
-- ESLint: Strict import order, no `any`, no unused variables
-- Naming:
-  - Components: PascalCase
-  - Hooks: `use` + camelCase
-  - Utilities: camelCase
-  - Constants: UPPER_SNAKE_CASE
-- Imports: Absolute with aliases (`@ui/components/Button`)
-- Exports: Default for main components, named for hooks/utilities
-- Tests: One responsibility per test, no `any`, no `require`
-- API routes: Use constants from `shared/constants/apiRoutes.ts`, never hardcode URLs
-
----
-
-## Testing & Quality
-
-- Unit tests: Components, hooks, utilities
-- Integration tests: Flows involving multiple components
-- E2E tests: Cypress for user flows
-- Test patterns:
-  - Use `I18nextProvider` and `MemoryRouter` for integration
-  - Mock only what is necessary
-  - For route tests, mock layouts with `<Outlet />`
-  - For page/component tests, mock hooks as needed
-- Snapshots: Update only after review (`npm run update:snapshots`)
-- Profiling: Use Jest and Node.js profiling for performance bottlenecks
-
-### Quality Automation: GitHub Actions, Husky, and Pre-commit
-
-#### GitHub Actions
-
-- **CI (`ci.yml`)**: Runs linting, build, tests, coverage, and SonarCloud on every push/PR to `main`, `feature/*`, or `fix/*`.
-- **Release (`release.yml`)**: Runs only on `release`. Automates versioning, tagging, and publishing with Lerna.
-- **Lighthouse (`lighthouse.yml`)**: After CI on `main`, performs Lighthouse audits and uploads reports as artifacts.
-
----
-
-## 🔒 Security Measures
-
-### 🛡️ Anti-DDoS System (Throttling)
-
-**IMPLEMENTED PROTECTION**: Robust throttling system that prevents DDoS attacks through massive form submissions.
-
-#### ✨ Features
-
-- **Intelligent Throttling**: Specific configurations per form type
-- **Anti-bypass Persistence**: Critical states persist in localStorage
-- **Intuitive Interface**: Visual counters and progressive alerts
-- **Accessibility**: Maintains WCAG2 standards with ARIA attributes
-- **Multi-language**: Full Spanish/English support
-
-#### 🔧 Throttling Configurations
-
-| Form Type          | Delay | Max Attempts | Window | Persistence |
-| ------------------ | ----- | ------------ | ------ | ----------- |
-| **Authentication** | 4s    | 8 attempts   | 5 min  | ✅ Yes      |
-| **Regular**        | 3s    | 12 attempts  | 5 min  | ❌ No       |
-| **Critical**       | 5s    | 5 attempts   | 5 min  | ✅ Yes      |
-
-> **Diferenciación de Seguridad**: Cada tipo tiene configuraciones específicas según su nivel de seguridad.
-
-#### 🎯 Protected Forms
-
-- `LoginForm` - Authentication
-- `RegisterForm` - Authentication
-- `ForgotPasswordForm` - Authentication
-- `ResetPasswordForm` - Authentication
-- `ResendVerificationForm` - Authentication
-
-#### 🔄 User Experience
-
-1. **Normal State**: Functional button without restrictions
-2. **Throttled State**: Button with countdown "Submit (3s)"
-3. **Warning**: Alert when ≤2 attempts remain
-4. **Blocked State**: Button temporarily disabled
-
-#### 📚 Technical Implementation
-
-```typescript
-// Specialized hook for throttling
-const {
-  isThrottled,
-  canSubmit,
-  timeUntilNextSubmission,
-  remainingAttempts,
-  handleThrottledSubmit,
-  resetThrottle,
-} = useAuthThrottledSubmit('login-form');
-
-// Form integration
-const formConfig = {
-  enableThrottling: true,
-  formName: 'login-form',
-  throttleConfig: 'AUTH_FORMS',
-};
-```
-
-#### 🛠️ Development Utilities
-
-```typescript
-// Clear throttling states (development)
-SecurityThrottleService.clearPersistedStates();
-
-// Check current state
-SecurityThrottleService.getThrottleState('form-name');
-```
-
-📖 **Detailed Documentation**: See [`docs/security-throttling.md`](./docs/security-throttling.md)
-
----
-
-### 🔐 Authentication & Authorization
-
-**Secure JWT System**
-
-- **Access Tokens**: Short-lived tokens (1 day) stored in Redux
-- **Refresh Tokens**: Long-lived tokens (7 days) in HTTP-only cookies
-- **Automatic Validation**: Token verification on every request
-- **Token Rotation**: Automatic renewal of expired tokens
-- **Session Management**: Automatic logout when tokens expire
-
-**Role-Based Access Control (RBAC)**
-
-- **Protected Routes**: `PrivateRoute` component for route protection
-- **Role Validation**: Permission verification in components
-- **Automatic Redirection**: Redirect to login if unauthorized
-- **Authentication State**: Centralized management with Redux
-
-```typescript
-// Route protection
-<PrivateRoute roles={['admin', 'manager']}>
-  <AdminPanel />
-</PrivateRoute>
-
-// Role validation in components
-const { user, hasRole } = useAuth();
-if (!hasRole('admin')) return <AccessDenied />;
-```
-
----
-
-### 🛡️ Input Validation & Sanitization
-
-**Multi-Layer Validation**
-
-- **Form Validation**: Zod schemas for real-time validation
-- **Type Validation**: TypeScript for type error prevention
-- **Format Validation**: Email, passwords, custom fields
-- **Length Validation**: Strict limits on all text fields
-
-**Advanced Sanitization**
-
-- **HTML Sanitization**: Automatic removal of dangerous HTML tags
-- **Character Escaping**: Automatic escape of special characters
-- **Data Normalization**: Automatic conversion to safe formats
-- **Email Validation**: Lowercase normalization and format validation
-
-```typescript
-// Example validation with Zod
-const userSchema = z.object({
-  email: z.string().email('Invalid email').transform(sanitizeEmail),
-  username: z.string().min(3).max(20).regex(REGEX.USERNAME),
-  password: z.string().min(8).regex(REGEX.STRONG_PASSWORD),
-});
-```
-
----
-
-### 🚨 Attack Protection
-
-**XSS Prevention (Cross-Site Scripting)**
-
-- **Output Sanitization**: Automatic escape of dynamic content
-- **Content Security Policy**: CSP headers configured in backend
-- **Input Validation**: Strict filtering of user content
-- **Safe Rendering**: React usage for automatic XSS prevention
-
-**CSRF Protection (Cross-Site Request Forgery)**
-
-- **JWT Tokens**: Token verification in Authorization headers
-- **SameSite Cookies**: Secure cookie configuration
-- **Origin Validation**: Origin header verification
-- **Authenticated Requests**: All requests require authentication
-
-**Code Injection Prevention**
-
-- **Strict Validation**: Validation of all user inputs
-- **Data Escaping**: Automatic escape of special characters
-- **URL Sanitization**: URL parameter validation
-- **Eval Prevention**: Prohibited use of `eval()` and similar functions
-
----
-
-### 🔍 Security Monitoring & Logging
-
-**Comprehensive Logging**
-
-- **Authentication Events**: Log successful/failed login attempts
-- **Authorization Events**: Log denied access and permissions
-- **Security Errors**: Capture security-related errors
-- **Suspicious Activity**: Detection of anomalous behavior patterns
-
-**Performance Monitoring**
-
-- **Security Metrics**: Authentication response time
-- **Error Monitoring**: Security error tracking with Sentry
-- **Usage Analysis**: Usage patterns to detect anomalies
-- **Automatic Alerts**: Notifications for critical security events
-
-```typescript
-// Example security logging
-const securityLogger = {
-  logAuthAttempt: (email: string, success: boolean) => {
-    console.log(`[SECURITY] Auth attempt: ${email}, success: ${success}`);
-  },
-  logSuspiciousActivity: (activity: string, details: any) => {
-    console.warn(`[SECURITY] Suspicious activity: ${activity}`, details);
-  },
-};
-```
-
----
-
-### 🛠️ Security Configuration
-
-**Environment-Based Configuration**
-
-- **Development**: Detailed logs and debugging enabled
-- **Production**: Strict configuration with minimal information
-- **Testing**: Isolated configuration for secure tests
-- **Staging**: Production-like configuration
-
-**Security Headers**
-
-```typescript
-// Secure headers configuration (configured in backend)
-Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'
-X-Content-Type-Options: nosniff
-X-Frame-Options: DENY
-X-XSS-Protection: 1; mode=block
-Referrer-Policy: strict-origin-when-cross-origin
-```
-
-**Secret Management**
-
-- **Environment Variables**: Secure secret configuration
-- **Key Rotation**: Process for API key rotation
-- **Secure Storage**: Use of secure services for secrets
-- **Configuration Validation**: Verification of critical configurations
-
----
-
-### 📋 Frontend Security Checklist
-
-✅ **Input Validation**: Zod schemas for all forms
-✅ **Sanitization**: Automatic escape of dynamic content
-✅ **Authentication**: JWT system with access and refresh tokens
-✅ **Authorization**: Role-based access control (RBAC)
-✅ **XSS Protection**: Content sanitization and escaping
-✅ **CSRF Protection**: JWT tokens in Authorization headers
-✅ **Throttling**: Anti-DDoS system in critical forms
-✅ **Session Management**: Automatic logout and token renewal
-✅ **Error Handling**: Secure error messages without sensitive information
-✅ **Logging**: Security event logging
-✅ **Headers**: Secure HTTP header configuration
-✅ **Type Validation**: TypeScript for error prevention
-✅ **Protected Routes**: Protection of sensitive routes
-✅ **Configuration**: Secure environment-based configuration
-✅ **Monitoring**: Security event tracking
-
----
-
-### 🧪 Testing Security
-
-**GUARANTEE**: It is **IMPOSSIBLE** to execute production database operations from Cypress tests.
-
-**8 security layers** have been implemented that completely prevent any accidental operations:
-
-- ✅ **Environment Verification**: Only works in `NODE_ENV=test`
-- ✅ **Database Validation**: Names must contain "test"
-- ✅ **Database Blacklist**: 8 production names prohibited
-- ✅ **User Validation**: Users must contain "test"
-- ✅ **User Blacklist**: 9 production users prohibited
-- ✅ **Host Blacklist**: 6 production hosts prohibited
-- ✅ **Port Validation**: Standard remote ports blocked
-- ✅ **Cypress Verification**: Validation in cypress.config.js
-
-### Protected Database Scripts
-
-```bash
-# All scripts include security validations
-npm run test:e2e:setup      # Setup test DB
-npm run test:e2e:cleanup    # Clean test DB
-npm run test:e2e:reset      # Reset test DB
-npm run test:e2e:verify     # Verify secure configuration
-```
-
-📖 **Complete Documentation**: See [`docs/security-throttling.md`](./docs/security-throttling.md)
+**Safety Note**: E2E tests use a completely separate test database with multiple security layers to prevent any production data issues.
 
 ---
 
 ## Docker & Deployment
 
-🆕 **New local architecture (2025-06-21)**
+### Local Development with Docker
 
-To prevent port collisions and simplify local development, **the backend's Nginx container is now the single TLS termination point**. The frontend container only runs `webpack-dev-server` and is exposed on the internal Docker network.
+The project uses Docker for consistent development environments across team members.
 
-### Step 1 — Create the external network (one-time)
-
-```bash
-npm run docker:create:net   # or:  docker network create --driver bridge acamae-network
-```
-
-### Step 2 — Start the containers
+**Quick Start**:
 
 ```bash
-# Frontend
+# Create shared network (one-time setup)
+npm run docker:create:net
+
+# Start frontend container
 npm run docker:up:dev
 
-# Backend
+# Start backend container (in separate terminal)
 cd ../acamae-backend
-docker compose -f docker/docker-compose.yml up -d
+docker compose up -d
 ```
 
-You can now access:
+**Access the application**:
 
-- `https://localhost` — React SPA with HMR
-- `https://localhost/api` — Backend API
+- **Frontend**: `https://localhost` (React app with hot reload)
+- **Backend API**: `https://localhost/api` (API endpoints)
 
-### Step 3 — Shut everything down
+**Cleanup**:
 
 ```bash
 npm run docker:down
-cd ../acamae-backend && docker compose down -v --remove-orphans
 ```
 
-### Key notes
+### Available Docker Commands
 
-- **No Nginx in frontend**: `docker/docker-compose.yml` of the frontend no longer contains an Nginx service nor publishes 80/443.
-- **Shared network**: both stacks declare `acamae-network` as `external: true`.
-- **Nginx config**: includes `resolver 127.0.0.11 valid=30s;` and proxies to `frontend:3000`.
-- **Port/service changes**: if you rename the service or change the internal port, update the `proxy_pass` rule accordingly.
+| Command                     | Description                             |
+| --------------------------- | --------------------------------------- |
+| `npm run docker:create:net` | Create shared Docker network (one-time) |
+| `npm run docker:up:dev`     | Start development environment           |
+| `npm run docker:up:prod`    | Start production environment            |
+| `npm run docker:down`       | Stop and cleanup containers             |
+| `npm run docker:build:dev`  | Build development image                 |
 
-### Quick commands
+### Production Deployment
 
-| Command                     | Description                                |
-| --------------------------- | ------------------------------------------ |
-| `npm run docker:create:net` | Create the `acamae-network` (run once)     |
-| `npm run docker:build:dev`  | Build the dev image of the frontend        |
-| `npm run docker:up:dev`     | Start the frontend container in dev mode   |
-| `npm run docker:up:prod`    | Start the production stack of the frontend |
-| `npm run docker:down`       | Stop the frontend and clean volumes        |
+The application is configured for deployment with:
 
----
-
-## Environment Variables
-
-- `SONAR_TOKEN`: Used for SonarCloud integration
-
----
-
-## API Integration
-
-- Centralized API route management, Axios clients
+- **Environment variables** for configuration
+- **Health checks** for container monitoring
+- **Multi-stage builds** for optimized images
+- **Security scanning** for vulnerabilities
 
 ---
 
 ## Contributing
 
-- Fork the repository
-- Create a new branch
-- Make your changes
-- Commit and push your changes
-- Create a pull request
+We welcome contributions! Here's how to get started:
+
+### Development Process
+
+1. **Fork** the repository
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Make your changes** following our coding standards
+4. **Add tests** for new functionality
+5. **Run the test suite**: `npm test`
+6. **Commit** using conventional commits: `feat: add amazing feature`
+7. **Push** and create a **Pull Request**
+
+### Pull Request Guidelines
+
+- ✅ All tests must pass
+- ✅ Code coverage must remain above 90%
+- ✅ Follow existing code style (ESLint/Prettier)
+- ✅ Update documentation if needed
+- ✅ Add meaningful test cases
+- ✅ Use conventional commit messages
+
+### Getting Help
+
+- **Documentation**: Check the `docs/` folder first
+- **Issues**: Search existing issues before creating new ones
+- **Questions**: Use GitHub Discussions for general questions
+- **Security**: Email security issues privately
 
 ---
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+**What this means**: You can use, modify, and distribute this code freely, including for commercial purposes. Just include the original license notice.

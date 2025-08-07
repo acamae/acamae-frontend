@@ -22,6 +22,7 @@ components:
       required:
         - success
         - data
+        - status
         - code
         - message
         - timestamp
@@ -33,6 +34,10 @@ components:
           description: Indicates if the operation was successful
         data:
           description: The response data (can be null, object, array)
+        status:
+          type: number
+          example: 200
+          description: HTTP status code
         code:
           type: string
           example: 'SUCCESS'
@@ -60,6 +65,7 @@ components:
       required:
         - success
         - data
+        - status
         - code
         - message
         - timestamp
@@ -73,6 +79,10 @@ components:
           nullable: true
           example: null
           description: Always null in errors
+        status:
+          type: number
+          example: 400
+          description: HTTP status code
         code:
           type: string
           example: 'AUTH_INVALID_CREDENTIALS'
