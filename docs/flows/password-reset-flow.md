@@ -1,4 +1,4 @@
-# Flujo Completo de Recuperación de Contraseña - Documentación Técnica Unificada
+﻿# Flujo Completo de Recuperación de Contraseña - Documentación Técnica Unificada
 
 ## 📋 Índice
 
@@ -126,18 +126,32 @@ Content-Type: application/json
 {
   "success": true,
   "data": null,
-  "message": "If the email exists, a password reset link has been sent",
-  "code": 200,
-  "status": 200
+  "status": 200,
+  "code": "SUCCESS",
+  "message": "We have sent you a link to reset your password",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "requestId": "550e8400-e29b-41d4-a716-446655440000"
 }
 
 // ❌ Email inválido
 {
   "success": false,
   "data": null,
-  "message": "Invalid email format",
-  "code": 400,
-  "status": 400
+  "status": 422,
+  "code": "VALIDATION_ERROR",
+  "message": "The submitted data is not valid",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "error": {
+    "type": "validation",
+    "details": [
+      {
+        "field": "email",
+        "code": "INVALID_FORMAT",
+        "message": "The email format is not valid"
+      }
+    ]
+  }
 }
 ```
 
@@ -201,9 +215,11 @@ Content-Type: application/json
     "isExpired": false,
     "userExists": true
   },
+  "status": 200,
+  "code": "SUCCESS",
   "message": "Token validation successful",
-  "code": 200,
-  "status": 200
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "requestId": "550e8400-e29b-41d4-a716-446655440000"
 }
 
 // ❌ Token expirado
@@ -214,9 +230,21 @@ Content-Type: application/json
     "isExpired": true,
     "userExists": true
   },
+  "status": 400,
+  "code": "AUTH_TOKEN_EXPIRED",
   "message": "Token validation failed",
-  "code": 400,
-  "status": 400
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "error": {
+    "type": "business",
+    "details": [
+      {
+        "field": "token",
+        "code": "EXPIRED",
+        "message": "Token has expired"
+      }
+    ]
+  }
 }
 
 // ❌ Token no existe o usuario no encontrado
@@ -227,9 +255,21 @@ Content-Type: application/json
     "isExpired": false,
     "userExists": false
   },
+  "status": 404,
+  "code": "INVALID_RESET_TOKEN",
   "message": "Token validation failed",
-  "code": 404,
-  "status": 404
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "error": {
+    "type": "business",
+    "details": [
+      {
+        "field": "token",
+        "code": "NOT_FOUND",
+        "message": "Token not found or user does not exist"
+      }
+    ]
+  }
 }
 ```
 
@@ -269,30 +309,54 @@ Content-Type: application/json
 // ✅ Reset exitoso
 {
   "success": true,
-  "data": {
-    "message": "Password reset successfully"
-  },
-  "message": "Password has been reset",
-  "code": 200,
-  "status": 200
+  "data": null,
+  "status": 200,
+  "code": "SUCCESS",
+  "message": "Password has been reset successfully",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "requestId": "550e8400-e29b-41d4-a716-446655440000"
 }
 
 // ❌ Token ya fue usado
 {
   "success": false,
   "data": null,
+  "status": 409,
+  "code": "AUTH_TOKEN_ALREADY_USED",
   "message": "Token has already been used",
-  "code": 409,
-  "status": 409
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "error": {
+    "type": "business",
+    "details": [
+      {
+        "field": "token",
+        "code": "ALREADY_USED",
+        "message": "This token has already been used"
+      }
+    ]
+  }
 }
 
 // ❌ Token expirado durante el proceso
 {
   "success": false,
   "data": null,
-  "message": "Token has expired",
-  "code": 410,
-  "status": 410
+  "status": 400,
+  "code": "AUTH_TOKEN_EXPIRED",
+  "message": "The reset link has expired",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "error": {
+    "type": "business",
+    "details": [
+      {
+        "field": "token",
+        "code": "EXPIRED",
+        "message": "Token has expired"
+      }
+    ]
+  }
 }
 ```
 

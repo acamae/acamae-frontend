@@ -1,4 +1,4 @@
-# Flujo Completo de Registro de Usuario y Verificación de Email - Documentación Técnica Unificada
+﻿# Flujo Completo de Registro de Usuario y Verificación de Email - Documentación Técnica Unificada
 
 ## 📋 Índice
 

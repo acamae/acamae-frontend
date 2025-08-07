@@ -23,6 +23,7 @@ export type ApiPromise<T = unknown> = Promise<ApiResponse<T>>;
 export interface ApiResponse<T> {
   success: boolean;
   data: T | null;
+  status: number;
   code: ApiErrorCode | ApiSuccessCode;
   message: string;
   timestamp: string;
@@ -36,6 +37,7 @@ export interface ApiResponse<T> {
 export interface ApiSuccessResponse<T> extends ApiResponse<T> {
   success: true;
   data: T | null;
+  status: number;
   code: ApiSuccessCode;
   message: string;
   timestamp: string;
@@ -48,6 +50,7 @@ export interface ApiSuccessResponse<T> extends ApiResponse<T> {
 export interface ApiErrorResponse<T> extends ApiResponse<T> {
   success: false;
   data: T | null;
+  status: number;
   code: ApiErrorCode;
   message: string;
   timestamp: string;

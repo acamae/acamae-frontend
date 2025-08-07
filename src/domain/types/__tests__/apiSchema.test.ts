@@ -16,6 +16,7 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: 'Test error message',
       data: { test: 'data' },
+      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: false,
       timestamp: new Date().toISOString(),
@@ -32,6 +33,7 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: 'Success message treated as error',
       data: { test: 'data' },
+      status: 200,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: true,
       timestamp: new Date().toISOString(),
@@ -47,6 +49,7 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: '',
       data: null,
+      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: false,
       timestamp: new Date().toISOString(),
@@ -62,6 +65,7 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: '   ',
       data: null,
+      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: false,
       timestamp: new Date().toISOString(),
@@ -100,6 +104,7 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: '\t\n\r ',
       data: null,
+      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: false,
       timestamp: new Date().toISOString(),
@@ -116,6 +121,7 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: '  Valid Message  ',
       data: null,
+      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: false,
       timestamp: new Date().toISOString(),
@@ -133,6 +139,7 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: originalMessage,
       data: null,
+      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: false,
       timestamp: new Date().toISOString(),
@@ -150,6 +157,7 @@ describe('ApiError', () => {
     const error = new ApiError({
       message: '\u00A0\u2000\u2001', // Non-breaking space and em spaces that trim to empty
       data: null,
+      status: 500,
       code: ApiErrorCodes.UNKNOWN_ERROR,
       success: false,
       timestamp: new Date().toISOString(),

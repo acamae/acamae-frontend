@@ -41,6 +41,7 @@ describe('VerifyEmailUseCase', () => {
     mockAuthRepository.verifyEmail.mockResolvedValue({
       success: true,
       data: mockResponse,
+      status: 200,
       message: 'Email verified successfully',
       code: ApiSuccessCodes.SUCCESS,
       timestamp: new Date().toISOString(),
@@ -53,6 +54,7 @@ describe('VerifyEmailUseCase', () => {
     expect(result).toEqual({
       success: true,
       data: mockResponse,
+      status: expect.any(Number),
       message: 'Email verified successfully',
       code: ApiSuccessCodes.SUCCESS,
       timestamp: expect.any(String),
@@ -74,6 +76,7 @@ describe('VerifyEmailUseCase', () => {
     mockAuthRepository.verifyEmail.mockResolvedValue({
       success: false,
       data: mockResponse,
+      status: 401,
       message: 'Verification token has expired',
       code: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
       timestamp: new Date().toISOString(),
@@ -86,6 +89,7 @@ describe('VerifyEmailUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: mockResponse,
+      status: expect.any(Number),
       message: 'Verification token has expired',
       code: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
       timestamp: expect.any(String),
@@ -107,6 +111,7 @@ describe('VerifyEmailUseCase', () => {
     mockAuthRepository.verifyEmail.mockResolvedValue({
       success: false,
       data: mockResponse,
+      status: 401,
       message: 'Invalid verification token',
       code: ApiErrorCodes.AUTH_TOKEN_INVALID,
       timestamp: new Date().toISOString(),
@@ -119,6 +124,7 @@ describe('VerifyEmailUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: mockResponse,
+      status: expect.any(Number),
       message: 'Invalid verification token',
       code: ApiErrorCodes.AUTH_TOKEN_INVALID,
       timestamp: expect.any(String),
@@ -140,6 +146,7 @@ describe('VerifyEmailUseCase', () => {
     mockAuthRepository.verifyEmail.mockResolvedValue({
       success: false,
       data: mockResponse,
+      status: 400,
       message: 'Email is already verified',
       code: ApiErrorCodes.VALIDATION_ERROR,
       timestamp: new Date().toISOString(),
@@ -152,6 +159,7 @@ describe('VerifyEmailUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: mockResponse,
+      status: expect.any(Number),
       message: 'Email is already verified',
       code: ApiErrorCodes.VALIDATION_ERROR,
       timestamp: expect.any(String),
@@ -173,6 +181,7 @@ describe('VerifyEmailUseCase', () => {
     mockAuthRepository.verifyEmail.mockResolvedValue({
       success: false,
       data: mockResponse,
+      status: 0,
       message: 'Token is valid but user update failed',
       code: ApiErrorCodes.ERR_NETWORK,
       timestamp: new Date().toISOString(),
@@ -185,6 +194,7 @@ describe('VerifyEmailUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: mockResponse,
+      status: expect.any(Number),
       message: 'Token is valid but user update failed',
       code: ApiErrorCodes.ERR_NETWORK,
       timestamp: expect.any(String),

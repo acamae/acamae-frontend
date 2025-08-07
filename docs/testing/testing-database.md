@@ -1,4 +1,4 @@
-# Base de Datos MySQL para Tests de Cypress
+﻿# Base de Datos MySQL para Tests de Cypress
 
 Este documento explica cómo configurar y usar una base de datos MySQL/MariaDB específica para los tests de Cypress, incluyendo todas las medidas de seguridad implementadas para proteger la base de datos de producción.
 
@@ -559,3 +559,129 @@ Para añadir nuevas medidas de seguridad:
 > 🔒 **Documentación de Seguridad Unificada** - Versión 2.0
 > 📅 Última actualización: 2024-12-19
 > ✅ **Estado**: Todas las medidas de seguridad activas y verificadas
+
+- Verifica que Nginx esté ejecutándose
+- Confirma que los certificados estén configurados
+
+2. **API no accesible**:
+   - Verifica que el proxy de Nginx esté configurado para `/api`
+   - Confirma que el backend esté ejecutándose
+
+3. **Base de datos no accesible**:
+   - Verifica credenciales en `.env.test`
+   - Confirma que MySQL esté ejecutándose
+   - Revisa permisos del usuario de pruebas
+
+4. **Violación de seguridad**:
+   - Verifica que `NODE_ENV=test`
+   - Confirma que nombres de BD y usuario contengan "test"
+   - Revisa que no estés usando nombres de la lista negra
+
+## 🔧 Configuración Avanzada
+
+### Docker
+
+Si usas Docker, puedes crear un servicio específico para tests:
+
+```yaml
+# docker-compose.test.yml
+version: '3.8'
+services:
+  test-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: acamae_test
+      MYSQL_USER: acamae_test_user
+      MYSQL_PASSWORD: acamae_test_password
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - '3307:3306'
+    volumes:
+      - test_db_data:/var/lib/mysql
+
+volumes:
+  test_db_data:
+```
+
+### CI/CD
+
+Para integración continua, configura las variables de entorno:
+
+```yaml
+# .github/workflows/test.yml
+env:
+  NODE_ENV: test
+  REACT_APP_DB_HOST: localhost
+  REACT_APP_DB_PORT: 3306
+  REACT_APP_DB_NAME: acamae_test
+  REACT_APP_DB_USER: acamae_test_user
+  REACT_APP_DB_PASSWORD: acamae_test_password
+  REACT_APP_DB_ADMIN_USER: root
+  REACT_APP_DB_ADMIN_PASSWORD: root
+```
+
+### Personalización de Medidas de Seguridad
+
+#### Añadir Nuevas Restricciones
+
+1. **Editar `scripts/test-db-setup.js`**:
+
+   ```javascript
+   const PRODUCTION_DATABASES = [
+     // ... existing items
+     'nueva_bd_prohibida',
+   ];
+   ```
+
+2. **Añadir validaciones**:
+   ```javascript
+   if (nueva_condicion_insegura) {
+     console.error('❌ SEGURIDAD: Nueva validación fallida');
+     process.exit(1);
+   }
+   ```
+
+#### Verificación de Seguridad Personalizada
+
+```bash
+# Ejecutar verificación completa
+npm run test:e2e:verify
+
+# Verificar solo la configuración de seguridad
+node scripts/validate-critical-config.js
+```
+
+## 📊 Bases de Datos Soportadas
+
+- ✅ **MySQL/MariaDB** (Completamente soportado)
+- ❌ **SQLite** (No soportado actualmente)
+- ❌ **MongoDB** (No soportado actualmente)
+
+## 🔄 Actualización de Medidas
+
+Para añadir nuevas medidas de seguridad:
+
+1. **Añadir a listas negras** en `scripts/test-db-setup.js`
+2. **Añadir validaciones adicionales** en función `validateTestEnvironment()`
+3. **Actualizar documentación** en este archivo
+4. **Probar nuevas validaciones** con `npm run test:e2e:verify`
+
+## 🎯 Garantía Final
+
+**CERTIFICADO**: Con estas medidas implementadas, es **técnicamente imposible** ejecutar operaciones en base de datos de producción desde los tests de Cypress.
+
+**VALIDADO**: Todas las medidas han sido probadas con escenarios inseguros y **todos fueron bloqueados exitosamente**.
+
+**ESTADO**: ✅ **100% Protegido** - 8 capas de seguridad activas
+
+## 📝 Notas Importantes
+
+- La BD se limpia automáticamente antes y después de cada ejecución
+- Los tests pueden usar datos reales si es necesario
+- La configuración es flexible y soporta múltiples SGBD
+- Los scripts manejan errores gracefully para evitar fallos en CI/CD
+- **Todas las operaciones requieren `NODE_ENV=test`**
+- **Nombres de BD y usuarios deben contener "test"**
+- **Hosts y usuarios de producción están completamente bloqueados**
+
+---

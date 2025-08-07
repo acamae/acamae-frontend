@@ -84,11 +84,12 @@ function handleApiSuccess<T>({ response }: { response: AxiosResponse<T> }): ApiS
   const meta = data.meta || response.headers;
 
   return {
-    data: data.data ?? null,
     success: data.success,
+    data: data.data ?? null,
+    status: response.status,
     code: data.code,
     message,
-    timestamp: data.timestamp,
+    timestamp: data.timestamp || new Date().toISOString(),
     requestId,
     meta,
   };
@@ -143,7 +144,6 @@ function handleApiSuccess<T>({ response }: { response: AxiosResponse<T> }): ApiS
  * @returns ApiErrorResponse<T>
  */
 function handleApiError<T>(error: AxiosError): ApiErrorResponse<T> {
-  console.log('error', error);
   if (error) {
     // Si hay respuesta del servidor, usar esos datos
     if (error.response?.data && typeof error.response.data === 'object') {
@@ -151,10 +151,14 @@ function handleApiError<T>(error: AxiosError): ApiErrorResponse<T> {
       return {
         success: false,
         data: serverData.data || null,
+        status: error.response.status,
         code: serverData.code || ApiErrorCodes.UNKNOWN_ERROR,
         message: serverData.message || error.message || 'Server error',
-        timestamp: serverData.timestamp,
-        requestId: serverData.requestId,
+        timestamp: serverData.timestamp || new Date().toISOString(),
+        requestId:
+          serverData.requestId ||
+          error.config?.headers?.['x-request-id'] ||
+          `req_${Date.now()}_${generateSecureId()}`,
         meta: serverData.meta,
         error: serverData.error,
       } as ApiErrorResponse<T>;
@@ -167,6 +171,7 @@ function handleApiError<T>(error: AxiosError): ApiErrorResponse<T> {
     return {
       success: false,
       data: null,
+      status: 0, // Network errors always have status 0
       code: networkErrorCode,
       message: getErrorMessage(error),
       timestamp: new Date().toISOString(),
@@ -187,11 +192,13 @@ function handleApiError<T>(error: AxiosError): ApiErrorResponse<T> {
 
   // Error no identificado
   return {
-    message: 'Unknown error occurred',
-    code: ApiErrorCodes.UNKNOWN_ERROR,
     success: false,
     data: null,
+    status: 500, // Unknown errors default to 500
+    code: ApiErrorCodes.UNKNOWN_ERROR,
+    message: 'Unknown error occurred',
     timestamp: new Date().toISOString(),
+    requestId: `req_${Date.now()}_${generateSecureId()}`,
     error: {
       type: 'server',
       details: [
