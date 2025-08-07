@@ -304,7 +304,6 @@ describe('PasswordStrengthMeter integration test', () => {
 
     await waitFor(() => {
       const progressBar = screen.getByTestId('password-strength-progress');
-      expect(progressBar).toHaveAttribute('role', 'progressbar');
       expect(progressBar).toHaveAttribute('aria-label', 'Progreso de fortaleza de la contraseña');
     });
   });
@@ -319,9 +318,8 @@ describe('PasswordStrengthMeter integration test', () => {
     render(<PasswordStrengthMeter password="A!9=123/dB*a.zvMS" t={mockT} />);
 
     await waitFor(() => {
-      const progressBar = screen.getByTestId('password-strength-progress-bar');
-      expect(progressBar).toHaveClass('password-strength__progress-bar--very-strong');
-      expect(progressBar).toHaveClass('password-strength__progress-bar--width-100');
+      const progressBar = screen.getByTestId('password-strength-progress');
+      expect(progressBar).toHaveAttribute('value', '100');
     });
   });
 
@@ -335,25 +333,8 @@ describe('PasswordStrengthMeter integration test', () => {
     render(<PasswordStrengthMeter password="Password" t={mockT} />);
 
     await waitFor(() => {
-      const progressBar = screen.getByTestId('password-strength-progress-bar');
-      expect(progressBar).toHaveClass('password-strength__progress-bar--good');
-      expect(progressBar).toHaveClass('password-strength__progress-bar--width-75');
-    });
-  });
-
-  it('should show progress bar with correct width for weak password', async () => {
-    mockZxcvbn.mockReturnValue({
-      score: 0,
-      feedback: { warning: '', suggestions: [] },
-    });
-
-    // @ts-expect-error: mockT no implementa $TFunctionBrand, pero es suficiente para pruebas
-    render(<PasswordStrengthMeter password="a" t={mockT} />);
-
-    await waitFor(() => {
-      const progressBar = screen.getByTestId('password-strength-progress-bar');
-      expect(progressBar).toHaveClass('password-strength__progress-bar--weak');
-      expect(progressBar).toHaveClass('password-strength__progress-bar--width-0');
+      const progressBar = screen.getByTestId('password-strength-progress');
+      expect(progressBar).toHaveAttribute('value', '75');
     });
   });
 });

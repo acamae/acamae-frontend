@@ -449,6 +449,9 @@ $visibility-values: (none, initial);
   background-color: var(--#{$prefix}theme);
   border-color: var(--#{$prefix}theme);
 }
+.btn-link {
+  color: var(--#{$prefix}theme);
+}
 .btn-theme {
   background-color: var(--#{$prefix}theme);
   border-color: var(--#{$prefix}theme);

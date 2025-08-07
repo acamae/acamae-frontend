@@ -49,14 +49,11 @@ const ResetPasswordPage: React.FC = () => {
         if (response.success && response.data?.isValid) {
           // Token válido, mostrar el formulario
           setTokenValidated(true);
+        } else if (response.data?.isExpired) {
+          navigate(APP_ROUTES.RESET_PASSWORD_EXPIRED);
         } else {
-          // Token inválido, verificar la razón específica
-          if (response.data?.isExpired) {
-            navigate(APP_ROUTES.RESET_PASSWORD_EXPIRED);
-          } else {
-            // Token inválido o usuario no existe
-            navigate(APP_ROUTES.RESET_PASSWORD_ERROR);
-          }
+          // Token inválido o usuario no existe
+          navigate(APP_ROUTES.RESET_PASSWORD_ERROR);
         }
       } catch (error: unknown) {
         console.error(error);
