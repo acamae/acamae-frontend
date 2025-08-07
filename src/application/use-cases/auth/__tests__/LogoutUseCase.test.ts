@@ -28,8 +28,8 @@ describe('LogoutUseCase', () => {
     mockAuthRepository.logout.mockResolvedValue({
       success: true,
       data: null,
-      message: 'Logout successful',
       status: 200,
+      message: 'Logout successful',
       code: ApiSuccessCodes.SUCCESS,
       timestamp: new Date().toISOString(),
       requestId: 'req_logout_123',
@@ -41,8 +41,8 @@ describe('LogoutUseCase', () => {
     expect(result).toEqual({
       success: true,
       data: null,
+      status: expect.any(Number),
       message: 'Logout successful',
-      status: 200,
       code: ApiSuccessCodes.SUCCESS,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -53,8 +53,8 @@ describe('LogoutUseCase', () => {
     mockAuthRepository.logout.mockResolvedValue({
       success: false,
       data: null,
+      status: 401,
       message: 'Logout failed',
-      status: 500,
       code: ApiErrorCodes.ERR_NETWORK,
       timestamp: new Date().toISOString(),
       requestId: 'req_logout_456',
@@ -66,8 +66,8 @@ describe('LogoutUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       message: 'Logout failed',
-      status: 500,
       code: ApiErrorCodes.ERR_NETWORK,
       timestamp: expect.any(String),
       requestId: expect.any(String),

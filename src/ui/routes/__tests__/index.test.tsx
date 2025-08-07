@@ -1822,8 +1822,8 @@ describe('AppRoutes', () => {
       const publicRoutes = buildPublicRoutes();
       const emailVerificationRoute = publicRoutes.find(
         (route: unknown) =>
-          (route as { path?: string }).path === '/verify-email' ||
-          (route as { path?: string }).path === 'verify-email'
+          (route as { path?: string }).path === '/verify-email/:token' ||
+          (route as { path?: string }).path === 'verify-email/:token'
       );
 
       expect(emailVerificationRoute).toBeDefined();
@@ -1915,7 +1915,7 @@ describe('AppRoutes', () => {
 
       const testRouter = createBrowserRouter([
         {
-          path: '/verify-email',
+          path: '/verify-email/:token',
           element: <EmailVerificationPage />,
         },
       ]);

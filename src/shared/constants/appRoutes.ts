@@ -4,8 +4,12 @@ export const PUBLIC_ROUTES = {
   LOGIN: '/login',
   REGISTER: '/register',
   FORGOT_PASSWORD: '/forgot-password',
-  RESET_PASSWORD: '/reset-password',
-  VERIFY_EMAIL: '/verify-email',
+  RESET_PASSWORD: '/reset-password/:token',
+  RESET_PASSWORD_SUCCESS: '/reset-password-success',
+  RESET_PASSWORD_ERROR: '/reset-password-error',
+  RESET_PASSWORD_EXPIRED: '/reset-password-expired',
+  RESET_PASSWORD_SENT: '/reset-password-sent',
+  VERIFY_EMAIL: '/verify-email/:token',
   VERIFY_EMAIL_SENT: '/verify-email-sent',
   VERIFY_EMAIL_SUCCESS: '/verify-email-success',
   VERIFY_EMAIL_EXPIRED: '/verify-email-expired',
@@ -40,3 +44,12 @@ export const APP_ROUTES = {
   ...PUBLIC_ROUTES,
   ...PRIVATE_ROUTES,
 } as const;
+
+// Funciones helper para generar enlaces
+export const getResetPasswordUrl = (token: string): string => {
+  return PUBLIC_ROUTES.RESET_PASSWORD.replace(':token', encodeURIComponent(token));
+};
+
+export const getVerifyEmailUrl = (token: string): string => {
+  return PUBLIC_ROUTES.VERIFY_EMAIL.replace(':token', encodeURIComponent(token));
+};

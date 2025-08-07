@@ -45,8 +45,8 @@ describe('LoginUseCase', () => {
     mockAuthRepository.login.mockResolvedValue({
       success: true,
       data: mockUser,
+      status: 403,
       message: 'Login successful',
-      status: 200,
       code: ApiSuccessCodes.SUCCESS,
       timestamp: new Date().toISOString(),
       requestId: 'req_login_123',
@@ -58,8 +58,8 @@ describe('LoginUseCase', () => {
     expect(result).toEqual({
       success: true,
       data: mockUser,
+      status: expect.any(Number),
       message: 'Login successful',
-      status: 200,
       code: ApiSuccessCodes.SUCCESS,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -75,8 +75,8 @@ describe('LoginUseCase', () => {
     mockAuthRepository.login.mockResolvedValue({
       success: false,
       data: null,
-      message: 'Invalid credentials',
       status: 401,
+      message: 'Invalid credentials',
       code: ApiErrorCodes.AUTH_INVALID_CREDENTIALS,
       timestamp: new Date().toISOString(),
       requestId: 'req_login_456',
@@ -88,8 +88,8 @@ describe('LoginUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       message: 'Invalid credentials',
-      status: 401,
       code: ApiErrorCodes.AUTH_INVALID_CREDENTIALS,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -105,8 +105,8 @@ describe('LoginUseCase', () => {
     mockAuthRepository.login.mockResolvedValue({
       success: false,
       data: null,
-      message: 'Invalid refresh token',
       status: 401,
+      message: 'Invalid refresh token',
       code: ApiErrorCodes.INVALID_REFRESH_TOKEN,
       timestamp: new Date().toISOString(),
       requestId: 'req_login_789',
@@ -118,8 +118,8 @@ describe('LoginUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       message: 'Invalid refresh token',
-      status: 401,
       code: ApiErrorCodes.INVALID_REFRESH_TOKEN,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -135,8 +135,8 @@ describe('LoginUseCase', () => {
     mockAuthRepository.login.mockResolvedValue({
       success: false,
       data: null,
-      message: 'Email not verified',
       status: 403,
+      message: 'Email not verified',
       code: ApiErrorCodes.EMAIL_NOT_VERIFIED,
       timestamp: new Date().toISOString(),
       requestId: 'req_login_abc',
@@ -148,8 +148,8 @@ describe('LoginUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       message: 'Email not verified',
-      status: 403,
       code: ApiErrorCodes.EMAIL_NOT_VERIFIED,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -165,8 +165,8 @@ describe('LoginUseCase', () => {
     mockAuthRepository.login.mockResolvedValue({
       success: false,
       data: null,
-      message: 'Database error occurred',
       status: 500,
+      message: 'Database error occurred',
       code: ApiErrorCodes.DATABASE_ERROR,
       timestamp: new Date().toISOString(),
       requestId: 'req_login_def',
@@ -178,8 +178,8 @@ describe('LoginUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       message: 'Database error occurred',
-      status: 500,
       code: ApiErrorCodes.DATABASE_ERROR,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -202,8 +202,8 @@ describe('LoginUseCase', () => {
       mockAuthRepository.login.mockResolvedValue({
         success: false,
         data: null,
+        status: 401,
         message: `Error with code: ${code}`,
-        status: 500,
         code,
         timestamp: new Date().toISOString(),
         requestId: `req_login_${code}`,

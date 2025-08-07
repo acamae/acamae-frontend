@@ -2,7 +2,7 @@
   min-width: rem(200px);
 
   @include media-breakpoint-up(md) {
-    min-height: calc(100vh - #{$app-header-height});
+    min-height: calc(100vh - $app-header-height);
     border-right: 1px solid var(--#{$prefix}border-color);
   }
 }
@@ -13,6 +13,7 @@
   @include media-breakpoint-down(md) {
     overflow: scroll;
     border-bottom: 1px solid var(--#{$prefix}border-color);
+    position: -webkit-sticky;
     position: sticky;
     top: $app-header-height;
     display: flex;
@@ -68,7 +69,7 @@
   width: 100%;
 
   @include media-breakpoint-up(md) {
-    min-height: calc(100vh - #{$app-header-height});
+    min-height: calc(100vh - $app-header-height);
   }
 }
 .gallery {

@@ -1,3 +1,4 @@
+import { TFunction } from 'i18next';
 import { useState, useCallback } from 'react';
 import { Form, Button, InputGroup } from 'react-bootstrap';
 import { Trans, useTranslation } from 'react-i18next';
@@ -15,7 +16,34 @@ import { useForm } from '@ui/hooks/useForm';
 
 import TCOffcanvas from '../Offcanvas/TCOffcanvas';
 
-const RegisterForm: React.FC = () => {
+interface RegisterFormProps {
+  onSuccess?: () => void;
+}
+
+// Helper components to reduce complexity
+const RequiredAsterisk: React.FC<{ t: TFunction }> = ({ t }) => (
+  <abbr className="text-danger" title={t('global.required')}>
+    *
+  </abbr>
+);
+
+const PasswordToggleButton: React.FC<{
+  showPassword: boolean;
+  onToggle: () => void;
+  t: TFunction;
+  testId: string;
+}> = ({ showPassword, onToggle, t, testId }) => (
+  <Button
+    variant="outline-secondary"
+    onClick={onToggle}
+    aria-label={t('register.toggle_password')}
+    data-testid={testId}
+    type="button">
+    <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
+  </Button>
+);
+
+const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   const { t } = useTranslation();
   const { register, loading } = useAuth();
 
@@ -32,23 +60,20 @@ const RegisterForm: React.FC = () => {
   const validate = useCallback(
     (values: RegisterFormData) => {
       const errors: Partial<Record<keyof RegisterFormData, string>> = {};
-      if (!validateEmail(values.email)) {
-        errors.email = t('errors.email.invalid');
-      }
-      if (!validateUsername(values.username)) {
-        errors.username = t('errors.username.invalid');
-      }
-      if (!validatePassword(values.password)) {
-        errors.password = t('errors.password.invalid');
-      }
+
+      // Basic field validation
+      if (!validateEmail(values.email)) errors.email = t('errors.email.invalid');
+      if (!validateUsername(values.username)) errors.username = t('errors.username.invalid');
+      if (!validatePassword(values.password)) errors.password = t('errors.password.invalid');
+      if (!values.terms) errors.terms = t('errors.terms.required');
+
+      // Password confirmation validation
       if (!values.confirmPassword) {
         errors.confirmPassword = t('errors.password.confirm_required');
       } else if (values.password !== values.confirmPassword) {
         errors.confirmPassword = t('errors.password.mismatch');
       }
-      if (!values.terms) {
-        errors.terms = t('errors.terms.required');
-      }
+
       return errors;
     },
     [t]
@@ -77,16 +102,19 @@ const RegisterForm: React.FC = () => {
     },
     validate,
     onSubmit: async (data: RegisterPayload) => {
-      await register(data);
+      try {
+        await register(data).unwrap();
+        if (onSuccess) onSuccess();
+      } catch {
+        // El feedbackMiddleware mostrará el toast de error
+      }
     },
     enableThrottling: true,
     formName: 'register-form',
   });
 
   const getButtonText = () => {
-    if (loading || isSubmitting) {
-      return t('global.processing');
-    }
+    if (loading || isSubmitting) return t('global.processing');
     if (isThrottled && timeUntilNextSubmission && timeUntilNextSubmission > 0) {
       return `${t('register.button')} (${Math.ceil(timeUntilNextSubmission / 1000)}s)`;
     }
@@ -114,10 +142,7 @@ const RegisterForm: React.FC = () => {
         data-testid="register-form">
         <Form.Group className="mb-3" controlId="email">
           <Form.Label>
-            {t('register.email')}{' '}
-            <abbr className="text-danger" title={t('global.required')}>
-              *
-            </abbr>
+            {t('register.email')} <RequiredAsterisk t={t} />
           </Form.Label>
           <Form.Control
             type="email"
@@ -150,10 +175,7 @@ const RegisterForm: React.FC = () => {
 
         <Form.Group className="mb-3" controlId="username">
           <Form.Label>
-            {t('register.username')}{' '}
-            <abbr className="text-danger" title={t('global.required')}>
-              *
-            </abbr>
+            {t('register.username')} <RequiredAsterisk t={t} />
           </Form.Label>
           <Form.Control
             type="text"
@@ -186,10 +208,7 @@ const RegisterForm: React.FC = () => {
 
         <Form.Group className="mb-3" controlId="password">
           <Form.Label>
-            {t('register.password')}{' '}
-            <abbr className="text-danger" title={t('global.required')}>
-              *
-            </abbr>
+            {t('register.password')} <RequiredAsterisk t={t} />
           </Form.Label>
           <InputGroup
             hasValidation
@@ -209,14 +228,12 @@ const RegisterForm: React.FC = () => {
               aria-errormessage="register-form-password-error"
               data-testid="register-form-password-input"
             />
-            <Button
-              variant="outline-secondary"
-              onClick={() => setShowPassword(prev => !prev)}
-              aria-label={t('register.toggle_password')}
-              data-testid="btn-toggle-password"
-              type="button">
-              <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
-            </Button>
+            <PasswordToggleButton
+              showPassword={showPassword}
+              onToggle={() => setShowPassword(prev => !prev)}
+              t={t}
+              testId="btn-toggle-password"
+            />
           </InputGroup>
           <Form.Text id="passwordHelp" className="text-muted">
             {t('register.password_help')}
@@ -235,10 +252,7 @@ const RegisterForm: React.FC = () => {
 
         <Form.Group className="mb-3" controlId="confirmPassword">
           <Form.Label>
-            {t('register.confirm_password')}{' '}
-            <abbr className="text-danger" title={t('global.required')}>
-              *
-            </abbr>
+            {t('register.confirm_password')} <RequiredAsterisk t={t} />
           </Form.Label>
           <InputGroup
             hasValidation
@@ -258,14 +272,12 @@ const RegisterForm: React.FC = () => {
               aria-errormessage="register-form-confirm-password-error"
               data-testid="register-form-confirm-password-input"
             />
-            <Button
-              variant="outline-secondary"
-              onClick={() => setShowConfirmPassword(prev => !prev)}
-              aria-label={t('register.toggle_password')}
-              data-testid="btn-toggle-confirm-password"
-              type="button">
-              <i className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
-            </Button>
+            <PasswordToggleButton
+              showPassword={showConfirmPassword}
+              onToggle={() => setShowConfirmPassword(prev => !prev)}
+              t={t}
+              testId="btn-toggle-confirm-password"
+            />
           </InputGroup>
           <Form.Text id="confirmPasswordHelp" className="text-muted">
             {t('register.confirm_password_help')}
@@ -289,11 +301,18 @@ const RegisterForm: React.FC = () => {
                 <Trans
                   i18nKey="register.terms_and_conditions"
                   title={t('register.terms_and_conditions_help')}
-                  components={{ url: <a href="#" onClick={handleShow} /> }} // NOSONAR: This is valid
+                  components={{
+                    url: (
+                      <button
+                        type="button"
+                        className="btn btn-link p-0"
+                        title={t('register.terms_and_conditions_link_title')}
+                        onClick={handleShow}
+                      />
+                    ),
+                  }} // NOSONAR: This is valid
                 />{' '}
-                <abbr className="text-danger" title={t('global.required')}>
-                  *
-                </abbr>
+                <RequiredAsterisk t={t} />
               </>
             }
             id="terms"

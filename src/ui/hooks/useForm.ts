@@ -29,6 +29,7 @@ export type UseFormReturn<T> = {
   timeUntilNextSubmission?: number;
   remainingAttempts?: number;
   resetThrottle?: () => void;
+  activateThrottle?: () => void;
 };
 
 export const useForm = <T extends object>({
@@ -196,8 +197,7 @@ export const useForm = <T extends object>({
       try {
         if (shouldUseThrottling && throttledSubmit) {
           await throttledSubmit.handleThrottledSubmit();
-          // Reset throttle on success
-          throttledSubmit.resetThrottle?.();
+          // Don't reset throttle on success - let it maintain its state
         } else {
           await onSubmit(values);
         }
@@ -224,8 +224,13 @@ export const useForm = <T extends object>({
     setTouched({} as Record<keyof T, boolean>);
   }, [initialValues]);
 
-  const hasValidationErrors = useMemo(() => Object.values(errors).some(Boolean), [errors]);
-
+  const hasValidationErrors = useMemo(
+    () =>
+      Object.keys(errors).some(
+        key => touched[key as keyof typeof touched] && Boolean(errors[key as keyof typeof errors])
+      ),
+    [errors, touched]
+  );
   // Check if form is valid (no errors and all required fields are filled)
   const isFormValid = useMemo(() => {
     if (hasValidationErrors) return false;
@@ -257,5 +262,6 @@ export const useForm = <T extends object>({
       shouldUseThrottling && throttledSubmit ? throttledSubmit.remainingAttempts : 0,
     resetThrottle:
       shouldUseThrottling && throttledSubmit ? throttledSubmit.resetThrottle : () => {},
+    activateThrottle: throttledSubmit?.activateThrottle,
   };
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { VerifyEmailUseCase } from '@application/use-cases/auth/VerifyEmailUseCase';
 import { ApiErrorCodes } from '@domain/constants/errorCodes';
@@ -10,14 +10,14 @@ import { APP_ROUTES } from '@shared/constants/appRoutes';
 
 const EmailVerificationPage: React.FC = () => {
   const { t } = useTranslation();
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const params = useParams();
   const [loading, setLoading] = useState(true);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
   const hasVerified = useRef(false);
 
   useEffect(() => {
-    const token = searchParams.get('token');
+    const token = params.token;
 
     if (!token) {
       // No token provided, redirect to error page
@@ -67,7 +67,7 @@ const EmailVerificationPage: React.FC = () => {
     };
 
     verifyEmail();
-  }, [searchParams, navigate, t]);
+  }, [params, navigate, t]);
 
   useEffect(() => {
     // Redirect to specific pages based on verification status

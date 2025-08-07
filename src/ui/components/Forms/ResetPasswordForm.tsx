@@ -1,37 +1,44 @@
 import React, { useState, useCallback } from 'react';
-import { Form, Button, InputGroup, Alert } from 'react-bootstrap';
+import { Alert, Button, Form, InputGroup } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
-import { validatePassword } from '@domain/services/validationService';
+import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { ResetPasswordPayload } from '@domain/types/apiSchema';
 import { ResetPasswordFormData } from '@domain/types/forms';
+import { APP_ROUTES } from '@shared/constants/appRoutes';
 import PasswordStrengthMeter from '@ui/components/PasswordStrengthMeter';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
 
 interface ResetPasswordFormProps {
   tokenProp?: string;
+  onSuccess?: () => void;
 }
 
-const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' }) => {
+const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '', onSuccess }) => {
   const { t } = useTranslation();
   const { resetPassword, loading } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validate = useCallback(
     (values: ResetPasswordFormData) => {
       const errors: Partial<ResetPasswordFormData> = {};
+
       if (!values.password) {
-        errors.password = t('errors.password.required');
-      } else if (!validatePassword(values.password)) {
-        errors.password = t('errors.password.invalid');
+        errors.password = t('reset.password_required');
+      } else if (values.password.length < 8) {
+        errors.password = t('reset.password_min_length');
       }
+
       if (!values.confirmPassword) {
-        errors.confirmPassword = t('errors.password.confirm_required');
+        errors.confirmPassword = t('reset.confirm_password_required');
       } else if (values.password !== values.confirmPassword) {
-        errors.confirmPassword = t('errors.password.mismatch');
+        errors.confirmPassword = t('reset.passwords_not_match');
       }
+
       return errors;
     },
     [t]
@@ -49,6 +56,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
     timeUntilNextSubmission,
     remainingAttempts,
     hasValidationErrors,
+    activateThrottle,
   } = useForm<ResetPasswordFormData>({
     initialValues: {
       password: '',
@@ -57,12 +65,43 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ tokenProp = '' })
     },
     validate,
     onSubmit: async (data: ResetPasswordFormData) => {
-      // Only send password and token to server, exclude confirmPassword
       const payload: ResetPasswordPayload = {
         password: data.password,
         token: tokenProp,
       };
-      await resetPassword(payload);
+      try {
+        await resetPassword(payload).unwrap();
+        if (onSuccess) onSuccess();
+      } catch (error: unknown) {
+        // Manejar diferentes tipos de errores del backend
+        if (error && typeof error === 'object' && 'code' in error) {
+          const errorCode = (error as { code: string }).code;
+
+          switch (errorCode) {
+            case ApiErrorCodes.AUTH_TOKEN_EXPIRED:
+              navigate(APP_ROUTES.RESET_PASSWORD_EXPIRED);
+              return;
+            case ApiErrorCodes.AUTH_TOKEN_INVALID:
+            case ApiErrorCodes.AUTH_UPDATE_FAILED:
+              navigate(APP_ROUTES.RESET_PASSWORD_ERROR);
+              return;
+            default:
+              // Para otros errores, el feedbackMiddleware mostrará el toast
+              break;
+          }
+        }
+
+        // Manejar errores de throttling
+        if (
+          activateThrottle &&
+          error &&
+          typeof error === 'object' &&
+          'status' in error &&
+          (error as { status: unknown }).status === 429
+        ) {
+          activateThrottle();
+        }
+      }
     },
     enableThrottling: true,
     formName: 'reset-password-form',

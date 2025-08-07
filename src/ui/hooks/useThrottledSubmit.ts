@@ -19,6 +19,7 @@ export interface UseThrottledSubmitReturn {
   remainingAttempts: number;
   handleThrottledSubmit: () => Promise<void>;
   resetThrottle: () => void;
+  activateThrottle: () => void;
 }
 
 export const useThrottledSubmit = ({
@@ -108,6 +109,23 @@ export const useThrottledSubmit = ({
     setTimeUntilNextSubmission(0);
   }, [actionId]);
 
+  const activateThrottle = useCallback(() => {
+    // Activar el throttling manualmente cuando el servidor devuelve un error 429
+    securityThrottleService.recordAction(actionId, throttleConfig);
+
+    // Actualizar el estado inmediatamente
+    const timeRemaining = securityThrottleService.getTimeUntilNextAction(actionId, throttleConfig);
+    const attempts = securityThrottleService.getRemainingAttempts(actionId, throttleConfig);
+
+    setTimeUntilNextSubmission(timeRemaining);
+    setRemainingAttempts(attempts);
+    setIsThrottled(true);
+
+    if (showToastOnThrottle) {
+      toast.error(t('security.throttle.server_blocked'));
+    }
+  }, [actionId, throttleConfig, showToastOnThrottle, t, toast]);
+
   const canSubmit = !isThrottled && timeUntilNextSubmission === 0;
 
   return {
@@ -117,6 +135,7 @@ export const useThrottledSubmit = ({
     remainingAttempts,
     handleThrottledSubmit,
     resetThrottle,
+    activateThrottle,
   };
 };
 

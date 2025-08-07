@@ -2,7 +2,7 @@
   & .app-content {
     z-index: $app-header-zindex + 100;
     position: relative;
-    height: calc(100vh - #{$app-header-height});
+    height: calc(100vh - $app-header-height);
     overflow: hidden;
   }
 }

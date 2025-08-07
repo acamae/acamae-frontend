@@ -97,8 +97,8 @@ const PasswordStrengthMeter: React.FC<Props> = ({ password, t }) => {
   }, [zxcvbnResult?.score, password.length]);
 
   return (
-    <div className="password-strength">
-      <div className="password-strength__requirements">
+    <div className="password-strength" data-testid="password-strength-meter">
+      <div className="password-strength__requirements" data-testid="password-strength-requirements">
         {requirements.map(requirement => {
           const isCompleted = requirement.test(password);
           return (
@@ -119,20 +119,22 @@ const PasswordStrengthMeter: React.FC<Props> = ({ password, t }) => {
       </div>
 
       {/* Horizontal progress bar */}
-      <div className="password-strength__progress-container mt-2">
-        <div
+      <div
+        className="password-strength__progress-container mt-2"
+        data-testid="password-strength-progress-container">
+        <progress
           className="progress password-strength__progress"
-          role="progressbar"
           aria-label={t('register.strength.progress_label')}
-          data-testid="password-strength-progress">
-          <div
-            className={`progress-bar password-strength__progress-bar password-strength__progress-bar--${strengthLevel} password-strength__progress-bar--width-${progressPercentage}`}
-            data-testid="password-strength-progress-bar"
-          />
-        </div>
+          data-testid="password-strength-progress"
+          value={progressPercentage}
+          max="100">
+          {progressPercentage}%
+        </progress>
       </div>
 
-      <div className="password-strength__strength-indicator mt-2">
+      <div
+        className="password-strength__strength-indicator mt-2"
+        data-testid="password-strength-strength-indicator">
         <span
           data-testid="password-strength-label"
           aria-live="polite"

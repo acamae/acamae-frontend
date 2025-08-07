@@ -127,6 +127,7 @@ export default defineConfig({
     defaultCommandTimeout: 10000,
     requestTimeout: 10000,
     responseTimeout: 10000,
+    pageLoadTimeout: 120000, // Increase to 2 minutes for slower page loads
 
     // Test files
     specPattern: 'cypress/e2e/**/*.cy.ts',

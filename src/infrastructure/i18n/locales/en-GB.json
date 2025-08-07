@@ -23,8 +23,6 @@
     "button": "Login",
     "forgot": "Forgot your password?",
     "remember": "Keep me logged in",
-    "email_help": "Enter your registered email address.",
-    "password_help": "Minimum 8 characters, at least one uppercase letter, one lowercase letter and one number.",
     "toggle_password": "Show/hide password",
     "failed": "Login failed",
     "sign_up": "Sign up",
@@ -52,7 +50,7 @@
     "email_help": "Required to confirm your account and recover password.",
     "failed": "Registration failed",
     "password": "Password",
-    "password_help": "Minimum 8 characters, at least one uppercase letter, one lowercase letter and one number.",
+    "password_help": "The password must meet the following requirements:",
     "confirm_password": "Confirm password",
     "confirm_password_help": "Type the same password to verify.",
     "button": "Sign up",
@@ -60,6 +58,7 @@
     "toggle_password": "Show/hide password",
     "terms_and_conditions": "I accept the <url>terms and conditions</url>",
     "terms_and_conditions_help": "By creating an account, you agree to our terms and conditions.",
+    "terms_and_conditions_link_title": "Open modal dialog with terms and conditions",
     "strength": {
       "weak": "The password is weak, try adding more characters.",
       "fair": "The password is fair, try adding more characters.",
@@ -127,8 +126,9 @@
     "throttle": {
       "wait": "Please wait {{seconds}} seconds before trying again.",
       "blocked": "Too many attempts. Try again in {{minutes}} minutes.",
-      "rate_limit_exceeded": "Rate limit exceeded. Please try again later.",
-      "attempts_remaining": "You have {{count}} attempts remaining before being temporarily blocked."
+      "rate_limit_exceeded": "Rate limit exceeded. Try again later.",
+      "attempts_remaining": "You have {{count}} attempts remaining before being temporarily blocked.",
+      "server_blocked": "The server has detected too many attempts. Please wait before trying again."
     }
   },
   "session": {
@@ -202,14 +202,46 @@
   },
   "reset": {
     "title": "Reset password",
+    "processing": {
+      "title": "Validating link...",
+      "message": "Please wait while we verify your reset link."
+    },
     "email_sent": "If your email exists, you will receive a password reset email.",
+    "success": {
+      "title": "Password updated!",
+      "message": "Your password has been successfully changed. You can now log in with your new password.",
+      "login": "Go to login"
+    },
+    "error": {
+      "title": "Invalid reset link",
+      "message": "The reset link you used is not valid. This could be because:",
+      "reasons": {
+        "invalid": "• The link is malformed or corrupted",
+        "expired": "• The link has expired (they are valid for 15 minutes)",
+        "already_used": "• The link was already used previously",
+        "wrong_user": "• The link doesn't correspond to your account"
+      },
+      "solutions": "To fix this:",
+      "solution_retry": "• Request a new reset link",
+      "solution_contact": "• If the problem persists, contact support",
+      "retry": "New link"
+    },
+    "expired": {
+      "title": "Reset link expired",
+      "message": "The reset link has expired. Reset links are valid for 15 minutes for security.",
+      "retry": "Request new link"
+    },
     "failed": "Password reset failed",
-    "success": "Password updated. Redirecting...",
     "password": "New password",
     "confirm_password": "Confirm new password",
+    "confirm_password_help": "Must match the password above.",
     "submit": "Update password",
     "saving": "Updating...",
     "invalid_token": "The reset link is invalid or has expired."
+  },
+  "resetPasswordSent": {
+    "email_sent_title": "Link sent",
+    "email_sent_message": "If your email exists in our system, you will receive an email with a link to reset your password. Check your inbox and follow the instructions."
   },
   "not_found": {
     "title": "Page not found",

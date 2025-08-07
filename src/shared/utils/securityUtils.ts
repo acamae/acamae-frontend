@@ -345,6 +345,24 @@ class SecurityThrottleService {
     // Return the remaining attempts
     return Math.max(Number(finalConfig.maxAttempts) - state.attemptCount, 0);
   }
+
+  /**
+   * Manually record an action (useful when server returns throttling error)
+   */
+  recordAction(actionId: string, config?: Partial<ThrottleConfig>): void {
+    const finalConfig = { ...this.defaultConfig, ...config };
+    const now = Date.now();
+    const state = this.throttleStates.get(actionId);
+
+    if (!state) {
+      // Create new state with attempt count
+      const newState = this.createNewState(now);
+      this.updateStateAndPersist(actionId, newState, now, finalConfig);
+    } else {
+      // Update existing state
+      this.updateStateAndPersist(actionId, state, now, finalConfig);
+    }
+  }
 }
 
 // Export the class for testing

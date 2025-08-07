@@ -37,8 +37,8 @@ describe('RegisterUseCase', () => {
     mockAuthRepository.register.mockResolvedValue({
       success: true,
       data: null,
-      message: 'User registered successfully',
       status: 201,
+      message: 'User registered successfully',
       code: ApiSuccessCodes.SUCCESS,
       timestamp: new Date().toISOString(),
       requestId: 'req_register_123',
@@ -50,8 +50,8 @@ describe('RegisterUseCase', () => {
     expect(result).toEqual({
       success: true,
       data: null,
+      status: expect.any(Number),
       message: 'User registered successfully',
-      status: 201,
       code: ApiSuccessCodes.SUCCESS,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -70,8 +70,8 @@ describe('RegisterUseCase', () => {
     mockAuthRepository.register.mockResolvedValue({
       success: false,
       data: null,
-      message: 'Email already exists',
       status: 400,
+      message: 'Email already exists',
       code: ApiErrorCodes.VALIDATION_ERROR,
       timestamp: new Date().toISOString(),
       requestId: 'req_register_456',
@@ -83,8 +83,8 @@ describe('RegisterUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       message: 'Email already exists',
-      status: 400,
       code: ApiErrorCodes.VALIDATION_ERROR,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -103,8 +103,8 @@ describe('RegisterUseCase', () => {
     mockAuthRepository.register.mockResolvedValue({
       success: false,
       data: null,
-      message: 'Database error occurred during registration',
       status: 500,
+      message: 'Database error occurred during registration',
       code: ApiErrorCodes.DATABASE_ERROR,
       timestamp: new Date().toISOString(),
       requestId: 'req_register_789',
@@ -116,8 +116,8 @@ describe('RegisterUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       message: 'Database error occurred during registration',
-      status: 500,
       code: ApiErrorCodes.DATABASE_ERROR,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -136,8 +136,8 @@ describe('RegisterUseCase', () => {
     mockAuthRepository.register.mockResolvedValue({
       success: false,
       data: null,
-      message: 'Email verification required',
       status: 403,
+      message: 'Email verification required',
       code: ApiErrorCodes.EMAIL_NOT_VERIFIED,
       timestamp: new Date().toISOString(),
       requestId: 'req_register_abc',
@@ -149,8 +149,8 @@ describe('RegisterUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       message: 'Email verification required',
-      status: 403,
       code: ApiErrorCodes.EMAIL_NOT_VERIFIED,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -176,8 +176,8 @@ describe('RegisterUseCase', () => {
       mockAuthRepository.register.mockResolvedValue({
         success: false,
         data: null,
+        status: 400,
         message: `Registration error: ${code}`,
-        status: 500,
         code,
         timestamp: new Date().toISOString(),
         requestId: `req_register_${code}`,

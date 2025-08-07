@@ -213,18 +213,16 @@ describe('Register Form - Accessibility and Usability', () => {
     it('should have accessible descriptions for complex fields', () => {
       // Verify that password has description of requirements
       cy.get('[data-testid="register-form-password-input"]').should(
-        'satisfy',
-        (element: JQuery<HTMLElement>) => {
-          return element.attr('aria-describedby') || element.attr('aria-label');
-        }
+        'have.attr',
+        'aria-describedby'
       );
 
       // Verify that help text is visible
-      cy.get('body')
-        .should('contain.text', '8 caracteres')
-        .and('contain.text', 'mayúscula')
-        .and('contain.text', 'minúscula')
-        .and('contain.text', 'número');
+      cy.get('[data-testid="password-strength-meter"]')
+        .should('contain.text', esES.register.password_requirements.length)
+        .and('contain.text', esES.register.password_requirements.uppercase)
+        .and('contain.text', esES.register.password_requirements.lowercase)
+        .and('contain.text', esES.register.password_requirements.digit);
     });
 
     it('should announce dynamic changes with aria-live', () => {

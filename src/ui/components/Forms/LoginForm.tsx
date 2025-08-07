@@ -10,7 +10,11 @@ import { APP_ROUTES } from '@shared/constants/appRoutes';
 import { useAuth } from '@ui/hooks/useAuth';
 import { useForm } from '@ui/hooks/useForm';
 
-const LoginForm: React.FC = () => {
+interface LoginFormProps {
+  onSuccess?: () => void;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const { t } = useTranslation();
   const { login, loading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
@@ -45,6 +49,7 @@ const LoginForm: React.FC = () => {
     timeUntilNextSubmission,
     remainingAttempts,
     hasValidationErrors,
+    activateThrottle,
   } = useForm<LoginFormData>({
     initialValues: {
       email: '',
@@ -52,7 +57,22 @@ const LoginForm: React.FC = () => {
     },
     validate,
     onSubmit: async (data: LoginPayload) => {
-      await login(data);
+      try {
+        await login(data).unwrap();
+        if (onSuccess) onSuccess();
+      } catch (error) {
+        // El feedbackMiddleware mostrará el toast de error
+        // Aquí puedes hacer lógica adicional si lo necesitas
+        if (
+          activateThrottle &&
+          error &&
+          typeof error === 'object' &&
+          'status' in error &&
+          (error as { status: unknown }).status === 429
+        ) {
+          activateThrottle();
+        }
+      }
     },
     enableThrottling: true,
     formName: 'login-form',
@@ -89,9 +109,6 @@ const LoginForm: React.FC = () => {
           aria-errormessage="login-form-email-error"
           data-testid="login-form-email-input"
         />
-        <Form.Text className="text-muted" data-testid="login-form-email-help">
-          {t('login.email_help')}
-        </Form.Text>
         <Form.Control.Feedback
           type="invalid"
           aria-live="polite"
@@ -131,9 +148,6 @@ const LoginForm: React.FC = () => {
             <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
           </Button>
         </InputGroup>
-        <Form.Text className="text-muted" data-testid="login-form-password-help">
-          {t('login.password_help')}
-        </Form.Text>
         <Form.Control.Feedback
           type="invalid"
           aria-live="polite"
@@ -171,6 +185,9 @@ const LoginForm: React.FC = () => {
       <div className="text-center text-inverse text-opacity-50">
         {t('login.no_account')} <Link to={APP_ROUTES.REGISTER}>{t('login.sign_up')}</Link>{' '}
         {t('login.no_account_suffix')}
+      </div>
+      <div className="text-center text-inverse text-opacity-50 mt-3">
+        <Link to={APP_ROUTES.FORGOT_PASSWORD}>{t('login.forgot')}</Link>
       </div>
     </Form>
   );

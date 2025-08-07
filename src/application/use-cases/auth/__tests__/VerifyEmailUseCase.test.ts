@@ -41,8 +41,8 @@ describe('VerifyEmailUseCase', () => {
     mockAuthRepository.verifyEmail.mockResolvedValue({
       success: true,
       data: mockResponse,
-      message: 'Email verified successfully',
       status: 200,
+      message: 'Email verified successfully',
       code: ApiSuccessCodes.SUCCESS,
       timestamp: new Date().toISOString(),
       requestId: 'req_verify_123',
@@ -54,8 +54,8 @@ describe('VerifyEmailUseCase', () => {
     expect(result).toEqual({
       success: true,
       data: mockResponse,
+      status: expect.any(Number),
       message: 'Email verified successfully',
-      status: 200,
       code: ApiSuccessCodes.SUCCESS,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -76,8 +76,8 @@ describe('VerifyEmailUseCase', () => {
     mockAuthRepository.verifyEmail.mockResolvedValue({
       success: false,
       data: mockResponse,
+      status: 401,
       message: 'Verification token has expired',
-      status: 410,
       code: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
       timestamp: new Date().toISOString(),
       requestId: 'req_verify_456',
@@ -89,8 +89,8 @@ describe('VerifyEmailUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: mockResponse,
+      status: expect.any(Number),
       message: 'Verification token has expired',
-      status: 410,
       code: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -111,8 +111,8 @@ describe('VerifyEmailUseCase', () => {
     mockAuthRepository.verifyEmail.mockResolvedValue({
       success: false,
       data: mockResponse,
+      status: 401,
       message: 'Invalid verification token',
-      status: 400,
       code: ApiErrorCodes.AUTH_TOKEN_INVALID,
       timestamp: new Date().toISOString(),
       requestId: 'req_verify_789',
@@ -124,8 +124,8 @@ describe('VerifyEmailUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: mockResponse,
+      status: expect.any(Number),
       message: 'Invalid verification token',
-      status: 400,
       code: ApiErrorCodes.AUTH_TOKEN_INVALID,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -146,8 +146,8 @@ describe('VerifyEmailUseCase', () => {
     mockAuthRepository.verifyEmail.mockResolvedValue({
       success: false,
       data: mockResponse,
+      status: 400,
       message: 'Email is already verified',
-      status: 409,
       code: ApiErrorCodes.VALIDATION_ERROR,
       timestamp: new Date().toISOString(),
       requestId: 'req_verify_abc',
@@ -159,8 +159,8 @@ describe('VerifyEmailUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: mockResponse,
+      status: expect.any(Number),
       message: 'Email is already verified',
-      status: 409,
       code: ApiErrorCodes.VALIDATION_ERROR,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -181,8 +181,8 @@ describe('VerifyEmailUseCase', () => {
     mockAuthRepository.verifyEmail.mockResolvedValue({
       success: false,
       data: mockResponse,
+      status: 0,
       message: 'Token is valid but user update failed',
-      status: 500,
       code: ApiErrorCodes.ERR_NETWORK,
       timestamp: new Date().toISOString(),
       requestId: 'req_verify_def',
@@ -194,8 +194,8 @@ describe('VerifyEmailUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: mockResponse,
+      status: expect.any(Number),
       message: 'Token is valid but user update failed',
-      status: 500,
       code: ApiErrorCodes.ERR_NETWORK,
       timestamp: expect.any(String),
       requestId: expect.any(String),

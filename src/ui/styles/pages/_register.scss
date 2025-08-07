@@ -1,7 +1,10 @@
 .login,
 .register,
+.reset-password,
+.reset-password-sent,
 .email-verification,
-.email-verification-resend {
+.email-verification-resend,
+.forgot-password {
   min-height: calc(100vh - $app-header-height - $app-footer-height);
   padding: $spacer * 3 $spacer;
   display: flex;
@@ -13,8 +16,11 @@
 
   & .login-content,
   & .register-content,
+  & .reset-password-content,
+  & .reset-password-sent-content,
   & .email-verification-content,
-  & .email-verification-resend-content {
+  & .email-verification-resend-content,
+  & .forgot-password-content {
     flex: 1;
     max-width: rem(360px);
     margin: 0 auto;
@@ -22,7 +28,11 @@
   }
 
   & .email-verification-icon,
-  & .email-verification-resend-icon {
+  & .email-verification-resend-icon,
+  & .reset-password-icon,
+  & .reset-password-success-icon,
+  & .reset-password-error-icon,
+  & .reset-password-sent-icon {
     font-size: rem(64px);
   }
 

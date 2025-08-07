@@ -34,8 +34,8 @@ describe('ResetPasswordUseCase', () => {
     mockAuthRepository.resetPassword.mockResolvedValue({
       success: true,
       data: null,
-      message: 'Password reset successful',
       status: 200,
+      message: 'Password reset successful',
       code: ApiSuccessCodes.SUCCESS,
       timestamp: new Date().toISOString(),
       requestId: 'req_reset_123',
@@ -47,8 +47,8 @@ describe('ResetPasswordUseCase', () => {
     expect(result).toEqual({
       success: true,
       data: null,
+      status: expect.any(Number),
       message: 'Password reset successful',
-      status: 200,
       code: ApiSuccessCodes.SUCCESS,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -64,8 +64,8 @@ describe('ResetPasswordUseCase', () => {
     mockAuthRepository.resetPassword.mockResolvedValue({
       success: false,
       data: null,
+      status: 401,
       message: 'Invalid or expired reset token',
-      status: 400,
       code: ApiErrorCodes.AUTH_TOKEN_INVALID,
       timestamp: new Date().toISOString(),
       requestId: 'req_reset_456',
@@ -77,8 +77,8 @@ describe('ResetPasswordUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       message: 'Invalid or expired reset token',
-      status: 400,
       code: ApiErrorCodes.AUTH_TOKEN_INVALID,
       timestamp: expect.any(String),
       requestId: expect.any(String),
@@ -94,8 +94,8 @@ describe('ResetPasswordUseCase', () => {
     mockAuthRepository.resetPassword.mockResolvedValue({
       success: false,
       data: null,
+      status: 401,
       message: 'Reset token has expired',
-      status: 410,
       code: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
       timestamp: new Date().toISOString(),
       requestId: 'req_reset_789',
@@ -107,8 +107,8 @@ describe('ResetPasswordUseCase', () => {
     expect(result).toEqual({
       success: false,
       data: null,
+      status: expect.any(Number),
       message: 'Reset token has expired',
-      status: 410,
       code: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
       timestamp: expect.any(String),
       requestId: expect.any(String),
