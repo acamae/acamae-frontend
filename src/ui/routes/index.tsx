@@ -112,7 +112,7 @@ const buildPrivateRoutes = () => {
   return [
     createPrivateRoute(privateRoutesRelative.DASHBOARD, DashboardPage),
     createPrivateRoute(privateRoutesRelative.PROFILE, UserProfilePage),
-    createPrivateRoute(privateRoutesRelative.TEAMS, TeamsPage, [USER_ROLES.ADMIN]),
+    createPrivateRoute(privateRoutesRelative.TEAMS, TeamsPage),
     createPrivateRoute(privateRoutesRelative.TOURNAMENTS, TournamentsPage, [USER_ROLES.ADMIN]),
     createPrivateRoute(privateRoutesRelative.USERS, UsersPage, [USER_ROLES.ADMIN]),
   ];
