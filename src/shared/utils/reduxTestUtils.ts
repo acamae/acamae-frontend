@@ -31,7 +31,7 @@ export function makeTestStore(preloadedState?: Partial<RootState>) {
       },
       preferences: {
         ...initialPreferencesState,
-        ...(preloadedState?.preferences as unknown),
+        ...((preloadedState?.preferences ?? {}) as object),
       },
     } as RootState,
     middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false }),

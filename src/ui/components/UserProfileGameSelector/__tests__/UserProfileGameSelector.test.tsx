@@ -85,6 +85,7 @@ describe('UserProfileGameSelector', () => {
     });
     // Mock thunk dispatch to simulate server success returning ['lol']
     const originalDispatch: typeof store.dispatch = store.dispatch;
+
     jest.spyOn(store, 'dispatch').mockImplementation(action => {
       if (typeof action === 'function') {
         return Promise.resolve({
@@ -92,6 +93,7 @@ describe('UserProfileGameSelector', () => {
           payload: { data: { games: [{ code: 'lol' }] } },
         });
       }
+
       return (originalDispatch as unknown)(action as unknown);
     });
 
