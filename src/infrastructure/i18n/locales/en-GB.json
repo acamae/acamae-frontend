@@ -6,7 +6,8 @@
     "processing": "Processing...",
     "required": "required",
     "required_asterisk": "Required fields are marked with an asterisk (<abbr>*</abbr>)",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "edit": "Edit"
   },
   "home": {
     "title": "Welcome to eSports Management",
@@ -76,12 +77,148 @@
     "success": "Registration successful",
     "welcome": "You can now log in!"
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Welcome. This is your private area.",
+    "menu_label": "Dashboard",
+    "cards": {
+      "messages": {
+        "title": "Messages",
+        "total": "Total messages"
+      }
+    }
+  },
+  "user-profile": {
+    "title": "User profile",
+    "description": "Manage your user profile",
+    "menu_label": "Profile",
+    "account": "Account",
+    "account-description": "Manage your account",
+    "games": {
+      "title": "Games",
+      "description": "What do you like to play?",
+      "list": {
+        "bf": {
+          "title": "Battlefield"
+        },
+        "cod": {
+          "title": "Call of Duty"
+        },
+        "csgo": {
+          "title": "Counter-Strike: Global Offensive"
+        },
+        "dota": {
+          "title": "Dota 2"
+        },
+        "fc": {
+          "title": "Fortnite"
+        },
+        "fortnite": {
+          "title": "Fortnite"
+        },
+        "gta": {
+          "title": "Grand Theft Auto V"
+        },
+        "lol": {
+          "title": "League of Legends"
+        },
+        "marvelrivals": {
+          "title": "Marvel Rivals"
+        },
+        "minecraft": {
+          "title": "Minecraft"
+        },
+        "overwatch": {
+          "title": "Overwatch"
+        },
+        "poe": {
+          "title": "Path of Exile"
+        },
+        "projectzomboid": {
+          "title": "Project Zomboid"
+        },
+        "pubg": {
+          "title": "PUBG: Battlegrounds"
+        },
+        "roblox": {
+          "title": "Roblox"
+        },
+        "rocketleague": {
+          "title": "Rocket League"
+        },
+        "rust": {
+          "title": "Rust"
+        },
+        "tft": {
+          "title": "Teamfight Tactics"
+        },
+        "valorant": {
+          "title": "Valorant"
+        },
+        "wow": {
+          "title": "World of Warcraft"
+        }
+      },
+      "warning_missing": "Your profile will not appear in search results until you select at least one game."
+    },
+    "timetable": {
+      "title": "Timetable",
+      "description": "What time do you usually connect to play?",
+      "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      }
+    },
+    "timezone": {
+      "select_placeholder": "Select a timezone",
+      "warning_missing": "Your profile will not appear in search results until you select your timezone."
+    }
+  },
+  "teams": {
+    "title": "Teams",
+    "description": "Manage your teams",
+    "menu_label": "Teams",
+    "list": {
+      "title": "Team list",
+      "description": "Manage your teams",
+      "menu_label": "Team list"
+    },
+    "create": {
+      "title": "Create team",
+      "description": "Create a new team",
+      "menu_label": "Create team"
+    },
+    "join": {
+      "title": "Join a team",
+      "description": "Join an existing team",
+      "menu_label": "Join a team"
+    }
+  },
+  "messages": {
+    "title": "Messages",
+    "description": "Manage your messages",
+    "menu_label": "Messages"
+  },
   "sessionTimeout": {
     "title": "Session about to expire",
     "body": "Your session will expire in <1>{{seconds}}</1> seconds.",
     "question": "Do you want to stay connected?",
     "logout": "Log out",
     "stayConnected": "Stay connected"
+  },
+  "error": {
+    "boundary": {
+      "title": "Something went wrong",
+      "message": "We encountered an unexpected error. Please try refreshing the page or going back.",
+      "reload": "Refresh page",
+      "back": "Go back",
+      "details": "Error details (development only)"
+    }
   },
   "errors": {
     "username": {
@@ -247,10 +384,6 @@
     "title": "Page not found",
     "message": "The page you are looking for does not exist.",
     "help_message": "Here are some helpful links instead:"
-  },
-  "dashboard": {
-    "title": "User dashboard",
-    "welcome_message": "Welcome. This is your private area."
   },
   "language": {
     "label": "Language selector",

@@ -35,26 +35,6 @@ const PrivateHeader: React.FC = () => {
       </div>
 
       <div className="menu">
-        <div className="menu-item">
-          <div className="menu-link">
-            <Link
-              to={APP_ROUTES.PROFILE}
-              className="btn btn-outline-light btn-sm"
-              data-testid="link-profile">
-              {t('nav.profile')}
-            </Link>
-          </div>
-        </div>
-        <div className="menu-item">
-          <div className="menu-link">
-            <Link
-              to={APP_ROUTES.TEAMS}
-              className="btn btn-outline-light btn-sm"
-              data-testid="link-teams">
-              {t('nav.teams')}
-            </Link>
-          </div>
-        </div>
         <div className="menu-item dropdown">
           <div className="menu-link">
             <LanguageSelector />

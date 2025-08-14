@@ -259,7 +259,7 @@ function getErrorMessage(error: AxiosError): string {
 export class AuthApiRepository implements IAuthRepository {
   async login(payload: LoginPayload): ApiPromise<User> {
     try {
-      const response = await api.post(API_ROUTES.AUTH.LOGIN, {
+      const response = await api.post(`${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}`, {
         ...payload,
       });
 
@@ -286,7 +286,7 @@ export class AuthApiRepository implements IAuthRepository {
 
   async register(payload: RegisterPayload): ApiPromise<void> {
     try {
-      const response = await api.post(API_ROUTES.AUTH.REGISTER, payload);
+      const response = await api.post(`${API_ROUTES.BASE}${API_ROUTES.AUTH.REGISTER}`, payload);
       return handleApiSuccess({
         response: {
           ...response,
@@ -303,7 +303,10 @@ export class AuthApiRepository implements IAuthRepository {
 
   async forgotPassword(payload: ForgotPasswordPayload): ApiPromise<void> {
     try {
-      const response = await api.post(API_ROUTES.AUTH.FORGOT_PASSWORD, payload);
+      const response = await api.post(
+        `${API_ROUTES.BASE}${API_ROUTES.AUTH.FORGOT_PASSWORD}`,
+        payload
+      );
       return handleApiSuccess({ response });
     } catch (error) {
       return handleApiError(error as AxiosError);
@@ -336,7 +339,7 @@ export class AuthApiRepository implements IAuthRepository {
 
   async logout(): ApiPromise<void> {
     try {
-      const response = await api.post(API_ROUTES.AUTH.LOGOUT, {
+      const response = await api.post(`${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGOUT}`, {
         refreshToken: tokenService.getRefreshToken(),
       });
 
@@ -350,7 +353,7 @@ export class AuthApiRepository implements IAuthRepository {
 
   async getCurrentUser(): ApiPromise<User> {
     try {
-      const response = await api.get(API_ROUTES.AUTH.ME);
+      const response = await api.get(`${API_ROUTES.BASE}${API_ROUTES.AUTH.ME}`);
       return handleApiSuccess({
         response: {
           ...response,
@@ -367,7 +370,7 @@ export class AuthApiRepository implements IAuthRepository {
 
   async findAll(): ApiPromise<User[]> {
     try {
-      const response = await api.get(API_ROUTES.USERS.GET_ALL);
+      const response = await api.get(`${API_ROUTES.BASE}${API_ROUTES.USERS.GET_ALL}`);
       return handleApiSuccess({
         response: {
           ...response,
@@ -431,7 +434,10 @@ export class AuthApiRepository implements IAuthRepository {
 
   async resendVerification(payload: ResendVerificationPayload): ApiPromise<void> {
     try {
-      const response = await api.post(API_ROUTES.AUTH.VERIFY_EMAIL_RESEND, payload);
+      const response = await api.post(
+        `${API_ROUTES.BASE}${API_ROUTES.AUTH.VERIFY_EMAIL_RESEND}`,
+        payload
+      );
       return handleApiSuccess({ response });
     } catch (error) {
       return handleApiError(error as AxiosError);

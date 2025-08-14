@@ -1,6 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import authReducer, { initialAuthState } from '@application/state/slices/authSlice';
+import preferencesReducer, {
+  initialPreferencesState,
+} from '@application/state/slices/preferencesSlice';
 import sessionTimerReducer from '@application/state/slices/sessionTimerSlice';
 import type { RootState } from '@domain/types/redux';
 import { SessionTimerState } from '@domain/types/sessionTimer';
@@ -15,6 +18,7 @@ export function makeTestStore(preloadedState?: Partial<RootState>) {
     reducer: {
       auth: authReducer,
       sessionTimer: sessionTimerReducer,
+      preferences: preferencesReducer,
     },
     preloadedState: {
       auth: {
@@ -24,6 +28,10 @@ export function makeTestStore(preloadedState?: Partial<RootState>) {
       sessionTimer: {
         ...initialSessionTimerState,
         ...preloadedState?.sessionTimer,
+      },
+      preferences: {
+        ...initialPreferencesState,
+        ...(preloadedState?.preferences as unknown),
       },
     } as RootState,
     middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false }),

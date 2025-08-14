@@ -47,7 +47,7 @@ const SessionTimeoutModal: React.FC = () => {
           {t('sessionTimeout.logout')}
         </Button>
         <Button
-          variant="primary"
+          variant="theme"
           onClick={() => {
             dispatch(resetTimer());
           }}>

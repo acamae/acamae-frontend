@@ -9,9 +9,9 @@ interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
 }
 
 const SESSION_RENEWAL_ENDPOINTS = [
-  API_ROUTES.AUTH.LOGIN,
-  API_ROUTES.AUTH.REFRESH_TOKEN,
-  API_ROUTES.AUTH.ME,
+  `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}`,
+  `${API_ROUTES.BASE}${API_ROUTES.AUTH.REFRESH_TOKEN}`,
+  `${API_ROUTES.BASE}${API_ROUTES.AUTH.ME}`,
 ];
 
 const api = axios.create({
@@ -100,6 +100,17 @@ api.interceptors.request.use(
     if (!token) {
       const store = getLazyStore() as StoreLike;
       token = store?.getState?.()?.auth?.token ?? null;
+    }
+
+    // Normalize URL to avoid double base prefix when both baseURL and path include API base (e.g. '/api/api')
+    const baseFromEnv = (process.env.REACT_APP_API_URL || '').replace(/\/+$/, '');
+    const apiBase = API_ROUTES.BASE; // '/api'
+    if (
+      typeof config.url === 'string' &&
+      baseFromEnv === apiBase &&
+      config.url.startsWith(apiBase)
+    ) {
+      config.url = config.url.slice(apiBase.length) || '/';
     }
 
     // Ensure headers exists and add Authorization only once
@@ -245,7 +256,7 @@ async function refreshToken(): Promise<TokensResponse | null> {
     const refreshToken = tokenService.getRefreshToken();
     if (!refreshToken) throw new Error('No refresh token');
 
-    const response = await api.post(API_ROUTES.AUTH.REFRESH_TOKEN, {
+    const response = await api.post(`${API_ROUTES.BASE}${API_ROUTES.AUTH.REFRESH_TOKEN}`, {
       refreshToken,
     });
 

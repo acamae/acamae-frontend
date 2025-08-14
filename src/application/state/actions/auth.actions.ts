@@ -17,7 +17,7 @@ import { API_ROUTES } from '@shared/constants/apiRoutes';
 
 // Async thunks using use cases
 export const loginAction = createAsyncThunk(
-  API_ROUTES.AUTH.LOGIN,
+  `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}`,
   async (payload: LoginPayload, { extra, rejectWithValue }) => {
     const { loginUseCase } = extra as { loginUseCase: LoginUseCase };
     try {
@@ -35,7 +35,7 @@ export const loginAction = createAsyncThunk(
 );
 
 export const registerAction = createAsyncThunk(
-  API_ROUTES.AUTH.REGISTER,
+  `${API_ROUTES.BASE}${API_ROUTES.AUTH.REGISTER}`,
   async (payload: RegisterPayload, { extra, rejectWithValue }) => {
     const { registerUseCase } = extra as { registerUseCase: RegisterUseCase };
     try {
@@ -53,7 +53,7 @@ export const registerAction = createAsyncThunk(
 );
 
 export const forgotPasswordAction = createAsyncThunk(
-  API_ROUTES.AUTH.FORGOT_PASSWORD,
+  `${API_ROUTES.BASE}${API_ROUTES.AUTH.FORGOT_PASSWORD}`,
   async (payload: ForgotPasswordPayload, { extra, rejectWithValue }) => {
     const { forgotPasswordUseCase } = extra as { forgotPasswordUseCase: ForgotPasswordUseCase };
     try {
@@ -71,7 +71,7 @@ export const forgotPasswordAction = createAsyncThunk(
 );
 
 export const resetPasswordAction = createAsyncThunk(
-  API_ROUTES.AUTH.RESET_PASSWORD,
+  `${API_ROUTES.BASE}${API_ROUTES.AUTH.RESET_PASSWORD}`,
   async (payload: ResetPasswordPayload, { extra, rejectWithValue }) => {
     const { resetPasswordUseCase } = extra as { resetPasswordUseCase: ResetPasswordUseCase };
     try {
@@ -89,7 +89,7 @@ export const resetPasswordAction = createAsyncThunk(
 );
 
 export const logoutAction = createAsyncThunk(
-  API_ROUTES.AUTH.LOGOUT,
+  `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGOUT}`,
   async (_, { extra, rejectWithValue }) => {
     const { logoutUseCase } = extra as { logoutUseCase: LogoutUseCase };
     try {
@@ -107,7 +107,7 @@ export const logoutAction = createAsyncThunk(
 );
 
 export const resendVerificationAction = createAsyncThunk(
-  API_ROUTES.AUTH.VERIFY_EMAIL_RESEND,
+  `${API_ROUTES.BASE}${API_ROUTES.AUTH.VERIFY_EMAIL_RESEND}`,
   async (payload: ResendVerificationPayload, { extra, rejectWithValue }) => {
     const { resendVerificationUseCase } = extra as {
       resendVerificationUseCase: ResendVerificationUseCase;

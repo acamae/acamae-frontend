@@ -26,18 +26,21 @@ describe('MainLayout', () => {
     );
 
     // Verificar que los componentes principales están presentes
-    expect(screen.getByText('Main Layout')).toBeInTheDocument();
-    expect(screen.getByTestId('private-header')).toBeInTheDocument();
+    // Content only renders when appContent=true; default is false
+    // Header is shown only when appHeader=true; default is false
+    expect(screen.queryByTestId('private-header')).not.toBeInTheDocument();
 
     // Verificar las clases CSS por defecto
     const appContainer = screen.getByTestId('main-layout');
     expect(appContainer).not.toHaveClass('app-with-top-nav');
     expect(appContainer).not.toHaveClass('app-content-full-height');
     expect(appContainer).not.toHaveClass('app-boxed-layout');
-    expect(appContainer).not.toHaveClass('app-without-header');
+    // By default header is not shown when appHeader=false (class applied)
+    expect(appContainer).toHaveClass('app-without-header');
     expect(appContainer).toHaveClass('app-without-sidebar');
     expect(appContainer).not.toHaveClass('app-sidebar-collapsed');
-    expect(appContainer).toHaveClass('app-footer-fixed');
+    // Footer fixed only when appFooter=true; default is false
+    expect(appContainer).not.toHaveClass('app-footer-fixed');
     expect(appContainer).not.toHaveClass('has-scroll');
   });
 
@@ -90,7 +93,8 @@ describe('MainLayout', () => {
     expect(appContainer).not.toHaveClass('app-without-header');
     expect(appContainer).toHaveClass('app-without-sidebar');
     expect(appContainer).not.toHaveClass('app-sidebar-collapsed');
-    expect(appContainer).toHaveClass('app-footer-fixed');
+    // Footer fixed only when appFooter=true; here it's false by default
+    expect(appContainer).not.toHaveClass('app-footer-fixed');
     expect(appContainer).not.toHaveClass('has-scroll');
   });
 

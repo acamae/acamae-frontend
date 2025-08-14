@@ -11,11 +11,31 @@ import { LogoutUseCase } from '@application/use-cases/auth/LogoutUseCase';
 import { RegisterUseCase } from '@application/use-cases/auth/RegisterUseCase';
 import { ResendVerificationUseCase } from '@application/use-cases/auth/ResendVerificationUseCase';
 import { ResetPasswordUseCase } from '@application/use-cases/auth/ResetPasswordUseCase';
+import {
+  GetUserAvailabilityUseCase,
+  PutUserAvailabilityUseCase,
+} from '@application/use-cases/preferences/AvailabilityUseCases';
+import { GetUserPublicProfileUseCase } from '@application/use-cases/preferences/GetUserPublicProfileUseCase';
+import { ListGamesUseCase } from '@application/use-cases/preferences/ListGamesUseCase';
+import { GetTimezonesCatalogUseCase } from '@application/use-cases/preferences/TimezonesUseCase';
+import {
+  AddUserGameUseCase,
+  GetUserGamesUseCase,
+  RemoveUserGameUseCase,
+} from '@application/use-cases/preferences/UserGamesUseCases';
 import { AuthApiRepository } from '@infrastructure/api/AuthApiRepository';
+import { AvailabilityApiRepository } from '@infrastructure/api/AvailabilityApiRepository';
+import { GameProfileApiRepository } from '@infrastructure/api/GameProfileApiRepository';
+import { GamesApiRepository } from '@infrastructure/api/GamesApiRepository';
+import { TimezonesApiRepository } from '@infrastructure/api/TimezonesApiRepository';
 import { configureAxiosService } from '@shared/services/axiosService';
 
 // Auth repository
 const authRepository = new AuthApiRepository();
+const gamesRepository = new GamesApiRepository();
+const gameProfileRepository = new GameProfileApiRepository();
+const availabilityRepository = new AvailabilityApiRepository();
+const timezoneRepository = new TimezonesApiRepository();
 
 // Use cases
 const loginUseCase = new LoginUseCase(authRepository);
@@ -24,6 +44,16 @@ const logoutUseCase = new LogoutUseCase(authRepository);
 const forgotPasswordUseCase = new ForgotPasswordUseCase(authRepository);
 const resetPasswordUseCase = new ResetPasswordUseCase(authRepository);
 const resendVerificationUseCase = new ResendVerificationUseCase(authRepository);
+
+// Preferences use cases
+const listGamesUseCase = new ListGamesUseCase(gamesRepository);
+const getUserPublicProfileUseCase = new GetUserPublicProfileUseCase();
+const getUserGamesUseCase = new GetUserGamesUseCase(gameProfileRepository);
+const addUserGameUseCase = new AddUserGameUseCase(gameProfileRepository);
+const removeUserGameUseCase = new RemoveUserGameUseCase(gameProfileRepository);
+const getUserAvailabilityUseCase = new GetUserAvailabilityUseCase(availabilityRepository);
+const putUserAvailabilityUseCase = new PutUserAvailabilityUseCase(availabilityRepository);
+const getTimezonesCatalogUseCase = new GetTimezonesCatalogUseCase(timezoneRepository);
 
 // Store
 export const store = configureStore({
@@ -44,6 +74,15 @@ export const store = configureStore({
           forgotPasswordUseCase,
           resetPasswordUseCase,
           resendVerificationUseCase,
+          // preferences
+          listGamesUseCase,
+          getUserPublicProfileUseCase,
+          getUserGamesUseCase,
+          addUserGameUseCase,
+          removeUserGameUseCase,
+          getUserAvailabilityUseCase,
+          putUserAvailabilityUseCase,
+          getTimezonesCatalogUseCase,
         },
       },
     })

@@ -73,7 +73,8 @@ jest.mock('axios', () => {
   const resOk: Array<(r: unknown) => unknown> = [];
   const resErr: Array<(e: unknown) => Promise<never>> = [];
 
-  const create = jest.fn(() => ({
+  // Shared instance used by axios.create() calls
+  const apiInstance = {
     interceptors: {
       request: {
         use: jest.fn((ok: (cfg: unknown) => unknown, err: (e: unknown) => unknown) => {
@@ -88,14 +89,26 @@ jest.mock('axios', () => {
         }),
       },
     },
-  }));
+    post: jest.fn(async () => ({ data: {} })),
+    get: jest.fn(async () => ({ data: {} })),
+    put: jest.fn(async () => ({ data: {} })),
+    delete: jest.fn(async () => ({ data: {} })),
+  } as unknown as {
+    interceptors: { request: { use: Function }; response: { use: Function } };
+    post: jest.Mock;
+    get: jest.Mock;
+    put: jest.Mock;
+    delete: jest.Mock;
+  };
+
+  const create = jest.fn(() => apiInstance);
 
   return {
     __esModule: true,
     default: { create },
     create,
     AxiosHeaders: jest.fn(),
-    __mock: { reqOk, reqErr, resOk, resErr },
+    __mock: { reqOk, reqErr, resOk, resErr, apiFn: apiInstance },
   };
 });
 
@@ -155,6 +168,7 @@ afterEach(() => {
   }
 });
 
+// Unified tests: edge branches, refresh success/concurrency, and core unit tests
 describe('axiosService unit tests', () => {
   it('should load the module and expose the instance', () => {
     jest.isolateModules(() => {
@@ -212,7 +226,9 @@ describe('axiosService unit tests', () => {
 
       const resetTimer = require('@application/state/slices/sessionTimerSlice').resetTimer;
 
-      const response: AxiosResponse = { config: { url: API_ROUTES.AUTH.LOGIN } };
+      const response: AxiosResponse = {
+        config: { url: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` },
+      };
       resOk[0](response);
       expect(storeMock.dispatch).toHaveBeenCalledWith(resetTimer());
 
@@ -319,7 +335,7 @@ describe('axiosService unit tests', () => {
 
       const error401: ExtendedError = {
         response: { status: 401 },
-        config: { url: API_ROUTES.AUTH.LOGIN },
+        config: { url: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` },
       };
 
       const { resErr } = getAxiosMock();
@@ -340,7 +356,9 @@ describe('axiosService unit tests', () => {
       const jsonSpy = jest.spyOn(JSON, 'parse').mockReturnValue(false as unknown);
       require('@shared/services/axiosService');
 
-      const res: AxiosResponse = { config: { url: API_ROUTES.AUTH.ME } } as AxiosResponse;
+      const res: AxiosResponse = {
+        config: { url: `${API_ROUTES.BASE}${API_ROUTES.AUTH.ME}` },
+      } as AxiosResponse;
       const { resOk } = getAxiosMock();
       resOk[0](res);
       expect(storeMock.dispatch).toHaveBeenCalledWith(resetTimer());
@@ -532,7 +550,7 @@ describe('axiosService unit tests', () => {
       const error401: ExtendedError = {
         response: { status: 401 },
         config: {
-          url: API_ROUTES.AUTH.LOGIN,
+          url: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}`,
           _retry: false,
           headers: {},
         },
@@ -783,6 +801,216 @@ describe('axiosService unit tests', () => {
   });
 });
 
+describe('Request interceptor edge case: missing store module', () => {
+  beforeEach(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
+  });
+
+  it('request interceptor should handle missing store (getLazyStore catch path)', () => {
+    jest.doMock('@application/state/store', () => {
+      throw new Error('Module not found');
+    });
+
+    const reqOk: Array<(c: unknown) => unknown> = [];
+    const reqErr: Array<(e: unknown) => unknown> = [];
+    const resOk: Array<(r: unknown) => unknown> = [];
+    const resErr: Array<(e: unknown) => Promise<unknown>> = [];
+
+    jest.doMock('axios', () => ({
+      __esModule: true,
+      default: {
+        create: jest.fn(() => ({
+          interceptors: {
+            request: {
+              use: (ok: (c: unknown) => unknown, err: (e: unknown) => unknown) => (
+                reqOk.push(ok),
+                reqErr.push(err)
+              ),
+            },
+            response: {
+              use: (ok: (r: unknown) => unknown, err: (e: unknown) => Promise<unknown>) => (
+                resOk.push(ok),
+                resErr.push(err)
+              ),
+            },
+          },
+        })),
+      },
+      create: jest.fn(),
+      AxiosHeaders: jest.fn(),
+      __mock: { reqOk, reqErr, resOk, resErr },
+    }));
+
+    require('@shared/services/axiosService');
+
+    const cfg = { headers: {} };
+    const result = reqOk[0](cfg);
+    expect(result).toBe(cfg);
+  });
+});
+
+// Refresh success merged
+describe('axiosService refresh token success flow (merged)', () => {
+  beforeEach(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
+  });
+
+  it('retries original request after successful token refresh', async () => {
+    const reqOk: Array<(c: unknown) => unknown> = [];
+    const reqErr: Array<(e: unknown) => unknown> = [];
+    const resOk: Array<(r: unknown) => unknown> = [];
+    const resErr: Array<(e: unknown) => Promise<unknown>> = [];
+
+    const apiFn = Object.assign(
+      jest.fn(async () => ({ status: 200 })),
+      {
+        interceptors: {
+          request: {
+            use: (ok: (c: unknown) => unknown, err: (e: unknown) => unknown) => (
+              reqOk.push(ok),
+              reqErr.push(err)
+            ),
+          },
+          response: {
+            use: (ok: (r: unknown) => unknown, err: (e: unknown) => Promise<unknown>) => (
+              resOk.push(ok),
+              resErr.push(err)
+            ),
+          },
+        },
+        post: jest.fn(async (url: string) => {
+          const { API_ROUTES } = await import('@shared/constants/apiRoutes');
+          if (url === `${API_ROUTES.BASE}${API_ROUTES.AUTH.REFRESH_TOKEN}`) {
+            return { data: { data: { accessToken: 'new-access', refreshToken: 'new-refresh' } } };
+          }
+          return { data: {} };
+        }),
+      }
+    );
+
+    jest.doMock('axios', () => ({
+      __esModule: true,
+      default: { create: jest.fn(() => apiFn) },
+      create: jest.fn(() => apiFn),
+      AxiosHeaders: jest.fn(),
+      __mock: { reqOk, reqErr, resOk, resErr, apiFn },
+    }));
+
+    const axiosModule = await import('axios');
+    const axios = axiosModule as unknown as {
+      __mock: {
+        resErr: Array<(e: unknown) => Promise<unknown>>;
+        apiFn: jest.Mock & { post: jest.Mock };
+      };
+    };
+
+    // Ensure refresh token is available
+    const { tokenService } = require('@infrastructure/storage/tokenService');
+    tokenService.getRefreshToken.mockReturnValue('refresh-token');
+
+    await import('@shared/services/axiosService');
+
+    const error401 = {
+      response: { status: 401 },
+      config: { url: '/api/protected', _retry: false, headers: {} as Record<string, string> },
+    };
+
+    await axios.__mock.resErr[0](error401).catch(() => {});
+    const { API_ROUTES } = await import('@shared/constants/apiRoutes');
+    expect(axios.__mock.apiFn.post).toHaveBeenCalledWith(
+      `${API_ROUTES.BASE}${API_ROUTES.AUTH.REFRESH_TOKEN}`,
+      expect.any(Object)
+    );
+    expect(axios.__mock.apiFn).toHaveBeenCalled();
+  });
+});
+
+// Refresh concurrency merged
+describe('axiosService refresh token concurrency (merged)', () => {
+  beforeEach(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
+  });
+
+  it('queues concurrent refresh attempts and performs only one refresh call', async () => {
+    const reqOk: Array<(c: unknown) => unknown> = [];
+    const reqErr: Array<(e: unknown) => unknown> = [];
+    const resOk: Array<(r: unknown) => unknown> = [];
+    const resErr: Array<(e: unknown) => Promise<unknown>> = [];
+
+    let resolveRefresh!: () => void;
+    const refreshPromise = new Promise<void>(resolve => {
+      resolveRefresh = resolve;
+    });
+
+    const apiFn = Object.assign(
+      jest.fn(async () => ({ status: 200 })),
+      {
+        interceptors: {
+          request: {
+            use: (ok: (c: unknown) => unknown, err: (e: unknown) => unknown) => (
+              reqOk.push(ok),
+              reqErr.push(err)
+            ),
+          },
+          response: {
+            use: (ok: (r: unknown) => unknown, err: (e: unknown) => Promise<unknown>) => (
+              resOk.push(ok),
+              resErr.push(err)
+            ),
+          },
+        },
+        post: jest.fn(async (url: string) => {
+          const { API_ROUTES } = await import('@shared/constants/apiRoutes');
+          if (url === `${API_ROUTES.BASE}${API_ROUTES.AUTH.REFRESH_TOKEN}`) {
+            await refreshPromise;
+            return { data: { data: { accessToken: 'newA', refreshToken: 'newR' } } };
+          }
+          return { data: {} };
+        }),
+      }
+    );
+
+    jest.doMock('axios', () => ({
+      __esModule: true,
+      default: { create: jest.fn(() => apiFn) },
+      create: jest.fn(() => apiFn),
+      AxiosHeaders: jest.fn(),
+      __mock: { reqOk, reqErr, resOk, resErr, apiFn },
+    }));
+
+    const axiosModule = await import('axios');
+    const axios = axiosModule as unknown as {
+      __mock: {
+        resErr: Array<(e: unknown) => Promise<unknown>>;
+        apiFn: jest.Mock & { post: jest.Mock };
+      };
+    };
+
+    // Ensure refresh token is available
+    const { tokenService } = require('@infrastructure/storage/tokenService');
+    tokenService.getRefreshToken.mockReturnValue('refresh-token');
+
+    await import('@shared/services/axiosService');
+
+    const error401 = {
+      response: { status: 401 },
+      config: { url: '/api/protected', _retry: false, headers: {} as Record<string, string> },
+    };
+
+    const p1 = axios.__mock.resErr[0](error401);
+    const p2 = axios.__mock.resErr[0](error401);
+
+    resolveRefresh();
+
+    const settled = await Promise.allSettled([p1, p2]);
+    expect(settled.length).toBe(2);
+    expect(axios.__mock.apiFn.post).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('Error Handling and Resilience', () => {
   beforeEach(() => {
     // Ensure axios service is loaded to register interceptors
@@ -847,7 +1075,7 @@ describe('Error Handling and Resilience', () => {
       const error401: ExtendedError = {
         response: { status: 401 },
         config: {
-          url: API_ROUTES.AUTH.LOGIN, // Session renewal endpoint
+          url: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}`, // Session renewal endpoint
           headers: {},
           _retry: true, // Already retried
         },
@@ -880,7 +1108,7 @@ describe('Analytics Configuration', () => {
     // Ensure we have interceptors registered
     if (resOk.length > 0) {
       const response = {
-        config: { url: API_ROUTES.AUTH.LOGIN },
+        config: { url: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` },
       } as AxiosResponse;
 
       // This should trigger the analytics branch
@@ -908,7 +1136,7 @@ describe('Analytics Configuration', () => {
 
       if (resOk.length > 0) {
         const response = {
-          config: { url: API_ROUTES.AUTH.LOGIN },
+          config: { url: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` },
         } as AxiosResponse;
 
         expect(() => resOk[0](response)).not.toThrow();
@@ -928,7 +1156,7 @@ describe('Analytics Configuration', () => {
 
     if (resOk.length > 0) {
       const response = {
-        config: { url: API_ROUTES.AUTH.LOGIN },
+        config: { url: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` },
       } as AxiosResponse;
 
       // Should not throw even with invalid JSON
@@ -1376,6 +1604,40 @@ describe('Additional branch coverage tests', () => {
     process.env.REACT_APP_ENABLE_ANALYTICS = originalEnv;
   });
 
+  it('normalizes URL when baseURL is /api to avoid double prefix', () => {
+    jest.isolateModules(() => {
+      const original = process.env.REACT_APP_API_URL;
+      process.env.REACT_APP_API_URL = '/api';
+
+      // Reload service to apply env
+      jest.resetModules();
+      require('@shared/services/axiosService');
+
+      const { reqOk } = getAxiosMock();
+      const cfg = { url: '/api/users/1', headers: {} } as { url: string; headers: unknown };
+      const result = (reqOk[0] as (c: unknown) => unknown)(cfg) as { url?: string };
+      expect(result?.url).toBe('/users/1');
+
+      process.env.REACT_APP_API_URL = original;
+    });
+  });
+
+  it('does not normalize when baseURL is not exactly /api', () => {
+    jest.isolateModules(() => {
+      const original = process.env.REACT_APP_API_URL;
+      process.env.REACT_APP_API_URL = 'https://example.test/api';
+
+      jest.resetModules();
+      require('@shared/services/axiosService');
+
+      const { reqOk } = getAxiosMock();
+      const cfg = { url: '/api/users/2', headers: {} } as { url: string; headers: unknown };
+      const result = (reqOk[0] as (c: unknown) => unknown)(cfg) as { url?: string };
+      expect(result?.url).toBe('/api/users/2');
+
+      process.env.REACT_APP_API_URL = original;
+    });
+  });
   it('should handle error stringification edge cases', () => {
     // Test different error types for safeStringifyError
     const { configureAxiosService } = require('@shared/services/axiosService');

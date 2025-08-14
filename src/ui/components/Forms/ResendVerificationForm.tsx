@@ -88,6 +88,7 @@ const ResendVerificationForm: React.FC = () => {
             aria-required="true"
             aria-errormessage="email-verification-resend-form-identifier-error"
             required
+            autoComplete="email"
             autoFocus
             data-testid="email-verification-resend-form-identifier-input"
           />

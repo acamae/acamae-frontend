@@ -11,6 +11,10 @@ import esTranslations from '@infrastructure/i18n/locales/es-ES.json';
 let consoleErrorSpy: jest.SpyInstance;
 let consoleWarnSpy: jest.SpyInstance;
 
+// Silenciar consola globalmente para evitar ruido en los tests
+consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation(query => ({
@@ -36,9 +40,6 @@ jest.mock('redux-persist', () => ({
 // La solución principal está en el hook useForm que proporciona valores por defecto cuando throttling está deshabilitado.
 
 beforeAll(async () => {
-  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-  consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-
   if (!i18n.hasResourceBundle('es-ES', 'translation')) {
     i18n.addResourceBundle('es-ES', 'translation', esTranslations, true, true);
   }
@@ -51,6 +52,12 @@ beforeAll(async () => {
 afterEach(() => {
   jest.clearAllMocks();
   jest.resetAllMocks();
+});
+
+beforeEach(() => {
+  // Re-aplicar mocks de consola porque Jest puede restaurarlos entre tests (restoreMocks)
+  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 });
 
 afterAll(() => {

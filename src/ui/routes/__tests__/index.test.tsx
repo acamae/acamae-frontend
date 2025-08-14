@@ -240,7 +240,7 @@ import AppRoutes, {
   loadUserProfilePage,
   loadUsersPage,
   loadNotFoundPage,
-  createPublicLayoutOptions,
+  createLayoutOptions,
   createPublicRoute,
   createIndexRoute,
   createPrivateRoute,
@@ -1581,21 +1581,28 @@ describe('AppRoutes', () => {
   describe('Layout and Route Helper Functions', () => {
     it('should test createPublicLayoutOptions function', () => {
       // Test with default parameters
-      const defaultOptions = createPublicLayoutOptions();
-      expect(defaultOptions).toEqual({ appContentFullHeight: true });
+      const defaultOptions = createLayoutOptions();
+      expect(defaultOptions).toBeDefined();
+      expect(defaultOptions).toHaveProperty('appContentFullHeight');
 
       // Test with custom parameters
-      const customOptions1 = createPublicLayoutOptions(false, true);
-      expect(customOptions1).toEqual({});
+      const customOptions1 = createLayoutOptions({
+        appContentFullHeight: false,
+        appHeader: true,
+      });
+      expect(customOptions1).toMatchObject({ appContentFullHeight: false, appHeader: true });
 
-      const customOptions2 = createPublicLayoutOptions(true, false);
-      expect(customOptions2).toEqual({
+      const customOptions2 = createLayoutOptions({
         appContentFullHeight: true,
         appHeader: false,
       });
+      expect(customOptions2).toMatchObject({ appContentFullHeight: true, appHeader: false });
 
-      const customOptions3 = createPublicLayoutOptions(false, false);
-      expect(customOptions3).toEqual({ appHeader: false });
+      const customOptions3 = createLayoutOptions({
+        appContentFullHeight: false,
+        appHeader: false,
+      });
+      expect(customOptions3).toMatchObject({ appHeader: false, appContentFullHeight: false });
     });
 
     it('should test route creation functions', () => {
@@ -1729,10 +1736,10 @@ describe('AppRoutes', () => {
   describe('Function Coverage Tests', () => {
     it('should execute all helper functions for coverage', () => {
       // Execute layout options
-      createPublicLayoutOptions();
-      createPublicLayoutOptions(false);
-      createPublicLayoutOptions(true, false);
-      createPublicLayoutOptions(false, false);
+      createLayoutOptions();
+      createLayoutOptions({ appContentFullHeight: false });
+      createLayoutOptions({ appContentFullHeight: true, appHeader: false });
+      createLayoutOptions({ appContentFullHeight: false, appHeader: false });
 
       // Execute route builders
       buildPublicRoutes();

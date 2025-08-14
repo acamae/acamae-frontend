@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { APP_ROUTES } from '@shared/constants/appRoutes';
-import { Card, CardBody } from '@ui/components/Card';
+import { Card, CardBody } from '@ui/components/Card/Card';
 
 const NotFoundPage: React.FC = () => {
   const { t } = useTranslation();
@@ -15,8 +15,8 @@ const NotFoundPage: React.FC = () => {
   };
 
   return (
-    <div className="error-page" data-testid="not-found-page">
-      <main className="error-page-content">
+    <div className="not-found-page" data-testid="not-found-page">
+      <main className="not-found-page-content">
         <Card className="mb-5 mx-auto">
           <CardBody>
             <Card>

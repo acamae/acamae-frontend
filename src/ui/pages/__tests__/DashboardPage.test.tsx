@@ -13,9 +13,10 @@ describe('DashboardPage', () => {
   it('should render the title and welcome message', () => {
     renderDashboardPage();
 
-    expect(screen.getByTestId('dashboard-title')).toHaveTextContent(i18n.t('dashboard.title'));
-    expect(screen.getByTestId('dashboard-welcome')).toHaveTextContent(
-      i18n.t('dashboard.welcome_message')
+    expect(screen.getByTestId('dashboard-page-title')).toHaveTextContent(i18n.t('dashboard.title'));
+    // El contenido actual muestra la descripción, no el welcome_message
+    expect(screen.getByTestId('dashboard-page-description')).toHaveTextContent(
+      i18n.t('dashboard.description')
     );
   });
 });

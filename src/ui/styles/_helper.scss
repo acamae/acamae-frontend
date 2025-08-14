@@ -496,9 +496,12 @@ $visibility-values: (none, initial);
   border-color: var(--#{$prefix}theme);
 
   &:hover,
+  &:focus,
+  &:active,
   &.active {
     background-color: var(--#{$prefix}theme);
     border-color: var(--#{$prefix}theme);
+    color: var(--#{$prefix}black);
   }
   &.disabled,
   &:disabled,
@@ -522,6 +525,16 @@ $visibility-values: (none, initial);
   &.active:focus,
   &:active:focus {
     @include box-shadow(0 0 0 0.25rem rgba(#{var(--#{$prefix}theme-rgb)}, 0.5));
+  }
+}
+.btn-theme {
+  color: var(--#{$prefix}black);
+
+  &:hover,
+  &:focus,
+  &:active,
+  &.active {
+    color: var(--#{$prefix}black);
   }
 }
 .nav-link {

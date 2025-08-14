@@ -59,7 +59,7 @@ function isApiError(obj: unknown): obj is { error?: { type?: string } } {
   );
 }
 
-fdescribe('AuthApiRepository', () => {
+describe('AuthApiRepository', () => {
   it('should login and map the response correctly', async () => {
     getMock().post.mockResolvedValue({
       data: {
@@ -85,7 +85,7 @@ fdescribe('AuthApiRepository', () => {
 
     const result = await repo.login({ email: 'a@b.com', password: '123456' });
 
-    expect(getMock().post).toHaveBeenCalledWith(API_ROUTES.AUTH.LOGIN, {
+    expect(getMock().post).toHaveBeenCalledWith(`${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}`, {
       email: 'a@b.com',
       password: '123456',
     });
@@ -99,7 +99,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGIN };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
     const response: ApiErrorResponse<null> = {
       status: 500,
       data: null,
@@ -140,7 +140,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.FORGOT_PASSWORD };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.FORGOT_PASSWORD}` };
 
     const error = new AxiosError('Network', 'ERR_NETWORK', config, request, {
       status: 0,
@@ -153,9 +153,12 @@ fdescribe('AuthApiRepository', () => {
 
     const result = await repo.forgotPassword({ email: 'a@b.com' });
 
-    expect(getMock().post).toHaveBeenCalledWith(API_ROUTES.AUTH.FORGOT_PASSWORD, {
-      email: 'a@b.com',
-    });
+    expect(getMock().post).toHaveBeenCalledWith(
+      `${API_ROUTES.BASE}${API_ROUTES.AUTH.FORGOT_PASSWORD}`,
+      {
+        email: 'a@b.com',
+      }
+    );
     expect(result).toEqual({
       success: false,
       data: null,
@@ -189,7 +192,7 @@ fdescribe('AuthApiRepository', () => {
       },
     });
     const result = await repo.register({ email: 'x@y.com', password: 'pwd', username: 'user' });
-    expect(getMock().post).toHaveBeenCalledWith(API_ROUTES.AUTH.REGISTER, {
+    expect(getMock().post).toHaveBeenCalledWith(`${API_ROUTES.BASE}${API_ROUTES.AUTH.REGISTER}`, {
       email: 'x@y.com',
       password: 'pwd',
       username: 'user',
@@ -210,7 +213,7 @@ fdescribe('AuthApiRepository', () => {
     });
     jest.spyOn(tokenService, 'getRefreshToken').mockReturnValue('mockRefresh');
     const result = await repo.logout();
-    expect(getMock().post).toHaveBeenCalledWith(API_ROUTES.AUTH.LOGOUT, {
+    expect(getMock().post).toHaveBeenCalledWith(`${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGOUT}`, {
       refreshToken: 'mockRefresh',
     });
     expect(result.success).toBe(true);
@@ -229,7 +232,7 @@ fdescribe('AuthApiRepository', () => {
       },
     });
     const result = await repo.findAll();
-    expect(getMock().get).toHaveBeenCalledWith(API_ROUTES.USERS.GET_ALL);
+    expect(getMock().get).toHaveBeenCalledWith(`${API_ROUTES.BASE}${API_ROUTES.USERS.GET_ALL}`);
     expect(result.success).toBe(true);
     expect(result.data?.length).toBe(1);
   });
@@ -261,7 +264,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.USERS.GET_ALL };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.USERS.GET_ALL}` };
     const response: ApiErrorResponse<null> = {
       status: 500,
       data: null,
@@ -298,7 +301,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.USERS.GET_BY_ID };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.USERS.GET_BY_ID}` };
 
     const error = new AxiosError('Network Error', 'ERR_NETWORK', config, request, {
       status: 0,
@@ -337,7 +340,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.USERS.GET_BY_ID };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.USERS.GET_BY_ID}` };
 
     const error = new AxiosError('Unknown Error', 'UNKNOWN_ERROR', config, request, {
       status: 0,
@@ -380,7 +383,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.USERS.GET_BY_ID };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.USERS.GET_BY_ID}` };
     const response: ApiErrorResponse<null> = {
       status: 500,
       data: null,
@@ -449,7 +452,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.USERS.UPDATE_BY_ID };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.USERS.UPDATE_BY_ID}` };
     const response: ApiErrorResponse<null> = {
       status: 500,
       data: null,
@@ -605,7 +608,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGOUT };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGOUT}` };
     const response: ApiErrorResponse<null> = {
       status: 500,
       data: null,
@@ -642,7 +645,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.USERS.GET_BY_ID };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.USERS.GET_BY_ID}` };
     const response: ApiErrorResponse<null> = {
       status: 500,
       data: null,
@@ -717,7 +720,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGIN };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
     const response: ApiErrorResponse<null> = {
       status: 500,
       data: null,
@@ -756,7 +759,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGIN };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
     const response: ApiErrorResponse<null> = {
       status: 500,
       data: null,
@@ -795,7 +798,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.REGISTER };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.REGISTER}` };
     const response: ApiErrorResponse<null> = {
       status: 500,
       success: false,
@@ -857,7 +860,7 @@ fdescribe('AuthApiRepository', () => {
       { code: 'DATABASE_ERROR', message: 'Database error occurred' },
     ];
 
-    const request = { path: API_ROUTES.AUTH.REGISTER };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.REGISTER}` };
 
     for (const errorInfo of errorCodes) {
       const dataResponse = {
@@ -890,7 +893,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGIN };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
 
     const networkError = new AxiosError('Network Error', 'ERR_NETWORK', config, request, {
       status: 0,
@@ -915,7 +918,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGIN };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
 
     const timeoutError = new AxiosError('Timeout', 'ETIMEDOUT', config, request, {
       status: 0,
@@ -939,7 +942,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGIN };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
 
     const canceledError = new AxiosError('Canceled', 'ERR_CANCELED', config, request, {
       status: 0,
@@ -964,7 +967,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGIN };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
 
     const abortedError = new AxiosError('Connection aborted', 'ECONNABORTED', config, request, {
       status: 0,
@@ -1000,7 +1003,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGIN };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
 
     const unknownError = new AxiosError('Unknown error', 'UNKNOWN_CODE', config, request, {
       status: 0,
@@ -1043,7 +1046,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGIN };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
     const response: ApiErrorResponse<null> = {
       status: 500,
       success: false,
@@ -1076,7 +1079,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGIN };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
     const response: ApiErrorResponse<null> = {
       status: 500,
       success: false,
@@ -1109,7 +1112,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGIN };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
     const response: ApiErrorResponse<null> = {
       status: 500,
       success: false,
@@ -1154,7 +1157,7 @@ fdescribe('AuthApiRepository', () => {
         url: 'https://localhost',
         headers,
       };
-      const request = { path: API_ROUTES.AUTH.LOGIN };
+      const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
       const response: ApiErrorResponse<null> = {
         status: 500,
         success: false,
@@ -1186,7 +1189,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGIN };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
     const response: ApiErrorResponse<null> = {
       status: 500,
       success: false,
@@ -1217,7 +1220,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGIN };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
     const response: ApiErrorResponse<null> = {
       status: 500,
       success: false,
@@ -1248,7 +1251,7 @@ fdescribe('AuthApiRepository', () => {
       url: 'https://localhost',
       headers,
     };
-    const request = { path: API_ROUTES.AUTH.LOGIN };
+    const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
 
     const error = new AxiosError(undefined, 'UNKNOWN_CODE', config, request, {
       status: 0,
@@ -1288,7 +1291,7 @@ fdescribe('AuthApiRepository', () => {
         url: 'https://localhost',
         headers,
       };
-      const request = { path: API_ROUTES.AUTH.LOGIN };
+      const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
       const response: ApiErrorResponse<null> = {
         status: 500,
         success: false,
@@ -1324,7 +1327,7 @@ fdescribe('AuthApiRepository', () => {
         url: 'https://localhost',
         headers,
       };
-      const request = { path: API_ROUTES.AUTH.LOGIN };
+      const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
 
       // Simulate multiple network failures
       const networkErrors = Array.from(
@@ -1380,7 +1383,7 @@ fdescribe('AuthApiRepository', () => {
         url: 'https://localhost',
         headers,
       };
-      const request = { path: API_ROUTES.AUTH.LOGIN };
+      const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
 
       // First attempt: Server error (500)
       const serverError = new AxiosError('Server Error', 'UNKNOWN_ERROR', config, request, {
@@ -1431,7 +1434,7 @@ fdescribe('AuthApiRepository', () => {
         url: 'https://localhost',
         headers,
       };
-      const request = { path: API_ROUTES.AUTH.LOGIN };
+      const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
 
       // Test with malformed response data
       const malformedError = new AxiosError(
@@ -1463,7 +1466,7 @@ fdescribe('AuthApiRepository', () => {
         url: 'https://localhost',
         headers,
       };
-      const request = { path: API_ROUTES.AUTH.LOGIN };
+      const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
 
       // Simulate timeout followed by successful retry
       const timeoutError = new AxiosError('Timeout Error', 'ETIMEDOUT', config, request, {
@@ -1517,7 +1520,7 @@ fdescribe('AuthApiRepository', () => {
         url: 'https://localhost',
         headers,
       };
-      const request = { path: API_ROUTES.AUTH.LOGIN };
+      const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
 
       // Simulate service degradation: 5 consecutive failures
       const failures = Array.from(
@@ -1587,7 +1590,7 @@ fdescribe('AuthApiRepository', () => {
         url: 'https://localhost',
         headers,
       };
-      const request = { path: API_ROUTES.AUTH.ME };
+      const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.ME}` };
 
       // Simulate expired token error
       const expiredTokenError = new AxiosError('Token Expired', 'TOKEN_EXPIRED', config, request, {
@@ -1633,7 +1636,7 @@ fdescribe('AuthApiRepository', () => {
         url: 'https://localhost',
         headers,
       };
-      const request = { path: API_ROUTES.AUTH.LOGIN };
+      const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGIN}` };
 
       // Simulate rate limiting error
       const rateLimitError = new AxiosError(
@@ -1695,7 +1698,7 @@ fdescribe('AuthApiRepository', () => {
         url: 'https://localhost',
         headers,
       };
-      const request = { path: API_ROUTES.AUTH.REGISTER };
+      const request = { path: `${API_ROUTES.BASE}${API_ROUTES.AUTH.REGISTER}` };
 
       // Simulate validation error with multiple field errors
       const validationError = new AxiosError(

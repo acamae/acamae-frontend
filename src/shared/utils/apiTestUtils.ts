@@ -136,5 +136,7 @@ export interface IPromiseMockParams {
 export type IPromiseMock = (params?: IPromiseMockParams) => jest.Mock;
 
 export const promiseMock: IPromiseMock = ({ error = null }: IPromiseMockParams = {}) => {
-  return jest.fn(() => Promise.resolve(error ? { message: error } : undefined));
+  return jest.fn(() => ({
+    unwrap: jest.fn(() => (error ? Promise.reject(new Error(error)) : Promise.resolve(undefined))),
+  }));
 };

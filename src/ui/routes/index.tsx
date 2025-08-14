@@ -2,7 +2,9 @@ import { lazy, Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import { USER_ROLES, type UserRole } from '@domain/constants/user';
+import { LayoutOptions } from '@domain/types/layoutOptions';
 import { PUBLIC_ROUTES, getPrivateRoutesRelative } from '@shared/constants/appRoutes';
+import { DEFAULT_LAYOUT_OPTIONS } from '@shared/constants/layoutOptions';
 import ErrorBoundary from '@ui/components/ErrorBoundary';
 import Loading from '@ui/components/Loading';
 import PrivateRoute from '@ui/components/PrivateRoute';
@@ -29,6 +31,7 @@ const loadResetPasswordExpiredPage = () => import('@ui/pages/ResetPasswordExpire
 const loadResetPasswordSentPage = () => import('@ui/pages/ResetPasswordSentPage');
 const loadTeamsPage = () => import('@ui/pages/TeamsPage');
 const loadTournamentsPage = () => import('@ui/pages/TournamentsPage');
+const loadMessagesPage = () => import('@ui/pages/MessagesPage');
 const loadUserProfilePage = () => import('@ui/pages/UserProfilePage');
 const loadUsersPage = () => import('@ui/pages/UsersPage');
 const loadNotFoundPage = () => import('@ui/pages/NotFoundPage');
@@ -53,14 +56,25 @@ const ResetPasswordExpiredPage = lazy(loadResetPasswordExpiredPage);
 const ResetPasswordSentPage = lazy(loadResetPasswordSentPage);
 const TeamsPage = lazy(loadTeamsPage);
 const TournamentsPage = lazy(loadTournamentsPage);
+const MessagesPage = lazy(loadMessagesPage);
 const UserProfilePage = lazy(loadUserProfilePage);
 const UsersPage = lazy(loadUsersPage);
 const NotFoundPage = lazy(loadNotFoundPage);
 
 // Helper functions for route configuration
-const createPublicLayoutOptions = (appContentFullHeight = true, appHeader = true) => ({
-  ...(appContentFullHeight && { appContentFullHeight }),
-  ...(appHeader === false && { appHeader: false }),
+const createLayoutOptions = (options: Partial<LayoutOptions> = {}) => ({
+  ...DEFAULT_LAYOUT_OPTIONS,
+  ...(options.appMode && { appMode: options.appMode }),
+  ...(options.appHeader && { appHeader: options.appHeader }),
+  ...(options.appSidebar && { appSidebar: options.appSidebar }),
+  ...(options.appSidebarCollapsed && { appSidebarCollapsed: options.appSidebarCollapsed }),
+  ...(options.appContent && { appContent: options.appContent }),
+  ...(options.appContentClass && { appContentClass: options.appContentClass }),
+  ...(options.appContentFullHeight && { appContentFullHeight: options.appContentFullHeight }),
+  ...(options.appBoxedLayout && { appBoxedLayout: options.appBoxedLayout }),
+  ...(options.appFooter && { appFooter: options.appFooter }),
+  ...(options.appTopNav && { appTopNav: options.appTopNav }),
+  ...(options.hasScroll && { hasScroll: options.hasScroll }),
 });
 
 const createPublicRoute = (path: string, Component: React.ComponentType) => ({
@@ -113,6 +127,7 @@ const buildPrivateRoutes = () => {
     createPrivateRoute(privateRoutesRelative.DASHBOARD, DashboardPage),
     createPrivateRoute(privateRoutesRelative.PROFILE, UserProfilePage),
     createPrivateRoute(privateRoutesRelative.TEAMS, TeamsPage),
+    createPrivateRoute(privateRoutesRelative.MESSAGES, MessagesPage),
     createPrivateRoute(privateRoutesRelative.TOURNAMENTS, TournamentsPage, [USER_ROLES.ADMIN]),
     createPrivateRoute(privateRoutesRelative.USERS, UsersPage, [USER_ROLES.ADMIN]),
   ];
@@ -126,19 +141,47 @@ const createRouter = () => {
   return createBrowserRouter([
     {
       path: '/',
-      element: <PublicLayout options={createPublicLayoutOptions(true, true)} />,
+      element: (
+        <PublicLayout
+          options={createLayoutOptions({
+            appContent: true,
+            appContentFullHeight: true,
+            appHeader: true,
+            appFooter: true,
+          })}
+        />
+      ),
       errorElement: <ErrorBoundary />,
       children: publicRoutes,
     },
     {
       path: '/app',
-      element: <MainLayout />,
+      element: (
+        <MainLayout
+          options={createLayoutOptions({
+            appContent: true,
+            appContentFullHeight: true,
+            appHeader: true,
+            appSidebar: true,
+            appFooter: true,
+          })}
+        />
+      ),
       errorElement: <ErrorBoundary />,
       children: privateRoutes,
     },
     {
       path: '*',
-      element: <PublicLayout options={createPublicLayoutOptions(true, false)} />,
+      element: (
+        <PublicLayout
+          options={createLayoutOptions({
+            appContent: true,
+            appContentFullHeight: true,
+            appHeader: true,
+            appFooter: true,
+          })}
+        />
+      ),
       errorElement: <ErrorBoundary />,
       children: [
         {
@@ -207,11 +250,11 @@ const executeAllLoaders = async () => {
 // Function to test all layout option combinations
 const testAllLayoutOptions = () => {
   const results = [];
-  results.push(createPublicLayoutOptions());
-  results.push(createPublicLayoutOptions(false));
-  results.push(createPublicLayoutOptions(true, false));
-  results.push(createPublicLayoutOptions(false, false));
-  results.push(createPublicLayoutOptions(true, true));
+  results.push(createLayoutOptions());
+  results.push(createLayoutOptions({ appContentFullHeight: false }));
+  results.push(createLayoutOptions({ appContentFullHeight: true, appHeader: false }));
+  results.push(createLayoutOptions({ appContentFullHeight: false, appHeader: false }));
+  results.push(createLayoutOptions({ appContentFullHeight: true, appHeader: true }));
   return results;
 };
 
@@ -325,7 +368,7 @@ export {
   loadUserProfilePage,
   loadUsersPage,
   loadNotFoundPage,
-  createPublicLayoutOptions,
+  createLayoutOptions,
   createPublicRoute,
   createIndexRoute,
   createPrivateRoute,

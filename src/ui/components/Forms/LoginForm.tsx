@@ -105,6 +105,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
           isInvalid={touched.email && !!errors.email}
           aria-invalid={touched.email && !!errors.email ? 'true' : 'false'}
           aria-required="true"
+          autoComplete="email"
           required
           aria-errormessage="login-form-email-error"
           data-testid="login-form-email-input"

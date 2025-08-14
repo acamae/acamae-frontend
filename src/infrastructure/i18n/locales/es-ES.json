@@ -6,7 +6,8 @@
     "processing": "Procesando...",
     "required": "requerido",
     "required_asterisk": "Los campos requeridos están marcados con un asterisco (<abbr>*</abbr>)",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "edit": "Editar"
   },
   "home": {
     "title": "Bienvenido a Gestión eSports",
@@ -76,12 +77,148 @@
     "success": "Registro completado correctamente",
     "welcome": "¡Ya puedes iniciar sesión!"
   },
+  "dashboard": {
+    "title": "Panel de control",
+    "description": "Bienvenido/a. Esta es tu área privada.",
+    "menu_label": "Panel de control",
+    "cards": {
+      "messages": {
+        "title": "Mensajes",
+        "total": "Total de mensajes"
+      }
+    }
+  },
+  "user-profile": {
+    "title": "Perfil de usuario",
+    "description": "Gestiona tu perfil de usuario",
+    "menu_label": "Perfil",
+    "account": "Cuenta",
+    "account-description": "Gestiona tu cuenta",
+    "games": {
+      "title": "Juegos",
+      "description": "¿A qué te gusta jugar?",
+      "list": {
+        "bf": {
+          "title": "Battlefield"
+        },
+        "cod": {
+          "title": "Call of Duty"
+        },
+        "csgo": {
+          "title": "Counter-Strike: Global Offensive"
+        },
+        "dota": {
+          "title": "Dota 2"
+        },
+        "fc": {
+          "title": "Fortnite"
+        },
+        "fortnite": {
+          "title": "Fortnite"
+        },
+        "gta": {
+          "title": "Grand Theft Auto V"
+        },
+        "lol": {
+          "title": "League of Legends"
+        },
+        "marvelrivals": {
+          "title": "Marvel Rivals"
+        },
+        "minecraft": {
+          "title": "Minecraft"
+        },
+        "overwatch": {
+          "title": "Overwatch"
+        },
+        "poe": {
+          "title": "Path of Exile"
+        },
+        "projectzomboid": {
+          "title": "Project Zomboid"
+        },
+        "pubg": {
+          "title": "PUBG: Battlegrounds"
+        },
+        "roblox": {
+          "title": "Roblox"
+        },
+        "rocketleague": {
+          "title": "Rocket League"
+        },
+        "rust": {
+          "title": "Rust"
+        },
+        "tft": {
+          "title": "Teamfight Tactics"
+        },
+        "valorant": {
+          "title": "Valorant"
+        },
+        "wow": {
+          "title": "World of Warcraft"
+        }
+      },
+      "warning_missing": "Tu perfil no aparecerá en los resultados de búsqueda hasta que selecciones al menos un juego."
+    },
+    "timetable": {
+      "title": "Horario",
+      "description": "¿A qué horas sueles conectarte para jugar?",
+      "days": {
+        "monday": "Lunes",
+        "tuesday": "Martes",
+        "wednesday": "Miércoles",
+        "thursday": "Jueves",
+        "friday": "Viernes",
+        "saturday": "Sábado",
+        "sunday": "Domingo"
+      }
+    },
+    "timezone": {
+      "select_placeholder": "Selecciona una zona horaria",
+      "warning_missing": "Tu perfil no aparecerá en los resultados de búsqueda hasta que selecciones tu zona horaria."
+    }
+  },
+  "teams": {
+    "title": "Equipos",
+    "description": "Gestiona tus equipos",
+    "menu_label": "Equipos",
+    "list": {
+      "title": "Listado de equipos",
+      "description": "Gestiona tus equipos",
+      "menu_label": "Listado de equipos"
+    },
+    "create": {
+      "title": "Crear equipo",
+      "description": "Crea un nuevo equipo",
+      "menu_label": "Crear equipo"
+    },
+    "join": {
+      "title": "Unirse a un equipo",
+      "description": "Unite a un equipo existente",
+      "menu_label": "Unirse a un equipo"
+    }
+  },
+  "messages": {
+    "title": "Mensajes",
+    "description": "Gestiona tus mensajes",
+    "menu_label": "Mensajes"
+  },
   "sessionTimeout": {
     "title": "Sesión a punto de expirar",
     "body": "Tu sesión caducará en <1>{{seconds}}</1> segundos.",
     "question": "¿Quieres seguir conectado?",
     "logout": "Cerrar sesión",
     "stayConnected": "Seguir conectado"
+  },
+  "error": {
+    "boundary": {
+      "title": "Algo salió mal",
+      "message": "Hemos encontrado un error inesperado. Por favor, intenta refrescar la página o volver atrás.",
+      "reload": "Refrescar página",
+      "back": "Volver atrás",
+      "details": "Detalles del error (solo desarrollo)"
+    }
   },
   "errors": {
     "username": {
@@ -247,10 +384,6 @@
     "help_message": "Aquí hay algunos enlaces útiles:",
     "back_to_home": "Volver al inicio",
     "go_back": "Volver"
-  },
-  "dashboard": {
-    "title": "Panel de usuario",
-    "welcome_message": "Bienvenido. Esta es tu área privada."
   },
   "language": {
     "label": "Selector de idioma",

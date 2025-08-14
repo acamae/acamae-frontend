@@ -76,7 +76,8 @@ export default [
       'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
 
       // Imports y exports
-      'no-duplicate-imports': 'error',
+      'no-duplicate-imports': 'off',
+      'import/no-duplicates': 'error',
       'import/order': [
         'error',
         {
@@ -101,18 +102,7 @@ export default [
         node: {
           extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs'],
         },
-        alias: {
-          map: [
-            ['@domain', resolve(__dirname, 'src/domain')],
-            ['@shared', resolve(__dirname, 'src/shared')],
-            ['@ui', resolve(__dirname, 'src/ui')],
-            ['@application', resolve(__dirname, 'src/application')],
-            ['@infrastructure', resolve(__dirname, 'src/infrastructure')],
-            ['@i18n', resolve(__dirname, 'src/infrastructure/i18n')],
-            ['@styles', resolve(__dirname, 'src/ui/styles')],
-          ],
-          extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
-        },
+        // rely on tsconfig paths; no extra alias resolver required
       },
     },
   },
@@ -183,18 +173,7 @@ export default [
         node: {
           extensions: ['.js', '.ts'],
         },
-        alias: {
-          map: [
-            ['@domain', resolve(__dirname, 'src/domain')],
-            ['@shared', resolve(__dirname, 'src/shared')],
-            ['@ui', resolve(__dirname, 'src/ui')],
-            ['@application', resolve(__dirname, 'src/application')],
-            ['@infrastructure', resolve(__dirname, 'src/infrastructure')],
-            ['@i18n', resolve(__dirname, 'src/infrastructure/i18n')],
-            ['@styles', resolve(__dirname, 'src/ui/styles')],
-          ],
-          extensions: ['.ts', '.js', '.json'],
-        },
+        // rely on tsconfig paths
       },
     },
   },

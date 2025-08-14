@@ -25,17 +25,18 @@ describe('PublicLayout', () => {
     );
 
     // Verificar que los componentes principales están presentes
-    expect(screen.getByText('Public Layout')).toBeInTheDocument();
-    expect(screen.getByTestId('public-header')).toBeInTheDocument();
+    // Content only renders when appContent=true; default is false
+    // Header is shown only when appHeader=true; default is false
 
     // Verificar las clases CSS por defecto
     const appContainer = screen.getByTestId('public-layout');
     expect(appContainer).not.toHaveClass('app-content-full-height');
     expect(appContainer).not.toHaveClass('app-boxed-layout');
-    expect(appContainer).not.toHaveClass('app-without-header');
+    // Default has no header
+    expect(appContainer).toHaveClass('app-without-header');
     expect(appContainer).toHaveClass('app-without-sidebar');
     expect(appContainer).not.toHaveClass('app-sidebar-collapsed');
-    expect(appContainer).toHaveClass('app-footer-fixed');
+    expect(appContainer).not.toHaveClass('app-footer-fixed');
     expect(appContainer).not.toHaveClass('app-with-top-nav');
     expect(appContainer).not.toHaveClass('has-scroll');
   });

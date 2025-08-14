@@ -1,5 +1,4 @@
 import React from 'react';
-import { Container } from 'react-bootstrap';
 import { Outlet } from 'react-router-dom';
 
 import { LayoutOptions } from '@domain/types/layoutOptions';
@@ -7,6 +6,7 @@ import { DEFAULT_LAYOUT_OPTIONS } from '@shared/constants/layoutOptions';
 import FeedbackInitializer from '@ui/components/FeedbackInitializer';
 import PrivateFooter from '@ui/components/PrivateFooter';
 import PrivateHeader from '@ui/components/PrivateHeader';
+import PrivateSidebar from '@ui/components/PrivateSidebar/PrivateSidebar';
 import SessionTimeoutModal from '@ui/components/SessionTimeoutModal/SessionTimeoutModal';
 import SessionTimerInitializer from '@ui/components/SessionTimerInitializer/SessionTimerInitializer';
 
@@ -36,11 +36,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ options = {} }) => {
         data-testid="main-layout">
         {LAYOUT_OPTIONS.appHeader && <PrivateHeader />}
         {/* LAYOUT_OPTIONS.appTopNav && (<PrivateTopNav />) */}
-        {/* LAYOUT_OPTIONS.appSidebar && (<PrivateSidebar />) */}
+        {LAYOUT_OPTIONS.appSidebar && <PrivateSidebar />}
         {LAYOUT_OPTIONS.appContent && (
-          <Container className={LAYOUT_OPTIONS.appContentClass} data-testid="main-layout-content">
+          <div className={LAYOUT_OPTIONS.appContentClass} data-testid="main-layout-content">
             <Outlet />
-          </Container>
+          </div>
         )}
         {LAYOUT_OPTIONS.appFooter && <PrivateFooter />}
       </div>

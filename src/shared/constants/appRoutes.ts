@@ -1,14 +1,16 @@
 // Rutas públicas (sin prefijo)
 export const PUBLIC_ROUTES = {
+  FORGOT_PASSWORD: '/forgot-password',
+  GAMES: '/games',
   HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',
-  FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password/:token',
   RESET_PASSWORD_SUCCESS: '/reset-password-success',
   RESET_PASSWORD_ERROR: '/reset-password-error',
   RESET_PASSWORD_EXPIRED: '/reset-password-expired',
   RESET_PASSWORD_SENT: '/reset-password-sent',
+  TIMEZONES: '/timezones',
   VERIFY_EMAIL: '/verify-email/:token',
   VERIFY_EMAIL_SENT: '/verify-email-sent',
   VERIFY_EMAIL_SUCCESS: '/verify-email-success',
@@ -22,8 +24,13 @@ export const PUBLIC_ROUTES = {
 // Rutas privadas (con prefijo /app)
 export const PRIVATE_ROUTES = {
   DASHBOARD: '/app/dashboard',
+  MESSAGES: '/app/messages',
+  MESSAGES_CREATE: '/app/messages/create',
+  MESSAGES_READ: '/app/messages/read',
   PROFILE: '/app/profile',
   TEAMS: '/app/teams',
+  TEAMS_CREATE: '/app/teams/create',
+  TEAMS_JOIN: '/app/teams/join',
   TOURNAMENTS: '/app/tournaments',
   USERS: '/app/users',
 } as const;
