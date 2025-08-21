@@ -1,4 +1,4 @@
-import { IAuthRepository } from '@domain/repositories/AuthRepository';
+import { IAuthRepository } from '@domain/repositories/auth/AuthRepository';
 import {
   ApiPromise,
   ResetTokenValidationResponse,

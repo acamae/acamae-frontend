@@ -2,14 +2,18 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Alert } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
+import { fetchGamesCatalogAction } from '@application/state/actions/catalogs.actions';
 import {
   addUserGameAction,
-  fetchGamesCatalogAction,
   removeUserGameAction,
-} from '@application/state/actions/preferences.actions';
+  getUserProfileAction,
+} from '@application/state/actions/profile.actions';
 import { useAppDispatch, useAppSelector } from '@application/state/hooks';
 // no direct API calls here; we rely on Redux actions and parent to load initial selection
-import { GAMES } from '@shared/constants/games';
+import {
+  applyGameToggleToProfile,
+  setSelectedGameIds,
+} from '@application/state/slices/profileSlice';
 import { useAuth } from '@ui/hooks/useAuth';
 
 type LegacyGamesPayload = { games: Array<{ code: string }> };
@@ -32,13 +36,7 @@ const isTogglePayload = (value: unknown): value is TogglePayload => {
   );
 };
 
-export const UserProfileGameSelector = ({
-  userSelectedGames,
-  setUserSelectedGames,
-}: {
-  userSelectedGames: string[];
-  setUserSelectedGames: (games: string[]) => void;
-}) => {
+export const UserProfileGameSelector = () => {
   const { t } = useTranslation();
   const assetsPath = '/assets/images/games/icons/';
   const assetsSize = 32;
@@ -47,49 +45,93 @@ export const UserProfileGameSelector = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [codeToId, setCodeToId] = useState<Record<string, number>>({});
   const dispatch = useAppDispatch();
-  const { gamesCatalog } = useAppSelector(state => state.preferences);
+  const { games } = useAppSelector(state => state.catalogs);
+  const { games: selectedIds, loading: profileLoading } = useAppSelector(state => state.profile);
 
-  const initializedRef = useRef(false);
+  const catalogLoadedRef = useRef(false);
+  const profileLoadedRef = useRef(false);
+
+  // Fetch games catalog
   useEffect(() => {
-    if (!userId || initializedRef.current) return;
-    initializedRef.current = true;
+    if (catalogLoadedRef.current) return;
+    if (games.length > 0) {
+      // Already in store, just build id map from store
+      const map: Record<string, number> = {};
+      for (const g of games as Array<{ id: string; code: string }>) {
+        const numericId = Number(g.id);
+        if (Number.isFinite(numericId)) {
+          map[g.code] = numericId;
+        }
+      }
+      setCodeToId(map);
+      catalogLoadedRef.current = true;
+      return;
+    }
+    catalogLoadedRef.current = true;
     const loadCatalog = async () => {
       setLoading(true);
       try {
-        // Evitar llamada si ya está en el store
-        const needsFetch = gamesCatalog.length === 0;
-        const res = needsFetch ? await dispatch(fetchGamesCatalogAction()) : null;
-        const payloadCatalog = (
-          res && fetchGamesCatalogAction.fulfilled.match(res) ? res.payload.data?.games : []
-        ) as Array<{
-          id?: number;
-          code: string;
-        }>;
-        const finalCatalog =
-          Array.isArray(payloadCatalog) && payloadCatalog.every(g => typeof g.id === 'number')
-            ? (payloadCatalog as Array<{ id: number; code: string }>)
-            : (gamesCatalog as Array<{ id: number; code: string }>);
-        const map: Record<string, number> = {};
-        for (const g of finalCatalog) map[g.code] = g.id;
-        setCodeToId(map);
+        const res = await dispatch(fetchGamesCatalogAction());
+        if (fetchGamesCatalogAction.fulfilled.match(res)) {
+          const payloadCatalog = (res.payload.data?.games || []) as Array<{
+            id?: string;
+            code: string;
+          }>;
+          const finalCatalog = (
+            Array.isArray(payloadCatalog) && payloadCatalog.every(g => typeof g.id === 'string')
+              ? payloadCatalog
+              : (games as Array<{ id: string; code: string }>)
+          ) as Array<{ id?: string; code: string }>;
+          const map: Record<string, number> = {};
+          for (const g of finalCatalog) {
+            const numericId = Number(g.id);
+            if (Number.isFinite(numericId)) {
+              map[g.code] = numericId;
+            }
+          }
+          setCodeToId(map);
+        }
       } finally {
         setLoading(false);
       }
     };
     void loadCatalog();
-  }, [userId, gamesCatalog.length]);
+  }, [userId, games.length]);
 
-  return GAMES.map(game => {
-    const isSelected = userSelectedGames.includes(game.value);
+  // Get user's games via public profile (canonical)
+  useEffect(() => {
+    if (!userId || profileLoadedRef.current) return;
+    profileLoadedRef.current = true;
+    const loadUserProfile = async () => {
+      setLoading(true);
+      try {
+        const res = await dispatch(getUserProfileAction({ userId }));
+        const payloadUserGames = getUserProfileAction.fulfilled.match(res)
+          ? (((res.payload as unknown as { data?: { games?: Array<{ id: number }> } }).data
+              ?.games as Array<{ id: number }>) ?? [])
+          : [];
+        const ids = payloadUserGames.map(g => Number(g.id)).filter(n => Number.isFinite(n));
+        if (ids.length) {
+          dispatch(setSelectedGameIds(ids));
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    void loadUserProfile();
+  }, [userId, profileLoading]);
+
+  // Render games
+  return games.map(game => {
+    const isSelected = selectedIds.includes(Number(game.id));
     const variant = isSelected ? 'theme active' : 'outline-theme';
 
     const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
       if (!userId) return;
-      const gameId =
-        codeToId[game.value] ??
-        (gamesCatalog.find(g => g.code === game.value)?.id as number | undefined);
+      const fallbackId = Number(games.find(g => g.code === game.code)?.id);
+      const gameId = codeToId[game.code] ?? (Number.isFinite(fallbackId) ? fallbackId : undefined);
       if (!gameId) return;
       try {
         setLoading(true);
@@ -106,7 +148,10 @@ export const UserProfileGameSelector = ({
               : undefined
             : undefined;
           if (Array.isArray(legacyGames)) {
-            setUserSelectedGames(legacyGames.map(g => g.code));
+            const ids = legacyGames
+              .map(g => Number(codeToId[g.code] ?? games.find(x => x.code === g.code)?.id))
+              .filter(n => Number.isFinite(n));
+            dispatch(setSelectedGameIds(ids));
             return;
           }
           const selected =
@@ -118,14 +163,11 @@ export const UserProfileGameSelector = ({
               ? res.payload.data.gameId
               : undefined;
           if (toggledGameId) {
-            const toggledCode = Object.entries(codeToId).find(
-              ([, id]) => id === toggledGameId
-            )?.[0];
+            const toggledCode =
+              Object.entries(codeToId).find(([, id]) => id === toggledGameId)?.[0] ||
+              (games.find(g => Number(g.id) === toggledGameId)?.code as string | undefined);
             if (toggledCode) {
-              const set = new Set(userSelectedGames);
-              if (selected) set.add(toggledCode);
-              else set.delete(toggledCode);
-              setUserSelectedGames(Array.from(set.values()));
+              dispatch(applyGameToggleToProfile({ gameId: toggledGameId, selected }));
             }
           }
         } else {
@@ -141,7 +183,10 @@ export const UserProfileGameSelector = ({
               : undefined
             : undefined;
           if (Array.isArray(legacyGames)) {
-            setUserSelectedGames(legacyGames.map(g => g.code));
+            const ids = legacyGames
+              .map(g => Number(codeToId[g.code] ?? games.find(x => x.code === g.code)?.id))
+              .filter(n => Number.isFinite(n));
+            dispatch(setSelectedGameIds(ids));
             return;
           }
           const selected =
@@ -153,14 +198,11 @@ export const UserProfileGameSelector = ({
               ? res.payload.data.gameId
               : undefined;
           if (toggledGameId) {
-            const toggledCode = Object.entries(codeToId).find(
-              ([, id]) => id === toggledGameId
-            )?.[0];
+            const toggledCode =
+              Object.entries(codeToId).find(([, id]) => id === toggledGameId)?.[0] ||
+              (games.find(g => Number(g.id) === toggledGameId)?.code as string | undefined);
             if (toggledCode) {
-              const set = new Set(userSelectedGames);
-              if (selected) set.add(toggledCode);
-              else set.delete(toggledCode);
-              setUserSelectedGames(Array.from(set.values()));
+              dispatch(applyGameToggleToProfile({ gameId: toggledGameId, selected }));
             }
           }
         }
@@ -173,21 +215,21 @@ export const UserProfileGameSelector = ({
 
     return (
       <Button
-        key={game.value}
+        key={game.code}
         variant={variant}
         className="mb-2 me-2 d-inline-flex align-items-center w-auto"
         onClick={handleClick}
         disabled={loading}
-        data-testid={`game-${game.value}`}>
+        data-testid={`game-${game.code}`}>
         <img
-          src={`${assetsPath}${game.asset}`}
-          alt={t(game.titleKey)}
+          src={`${assetsPath}${game.imageFilename}`}
+          alt={t(game.nameCode)}
           width={assetsSize}
           height={assetsSize}
           aria-hidden="true"
           role="presentation"
         />
-        <span className="ms-2">{t(game.titleKey)}</span>
+        <span className="ms-2">{t(game.nameCode)}</span>
       </Button>
     );
   });
@@ -196,26 +238,15 @@ export const UserProfileGameSelector = ({
   // Consumers should place this component inside a container capable of showing the alert below
 };
 
-export const UserProfileGameSelectorWithWarning = (props: {
-  userSelectedGames: string[];
-  setUserSelectedGames: (games: string[]) => void;
-}) => {
+export const UserProfileGameSelectorWithWarning = () => {
   const { t } = useTranslation();
-  const [selected, setSelected] = useState<string[]>(props.userSelectedGames);
-  const [showWarning, setShowWarning] = useState<boolean>(props.userSelectedGames.length === 0);
-
-  useEffect(() => {
-    setSelected(props.userSelectedGames);
-    setShowWarning(props.userSelectedGames.length === 0);
-  }, [props.userSelectedGames]);
+  const selectedIds = useAppSelector(state => state.profile.games);
+  const showWarning = selectedIds.length === 0;
 
   return (
     <div>
       <div className="d-flex flex-wrap">
-        <UserProfileGameSelector
-          userSelectedGames={selected}
-          setUserSelectedGames={props.setUserSelectedGames}
-        />
+        <UserProfileGameSelector />
       </div>
       {showWarning && (
         <Alert variant="warning" className="mt-2" data-testid="games-warning">

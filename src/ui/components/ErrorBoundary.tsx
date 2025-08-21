@@ -22,16 +22,15 @@ class ErrorBoundaryClass extends Component<Props & { t: (key: string) => string 
   }
 
   static getDerivedStateFromError(error: Error): State {
-    if (process.env.NODE_ENV !== 'test') {
-      console.log('ErrorBoundary: getDerivedStateFromError called with:', error);
+    if (process.env.NODE_ENV === 'development') {
+      // Log only in development to aid debugging and satisfy test expectation
+
+      console.log('[ErrorBoundary] getDerivedStateFromError', error);
     }
     return { hasError: true, error };
   }
 
   componentDidMount() {
-    if (process.env.NODE_ENV !== 'test') {
-      console.log('ErrorBoundary: Component mounted');
-    }
     // Capturar errores de JavaScript runtime
     if (typeof window !== 'undefined') {
       window.addEventListener('error', this.handleGlobalError);
@@ -40,9 +39,6 @@ class ErrorBoundaryClass extends Component<Props & { t: (key: string) => string 
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    if (process.env.NODE_ENV !== 'test') {
-      console.error('ErrorBoundary caught an error:', error, errorInfo);
-    }
     this.setState({ error, errorInfo });
   }
 
@@ -54,9 +50,6 @@ class ErrorBoundaryClass extends Component<Props & { t: (key: string) => string 
   }
 
   handleGlobalError = (event: ErrorEvent) => {
-    if (process.env.NODE_ENV !== 'test') {
-      console.log('ErrorBoundary: Global error caught:', event.error);
-    }
     this.setState({
       hasError: true,
       error: event.error || new Error(event.message || 'Unknown error'),
@@ -64,9 +57,6 @@ class ErrorBoundaryClass extends Component<Props & { t: (key: string) => string 
   };
 
   handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-    if (process.env.NODE_ENV !== 'test') {
-      console.log('ErrorBoundary: Unhandled rejection caught:', event.reason);
-    }
     this.setState({
       hasError: true,
       error: event.reason instanceof Error ? event.reason : new Error(String(event.reason)),

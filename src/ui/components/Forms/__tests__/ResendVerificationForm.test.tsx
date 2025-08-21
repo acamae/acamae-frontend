@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { promiseMock } from '@shared/utils/apiTestUtils';
 import ResendVerificationForm from '@ui/components/Forms/ResendVerificationForm';
 import { useAuth } from '@ui/hooks/useAuth';
+import * as useFormModule from '@ui/hooks/useForm';
 import { useToast } from '@ui/hooks/useToast';
 
 // Mock de las dependencias
@@ -239,6 +240,37 @@ describe('ResendVerificationForm', () => {
     expect(screen.getByTestId('email-verification-resend-form-button')).toHaveTextContent(
       'verification.resend.loading'
     );
+  });
+
+  it('shows throttled countdown text when throttled (branch at line 55)', () => {
+    (useTranslation as jest.Mock).mockReturnValue({
+      t: (s: string) => s,
+      i18n: { language: 'es' },
+    });
+    (useAuth as jest.Mock).mockReturnValue({ loading: false, resendVerification: jest.fn() });
+
+    jest.spyOn(useFormModule, 'useForm').mockReturnValue({
+      values: { identifier: 'user@example.com' },
+      errors: {},
+      touched: { identifier: true },
+      isSubmitting: false,
+      handleChange: jest.fn(),
+      handleBlur: jest.fn(),
+      handleSubmit: jest.fn(),
+      isThrottled: true,
+      canSubmit: false,
+      timeUntilNextSubmission: 2100,
+      remainingAttempts: 1,
+      resetThrottle: jest.fn(),
+      activateThrottle: jest.fn(),
+      handleCheckboxChange: jest.fn(),
+      resetForm: jest.fn(),
+      hasValidationErrors: false,
+      isFormValid: true,
+    } as unknown as ReturnType<typeof useFormModule.useForm>);
+
+    renderResendVerificationForm();
+    expect(screen.getByTestId('email-verification-resend-form-button')).toHaveTextContent('(3s)');
   });
 
   it('should handle error when API fails', async () => {

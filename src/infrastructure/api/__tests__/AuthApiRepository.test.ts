@@ -3,7 +3,7 @@
 import { USER_ROLES } from '@domain/constants/user';
 import { ApiErrorCode } from '@domain/types/apiCodes';
 import { ApiErrorResponse } from '@domain/types/apiSchema';
-import { AuthApiRepository } from '@infrastructure/api/AuthApiRepository';
+import { AuthApiRepository } from '@infrastructure/api/auth/AuthApiRepository';
 import { tokenService } from '@infrastructure/storage/tokenService';
 import { API_ROUTES } from '@shared/constants/apiRoutes';
 

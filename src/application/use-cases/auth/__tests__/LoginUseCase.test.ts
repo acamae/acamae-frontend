@@ -3,7 +3,7 @@ import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { ApiSuccessCodes } from '@domain/constants/successCodes';
 import { USER_ROLES } from '@domain/constants/user';
 import { User } from '@domain/entities/User';
-import { IAuthRepository } from '@domain/repositories/AuthRepository';
+import { IAuthRepository } from '@domain/repositories/auth/AuthRepository';
 import { LoginPayload } from '@domain/types/apiSchema';
 
 describe('LoginUseCase', () => {

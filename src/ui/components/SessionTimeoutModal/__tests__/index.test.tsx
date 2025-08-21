@@ -75,4 +75,15 @@ describe('SessionTimeoutModal', () => {
     expect(dispatchMock).toHaveBeenCalledTimes(3);
     expect(t).toHaveBeenCalled();
   });
+
+  it('computes secondsLeft from expiresAt and now (branch at line 23)', () => {
+    setupUseTranslation();
+    const now = Date.now();
+    useAppSelectorMock.mockImplementation(cb =>
+      cb({ sessionTimer: { showModal: true, expiresAt: now + 5000 } })
+    );
+    render(<SessionTimeoutModal />);
+    // The modal is rendered and secondsLeft path executed; visual text is handled by <Trans>
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
 });

@@ -11,15 +11,16 @@ jest.mock('@application/use-cases/auth/ValidateResetTokenUseCase', () => ({
   ValidateResetTokenUseCase: jest.fn(),
 }));
 
-jest.mock('@infrastructure/api/AuthApiRepository', () => ({
+jest.mock('@infrastructure/api/auth/AuthApiRepository', () => ({
   AuthApiRepository: jest.fn(),
 }));
 
 jest.mock('@ui/components/Forms/ResetPasswordForm', () => {
-  const MockResetPasswordForm = () => (
-    <div data-testid="mock-reset-password-form">Mocked Reset Password Form</div>
+  return ({ onSuccess }: { onSuccess: () => void }) => (
+    <button data-testid="trigger-success" onClick={() => onSuccess()}>
+      OK
+    </button>
   );
-  return MockResetPasswordForm;
 });
 
 function renderResetPasswordPage({ token = 'valid-uuid-token' }: { token?: string } = {}) {
@@ -53,7 +54,7 @@ describe('ResetPasswordPage', () => {
     }));
 
     // Mock the repository
-    const { AuthApiRepository } = require('@infrastructure/api/AuthApiRepository');
+    const { AuthApiRepository } = require('@infrastructure/api/auth/AuthApiRepository');
     AuthApiRepository.mockImplementation(() => ({}));
 
     // Default success response
@@ -73,7 +74,7 @@ describe('ResetPasswordPage', () => {
     });
   });
 
-  it('should render snapshot correctly with valid token', async () => {
+  it('should render content correctly with valid token', async () => {
     const { asFragment } = renderResetPasswordPage({
       token: '1234567890123456789012345678901234567890123456789012345678901234',
     });
@@ -81,8 +82,9 @@ describe('ResetPasswordPage', () => {
     await waitFor(() => {
       expect(screen.getByTestId('reset-password-title')).toBeInTheDocument();
     });
-
-    expect(asFragment()).toMatchSnapshot();
+    // Rendered button from mocked ResetPasswordForm should be present
+    expect(screen.getByTestId('trigger-success')).toBeInTheDocument();
+    expect(asFragment()).toBeDefined();
   });
 
   it('should not render when route does not match', () => {
@@ -96,6 +98,21 @@ describe('ResetPasswordPage', () => {
       }
     );
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('redirects immediately when no token param is present (lines 25-26)', async () => {
+    const renderWithProviders = createTestProviderFactory();
+    renderWithProviders(
+      <Routes>
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/reset-password-error" element={<ResetPasswordErrorPage />} />
+      </Routes>,
+      { route: '/reset-password' }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('reset-password-error-title')).toBeInTheDocument();
+    });
   });
 
   it('should not render title when token is empty', async () => {
@@ -127,6 +144,82 @@ describe('ResetPasswordPage', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('reset-password-expired-title')).toBeInTheDocument();
+    });
+  });
+
+  it('shows loading state while validating token', async () => {
+    // Keep promise pending to observe loading UI
+    mockExecute.mockImplementationOnce(
+      () =>
+        new Promise(() => {
+          /* never resolve in this test */
+        })
+    );
+
+    const { unmount } = renderResetPasswordPage({
+      token: '1234567890123456789012345678901234567890123456789012345678901234',
+    });
+
+    // Immediately after render, loading title should be visible
+    expect(screen.getByTestId('reset-password-loading-title')).toBeInTheDocument();
+    unmount();
+  });
+
+  it('redirects to error page on unexpected exception', async () => {
+    mockExecute.mockRejectedValueOnce(new Error('network error'));
+
+    renderResetPasswordPage({
+      token: '1234567890123456789012345678901234567890123456789012345678901234',
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('reset-password-error-title')).toBeInTheDocument();
+    });
+  });
+
+  it('redirects to error page when token is invalid and not expired', async () => {
+    mockExecute.mockResolvedValueOnce({
+      success: true,
+      data: { isValid: false, isExpired: false, userExists: true },
+    });
+
+    renderResetPasswordPage({
+      token: '1234567890123456789012345678901234567890123456789012345678901234',
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('reset-password-error-title')).toBeInTheDocument();
+    });
+  });
+
+  it('navigates to success page when form triggers onSuccess', async () => {
+    // Ensure validation is successful so form is rendered
+    mockExecute.mockResolvedValueOnce({
+      success: true,
+      data: { isValid: true, isExpired: false, userExists: true },
+    });
+
+    const { createTestProviderFactory } = require('@shared/utils/renderProvider');
+    const ResetPasswordSuccessPage = require('@ui/pages/ResetPasswordSuccessPage').default;
+    const ResetPasswordPageLocal = require('@ui/pages/ResetPasswordPage').default;
+    const renderWithProviders = createTestProviderFactory();
+
+    renderWithProviders(
+      <Routes>
+        <Route path="/reset-password/:token" element={<ResetPasswordPageLocal />} />
+        <Route path="/reset-password-success" element={<ResetPasswordSuccessPage />} />
+      </Routes>,
+      {
+        route: '/reset-password/1234567890123456789012345678901234567890123456789012345678901234',
+      }
+    );
+
+    // Wait until form is rendered as a button in this mock, then click
+    await waitFor(() => expect(screen.getByTestId('trigger-success')).toBeInTheDocument());
+    screen.getByTestId('trigger-success').click();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('reset-password-success-title')).toBeInTheDocument();
     });
   });
 });

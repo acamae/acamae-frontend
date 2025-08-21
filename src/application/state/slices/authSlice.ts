@@ -72,6 +72,10 @@ const authSlice = createSlice({
       })
       // Logout
       .addCase(logoutAction.pending, (state: AuthState) => {
+        // Immediately drop client auth on logout start
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
         state.loading = true;
       })
       .addCase(logoutAction.fulfilled, (state: AuthState) => {
@@ -81,8 +85,14 @@ const authSlice = createSlice({
         state.loading = false;
       })
       .addCase(logoutAction.rejected, (state: AuthState) => {
+        // Even if the API fails (e.g., 401), force client-side logout
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
         state.loading = false;
       })
+      // Safety: also mark unauthenticated on explicit token clear events (e.g., refresh failure)
+      // Keep matcher ordering rules: no addCase after addMatcher
       // Forgot Password
       .addCase(forgotPasswordAction.pending, (state: AuthState) => {
         state.loading = true;

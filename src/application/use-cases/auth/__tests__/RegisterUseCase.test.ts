@@ -1,7 +1,7 @@
 import { RegisterUseCase } from '@application/use-cases/auth/RegisterUseCase';
 import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { ApiSuccessCodes } from '@domain/constants/successCodes';
-import { IAuthRepository } from '@domain/repositories/AuthRepository';
+import { IAuthRepository } from '@domain/repositories/auth/AuthRepository';
 import { RegisterPayload } from '@domain/types/apiSchema';
 
 describe('RegisterUseCase', () => {

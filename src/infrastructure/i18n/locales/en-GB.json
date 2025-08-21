@@ -94,6 +94,20 @@
     "menu_label": "Profile",
     "account": "Account",
     "account-description": "Manage your account",
+    "location": {
+      "title": "Where do you play from?",
+      "description": "Your location is important to synchronize your game schedule with your friends who are in other time zones.",
+      "country": {
+        "select_placeholder": "Select a country",
+        "title": "Country",
+        "warning_missing": "Your profile will not appear in search results until you select your country."
+      },
+      "timezone": {
+        "select_placeholder": "Select a timezone",
+        "title": "Timezone",
+        "warning_missing": "Your profile will not appear in search results until you select your timezone."
+      }
+    },
     "games": {
       "title": "Games",
       "description": "What do you like to play?",
@@ -173,10 +187,6 @@
         "saturday": "Saturday",
         "sunday": "Sunday"
       }
-    },
-    "timezone": {
-      "select_placeholder": "Select a timezone",
-      "warning_missing": "Your profile will not appear in search results until you select your timezone."
     }
   },
   "teams": {

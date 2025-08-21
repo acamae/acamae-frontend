@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { ValidateResetTokenUseCase } from '@application/use-cases/auth/ValidateResetTokenUseCase';
 import { validateToken } from '@domain/services/validationService';
-import { AuthApiRepository } from '@infrastructure/api/AuthApiRepository';
+import { AuthApiRepository } from '@infrastructure/api/auth/AuthApiRepository';
 import { APP_ROUTES } from '@shared/constants/appRoutes';
 import ResetPasswordForm from '@ui/components/Forms/ResetPasswordForm';
 

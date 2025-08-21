@@ -11,33 +11,41 @@ import { LogoutUseCase } from '@application/use-cases/auth/LogoutUseCase';
 import { RegisterUseCase } from '@application/use-cases/auth/RegisterUseCase';
 import { ResendVerificationUseCase } from '@application/use-cases/auth/ResendVerificationUseCase';
 import { ResetPasswordUseCase } from '@application/use-cases/auth/ResetPasswordUseCase';
-import {
-  GetUserAvailabilityUseCase,
-  PutUserAvailabilityUseCase,
-} from '@application/use-cases/preferences/AvailabilityUseCases';
-import { GetUserPublicProfileUseCase } from '@application/use-cases/preferences/GetUserPublicProfileUseCase';
-import { ListGamesUseCase } from '@application/use-cases/preferences/ListGamesUseCase';
-import { GetTimezonesCatalogUseCase } from '@application/use-cases/preferences/TimezonesUseCase';
+import { GetCountriesCatalogUseCase } from '@application/use-cases/catalogs/CountriesCatalogUseCase';
+import { GetGamesCatalogUseCase } from '@application/use-cases/catalogs/GamesCatalogUseCase';
+import { GetTimezonesCatalogUseCase } from '@application/use-cases/catalogs/TimezonesCatalogUseCase';
+import { AddUserAvailabilityUseCase } from '@application/use-cases/profile/AvailabilityUseCases';
+import { PutUserCountryUseCase } from '@application/use-cases/profile/UserCountryUseCase';
 import {
   AddUserGameUseCase,
-  GetUserGamesUseCase,
   RemoveUserGameUseCase,
-} from '@application/use-cases/preferences/UserGamesUseCases';
-import { AuthApiRepository } from '@infrastructure/api/AuthApiRepository';
-import { AvailabilityApiRepository } from '@infrastructure/api/AvailabilityApiRepository';
-import { GameProfileApiRepository } from '@infrastructure/api/GameProfileApiRepository';
-import { GamesApiRepository } from '@infrastructure/api/GamesApiRepository';
-import { TimezonesApiRepository } from '@infrastructure/api/TimezonesApiRepository';
+} from '@application/use-cases/profile/UserGamesUseCases';
+import { GetUserProfileUseCase } from '@application/use-cases/profile/UserProfileUseCases';
+import { PutUserTimezoneUseCase } from '@application/use-cases/profile/UserTimezoneUseCases';
+import { AuthApiRepository } from '@infrastructure/api/auth/AuthApiRepository';
+import { CountriesCatalogApiRepository } from '@infrastructure/api/catalogs/CountriesCatalogApiRepository';
+import { GamesCatalogApiRepository } from '@infrastructure/api/catalogs/GamesCatalogApiRepository';
+import { TimezonesCatalogApiRepository } from '@infrastructure/api/catalogs/TimezonesCatalogApiRepository';
+import { AvailabilityProfileApiRepository } from '@infrastructure/api/profile/AvailabilityProfileApiRepository';
+import { GameProfileApiRepository } from '@infrastructure/api/profile/GameProfileApiRepository';
+// AddUserAvailabilityUseCase already imported above
+import { UserCountryApiRepository } from '@infrastructure/api/profile/UserCountryApiRepository';
+import { UserProfileApiRepository } from '@infrastructure/api/profile/UserProfileApiRepository';
+import { UserTimezoneApiRepository } from '@infrastructure/api/profile/UserTimezoneApiRepository';
 import { configureAxiosService } from '@shared/services/axiosService';
 
 // Auth repository
 const authRepository = new AuthApiRepository();
-const gamesRepository = new GamesApiRepository();
+const gamesRepository = new GamesCatalogApiRepository();
 const gameProfileRepository = new GameProfileApiRepository();
-const availabilityRepository = new AvailabilityApiRepository();
-const timezoneRepository = new TimezonesApiRepository();
+const availabilityRepository = new AvailabilityProfileApiRepository();
+const timezoneRepository = new TimezonesCatalogApiRepository();
+const countriesRepository = new CountriesCatalogApiRepository();
+const userProfileRepository = new UserProfileApiRepository();
+const userCountryRepository = new UserCountryApiRepository();
+const userTimezoneRepository = new UserTimezoneApiRepository();
 
-// Use cases
+// Auth use cases
 const loginUseCase = new LoginUseCase(authRepository);
 const registerUseCase = new RegisterUseCase(authRepository);
 const logoutUseCase = new LogoutUseCase(authRepository);
@@ -45,15 +53,18 @@ const forgotPasswordUseCase = new ForgotPasswordUseCase(authRepository);
 const resetPasswordUseCase = new ResetPasswordUseCase(authRepository);
 const resendVerificationUseCase = new ResendVerificationUseCase(authRepository);
 
-// Preferences use cases
-const listGamesUseCase = new ListGamesUseCase(gamesRepository);
-const getUserPublicProfileUseCase = new GetUserPublicProfileUseCase();
-const getUserGamesUseCase = new GetUserGamesUseCase(gameProfileRepository);
+// User profile use cases
+const getUserProfileUseCase = new GetUserProfileUseCase(userProfileRepository);
 const addUserGameUseCase = new AddUserGameUseCase(gameProfileRepository);
 const removeUserGameUseCase = new RemoveUserGameUseCase(gameProfileRepository);
-const getUserAvailabilityUseCase = new GetUserAvailabilityUseCase(availabilityRepository);
-const putUserAvailabilityUseCase = new PutUserAvailabilityUseCase(availabilityRepository);
+const addUserAvailabilityUseCase = new AddUserAvailabilityUseCase(availabilityRepository);
+const putUserCountryUseCase = new PutUserCountryUseCase(userCountryRepository);
+const putUserTimezoneUseCase = new PutUserTimezoneUseCase(userTimezoneRepository);
+
+// Catalogs use cases (static data)
+const getGamesCatalogUseCase = new GetGamesCatalogUseCase(gamesRepository);
 const getTimezonesCatalogUseCase = new GetTimezonesCatalogUseCase(timezoneRepository);
+const getCountriesCatalogUseCase = new GetCountriesCatalogUseCase(countriesRepository);
 
 // Store
 export const store = configureStore({
@@ -74,15 +85,27 @@ export const store = configureStore({
           forgotPasswordUseCase,
           resetPasswordUseCase,
           resendVerificationUseCase,
-          // preferences
-          listGamesUseCase,
-          getUserPublicProfileUseCase,
-          getUserGamesUseCase,
+
+          // Catalogs
+          getGamesCatalogUseCase,
+          getTimezonesCatalogUseCase,
+          getCountriesCatalogUseCase,
+
+          // Profile All
+          getUserProfileUseCase,
+
+          // Profile Games
           addUserGameUseCase,
           removeUserGameUseCase,
-          getUserAvailabilityUseCase,
-          putUserAvailabilityUseCase,
-          getTimezonesCatalogUseCase,
+
+          // Profile Availability
+          addUserAvailabilityUseCase,
+
+          // Profile Country
+          putUserCountryUseCase,
+
+          // Profile Timezone
+          putUserTimezoneUseCase,
         },
       },
     })

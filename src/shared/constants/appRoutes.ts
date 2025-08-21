@@ -10,7 +10,6 @@ export const PUBLIC_ROUTES = {
   RESET_PASSWORD_ERROR: '/reset-password-error',
   RESET_PASSWORD_EXPIRED: '/reset-password-expired',
   RESET_PASSWORD_SENT: '/reset-password-sent',
-  TIMEZONES: '/timezones',
   VERIFY_EMAIL: '/verify-email/:token',
   VERIFY_EMAIL_SENT: '/verify-email-sent',
   VERIFY_EMAIL_SUCCESS: '/verify-email-success',

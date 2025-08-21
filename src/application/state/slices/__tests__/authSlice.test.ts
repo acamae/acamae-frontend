@@ -71,6 +71,17 @@ describe('authSlice reducer', () => {
     expect(state.user).toBeNull();
   });
 
+  it('should set user to null and no token when login is fulfilled with success true but no token in storage (line 47 branch)', () => {
+    jest.spyOn(tokenService, 'getAccessToken').mockReturnValue(null);
+    const state = reducer(initialAuthState, {
+      type: loginAction.fulfilled.type,
+      payload: { data: user, success: true },
+    });
+    expect(state.token).toBeNull();
+    expect(state.isAuthenticated).toBe(false);
+    jest.restoreAllMocks();
+  });
+
   it('should set user to null when login is fulfilled with missing data', () => {
     const state = reducer(initialAuthState, {
       type: loginAction.fulfilled.type,

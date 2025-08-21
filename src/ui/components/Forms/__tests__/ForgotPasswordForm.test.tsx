@@ -205,6 +205,31 @@ describe('ForgotPasswordForm', () => {
     expect(submitButton).toHaveAttribute('aria-busy', 'true');
   });
 
+  it('shows throttled countdown text when throttled (branch at line 67)', async () => {
+    jest.spyOn(useFormModule, 'useForm').mockReturnValue({
+      values: { email: 'a@a.com' },
+      errors: {},
+      touched: { email: true },
+      isSubmitting: false,
+      handleChange: jest.fn(),
+      handleBlur: jest.fn(),
+      handleSubmit: jest.fn(),
+      isThrottled: true,
+      canSubmit: false,
+      timeUntilNextSubmission: 1200,
+      remainingAttempts: 3,
+      resetThrottle: jest.fn(),
+      activateThrottle: jest.fn(),
+      handleCheckboxChange: jest.fn(),
+      resetForm: jest.fn(),
+      hasValidationErrors: false,
+      isFormValid: true,
+    } as unknown as ReturnType<typeof useFormModule.useForm>);
+
+    renderForgotPasswordForm();
+    expect(screen.getByTestId('forgot-password-form-button')).toHaveTextContent('(2s)');
+  });
+
   it('should show attempts warning when remainingAttempts is 2', () => {
     jest.spyOn(useFormModule, 'useForm').mockReturnValue({
       values: { email: '' },

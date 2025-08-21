@@ -1,7 +1,7 @@
 import { ForgotPasswordUseCase } from '@application/use-cases/auth/ForgotPasswordUseCase';
 import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { ApiSuccessCodes } from '@domain/constants/successCodes';
-import { IAuthRepository } from '@domain/repositories/AuthRepository';
+import { IAuthRepository } from '@domain/repositories/auth/AuthRepository';
 import { ForgotPasswordPayload } from '@domain/types/apiSchema';
 
 describe('ForgotPasswordUseCase', () => {

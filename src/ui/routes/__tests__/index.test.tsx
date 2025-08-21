@@ -1402,6 +1402,12 @@ describe('AppRoutes', () => {
     expect(component2.props.children.props.children.props.router).toBeDefined();
   });
 
+  it('throws when provided router is invalid (coverage for error branch)', () => {
+    // Pass a truthy non-object so typeof !== 'object'
+    const invalidRouter = 'invalid-router' as unknown as ReturnType<typeof createBrowserRouter>;
+    expect(() => AppRoutes({ router: invalidRouter })).toThrow('Invalid router provided');
+  });
+
   it('should test Suspense and RouterProvider integration', () => {
     // Test Suspense and RouterProvider structure
     const component = AppRoutes();

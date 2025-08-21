@@ -94,6 +94,20 @@
     "menu_label": "Perfil",
     "account": "Cuenta",
     "account-description": "Gestiona tu cuenta",
+    "location": {
+      "title": "¿Desde dónde juegas?",
+      "description": "Tu ubicación es importante para sincronizar tu horario de juego con el de tus amigos que estén en otras zonas horarias.",
+      "country": {
+        "select_placeholder": "Selecciona un país",
+        "title": "País",
+        "warning_missing": "Tu perfil no aparecerá en los resultados de búsqueda hasta que selecciones tu país."
+      },
+      "timezone": {
+        "select_placeholder": "Selecciona una zona horaria",
+        "title": "Zona horaria",
+        "warning_missing": "Tu perfil no aparecerá en los resultados de búsqueda hasta que selecciones tu zona horaria."
+      }
+    },
     "games": {
       "title": "Juegos",
       "description": "¿A qué te gusta jugar?",
@@ -173,10 +187,6 @@
         "saturday": "Sábado",
         "sunday": "Domingo"
       }
-    },
-    "timezone": {
-      "select_placeholder": "Selecciona una zona horaria",
-      "warning_missing": "Tu perfil no aparecerá en los resultados de búsqueda hasta que selecciones tu zona horaria."
     }
   },
   "teams": {

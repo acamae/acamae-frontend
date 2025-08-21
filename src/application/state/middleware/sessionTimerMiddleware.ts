@@ -9,6 +9,7 @@ import {
   removeExpiresAt,
 } from '@application/state/slices/sessionTimerSlice';
 import { AppDispatch } from '@domain/types/redux';
+import { localStorageService } from '@infrastructure/storage/localStorageService';
 import { sessionExpiryService } from '@infrastructure/storage/sessionExpiryService';
 
 const SESSION_TIMEOUT_MINUTES = Number(process.env.REACT_APP_SESSION_TIMEOUT_MINUTES) || 15;
@@ -72,6 +73,18 @@ function handleRemoveExpiresAt(): void {
 function handleLogoutFulfilled(store: MiddlewareAPI): void {
   clearTimer();
   store.dispatch(removeExpiresAt());
+  // Ensure persisted auth is removed to avoid stale rehydration
+  try {
+    localStorageService.remove('persist:auth');
+    localStorageService.remove('__refreshToken__');
+    // Attempt to purge redux-persist storage to fully reset persistence state
+    const mod = require('@application/state/store');
+    if (mod?.persistor?.purge) {
+      mod.persistor.purge();
+    }
+  } catch {
+    // ignore storage errors
+  }
 }
 
 function handleLoginFulfilled(store: MiddlewareAPI): void {
@@ -87,7 +100,13 @@ const sessionTimerMiddleware: Middleware = (store: MiddlewareAPI) => next => act
     handleSetExpiresAt(store, action.payload);
   } else if (removeExpiresAt.match(action)) {
     handleRemoveExpiresAt();
+  } else if (logoutAction.pending?.match && logoutAction.pending.match(action)) {
+    // On logout start, cleanup timers and persisted auth to avoid stale auth on rehydrate
+    handleLogoutFulfilled(store);
   } else if (logoutAction.fulfilled.match(action)) {
+    handleLogoutFulfilled(store);
+  } else if (logoutAction.rejected?.match && logoutAction.rejected.match(action)) {
+    // Ensure timer cleanup also when logout API fails
     handleLogoutFulfilled(store);
   } else if (loginAction.fulfilled.match(action)) {
     handleLoginFulfilled(store);

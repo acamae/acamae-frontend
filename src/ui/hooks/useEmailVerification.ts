@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { VerifyEmailUseCase } from '@application/use-cases/auth/VerifyEmailUseCase';
 import { ApiErrorCodes } from '@domain/constants/errorCodes';
-import { AuthApiRepository } from '@infrastructure/api/AuthApiRepository';
+import { AuthApiRepository } from '@infrastructure/api/auth/AuthApiRepository';
 
 export type EmailVerificationStatus =
   | 'IDLE'

@@ -1,15 +1,14 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Breadcrumb, Button, Col, Row } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-import { fetchGamesCatalogAction } from '@application/state/actions/preferences.actions';
-import { useAppDispatch, useAppSelector } from '@application/state/hooks';
-import { getUserPublicProfileUrl } from '@shared/constants/apiRoutes';
+import { getUserProfileAction } from '@application/state/actions/profile.actions';
+import { useAppDispatch } from '@application/state/hooks';
 import { APP_ROUTES } from '@shared/constants/appRoutes';
 import { TIMETABLE } from '@shared/constants/timeTable';
-import api from '@shared/services/axiosService';
 import { Card, CardBody } from '@ui/components/Card/Card';
+import { CountrySelector } from '@ui/components/CountrySelector/CountrySelector';
 import { TimeZoneSelector } from '@ui/components/TimeZoneSelector/TimeZoneSelector';
 import { UserProfileGameSelectorWithWarning } from '@ui/components/UserProfileGameSelector/UserProfileGameSelector';
 import { useAuth } from '@ui/hooks/useAuth';
@@ -18,11 +17,9 @@ const UserProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const daysCount = TIMETABLE.length;
   const slotsPerDay = TIMETABLE[0]?.times.length ?? 0;
-  const [userSelectedGames, setUserSelectedGames] = useState<string[]>([]);
 
   const { user } = useAuth();
   const dispatch = useAppDispatch();
-  const { gamesCatalog } = useAppSelector(state => state.preferences);
   const userId = useMemo(() => String(user?.id ?? ''), [user?.id]);
 
   const initializedRef = useRef(false);
@@ -32,18 +29,16 @@ const UserProfilePage: React.FC = () => {
     const loadInitialProfile = async () => {
       if (!userId) return;
       try {
-        if (gamesCatalog.length === 0) {
-          await dispatch(fetchGamesCatalogAction());
+        const res = await dispatch(getUserProfileAction({ userId }));
+        if (getUserProfileAction.fulfilled.match(res)) {
+          // Profile slice will be hydrated by reducer; no local state needed
         }
-        const res = await api.get(getUserPublicProfileUrl(userId));
-        const games = ((res.data?.data?.games ?? []) as Array<{ code: string }>).map(g => g.code);
-        setUserSelectedGames(games);
       } catch {
         // Ignore initial profile errors to avoid blocking the UI
       }
     };
     void loadInitialProfile();
-  }, [userId, gamesCatalog.length]);
+  }, [userId]);
 
   const focusSlot = (dayIndex: number, timeIndex: number) => {
     const selector = `button[data-day-index="${dayIndex}"][data-time-index="${timeIndex}"]`;
@@ -121,41 +116,76 @@ const UserProfilePage: React.FC = () => {
             </Row>
             <Row>
               <Card>
-                <div className="list-group list-group-flush">
-                  <div className="list-group-item d-flex align-items-center">
-                    <div className="flex-1 text-break">
-                      <div>Username</div>
-                      <div className="text-inverse text-opacity-50">{user?.username ?? '-'}</div>
+                <CardBody>
+                  <div className="list-group list-group-flush">
+                    <div className="list-group-item d-flex align-items-center pb-3">
+                      <div className="flex-1 text-break">
+                        <div>Username</div>
+                        <div className="text-inverse text-opacity-50">{user?.username ?? '-'}</div>
+                      </div>
+                      <div className="w-100px">
+                        <Button variant="outline-default" className="w-100px">
+                          {t('global.edit')}
+                        </Button>
+                      </div>
                     </div>
-                    <div className="w-100px">
-                      <Button variant="outline-default" className="w-100px">
-                        {t('global.edit')}
-                      </Button>
+                    <div className="list-group-item d-flex align-items-center py-3">
+                      <div className="flex-1 text-break">
+                        <div>Email address</div>
+                        <div className="text-inverse text-opacity-50">{user?.email ?? '-'}</div>
+                      </div>
+                      <div>
+                        <Button variant="outline-default" className="w-100px">
+                          {t('global.edit')}
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="list-group-item d-flex align-items-center pt-3">
+                      <div className="flex-1 text-break">
+                        <div>Password</div>
+                      </div>
+                      <div>
+                        <Button variant="outline-default" className="w-100px">
+                          {t('global.edit')}
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                  <div className="list-group-item d-flex align-items-center">
-                    <div className="flex-1 text-break">
-                      <div>Email address</div>
-                      <div className="text-inverse text-opacity-50">{user?.email ?? '-'}</div>
+                </CardBody>
+              </Card>
+            </Row>
+            <Row className="mt-5">
+              <h2 className="h4" data-testid="user-profile-location">
+                <i className="fa-solid fa-globe text-theme"></i> {t('user-profile.location.title')}
+              </h2>
+              <p
+                className="text-inverse text-opacity-50 mb-4"
+                data-testid="user-profile-location-description">
+                {t('user-profile.location.description')}
+              </p>
+            </Row>
+            <Row>
+              <Card>
+                <CardBody>
+                  <Row>
+                    <div className="mb-2">
+                      <label htmlFor="country-select">
+                        {t('user-profile.location.country.title')}
+                      </label>
                     </div>
-                    <div>
-                      <Button variant="outline-default" className="w-100px">
-                        {t('global.edit')}
-                      </Button>
+                    <div className="text-inverse text-opacity-50">
+                      <CountrySelector />
                     </div>
-                  </div>
-                  <div className="list-group-item d-flex align-items-center">
-                    <div className="flex-1 text-break">
-                      <div>Password</div>
+                    <div className="mt-3 mb-2">
+                      <label htmlFor="timezone-select">
+                        {t('user-profile.location.timezone.title')}
+                      </label>
                     </div>
-                    <div>
-                      <Button variant="outline-default" className="w-100px">
-                        {t('global.edit')}
-                      </Button>
+                    <div className="text-inverse text-opacity-50">
+                      <TimeZoneSelector />
                     </div>
-                  </div>
-                  <TimeZoneSelector />
-                </div>
+                  </Row>
+                </CardBody>
               </Card>
             </Row>
             <Row className="mt-5">
@@ -172,10 +202,7 @@ const UserProfilePage: React.FC = () => {
               <Card>
                 <CardBody>
                   <Row>
-                    <UserProfileGameSelectorWithWarning
-                      userSelectedGames={userSelectedGames}
-                      setUserSelectedGames={setUserSelectedGames}
-                    />
+                    <UserProfileGameSelectorWithWarning />
                   </Row>
                 </CardBody>
               </Card>

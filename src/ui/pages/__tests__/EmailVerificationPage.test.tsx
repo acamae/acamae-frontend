@@ -13,7 +13,7 @@ jest.mock('@application/use-cases/auth/VerifyEmailUseCase', () => ({
   VerifyEmailUseCase: jest.fn(),
 }));
 
-jest.mock('@infrastructure/api/AuthApiRepository', () => ({
+jest.mock('@infrastructure/api/auth/AuthApiRepository', () => ({
   AuthApiRepository: jest.fn(),
 }));
 
@@ -37,7 +37,7 @@ describe('EmailVerificationPage', () => {
     }));
 
     // Mock the repository
-    const { AuthApiRepository } = require('@infrastructure/api/AuthApiRepository');
+    const { AuthApiRepository } = require('@infrastructure/api/auth/AuthApiRepository');
     AuthApiRepository.mockImplementation(() => ({}));
   });
 

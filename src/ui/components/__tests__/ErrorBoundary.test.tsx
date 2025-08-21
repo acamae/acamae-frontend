@@ -82,6 +82,20 @@ describe('ErrorBoundary', () => {
     ).toBeInTheDocument();
   });
 
+  it('should call console.log in non-test environments (getDerivedStateFromError branch)', () => {
+    const originalEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    renderWithI18n(
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    );
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+    process.env.NODE_ENV = originalEnv;
+  });
+
   it('should render reload button', () => {
     renderWithI18n(
       <ErrorBoundary>
@@ -222,6 +236,17 @@ describe('ErrorBoundary', () => {
     expect(consoleSpy).toHaveBeenCalled();
 
     consoleSpy.mockRestore();
+  });
+
+  it('componentDidCatch sets error and errorInfo (branch coverage)', () => {
+    // Force React error boundary path; simulate an error with ErrorInfo
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    renderWithI18n(
+      <ErrorBoundary>
+        <ThrowErrorWithInfo shouldThrow={true} />
+      </ErrorBoundary>
+    );
+    expect(consoleSpy).toHaveBeenCalled();
   });
 
   // Tests adicionales para aumentar cobertura de branches

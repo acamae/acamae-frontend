@@ -314,6 +314,17 @@ describe('axiosService unit tests', () => {
     });
   });
 
+  it('should stringify circular error via toString in request error handler (catch path)', async () => {
+    await jest.isolateModulesAsync(async () => {
+      require('@shared/services/axiosService');
+      const { reqErr } = getAxiosMock();
+      const circular: { [key: string]: unknown; toString?: () => string } = {};
+      circular.self = circular; // cause JSON.stringify to throw
+      circular.toString = () => 'circular-error';
+      await expect(reqErr[0](circular)).rejects.toBeInstanceOf(Error);
+    });
+  });
+
   it('should keep existing headers and set Authorization again (duplicate block)', () => {
     jest.isolateModules(() => {
       storeMock.getState.mockReturnValueOnce({ auth: { token: 'dup' } });
@@ -624,6 +635,49 @@ describe('axiosService unit tests', () => {
       await expect(
         (resErr[0] as (e: unknown) => Promise<never>)(stringError)
       ).rejects.toBeInstanceOf(Error);
+    });
+  });
+
+  it('logs different branches in development mode (response/request/generic)', async () => {
+    const originalEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+    await jest.isolateModulesAsync(async () => {
+      require('@shared/services/axiosService');
+      const { resErr } = getAxiosMock();
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      // with response
+      await expect(
+        (resErr[0] as (e: unknown) => Promise<never>)({ response: { status: 500 }, config: {} })
+      ).rejects.toBeInstanceOf(Error);
+
+      // with request
+      await expect(
+        (resErr[0] as (e: unknown) => Promise<never>)({
+          request: {},
+          message: 'm',
+          code: 'c',
+          config: {},
+        })
+      ).rejects.toBeInstanceOf(Error);
+
+      // generic
+      await expect(
+        (resErr[0] as (e: unknown) => Promise<never>)({ message: 'g', code: 'x', config: {} })
+      ).rejects.toBeInstanceOf(Error);
+
+      consoleSpy.mockRestore();
+    });
+    process.env.NODE_ENV = originalEnv;
+  });
+
+  it('safeStringifyError returns "[Unknown error]" when object has no toString and is circular', async () => {
+    await jest.isolateModulesAsync(async () => {
+      require('@shared/services/axiosService');
+      const { reqErr } = getAxiosMock();
+      const circular: { [key: string]: unknown } = Object.create(null);
+      circular.self = circular; // circular without toString
+      await expect(reqErr[0](circular)).rejects.toBeInstanceOf(Error);
     });
   });
 

@@ -1,8 +1,9 @@
 import { VerifyEmailUseCase } from '@application/use-cases/auth/VerifyEmailUseCase';
 import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { ApiSuccessCodes } from '@domain/constants/successCodes';
-import { IAuthRepository } from '@domain/repositories/AuthRepository';
-import { VerifyEmailPayload, EmailVerificationResponse } from '@domain/types/apiSchema';
+import { User } from '@domain/entities/User';
+import { IAuthRepository } from '@domain/repositories/auth/AuthRepository';
+import { VerifyEmailPayload } from '@domain/types/apiSchema';
 
 describe('VerifyEmailUseCase', () => {
   let verifyEmailUseCase: VerifyEmailUseCase;
@@ -32,10 +33,11 @@ describe('VerifyEmailUseCase', () => {
       token: 'valid-verification-token',
     };
 
-    const mockResponse: EmailVerificationResponse = {
-      status: ApiSuccessCodes.SUCCESS,
-      message: 'Email verified successfully',
-      resendRequired: false,
+    const mockResponse: User = {
+      id: '1',
+      username: 'test',
+      email: 'test@test.com',
+      role: 'user',
     };
 
     mockAuthRepository.verifyEmail.mockResolvedValue({
@@ -67,10 +69,11 @@ describe('VerifyEmailUseCase', () => {
       token: 'expired-verification-token',
     };
 
-    const mockResponse: EmailVerificationResponse = {
-      status: ApiErrorCodes.AUTH_TOKEN_EXPIRED,
-      message: 'Verification token has expired',
-      resendRequired: true,
+    const mockResponse: User = {
+      id: '1',
+      username: 'test',
+      email: 'test@test.com',
+      role: 'user',
     };
 
     mockAuthRepository.verifyEmail.mockResolvedValue({
@@ -102,10 +105,11 @@ describe('VerifyEmailUseCase', () => {
       token: 'invalid-verification-token',
     };
 
-    const mockResponse: EmailVerificationResponse = {
-      status: ApiErrorCodes.AUTH_TOKEN_INVALID,
-      message: 'Invalid verification token',
-      resendRequired: true,
+    const mockResponse: User = {
+      id: '1',
+      username: 'test',
+      email: 'test@test.com',
+      role: 'user',
     };
 
     mockAuthRepository.verifyEmail.mockResolvedValue({
@@ -137,10 +141,11 @@ describe('VerifyEmailUseCase', () => {
       token: 'already-used-token',
     };
 
-    const mockResponse: EmailVerificationResponse = {
-      status: ApiErrorCodes.AUTH_USER_ALREADY_VERIFIED,
-      message: 'Email is already verified',
-      resendRequired: false,
+    const mockResponse: User = {
+      id: '1',
+      username: 'test',
+      email: 'test@test.com',
+      role: 'user',
     };
 
     mockAuthRepository.verifyEmail.mockResolvedValue({
@@ -172,10 +177,11 @@ describe('VerifyEmailUseCase', () => {
       token: 'valid-token-update-failed',
     };
 
-    const mockResponse: EmailVerificationResponse = {
-      status: ApiErrorCodes.AUTH_UPDATE_FAILED,
-      message: 'Token is valid but user update failed',
-      resendRequired: true,
+    const mockResponse: User = {
+      id: '1',
+      username: 'test',
+      email: 'test@test.com',
+      role: 'user',
     };
 
     mockAuthRepository.verifyEmail.mockResolvedValue({

@@ -5,7 +5,7 @@ import { SessionTimerState } from '@domain/types/sessionTimer';
 const SESSION_TIMEOUT_MINUTES = Number(process.env.REACT_APP_SESSION_TIMEOUT_MINUTES) || 15;
 
 const initialState: SessionTimerState = {
-  expiresAt: Date.now() + SESSION_TIMEOUT_MINUTES * 60 * 1000,
+  expiresAt: 0,
   showModal: false,
 };
 

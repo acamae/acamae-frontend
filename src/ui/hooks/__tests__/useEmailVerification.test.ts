@@ -1,8 +1,8 @@
 import { renderHook, act } from '@testing-library/react';
 
 import * as errorCodes from '@domain/constants/errorCodes';
-import * as api from '@infrastructure/api/AuthApiRepository';
-import { AuthApiRepository } from '@infrastructure/api/AuthApiRepository';
+import * as api from '@infrastructure/api/auth/AuthApiRepository';
+import { AuthApiRepository } from '@infrastructure/api/auth/AuthApiRepository';
 import { useEmailVerification } from '@ui/hooks/useEmailVerification';
 
 describe('useEmailVerification', () => {

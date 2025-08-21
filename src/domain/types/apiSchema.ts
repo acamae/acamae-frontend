@@ -101,15 +101,6 @@ export interface VerifyEmailPayload {
 }
 
 /**
- * Email verification response
- */
-export interface EmailVerificationResponse {
-  status: string;
-  message: string;
-  resendRequired?: boolean;
-}
-
-/**
  * Validate reset token
  */
 export interface ValidateResetTokenPayload {

@@ -1,5 +1,6 @@
 import axios, { AxiosHeaders, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
+import { localStorageService } from '@infrastructure/storage/localStorageService';
 import { tokenService } from '@infrastructure/storage/tokenService';
 import { API_ROUTES } from '@shared/constants/apiRoutes';
 
@@ -32,6 +33,9 @@ const NOOP: SessionRenewalFn = () => {};
 let getTokenFn: GetTokenFn = () => tokenService.getAccessToken();
 let onSessionRenewalFn: SessionRenewalFn = NOOP;
 
+// Guard to avoid infinite dispatch loops when forcing logout on 401
+let isForcingLogout = false;
+
 const getLazyStore = (): unknown => {
   try {
     const mod = require('@application/state/store');
@@ -58,6 +62,19 @@ const dispatchResetTimerFallback = () => {
     store?.dispatch?.(timerSlice.resetTimer());
   } catch {
     // Intentionally ignored: fallback for environments where timerSlice or store is unavailable
+  }
+};
+
+const dispatchLogoutFallback = (): void => {
+  try {
+    const { logoutAction } = require('@application/state/actions/auth.actions');
+    const store = getLazyStore() as StoreLike;
+    if (typeof store?.dispatch === 'function') {
+      // Dispatching thunk; reducers will clear auth state on rejected as a safety net
+      store.dispatch(logoutAction());
+    }
+  } catch {
+    // Intentionally ignored: fallback for environments where actions or store are unavailable
   }
 };
 
@@ -185,6 +202,27 @@ const handleUnauthorizedError = async (error: AxiosError): Promise<AxiosResponse
   if (retryResult) return retryResult;
 
   tokenService.clear();
+  try {
+    // Remove persisted auth and refresh token to avoid stale rehydration
+    localStorageService.remove('persist:auth');
+    localStorageService.remove('__refreshToken__');
+  } catch {
+    // ignore storage errors
+  }
+
+  const url = (error.config?.url ?? '').toString();
+  const logoutEndpoint = `${API_ROUTES.BASE}${API_ROUTES.AUTH.LOGOUT}`;
+  const isLogoutRequest = url.includes(logoutEndpoint);
+
+  // Force client-side logout once when refresh failed and this is not the logout call itself
+  if (!isLogoutRequest && !isForcingLogout) {
+    isForcingLogout = true;
+    dispatchLogoutFallback();
+    // Release the guard shortly after to avoid long-lived lock while preventing immediate recursion
+    setTimeout(() => {
+      isForcingLogout = false;
+    }, 500);
+  }
   return null;
 };
 

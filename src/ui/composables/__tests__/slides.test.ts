@@ -106,4 +106,60 @@ describe('composables: slideDown/slideUp/slideToggle', () => {
     toggle(elVisible, 25);
     expect(slideUpMock).toHaveBeenCalledWith(elVisible, 25);
   });
+
+  it('slideDown uses default duration and keeps non-none display', () => {
+    const el = document.createElement('div');
+    el.style.display = 'inline';
+
+    jest
+      .spyOn(window, 'getComputedStyle')
+      .mockReturnValue({ display: 'inline' } as unknown as CSSStyleDeclaration);
+
+    Object.defineProperty(el, 'offsetHeight', { get: () => 80 });
+
+    slideDown(el); // no duration -> default 300ms
+
+    expect(el.style.transitionDuration).toBe('300ms');
+    expect(el.style.display).toBe('inline');
+
+    jest.advanceTimersByTime(300);
+    expect(el.style.transitionDuration).toBe('');
+    expect(el.classList.contains('transitioning')).toBe(false);
+  });
+
+  it('slideUp uses default duration (300ms)', () => {
+    const el = document.createElement('div');
+    Object.defineProperty(el, 'offsetHeight', { get: () => 60 });
+
+    slideUp(el); // no duration -> default 300ms
+
+    expect(el.style.transitionDuration).toBe('300ms');
+    jest.advanceTimersByTime(300);
+    expect(el.style.transitionDuration).toBe('');
+    expect(el.classList.contains('transitioning')).toBe(false);
+  });
+
+  it('slideToggle uses default duration when not provided', () => {
+    jest.resetModules();
+    const slideDownMock = jest.fn();
+    const slideUpMock = jest.fn();
+
+    jest.doMock('@ui/composables/slideDown', () => ({ __esModule: true, default: slideDownMock }));
+    jest.doMock('@ui/composables/slideUp', () => ({ __esModule: true, default: slideUpMock }));
+
+    const toggle = require('@ui/composables/slideToggle').default as typeof slideToggle;
+
+    const elHidden = document.createElement('div');
+    jest
+      .spyOn(window, 'getComputedStyle')
+      .mockReturnValueOnce({ display: 'none' } as unknown as CSSStyleDeclaration)
+      .mockReturnValueOnce({ display: 'block' } as unknown as CSSStyleDeclaration);
+
+    toggle(elHidden); // no duration -> default 300 passed to slideDown
+    expect(slideDownMock).toHaveBeenCalledWith(elHidden, 300);
+
+    const elVisible = document.createElement('div');
+    toggle(elVisible); // no duration -> default 300 passed to slideUp
+    expect(slideUpMock).toHaveBeenCalledWith(elVisible, 300);
+  });
 });

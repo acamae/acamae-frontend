@@ -1,7 +1,7 @@
 import { LogoutUseCase } from '@application/use-cases/auth/LogoutUseCase';
 import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { ApiSuccessCodes } from '@domain/constants/successCodes';
-import { IAuthRepository } from '@domain/repositories/AuthRepository';
+import { IAuthRepository } from '@domain/repositories/auth/AuthRepository';
 
 describe('LogoutUseCase', () => {
   let logoutUseCase: LogoutUseCase;

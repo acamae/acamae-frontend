@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { VerifyEmailUseCase } from '@application/use-cases/auth/VerifyEmailUseCase';
 import { ApiErrorCodes } from '@domain/constants/errorCodes';
 import { ApiSuccessCodes } from '@domain/constants/successCodes';
-import { AuthApiRepository } from '@infrastructure/api/AuthApiRepository';
+import { AuthApiRepository } from '@infrastructure/api/auth/AuthApiRepository';
 import { APP_ROUTES } from '@shared/constants/appRoutes';
 
 const EmailVerificationPage: React.FC = () => {
