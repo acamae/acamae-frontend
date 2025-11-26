@@ -1,0 +1,49 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "plugins": [
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "eslint:lint"
+      }
+    },
+    {
+      "plugin": "@nx/webpack/plugin",
+      "options": {
+        "buildTargetName": "webpack:build",
+        "serveTargetName": "serve",
+        "previewTargetName": "webpack:preview",
+        "buildDepsTargetName": "build-deps",
+        "watchDepsTargetName": "watch-deps",
+        "serveStaticTargetName": "serve-static"
+      }
+    },
+    {
+      "plugin": "@nx/jest/plugin",
+      "options": {
+        "targetName": "jest:test"
+      }
+    },
+    {
+      "plugin": "@nx/cypress/plugin",
+      "options": {
+        "targetName": "e2e",
+        "openTargetName": "open-cypress",
+        "componentTestingTargetName": "component-test",
+        "ciTargetName": "e2e-ci"
+      }
+    },
+    {
+      "plugin": "@nx/docker",
+      "options": {
+        "buildTarget": {
+          "name": "docker:build"
+        },
+        "runTarget": {
+          "name": "docker:run"
+        }
+      }
+    }
+  ],
+  "nxCloudId": "69272c354a53206cfdd10626"
+}

@@ -54,3 +54,8 @@ docker/ssl/*.pem
 /generated/prisma
 
 cypress/screenshots/
+
+
+
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md
