@@ -12,6 +12,10 @@ npm-debug.log*
 # Docker temporary files
 *.dockerignore
 
+# Nx files
+.nx/cache
+.nx/workspace-data
+
 # Operating system files
 .DS_Store
 Thumbs.db
