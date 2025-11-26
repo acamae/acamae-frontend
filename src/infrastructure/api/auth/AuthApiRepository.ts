@@ -443,7 +443,7 @@ export class AuthApiRepository implements IAuthRepository {
 
   async verifyEmail(payload: VerifyEmailPayload): ApiPromise<User> {
     try {
-      const response = await api.get(getAuthVerifyEmailUrl(payload.token));
+      const response = await api.post(getAuthVerifyEmailUrl(payload.token));
       return handleApiSuccess({ response });
     } catch (error) {
       return handleApiError(error as AxiosError);
